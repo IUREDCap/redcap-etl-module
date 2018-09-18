@@ -1,0 +1,35 @@
+{
+   "name": "REDCap-ETL Module",
+   "namespace": "IU\\RedCapEtlModule", 
+   "description": "REDCap-ETL module for extracting REDCap data and storing it in a database.",
+   "authors": [
+       {
+           "name": "Jim Mullen",
+           "email": "mullen2@iu.edu",
+           "institution": "Indiana University"
+       }
+   ],
+   "links": {
+       "control-center": [
+           {
+               "name": "REDCap-ETL",
+               "icon": "table_gear",
+               "url": "admin.php"
+           }
+       ],
+       "project": [
+           {
+               "name": "REDCap-ETL",
+               "icon": "database_table",
+               "url": "index.php"
+           }
+       ]
+    },
+    "project-settings": [
+        {
+            "key": "user-data",
+            "name": "User data field.",
+            "type": "json"
+        }
+    ]
+}
