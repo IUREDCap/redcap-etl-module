@@ -1,20 +1,24 @@
 <?php
 
+require_once __DIR__.'/AdminConfig.php';
 require_once __DIR__.'/Configuration.php';
 require_once __DIR__.'/redcap-etl/dependencies/autoload.php';
 
+use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Configuration;
 
 $error   = '';
 $success = '';
 
-$redCapEtlModule = new \IU\RedCapEtlModule\RedCapEtlModule();
+$module = new \IU\RedCapEtlModule\RedCapEtlModule();
+
+$adminConfig = $module->getAdminConfig();
 
 
-$configurationNames = $redCapEtlModule->getUserConfigurationNames();
+$configurationNames = $module->getUserConfigurationNames();
 
-$selfUrl   = $redCapEtlModule->getUrl(basename(__FILE__));
-$listUrl = $redCapEtlModule->getUrl("index.php");
+$selfUrl   = $module->getUrl(basename(__FILE__));
+$listUrl = $module->getUrl("index.php");
 
 $configName = $_POST['configName'];
 if (empty($configName)) {
@@ -22,7 +26,7 @@ if (empty($configName)) {
 }
 
 if (!empty($configName)) {
-    $configuration = $redCapEtlModule->getConfiguration($configName);
+    $configuration = $module->getConfiguration($configName);
 }
 
 #-------------------------
@@ -45,6 +49,7 @@ if (strcasecmp($submit, 'Run') === 0) {
             $redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
             $redCapEtl->run();
             $success = 'Run completed.';
+            \REDCap::logEvent('Run REDCap-ETL configuration '.$configName.'.');
         } catch (Exception $exception) {
             $error = 'ERROR: '.$exception->getMessage();
         }
@@ -57,7 +62,13 @@ if (strcasecmp($submit, 'Run') === 0) {
 #--------------------------------------------
 # Include REDCap's project page header
 #--------------------------------------------
-include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
+ob_start();
+include APP_PATH_DOCROOT . 'ProjectGeneral/header.php'; 
+$buffer = ob_get_clean();
+$cssFile = $module->getUrl('resources/redcap-etl.css');
+$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+echo $buffer;
 ?>
 
 <div class="projhdr"> <!--h4 style="color:#800000;margin:0 0 10px;"> -->
@@ -65,7 +76,7 @@ include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 </div>
 
 
-<?php $redCapEtlModule->renderUserTabs($selfUrl); ?>
+<?php $module->renderUserTabs($selfUrl); ?>
 
 <?php
 #----------------------------
@@ -87,13 +98,15 @@ if (!empty($success)) { ?>
 <?php } ?>
 
 <?php
+#---------------------------------------
 # Configuration selection form
+#---------------------------------------
 ?>
 <form action="<?php echo $selfUrl;?>" method="post" style="padding: 4px; margin-bottom: 0px; border: 1px solid #ccc; background-color: #ccc;">
     <span style="font-weight: bold;">Configuration:</span>
     <select name="configName" onchange="this.form.submit()">
     <?php
-    $values = $redCapEtlModule->getUserConfigurationNames();
+    $values = $module->getUserConfigurationNames();
     array_unshift($values, '');
     foreach ($values as $value) {
         if (strcmp($value, $configName) === 0) {
@@ -108,15 +121,90 @@ if (!empty($success)) { ?>
 
 <br />
 
-<!-- Configuration form -->
+<!-- Run form -->
 <form action="<?php echo $selfUrl;?>" method="post">
+  <fieldset style="border: 2px solid #ccc; border-radius: 7px; padding: 7px;">
+  <legend style="font-weight: bold;">Run Now</legend>
   <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
   <input type="hidden" name="<?php echo Configuration::CONFIG_API_TOKEN; ?>"
          value="<?php echo $properties[Configuration::CONFIG_API_TOKEN]; ?>" />
   <input type="hidden" name="<?php echo Configuration::TRANSFORM_RULES_SOURCE; ?>"
          value="<?php echo $properties[Configuration::TRANSFORM_RULES_SOURCE]; ?>" />
   <input type="submit" name="submit" value="Run" />
+  </fieldset>
 </form>
+
+<?php
+if ($adminConfig->getAllowCron()) {
+?>
+<form style="margin-top: 14px;">
+  <fieldset style="border: 2px solid #ccc; border-radius: 7px; padding: 7px;">
+  <legend style="font-weight: bold;">Schedule Automated Repeating Run</legend>
+  <?php
+  #-----------------------------------------------
+  # Daily cron jobs allowed
+  #-----------------------------------------------
+  if ($adminConfig->getAllowDailyCron()) {
+      $daily = true;
+  ?>
+    <p>Maximum frequency: daily</p>
+  <?php
+  #-----------------------------------------------
+  # Weekly cron jobs allowed
+  #-----------------------------------------------
+  } else {
+      $daily = false;
+  ?>
+    <p>Maximum frequency: weekly</p>
+  <?php
+  }
+  ?>
+
+  <table class="cron-schedule">
+    <thead>
+      <tr>
+        <th>&nbsp;</th>
+        <?php
+        foreach (AdminConfig::DAY_LABELS as $key => $label) {
+            echo "<th class=\"day\">{$label}</th>\n";
+        }
+        ?>
+      </tr>
+    </thead>
+    <tbody>
+      <?php
+      $row = 1;
+      foreach ($adminConfig->getTimes() as $time) {
+          if ($row % 2 === 0) {
+              echo '<tr class="even-row">';
+          } else {
+              echo '<tr>';
+          }
+          echo "<td>".($adminConfig->getTimeLabel($time))."</td>";
+          foreach (AdminConfig::DAY_LABELS as $day => $label) {
+              if ($daily) {
+                  $radioName = $label;
+              } else {
+                  $radioName = 'week';
+              }
+
+              if ($adminConfig->isAllowedCronTime($day, $time)) {
+                  echo '<td class="day" ><input type="radio" name="'.$radioName.'"></td>'."\n";
+              } else {
+                  echo "<td class=\"day cron-not-allowed\">&nbsp;</td>";
+              }
+          }
+          echo "</tr>\n";
+          $row++;
+      }
+      ?>
+    </tbody>
+  </table>
+  </fieldset>
+</form>
+<?php
+}
+?>
 
 <?php include APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
 

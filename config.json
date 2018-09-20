@@ -9,6 +9,15 @@
            "institution": "Indiana University"
        }
    ],
+   "crons": [
+       {
+           "cron_name": "redcap_etl",
+           "cron_description": "Cron that runs every 15 minutes check for jobs to run",
+           "method": "cron",
+           "cron_frequency": "900",
+           "cron_max_run_time": "300"
+        }
+    ],
    "links": {
        "control-center": [
            {
@@ -25,11 +34,11 @@
            }
        ]
     },
-    "project-settings": [
+    "system-settings": [
         {
-            "key": "user-data",
-            "name": "User data field.",
-            "type": "json"
+            "key": "admin-config",
+            "name": "Admin configuration data.",
+            "type": "string"
         }
     ]
 }

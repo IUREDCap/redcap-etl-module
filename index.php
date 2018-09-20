@@ -3,9 +3,9 @@
 require_once __DIR__.'/Configuration.php'; 
 
 
-$redCapEtl = new \IU\RedCapEtlModule\RedCapEtlModule();
+$redCapEtlModule = new \IU\RedCapEtlModule\RedCapEtlModule();
 
-#$header = $redCapEtl->getProjectHeader();
+#$header = $redCapEtlModule->getProjectHeader();
 
 #echo $header;
 
@@ -33,15 +33,15 @@ echo $buffer;
 <?php
 
 
-$configurationNames = $redCapEtl->getUserConfigurationNames();
+$configurationNames = $redCapEtlModule->getUserConfigurationNames();
 
-$selfUrl   = $redCapEtl->getUrl(basename(__FILE__));
-$configUrl = $redCapEtl->getUrl("configure.php");
-$runUrl    = $redCapEtl->getUrl("run.php");
+$selfUrl   = $redCapEtlModule->getUrl(basename(__FILE__));
+$configUrl = $redCapEtlModule->getUrl("configure.php");
+$runUrl    = $redCapEtlModule->getUrl("run.php");
 
 ?>
 
-<?php $redCapEtl->renderUserTabs($selfUrl); ?>
+<?php $redCapEtlModule->renderUserTabs($selfUrl); ?>
 
 <table class="dataTable">
 <thead>

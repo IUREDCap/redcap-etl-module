@@ -1,11 +1,25 @@
 <?php
-// Set the namespace defined in your config file
+
 namespace IU\RedCapEtlModule;
 
-// Declare your module class, which must extend AbstractExternalModule 
 class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
-    // Your module methods, constants, etc. go here
 
+    const ADMIN_CONFIG_KEY = 'admin-config';
+
+
+    public function cron()
+    {
+    }
+
+    public function getVersionNumber()
+    {
+        $versionNumber = '';
+        $dirName = $this->getModuleDirectoryName();
+        if (preg_match('/.*_v(.*)/', $dirName, $matches) === 1) {
+            $versionNumber = $matches[1];
+        }
+        return $versionNumber;
+    }
 
     private function getUserInfo()
     {
@@ -22,6 +36,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         $key = $this->getUserKey();
         $userInfo = json_encode($userInfo);
         $this->setSystemSetting($key, $userInfo);
+    }
+
+    private function getUserInfos()
+    {
     }
 
     public function getUserConfigurationNames()
@@ -82,6 +100,16 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
             print_r($jsonConfiguration);
             $this->setSystemSetting($key, $jsonConfiguration);
         }
+
+        \REDCap::logEvent('Added REDCap-ETL configuration '.$name.'.');
+    }
+
+    public function getAdminConfig()
+    {
+        $adminConfig = new AdminConfig();
+        $setting = $this->getSystemSetting(self::ADMIN_CONFIG_KEY);
+        $adminConfig->fromJson($setting);
+        return $adminConfig;
     }
 
     public function getUserKey()
@@ -104,6 +132,17 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
 
     }
 
+
+    public function renderAdminTabs($activeUrl = '')
+    {
+        $adminUrl = $this->getUrl('admin.php');
+        $adminLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
+           .' Configure';
+
+
+        $tabs = array($adminUrl => $adminLabel);
+        $this->renderTabs($tabs, $activeUrl);
+    }
 
     public function renderUserTabs($activeUrl = '')
     {
