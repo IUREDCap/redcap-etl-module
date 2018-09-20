@@ -137,6 +137,38 @@ if (!empty($success)) { ?>
 <?php
 if ($adminConfig->getAllowCron()) {
 ?>
+
+<script type="text/javascript">
+// Change radio buttons so that a checked
+// radio button that is clicked will be
+// unchecked
+$(function () {
+    var val = -1;
+    var vals = {};
+    vals['Sunday'] = -1;
+    vals['Monday'] = -1;
+    vals['Tuesday'] = -1;
+    vals['Wednesday'] = -1;
+    vals['Thursday'] = -1;
+    vals['Friday'] = -1;
+    vals['Saturday'] = -1;
+    vals['Week'] = -1;
+
+    $('input:radio').click(function () {
+        name = $(this).attr('name');
+        //alert('value:' + $(this).val());
+        //alert('name:' + $(this).attr('name'));
+        if ($(this).val() == vals[name]) {
+            $(this).prop('checked',false);
+            vals[name] = -1;
+        } else {
+            $(this).prop('checked',true);
+            vals[name] = $(this).val();
+        }
+});
+});
+</script>
+
 <form style="margin-top: 14px;">
   <fieldset style="border: 2px solid #ccc; border-radius: 7px; padding: 7px;">
   <legend style="font-weight: bold;">Schedule Automated Repeating Run</legend>
@@ -172,6 +204,12 @@ if ($adminConfig->getAllowCron()) {
       </tr>
     </thead>
     <tbody>
+      <!--
+      <tr>
+        <td>&nbsp;</td>
+        <td style="text-align:center;"><button type="button" onclick="$('input[name=Sunday]').prop('checked', false);">Clear</button></td>
+      </tr>
+      -->
       <?php
       $row = 1;
       foreach ($adminConfig->getTimes() as $time) {
@@ -185,11 +223,11 @@ if ($adminConfig->getAllowCron()) {
               if ($daily) {
                   $radioName = $label;
               } else {
-                  $radioName = 'week';
+                  $radioName = 'Week';
               }
 
               if ($adminConfig->isAllowedCronTime($day, $time)) {
-                  echo '<td class="day" ><input type="radio" name="'.$radioName.'"></td>'."\n";
+                  echo '<td class="day" ><input type="radio" name="'.$radioName.'" value="'.$time.'"></td>'."\n";
               } else {
                   echo "<td class=\"day cron-not-allowed\">&nbsp;</td>";
               }
