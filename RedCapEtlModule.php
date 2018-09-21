@@ -111,6 +111,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         $adminConfig->fromJson($setting);
         return $adminConfig;
     }
+    
+    public function setAdminConfig($adminConfig)
+    {
+        $json = $adminConfig->toJson();
+        $this->setSystemSetting(self::ADMIN_CONFIG_KEY, $json);
+    }
 
     public function getUserKey()
     {
