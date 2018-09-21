@@ -222,14 +222,17 @@ $(function () {
           foreach (AdminConfig::DAY_LABELS as $day => $label) {
               if ($daily) {
                   $radioName = $label;
+                  $value = $time;
               } else {
+                  $value = ($day * 100) + $time;
                   $radioName = 'Week';
               }
 
               if ($adminConfig->isAllowedCronTime($day, $time)) {
-                  echo '<td class="day" ><input type="radio" name="'.$radioName.'" value="'.$time.'"></td>'."\n";
+                  echo '<td class="day" ><input type="radio" name="'.$radioName.'" value="'.$value.'"></td>'."\n";
               } else {
-                  echo "<td class=\"day cron-not-allowed\">&nbsp;</td>";
+                  echo '<td class="day" ><input type="radio" name="'.$radioName.'" value="'.$value.'" disabled></td>'."\n";
+                  #echo '<td class="day cron-not-allowed"><span style="color: red;" class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span></td>'."\n";
               }
           }
           echo "</tr>\n";

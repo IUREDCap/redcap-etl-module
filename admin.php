@@ -1,5 +1,7 @@
 <?php
 
+if (!SUPER_USER) exit("Only super users can access this page!");
+
 require_once __DIR__.'/AdminConfig.php';
 
 use IU\RedCapEtlModule\AdminConfig;

@@ -139,8 +139,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         $adminLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
            .' Configure';
 
+        $manageUsersUrl = $this->getUrl('users.php');
+        #$manageUsersLabel = '<span>Manage Users</span>';
+        #$manageUsersLabel = '<span><img aria-hidden="true" src="/redcap/redcap_v8.5.11/Resources/images/users3.png">'
+        $manageUsersLabel = '<span class="glyphicon glyphicon-user" aria-hidden="true"></span>'
+           .' Manage Users</span>';
 
-        $tabs = array($adminUrl => $adminLabel);
+
+        $tabs = array($adminUrl => $adminLabel, $manageUsersUrl => $manageUsersLabel);
         $this->renderTabs($tabs, $activeUrl);
     }
 
@@ -191,4 +197,5 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
 		echo '</div>'."\n";
 		echo '<div class="clear"></div>'."\n";
 	}
+
 }

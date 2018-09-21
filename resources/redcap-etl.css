@@ -34,7 +34,12 @@ table.cron-schedule td.cron-not-allowed {
 }
 
 table.cron-schedule input[type="radio"] {
-    height: 50%;
-    width: 50%;
-    font-size: 50%;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+    /* margin: 0;
+    padding: 0;
+    height: 6px;
+    width: 6px;
+    */
 }
