@@ -145,7 +145,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         $manageUsersLabel = '<span class="glyphicon glyphicon-user" aria-hidden="true"></span>'
            .' Manage Users</span>';
 
-
         $tabs = array($adminUrl => $adminLabel, $manageUsersUrl => $manageUsersLabel);
         $this->renderTabs($tabs, $activeUrl);
     }
