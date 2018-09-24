@@ -2,9 +2,12 @@
 
 namespace IU\RedCapEtlModule;
 
+include_once __DIR__.'/UserList.php';
+
 class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
 
     const ADMIN_CONFIG_KEY = 'admin-config';
+    const USER_LIST_KEY    = 'user-list';
 
 
     public function cron()
@@ -20,6 +23,26 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         }
         return $versionNumber;
     }
+
+    public function getUsers()
+    {
+        $userList = new UserList();
+        $json = $this->getSystemSetting(self::USER_LIST_KEY, true);
+        $userList->fromJson($json);
+        $users = $userList->getUsers();
+        return $users;
+    }
+
+    public function addUser($username)
+    {
+        $userList = new UserList();
+        $json = $this->getSystemSetting(self::USER_LIST_KEY, true);
+        $userList->fromJson($json);
+        $userList->addUser($username);
+        $json = $userList->toJson();
+        $this->setSystemSetting(self::USER_LIST_KEY, $json);
+    }
+
 
     private function getUserInfo()
     {
@@ -97,7 +120,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         if (!isset($configuration)) {
             $configuration = new Configuration($name);
             $jsonConfiguration = json_encode($configuration);
-            print_r($jsonConfiguration);
             $this->setSystemSetting($key, $jsonConfiguration);
         }
 

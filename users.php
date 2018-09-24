@@ -16,15 +16,27 @@ $adminConfigJson = $module->getSystemSetting(AdminConfig::KEY);
 $adminConfig = new AdminConfig();
 
 
+$submit = $_POST['submit'];
+
 $username = $_POST['username-result'];
 if (!empty($username)) {
-    $db = new RedCapDb();
-    $userInfo = $db->getUserInfo($username);
+    if (strcasecmp($submit, 'Add User') === 0) {
+        $module->addUser($username);
+    }
+#    $db = new RedCapDb();
+#    $userInfo = $db->getUserInfo($username);
 }
 
 ?>
 
 <?php include APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>
+
+<?php
+#print "SUBMIT = {$submit} <br/> \n";
+$users = $module->getUsers();
+#print "Users: <pre><br />\n"; print_r($users); print "</pre> <br/> \n";
+?>
+
 
 <h4><img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>table_gear.png">REDCap-ETL Admin</h4>
 
@@ -35,7 +47,8 @@ if (!empty($username)) {
 <?php # print "<pre>"; print_r($userInfo); print "</pre>"; ?>
 
 <form action="<?php echo $selfUrl;?>" method="post">
-User: <input type="text" id="user-search" name="user-search" size="40"> <input type="submit" value="Add User"><br />
+User: <input type="text" id="user-search" name="user-search" size="48">
+<input type="submit" name="submit" value="Add User"><br />
 <input type="hidden" name="username-result" id="username-result">
 </form>
     <!--
@@ -64,5 +77,20 @@ $(function() {
     };
 });
 </script>
+
+
+<h5 style="margin-top: 2em;">REDCap-ETL Users</h5>
+<table class="dataTable">
+  <thead>
+    <tr> <th>username</th> </tr>
+  </thead>
+  <tbody>
+    <?php
+    foreach ($users as $user) {
+      echo "<tr><td>{$user}</td></tr>\n";
+    }
+    ?>
+  </tbody>
+</table>
 
 <?php include APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>

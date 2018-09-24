@@ -4,6 +4,7 @@ require_once __DIR__.'/Configuration.php';
 
 
 $redCapEtlModule = new \IU\RedCapEtlModule\RedCapEtlModule();
+$config = $redCapEtlModule->getConfig();
 
 #$header = $redCapEtlModule->getProjectHeader();
 
@@ -42,6 +43,19 @@ $runUrl    = $redCapEtlModule->getUrl("run.php");
 ?>
 
 <?php $redCapEtlModule->renderUserTabs($selfUrl); ?>
+
+<?php
+/*
+print  "<p>
+       {$lang['info_11']}
+       <a style='text-decoration:underline;' href='".
+       (trim($homepage_contact_url) == '' ? "mailto:$homepage_contact_email" : trim($homepage_contact_url)) .
+       "'>$homepage_contact</a>{$lang['period']}
+       </p>";
+ */
+?>
+
+<?php # Get all config file values: #print "<pre>\n"; print_r($config); print "</pre>\n"; ?>
 
 <table class="dataTable">
 <thead>

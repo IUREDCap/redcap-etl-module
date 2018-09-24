@@ -171,7 +171,6 @@ class AdminConfig implements \JsonSerializable
         if (!empty($json)) {
             $object = json_decode($json);
             foreach (get_object_vars($this) as $var => $value) {
-                print "VAR: {$var}\n";
                 $this->$var = $object->$var;
             }
         }
