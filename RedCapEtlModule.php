@@ -7,6 +7,7 @@ include_once __DIR__.'/UserList.php';
 class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
 
     const ADMIN_CONFIG_KEY = 'admin-config';
+    const SERVERS_KEY      = 'servers';
     const USER_LIST_KEY    = 'user-list';
 
 
@@ -41,6 +42,25 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         $userList->addUser($username);
         $json = $userList->toJson();
         $this->setSystemSetting(self::USER_LIST_KEY, $json);
+    }
+
+    public function getServers()
+    {
+        $servers = new Servers();
+        $json = $this->getSystemSetting(self::SERVERS_KEY, true);
+        $servers->fromJson($json);
+        $servers = $servers->getServers();
+        return $servers;
+    }
+
+    public function addServer($serverName)
+    {
+        $servers = new Servers();
+        $json = $this->getSystemSetting(self::SERVERS_KEY, true);
+        $servers->fromJson($json);
+        $servers->addServer($serverName);
+        $json = $servers->toJson();
+        $this->setSystemSetting(self::SERVERS_KEY, $json);
     }
 
 
@@ -173,7 +193,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         $manageUsersLabel = '<span class="glyphicon glyphicon-user" aria-hidden="true"></span>'
            .' Manage Users</span>';
 
-        $tabs = array($adminUrl => $adminLabel, $manageUsersUrl => $manageUsersLabel);
+        $serversUrl = $this->getUrl('servers.php');
+        $serversLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
+           .' ETL Servers';
+
+        $tabs = array($adminUrl => $adminLabel, $manageUsersUrl => $manageUsersLabel
+            , $serversUrl => $serversLabel);
         $this->renderTabs($tabs, $activeUrl);
     }
 
