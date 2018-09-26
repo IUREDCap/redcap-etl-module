@@ -10,7 +10,7 @@ use IU\RedCapEtlModule\RedCapDb;
 
 $module = new \IU\RedCapEtlModule\RedCapEtlModule();
 $selfUrl = $module->getUrl(basename(__FILE__));
-$configureUrl = $module->getUrl('server_config.php');
+$configureUrl = $module->getUrl('server_configure.php');
 
 $submit = $_POST['submit'];
 
@@ -54,52 +54,46 @@ $servers = $module->getServers();
 <?php # echo "username-result: ".$_POST['username-result']."<br/>\n"; ?>
 <?php # print "<pre>"; print_r($userInfo); print "</pre>"; ?>
 
-<form action="<?php echo $selfUrl;?>" method="post">
-Server: <input type="text" id="server-name" name="server-name" size="48">
-<input type="submit" name="submit" value="Add Server"><br />
+<h5 style="margin-top: 2em;">REDCap-ETL Server Configuration</h5>
+
+
+<form action=<?php echo $selfUrl;?> method="post">
+  <table>
+    <tr>
+      <td>Server address:</td>
+      <td><input type="text" name="serverAddress" size="60" style="margin: 4px;"></td>
+    </tr>
+    <tr>
+      <td style="padding-top: 4px; padding-bottom: 4px; vertical-align: top;">Authentication method:</td>
+      <td style="padding: 4px;">
+        <input type="radio" name="authMethod" value="ssh-key" style="vertical-align: middle; margin: 0;">
+        <span style="vertical-align: top; margin-right: 8px;">SSH Key</span>
+        <input type="radio" name="authMethod" value="password" style="vertical-align: middle; margin: 0;">
+        <span style="vertical-align: top; margin-right: 8px;">Password</span>
+      </td>
+    </tr>
+    <tr>
+      <td>Username:</td>
+      <td><input type="text" name="serverUsername" size="28" style="margin: 4px;"></td>
+    </tr>
+    <tr>
+      <td>SSH private key file:</td>
+      <td><input type="text" name="sshKeyFile" size="28" style="margin: 4px;"></td>
+    </tr>
+    <tr>
+      <td>Password:</td>
+      <td><input type="text" name="password" size="28" style="margin: 4px;"></td>
+    </tr>
+    <tr>
+      <td>Configuration directory:</td>
+      <td><input type="text" name="configDir" size="60" style="margin: 4px;"></td>
+    </tr>
+    <tr>
+      <td>ETL command:</td>
+      <td><input type="text" name="etlCommand" size="60" style="margin: 4px;"></td>
+    </tr>
+  </table>
+  <input type="submit" name="submit" value="Save">
 </form>
-    <!--
-<div class="ui-widget">
-  <label for="user">User: </label>
-  <input type="text" id="user-search" size="40">
-</div>
--->
-
-
-
-<form action="<?php echo $selfUrl;?>" method="post" style="margin-top: 14px;">
-  <div style="vertical-align: bottom;">
-    <input type="checkbox">
-    Allow embedded REDCap-ETL server
-  </div>
-</form>
-
-<h5 style="margin-top: 2em;">REDCap-ETL Servers</h5>
-
-<table class="dataTable">
-  <thead>
-    <tr> <th>Server Name</th> <th>Configure</th> </tr>
-  </thead>
-  <tbody>
-    <?php
-    $row = 1;
-    foreach ($servers as $server) {
-      if ($row % 2 == 0) {
-          echo "<tr class=\"even\">\n";
-      } else {
-          echo "<tr class=\"odd\">\n";
-      }
-      print "<td>{$server}</td>\n";
-
-      print '<td style="text-align:center;">'
-          .'<a href="'.$configureUrl.'"><img src='.APP_PATH_IMAGES.'gear.png></a>'
-          ."</td>\n";
-
-      print "</tr>\n";
-      $row++;
-    }
-    ?>
-  </tbody>
-</table>
 
 <?php include APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>

@@ -197,8 +197,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         $serversLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
            .' ETL Servers';
 
+        $serverConfigUrl = $this->getUrl('server_config.php');
+        $serverConfigLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
+           .' ETL Server Config';
+
         $tabs = array($adminUrl => $adminLabel, $manageUsersUrl => $manageUsersLabel
-            , $serversUrl => $serversLabel);
+            , $serversUrl => $serversLabel
+            , $serverConfigUrl => $serverConfigLabel
+        );
         $this->renderTabs($tabs, $activeUrl);
     }
 
