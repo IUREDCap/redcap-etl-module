@@ -5,6 +5,9 @@ namespace IU\RedCapEtlModule;
 
 class ServerConfig implements \JsonSerializable
 {
+    const AUTH_METHOD_SSH_KEY  = 0;
+    const AUTH_METHOD_PASSWORD = 1;
+    
     private $name;
     private $serverAddress; # address of REDCap-ETL server
     private $authMethod;
@@ -17,6 +20,8 @@ class ServerConfig implements \JsonSerializable
     public function __construct($name)
     {
         $this->name = $name;
+        
+        $this->authMethod = self::AUTH_METHOD_SSH_KEY;
     }
 
     public function set($properties)
@@ -59,5 +64,35 @@ class ServerConfig implements \JsonSerializable
     public function getServerAddress()
     {
         return $this->serverAddress;
+    }
+        
+    public function getAuthMethod()
+    {
+        return $this->authMethod;
+    }
+    
+    public function getUsername()
+    {
+        return $this->username;
+    }
+    
+    public function getPassword()
+    {
+        return $this->password;
+    }
+        
+    public function getSshKeyFile()
+    {
+        return $this->sshKeyFile;
+    }
+    
+    public function getConfigDir()
+    {
+        return $this->configDir;
+    }
+        
+    public function getEtlCommand()
+    {
+        return $this->etlCommand;
     }
 }

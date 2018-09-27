@@ -105,15 +105,14 @@ if (!empty($error)) { ?>
     </select>
 </form>
 
-<?php # echo "user-search: ".$_POST['user-search']."<br/>\n"; ?>
-<?php # echo "username-result: ".$_POST['username-result']."<br/>\n"; ?>
-<?php # print "<pre>"; print_r($userInfo); print "</pre>"; ?>
 
 <?php
 #----------------------------------------------------
 # Server configuration form
 #----------------------------------------------------
 if (!empty($serverName)) {
+    $authMethod = $serverConfig->getAuthMethod();
+    print "authMethod: {$authMethod}<br />\n";
 ?>
 <form action=<?php echo $selfUrl;?> method="post">
   <input type="hidden" name="serverName" value="<?php echo $serverConfig->getName();?>">
@@ -126,31 +125,45 @@ if (!empty($serverName)) {
     <tr>
       <td style="padding-top: 4px; padding-bottom: 4px; vertical-align: top;">Authentication method:</td>
       <td style="padding: 4px;">
-        <input type="radio" name="authMethod" value="ssh-key" style="vertical-align: middle; margin: 0;">
+        <input type="radio" name="authMethod" value="<?php echo ServerConfig::AUTH_METHOD_SSH_KEY;?>"
+            <?php if ($authMethod == ServerConfig::AUTH_METHOD_SSH_KEY) echo ' checked '; ?>
+            style="vertical-align: middle; margin: 0;">
         <span style="vertical-align: top; margin-right: 8px;">SSH Key</span>
-        <input type="radio" name="authMethod" value="password" style="vertical-align: middle; margin: 0;">
+        <input type="radio" name="authMethod" value="<?php echo ServerConfig::AUTH_METHOD_PASSWORD;?>"
+            <?php if ($authMethod == ServerConfig::AUTH_METHOD_PASSWORD) echo ' checked '; ?>
+            style="vertical-align: middle; margin: 0;">
         <span style="vertical-align: top; margin-right: 8px;">Password</span>
       </td>
     </tr>
     <tr>
       <td>Username:</td>
-      <td><input type="text" name="serverUsername" size="28" style="margin: 4px;"></td>
+      <td><input type="text" name="username" value="<?php echo $serverConfig->getUsername();?>"
+                 size="28" style="margin: 4px;"></td>
     </tr>
-    <tr>
-      <td>SSH private key file:</td>
-      <td><input type="text" name="sshKeyFile" size="28" style="margin: 4px;"></td>
-    </tr>
-    <tr>
+    <tr id="passwordRow">
       <td>Password:</td>
-      <td><input type="text" name="password" size="28" style="margin: 4px;"></td>
+      <td><input type="text" name="password" value="<?php echo $serverConfig->getPassword();?>"
+                 size="28" style="margin: 4px;"></td>
     </tr>
+    <tr id="sshKeyFileRow">
+      <td>SSH key file:</td>
+      <td><input type="text" name="sshKeyFile" value="<?php echo $serverConfig->getSshKeyFile();?>"
+                 size="44" style="margin: 4px;"></td>
+    </tr>
+
+    <tr>
+      <td>&nbsp;</td><td>&nbsp</td>
+    </tr>
+    
     <tr>
       <td>Configuration directory:</td>
-      <td><input type="text" name="configDir" size="60" style="margin: 4px;"></td>
+      <td><input type="text" name="configDir" value="<?php echo $serverConfig->getConfigDir();?>"
+                 size="60" style="margin: 4px;"></td>
     </tr>
     <tr>
       <td>ETL command:</td>
-      <td><input type="text" name="etlCommand" size="60" style="margin: 4px;"></td>
+      <td><input type="text" name="etlCommand" value="<?php echo $serverConfig->getEtlCommand();?>"
+                 size="60" style="margin: 4px;"></td>
     </tr>
   </table>
   <div style="margin-top: 20px;">

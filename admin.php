@@ -36,14 +36,18 @@ echo $buffer;
 <?php $module->renderAdminTabs($selfUrl); ?>
 
 <form>
+
+  <input type="checkbox"> Allow embedded REDCap-ETL server
+  <br />
+    
   <?php
   $checked = '';
   if ($adminConfig->getAllowCron()) {;
       $checked = 'checked';
   }
   ?>
-
-  Allow ETL cron jobs? <input type="checkbox" name="allowCron" <?php echo $checked;?>> <br />
+  <input type="checkbox" name="allowCron" <?php echo $checked;?>>
+  Allow ETL cron jobs? <br />
 
   <p>Allowed ETL cron job times</p>
   <table class="cron-schedule">

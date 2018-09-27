@@ -28,6 +28,11 @@ class Servers implements \JsonSerializable
     {
         $this->servers[$serverName] = 1;
     }
+    
+    public function removeServer($serverName)
+    {
+        unset($this->servers[$serverName]);
+    }
 
 
     public function fromJson($json)

@@ -68,6 +68,18 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         $json = $servers->toJson();
         $this->setSystemSetting(self::SERVERS_KEY, $json);
     }
+    
+    public function removeServer($serverName)
+    {
+        $this->removeServerConfig($serverName);
+        
+        $servers = new Servers();
+        $json = $this->getSystemSetting(self::SERVERS_KEY, true);
+        $servers->fromJson($json);
+        $servers->removeServer($serverName);
+        $json = $servers->toJson();
+        $this->setSystemSetting(self::SERVERS_KEY, $json);
+    }
 
 
     private function getUserInfo()
@@ -180,6 +192,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         $json = $serverConfig->toJson();
         $key = self::SERVER_CONFIG_KEY_PREFIX . $serverConfig->getName();
         $this->setSystemSetting($key, $json);
+    }
+    
+    public function removeServerConfig($serverName)
+    {
+        $key = self::SERVER_CONFIG_KEY_PREFIX . $serverName;
+        $result = $this->removeSystemSetting($key);
+        return $result;
     }
 
     public function getUserKey()

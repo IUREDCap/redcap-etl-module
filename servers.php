@@ -15,10 +15,16 @@ $configureUrl = $module->getUrl('server_config.php');
 $submit = $_POST['submit'];
 
 $serverName = $_POST['server-name'];
+
 if (!empty($serverName)) {
     if (strcasecmp($submit, 'Add Server') === 0) {
         $module->addServer($serverName);
     }
+}
+
+$delete = $_POST['delete'];
+if (!empty($delete)) {
+    $module->removeServer($delete);
 }
 
 ?>
@@ -42,6 +48,7 @@ echo $buffer;
 #print "SUBMIT = {$submit} <br/> \n";
 #print "serverName: = {$serverName} <br/> \n";
 $servers = $module->getServers();
+print "delete: ".$_POST['delete']."<br />\n";
 #print "Servers: <pre><br />\n"; print_r($servers); print "</pre> <br/> \n";
 ?>
 
@@ -65,20 +72,9 @@ Server: <input type="text" id="server-name" name="server-name" size="48">
 </div>
 -->
 
-
-
-<form action="<?php echo $selfUrl;?>" method="post" style="margin-top: 14px;">
-  <div style="vertical-align: bottom;">
-    <input type="checkbox">
-    Allow embedded REDCap-ETL server
-  </div>
-</form>
-
-<h5 style="margin-top: 2em;">REDCap-ETL Servers</h5>
-
 <table class="dataTable">
   <thead>
-    <tr> <th>Server Name</th> <th>Configure</th> </tr>
+    <tr> <th>Server Name</th> <th>Configure</th> <th>Delete</th> </th></tr>
   </thead>
   <tbody>
     <?php
@@ -96,7 +92,14 @@ Server: <input type="text" id="server-name" name="server-name" size="48">
       print '<td style="text-align:center;">'
           .'<a href="'.$serverConfigureUrl.'"><img src='.APP_PATH_IMAGES.'gear.png></a>'
           ."</td>\n";
-
+          
+      print '<td style="text-align:center;">';
+      print '<form action="'.$selfUrl.'" method="post">'
+            .'<input type="hidden" name="delete" value="'.$server.'">'
+            .'<img src='.APP_PATH_IMAGES.'delete.png onclick="$(this).closest(\'form\').submit();" style="cursor: pointer;">'
+            .'</form>';
+      print "</td>\n";
+      
       print "</tr>\n";
       $row++;
     }
