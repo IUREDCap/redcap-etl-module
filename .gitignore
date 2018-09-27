@@ -1,0 +1,22 @@
+#-------------------------------------------------
+# Files to be ignored by Git
+#-------------------------------------------------
+
+# Composer 3rd-party software
+/vendor
+
+# Composer PHP archive file
+composer.phar
+
+# ignore swap files
+*.swp
+
+# Eclipse project file and settings directory
+.project
+.settings/
+
+# Geany project files
+*.geany
+
+# ignore atom tags
+*.tags*
