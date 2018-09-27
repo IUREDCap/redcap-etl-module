@@ -2,6 +2,13 @@
 
 namespace IU\RedCapEtlModule;
 
+require_once __DIR__.'/dependencies/autoload.php';
+
+use phpseclib\Crypt\RSA;
+use phpseclib\Net\SCP;
+use phpseclib\Net\SFTP;
+use phpseclib\Net\SSH2;
+
 
 class ServerConfig implements \JsonSerializable
 {
@@ -56,6 +63,35 @@ class ServerConfig implements \JsonSerializable
         return $json;
     }
 
+    /**
+     * Run the ETL process for this server configuration.
+     */
+    public function run()
+    {
+        if (empty($this->serverAddress)) {
+            throw new \Exeption('No server address specified.');
+        }
+            
+        if ($this->authMethod == self::AUTH_METHOD_PASSWORD) {
+            $ssh = new SSH2($this->serverAddress);
+            $ssh->login($username, $this->password);
+        } elseif ($this->authMethod == self::AUTH_METHOD_SSH_KEY) {
+            $keyFile = $this->getSshKeyFile();
+            $key = new RSA();
+            $key->setPassword('');
+            $keyFileContents = file_get_contents($keyFile);
+            if ($keyFileContents === false) {
+                throw new \Exception('SSH key file "'.$keyFile.'" could not be accessed.');
+            }
+            $key->loadKey($keyFileContents);
+            $ssh = new SSH2($this->serverAddress);
+            $ssh->login($this->username, $key);
+        } else {
+            throw new \Exception('Unrecognized authentication method: '
+                .$this->authMethod);
+        }
+    }
+    
     public function getName()
     {
         return $this->name;

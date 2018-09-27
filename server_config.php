@@ -2,7 +2,13 @@
 
 if (!SUPER_USER) exit("Only super users can access this page!");
 
+require_once __DIR__.'/dependencies/autoload.php';
 require_once __DIR__.'/ServerConfig.php';
+
+use phpseclib\Crypt\RSA;
+use phpseclib\Net\SCP;
+use phpseclib\Net\SFTP;
+use phpseclib\Net\SSH2;
 
 
 use IU\RedCapEtlModule\ServerConfig;
@@ -23,7 +29,9 @@ if (empty($serverName)) {
 if (!empty($serverName)) {
     $serverConfig = $module->getServerConfig($serverName);
 }
-    
+
+$testOutput = '';
+
 #------------------------------------
 # Router
 #------------------------------------
@@ -42,8 +50,44 @@ if (strcasecmp($submit, 'Save') === 0) {
     }
 } elseif (strcasecmp($submit, 'Cancel') === 0) {
     header('Location: '.$serversUrl);
-}
+} elseif (strcasecmp($submit, 'Test Server Connection') === 0) {
+    try {
+        if (!isset($serverConfig)) {
+            $testOutput = 'ERROR: no server configuration found.';
+        } else {
+            $serverAddress = $serverConfig->getServerAddress();
+            $username = $serverConfig->getUsername();
+            if ($serverConfig->getAuthMethod() == ServerConfig::AUTH_METHOD_SSH_KEY) {
+                $keyFile = $serverConfig->getSshKeyFile();
+                $key = new RSA();
+                $key->setPassword('');
+                $keyFileContents = file_get_contents($keyFile);
+                if ($keyFileContents === false) {
+                    throw new Exception('SSH key file could not be accessed.');
+                }
+                $key->loadKey($keyFileContents);
 
+                $ssh = new SSH2($serverAddress);
+                $ssh->login($username, $key);
+            } else {
+                $password = $serverConfig->getPassword();
+                
+                $ssh = new SSH2($serverAddress);
+                $ssh->login($username, $password);
+            }
+
+            $output = $ssh->exec('hostname');
+            if (!$output) {
+                $testOutput = "ERROR: ssh command failed.";
+            } else {
+                $testOutput = "SUCCESS:\noutput of hostname command:\n"
+                    .$output."\n";
+            }
+        }
+    } catch (Exception $exception) {
+        $testOutput = 'ERROR: '.$exception->getMessage();
+    }
+}
 ?>
 
 <?php #include APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>
@@ -62,7 +106,7 @@ echo $buffer;
 
 
 <?php
-#print "SUBMIT = {$submit} <br/> \n";
+print "SUBMIT = {$submit} <br/> \n";
 #print "serverName: = {$serverName} <br/> \n";
 #print "ServerConfig: <pre><br />\n"; print_r($serverConfig); print "</pre> <br/> \n";
 #print "POST: <pre><br />\n"; print_r($_POST); print "</pre> <br/> \n";
@@ -150,7 +194,7 @@ if (!empty($serverName)) {
       <td><input type="text" name="sshKeyFile" value="<?php echo $serverConfig->getSshKeyFile();?>"
                  size="44" style="margin: 4px;"></td>
     </tr>
-
+    
     <tr>
       <td>&nbsp;</td><td>&nbsp</td>
     </tr>
@@ -175,6 +219,10 @@ if (!empty($serverName)) {
     </div>
     <div style="clear: both;">
     </div>
+  </div>
+  <div style="margin-top: 4ex;">
+    <input type="submit" name="submit" value="Test Server Connection"> <br/>
+    <textarea id="testOutput" name="testOutput" rows="4" cols="40"><?php echo $testOutput;?>&nbsp;</textarea>
   </div>
 </form>
 <?php

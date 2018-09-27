@@ -78,6 +78,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         $servers->fromJson($json);
         $servers->removeServer($serverName);
         $json = $servers->toJson();
+        error_log('JSON: '.$json);
         $this->setSystemSetting(self::SERVERS_KEY, $json);
     }
 
