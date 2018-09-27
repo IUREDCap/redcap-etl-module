@@ -19,6 +19,17 @@ class ServerConfig implements \JsonSerializable
         $this->name = $name;
     }
 
+    public function set($properties)
+    {
+        # Add validation!!!!
+        
+        foreach (get_object_vars($this) as $var => $value) {
+            if (array_key_exists($var, $properties)) {
+                $this->$var = $properties[$var];
+            }
+        }
+    }
+    
     public function jsonSerialize()
     {
         return (object) get_object_vars($this);
@@ -43,5 +54,10 @@ class ServerConfig implements \JsonSerializable
     public function getName()
     {
         return $this->name;
+    }
+    
+    public function getServerAddress()
+    {
+        return $this->serverAddress;
     }
 }

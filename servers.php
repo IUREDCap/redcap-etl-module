@@ -84,6 +84,7 @@ Server: <input type="text" id="server-name" name="server-name" size="48">
     <?php
     $row = 1;
     foreach ($servers as $server) {
+        
       if ($row % 2 == 0) {
           echo "<tr class=\"even\">\n";
       } else {
@@ -91,8 +92,9 @@ Server: <input type="text" id="server-name" name="server-name" size="48">
       }
       print "<td>{$server}</td>\n";
 
+      $serverConfigureUrl = $configureUrl.'&serverName='.$server;
       print '<td style="text-align:center;">'
-          .'<a href="'.$configureUrl.'"><img src='.APP_PATH_IMAGES.'gear.png></a>'
+          .'<a href="'.$serverConfigureUrl.'"><img src='.APP_PATH_IMAGES.'gear.png></a>'
           ."</td>\n";
 
       print "</tr>\n";

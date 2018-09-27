@@ -3,12 +3,18 @@
 namespace IU\RedCapEtlModule;
 
 include_once __DIR__.'/UserList.php';
+include_once __DIR__.'/ServerConfig.php';
+include_once __DIR__.'/Servers.php';
 
+/**
+ * Main REDCap-ETL module class.
+ */
 class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
 
-    const ADMIN_CONFIG_KEY = 'admin-config';
-    const SERVERS_KEY      = 'servers';
-    const USER_LIST_KEY    = 'user-list';
+    const ADMIN_CONFIG_KEY         = 'admin-config';
+    const SERVER_CONFIG_KEY_PREFIX = 'server-config:';
+    const SERVERS_KEY              = 'servers';
+    const USER_LIST_KEY            = 'user-list';
 
 
     public function cron()
@@ -158,6 +164,22 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
     {
         $json = $adminConfig->toJson();
         $this->setSystemSetting(self::ADMIN_CONFIG_KEY, $json);
+    }
+
+    public function getServerConfig($serverName)
+    {
+        $serverConfig = new ServerConfig($serverName);
+        $key = self::SERVER_CONFIG_KEY_PREFIX . $serverName;
+        $setting = $this->getSystemSetting($key);
+        $serverConfig->fromJson($setting);
+        return $serverConfig;
+    }
+    
+    public function setServerConfig($serverConfig)
+    {
+        $json = $serverConfig->toJson();
+        $key = self::SERVER_CONFIG_KEY_PREFIX . $serverConfig->getName();
+        $this->setSystemSetting($key, $json);
     }
 
     public function getUserKey()
