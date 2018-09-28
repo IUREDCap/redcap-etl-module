@@ -22,6 +22,10 @@ class Configuration implements \JsonSerializable
     
     const BATCH_SIZE = 'batch_size';
 
+    const EMAIL_FROM_ADDRESS     = 'email_from_address';
+    const EMAIL_SUBJECT          = 'email_subject';
+    const EMAIL_TO_LIST          = 'email_to_list';
+
     private $name;
     private $properties;
 
@@ -140,7 +144,8 @@ class Configuration implements \JsonSerializable
         $properties = $this->getRedCapEtlProperties();
         
         if (!empty($transformationRulesFile)) {
-            $properties[self::TRANSFORM_RULES_FILE] = $transformationRulesFile;
+            $properties[self::TRANSFORM_RULES_SOURCE] = 2;
+            $properties[self::TRANSFORM_RULES_FILE]   = $transformationRulesFile;
         }
         
         foreach ($properties as $property => $value) {

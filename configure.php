@@ -14,9 +14,18 @@ $userInfo = $redCapEtlModule->getUserInfo();
 $selfUrl  = $redCapEtlModule->getUrl("configure.php");
 
 
+#-------------------------------------------
+# Get the configuration name
+#-------------------------------------------
 $configName = $_POST['configName'];
 if (empty($configName)) {
     $configName = $_GET['configName'];
+    if (empty($configName)) {
+        $configName = $_SESSION['configName'];
+    }
+}
+if (!empty($configName)) {
+    $_SESSION['configName'] = $configName;
 }
 
 if (!empty($configName)) {
@@ -275,6 +284,22 @@ $(function() {
         <td>Batch size</td>
         <td><input type="text" name="<?php echo Configuration::BATCH_SIZE;?>"
                    value="<?php echo $properties[Configuration::BATCH_SIZE];?>"/></td>
+      </tr>
+
+      <tr>
+        <td>E-mail from address</td>
+        <td><input type="text" name="<?php echo Configuration::EMAIL_FROM_ADDRESS;?>" size="44"
+                   value="<?php echo $properties[Configuration::EMAIL_FROM_ADDRESS];?>"/></td>
+      </tr>
+      <tr>
+        <td>E-mail subject</td>
+        <td><input type="text" name="<?php echo Configuration::EMAIL_SUBJECT;?>" size="64"
+                   value="<?php echo $properties[Configuration::EMAIL_SUBJECT];?>"/></td>
+      </tr>
+      <tr>
+        <td>E-mail to list</td>
+        <td><input type="text" name="<?php echo Configuration::EMAIL_TO_LIST;?>" size="64"
+                   value="<?php echo $properties[Configuration::EMAIL_TO_LIST];?>"/></td>
       </tr>
 
       <tr>

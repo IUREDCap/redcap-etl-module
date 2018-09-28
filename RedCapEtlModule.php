@@ -16,7 +16,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
     const SERVERS_KEY              = 'servers';
     const USER_LIST_KEY            = 'user-list';
 
-
+    const CONFIG_SESSION_KEY = 'redcap-etl-config';
+    
     public function cron()
     {
     }

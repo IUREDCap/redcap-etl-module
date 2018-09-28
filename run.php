@@ -21,9 +21,18 @@ $configurationNames = $module->getUserConfigurationNames();
 $selfUrl   = $module->getUrl(basename(__FILE__));
 $listUrl = $module->getUrl("index.php");
 
+#-------------------------------------------
+# Get the configuration name
+#-------------------------------------------
 $configName = $_POST['configName'];
 if (empty($configName)) {
     $configName = $_GET['configName'];
+    if (empty($configName)) {
+        $configName = $_SESSION['configName'];
+    }
+}
+if (!empty($configName)) {
+    $_SESSION['configName'] = $configName;
 }
 
 if (!empty($configName)) {

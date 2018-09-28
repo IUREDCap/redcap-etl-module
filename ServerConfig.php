@@ -123,7 +123,7 @@ class ServerConfig implements \JsonSerializable
         }       
         
         #$ssh->setTimeout(1);
-        $command = $this->getEtlCommand() . ' ' . $configFilePath . ' ' . $rulesFilePath;
+        $command = $this->getEtlCommand() . ' ' . $configFileName . ' ' . $rulesFileName;
         $output = $ssh->exec($command);
         
         return $output;
