@@ -14,6 +14,7 @@ $module = new \IU\RedCapEtlModule\RedCapEtlModule();
 
 $adminConfig = $module->getAdminConfig();
 
+$servers = $module->getServers();
 
 $configurationNames = $module->getUserConfigurationNames();
 
@@ -37,6 +38,7 @@ if (array_key_exists('submit', $_POST)) {
     $submit = $_POST['submit'];
 }
 
+$runOutput = '';
 if (strcasecmp($submit, 'Run') === 0) {
     if (empty($configName)) {
         $error = 'ERROR: No ETL configuration specified.';
@@ -44,12 +46,18 @@ if (strcasecmp($submit, 'Run') === 0) {
         $error = 'ERROR: No ETL configuration found for '.$configName.'.';
     } else {
         try {
-            $logger = new \IU\REDCapETL\NullLogger('REDCap-ETL');
-            $properties = $configuration->getProperties();
-            $redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
-            $redCapEtl->run();
-            $success = 'Run completed.';
-            \REDCap::logEvent('Run REDCap-ETL configuration '.$configName.'.');
+            $server = $_POST['server'];
+            if (empty($server)) {
+                $logger = new \IU\REDCapETL\NullLogger('REDCap-ETL');
+                $properties = $configuration->getProperties();
+                $redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
+                $redCapEtl->run();
+                $success = 'Run completed.';
+                \REDCap::logEvent('Run REDCap-ETL configuration '.$configName.'.');
+            } else {
+                $serverConfig = $module->getServerConfig($server);
+                $runOutput = $serverConfig->run($configuration);
+            }
         } catch (Exception $exception) {
             $error = 'ERROR: '.$exception->getMessage();
         }
@@ -126,13 +134,24 @@ if (!empty($success)) { ?>
   <fieldset style="border: 2px solid #ccc; border-radius: 7px; padding: 7px;">
   <legend style="font-weight: bold;">Run Now</legend>
   <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
-  <input type="hidden" name="<?php echo Configuration::CONFIG_API_TOKEN; ?>"
-         value="<?php echo $properties[Configuration::CONFIG_API_TOKEN]; ?>" />
-  <input type="hidden" name="<?php echo Configuration::TRANSFORM_RULES_SOURCE; ?>"
-         value="<?php echo $properties[Configuration::TRANSFORM_RULES_SOURCE]; ?>" />
-  <input type="submit" name="submit" value="Run" />
+  <input type="submit" name="submit" value="Run" /> on
+  <?php
+  echo '<select name="server">'."\n";
+  echo '<option value="">(embedded server)</option>'."\n";
+  foreach ($servers as $server) {
+      echo '<option value="'.$server.'">'.$server."</option>\n";
+  }
+  echo "</select>\n";
+  ?>
+  <p><?php echo "<pre>{$runOutput}</pre>\n";?></p>
   </fieldset>
 </form>
+
+
+<?php
+#print '<pre>'; print_r($servers); print '</pre>'."\n";
+?>
+
 
 <?php
 if ($adminConfig->getAllowCron()) {

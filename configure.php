@@ -109,6 +109,8 @@ include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 #while ($row = db_fetch_assoc($q)) {
 #    print $row['project_id']." ".$row['app_title']." ".$row['api_token']."<br />";
 #}
+#print "Properties text: <pre>\n".$configuration->getRedCapEtlPropertiesText()."</pre>\n";
+#print "Transformation rules text: <pre>\n".$configuration->getTransformationRulesText()."</pre>\n";
 ?>
 
 <div class="projhdr"> 

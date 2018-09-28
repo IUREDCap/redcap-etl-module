@@ -48,7 +48,7 @@ echo $buffer;
 #print "SUBMIT = {$submit} <br/> \n";
 #print "serverName: = {$serverName} <br/> \n";
 $servers = $module->getServers();
-print "delete: ".$_POST['delete']."<br />\n";
+#print "delete: ".$_POST['delete']."<br />\n";
 #print "Servers: <pre><br />\n"; print_r($servers); print "</pre> <br/> \n";
 ?>
 
@@ -74,7 +74,7 @@ Server: <input type="text" id="server-name" name="server-name" size="48">
 
 <table class="dataTable">
   <thead>
-    <tr> <th>Server Name</th> <th>Configure</th> <th>Delete</th> </th></tr>
+    <tr> <th>Server Name</th> <th>Configure</th> <th>Copy</th> <th>Delete</th> </th></tr>
   </thead>
   <tbody>
     <?php
@@ -92,6 +92,10 @@ Server: <input type="text" id="server-name" name="server-name" size="48">
       print '<td style="text-align:center;">'
           .'<a href="'.$serverConfigureUrl.'"><img src='.APP_PATH_IMAGES.'gear.png></a>'
           ."</td>\n";
+
+      print '<td style="text-align:center;">'
+          .'<img src="'.APP_PATH_IMAGES.'page_copy.png" id="copy-'.$server.'" class="copyServer" style="cursor: pointer;">'
+          ."</td>\n";
           
       print '<td style="text-align:center;">';
       print '<form action="'.$selfUrl.'" method="post">'
@@ -106,5 +110,15 @@ Server: <input type="text" id="server-name" name="server-name" size="48">
     ?>
   </tbody>
 </table>
+
+<script>
+$(function() {
+    $(".copyServer").click(function(){
+        var id = this.id;
+        var server = id.substring(5);
+        alert('id clicked: '+id + " server: " + server);
+    });
+});
+</script>
 
 <?php include APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>

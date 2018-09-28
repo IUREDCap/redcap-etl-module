@@ -59,8 +59,9 @@ if (strcasecmp($submit, 'Save') === 0) {
             $username = $serverConfig->getUsername();
             if ($serverConfig->getAuthMethod() == ServerConfig::AUTH_METHOD_SSH_KEY) {
                 $keyFile = $serverConfig->getSshKeyFile();
+                $keyPassword = $serverConfig->getSshKeyPassword();
                 $key = new RSA();
-                $key->setPassword('');
+                $key->setPassword($keyPassword);
                 $keyFileContents = file_get_contents($keyFile);
                 if ($keyFileContents === false) {
                     throw new Exception('SSH key file could not be accessed.');
@@ -186,7 +187,7 @@ if (!empty($serverName)) {
     </tr>
     <tr id="passwordRow">
       <td>Password:</td>
-      <td><input type="text" name="password" value="<?php echo $serverConfig->getPassword();?>"
+      <td><input type="password" name="password" value="<?php echo $serverConfig->getPassword();?>"
                  size="28" style="margin: 4px;"></td>
     </tr>
     <tr id="sshKeyFileRow">
@@ -194,7 +195,12 @@ if (!empty($serverName)) {
       <td><input type="text" name="sshKeyFile" value="<?php echo $serverConfig->getSshKeyFile();?>"
                  size="44" style="margin: 4px;"></td>
     </tr>
-    
+    <tr id="sshKeyPasswordRow">
+      <td>SSH key password:</td>
+      <td><input type="password" name="sshKeyPassword" value="<?php echo $serverConfig->getSshKeyPassword();?>"
+                 size="44" style="margin: 4px;"></td>
+    </tr>
+        
     <tr>
       <td>&nbsp;</td><td>&nbsp</td>
     </tr>
