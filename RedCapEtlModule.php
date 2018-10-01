@@ -196,6 +196,21 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         $this->setSystemSetting($key, $json);
     }
     
+    public function copyServerConfig($fromServerName, $toServerName)
+    {
+        $fromServerConfig = $this->getServerConfig($fromServerName);
+        $json = $fromServerConfig->toJson();
+        $key = self::SERVER_CONFIG_KEY_PREFIX . $toServerName;
+        
+        $servers = $this->getServers();
+        if (in_array($toServerName, $servers)) {
+            throw new \Exception('The server "'.$toServerName.'" already exists.');
+        }
+        
+        $this->addServer($toServerName);
+        $this->setSystemSetting($key, $json);
+    }
+    
     public function removeServerConfig($serverName)
     {
         $key = self::SERVER_CONFIG_KEY_PREFIX . $serverName;

@@ -27,6 +27,18 @@ if (!empty($delete)) {
     $module->removeServer($delete);
 }
 
+$copyFromServerName = $_POST['copy-from-server-name'];
+$copyToServerName   = $_POST['copy-to-server-name'];
+if (!empty($copyFromServerName) && !empty($copyToServerName)) {
+    try {
+        $module->copyServerConfig($copyFromServerName, $copyToServerName);
+    } catch (Exception $exception) {
+        $error = 'ERROR: ' . $exception->getMessage();
+    }
+}
+
+$servers = $module->getServers();
+
 ?>
 
 <?php #include APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>
@@ -39,15 +51,18 @@ include APP_PATH_DOCROOT . 'ControlCenter/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
 $link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+$jsInclude = '<script type="text/javascript" src="'.($module->getUrl('resources/servers.js')).'"></script>';
+$buffer = str_replace('</head>', "    {$link}\n{$jsInclude}\n</head>", $buffer);
+
 echo $buffer;
 ?>
 
 
 <?php
-#print "SUBMIT = {$submit} <br/> \n";
+# print "SUBMIT = {$submit} <br/> \n";
 #print "serverName: = {$serverName} <br/> \n";
-$servers = $module->getServers();
+#print "POST: <pre><br />\n"; print_r($_POST); print "</pre> <br/> \n";
+#print "ERROR: {$error}\n";
 #print "delete: ".$_POST['delete']."<br />\n";
 #print "Servers: <pre><br />\n"; print_r($servers); print "</pre> <br/> \n";
 ?>
@@ -55,7 +70,25 @@ $servers = $module->getServers();
 
 <h4><img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>table_gear.png">REDCap-ETL Admin</h4>
 
-<?php $module->renderAdminTabs($selfUrl); ?>
+
+<?php
+#-------------------------------------
+# Render page sub-navigation tabs
+#-------------------------------------
+$module->renderAdminTabs($selfUrl);
+?>
+
+<?php
+#----------------------------
+# Display error, if any
+#----------------------------
+if (!empty($error)) { ?>
+<div class="red" style="margin:20px 0;font-weight:bold;">
+    <img src="/redcap/redcap_v8.5.11/Resources/images/exclamation.png">
+    <?php echo $error; ?>
+    </div>
+<?php } ?>
+
 
 <?php # echo "user-search: ".$_POST['user-search']."<br/>\n"; ?>
 <?php # echo "username-result: ".$_POST['username-result']."<br/>\n"; ?>
@@ -111,14 +144,20 @@ Server: <input type="text" id="server-name" name="server-name" size="48">
   </tbody>
 </table>
 
-<script>
-$(function() {
-    $(".copyServer").click(function(){
-        var id = this.id;
-        var server = id.substring(5);
-        alert('id clicked: '+id + " server: " + server);
-    });
-});
-</script>
+<div id="copy-dialog"
+    title="Server Configuration Copy"
+    style="display: none;"
+    >
+    <form id="copy-form" action="<?php echo $selfUrl;?>" method="post">
+    To copy the server <span id="server-to-copy" style="font-weight: bold;"></span>,
+    enter the name of the new server below, and click on the <span style="font-weight: bold;">Copy server</span> button.
+    <p>
+    <span style="font-weight: bold;">New server name:</span> <input type="text" name="copy-to-server-name" id="new-server-name">
+    </p>
+    <input type="hidden" name="copy-from-server-name" id="copy-from-server-name" value="">
+    </form>
+</div>
+
+
 
 <?php include APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>
