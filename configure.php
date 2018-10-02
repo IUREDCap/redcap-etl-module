@@ -53,6 +53,11 @@ if (array_key_exists('submit', $_POST)) {
     $submit = $_POST['submit'];
 }
 
+$submitValue = '';
+if (array_key_exists('submitValue', $_POST)) {
+    $submitValue = $_POST['submitValue'];
+}
+
 if (strcasecmp($submit, 'Auto-Generate') === 0) {
     # Check for API Token (or just let RedCapEtl class handle?)
     if (!empty($properties)) {
@@ -99,7 +104,20 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
     } catch (Exception $exception) {
         $error = 'ERROR: '.$exception->getMessage();
     }
-
+} elseif (strcasecmp($submitValue, 'Upload CSV file') === 0) {
+    $fileContents = file_get_contents($_FILES['uploadCsvFile']['tmp_name']);
+    if ($fileContents === false) {
+        $error = 'ERROR: Unable to upload transformation rules file "'.$_FILES['uploadCsvFile']['tmp_name'].'"\n"';
+    } else {
+        $properties[Configuration::TRANSFORM_RULES_TEXT] = $fileContents;
+    }
+} elseif (strcasecmp($submitValue, 'Download CSV file') === 0) {
+    $downloadFileName = 'rules.csv';
+    header('Content-Type: application/octet-stream');
+    header("Content-Transfer-Encoding: Binary"); 
+    header("Content-disposition: attachment; filename=\"" . $downloadFileName . "\""); 
+    echo $properties[Configuration::TRANSFORM_RULES_TEXT];
+    return;
 } else {
     // this should be a GET request, initialize with existing database values, if any
 }
@@ -114,12 +132,20 @@ include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 ?>
 
 <?php
+print "submitValue {$submitValue}\n";
 #print "PROJECTS:<br />\n";
 #while ($row = db_fetch_assoc($q)) {
 #    print $row['project_id']." ".$row['app_title']." ".$row['api_token']."<br />";
 #}
 #print "Properties text: <pre>\n".$configuration->getRedCapEtlPropertiesText()."</pre>\n";
 #print "Transformation rules text: <pre>\n".$configuration->getTransformationRulesText()."</pre>\n";
+#print "<pre>_POST\n"; print_r($_POST); print "</pre>\n";
+#print "<pre>_FILES\n"; print_r($_FILES); print "</pre>\n";
+#$tmp = $_FILES['uploadCsvFile']['tmp_name'];
+#print "tmp file: {$tmp}<br />\n";
+#$fileContents = file_get_contents($_FILES['uploadCsvFile']['tmp_name']);
+#print "\nCONTENTS: <pre>{$fileContents}</pre>\n\n";
+
 ?>
 
 <div class="projhdr"> 
@@ -169,6 +195,7 @@ if (!empty($error)) { ?>
 <div id="rules-overwrite-dialog" style="display:none;" title="Overwrite transformation rules?">
   Test...
 </div>
+
 <!-- <button type="button" id="api-token-button">...</button> -->
 <script>
 $(function() {
@@ -182,16 +209,17 @@ $(function() {
 </script>
           
 <!-- Configuration form -->
-<form action="<?php echo $selfUrl;?>" method="post">
+<form action="<?php echo $selfUrl;?>" method="post" enctype="multipart/form-data" style="margin-top: 17px;">
+
   <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
   <input type="hidden" name="<?php echo Configuration::CONFIG_API_TOKEN; ?>"
          value="<?php echo $properties[Configuration::CONFIG_API_TOKEN]; ?>" />
   <input type="hidden" name="<?php echo Configuration::TRANSFORM_RULES_SOURCE; ?>"
          value="<?php echo $properties[Configuration::TRANSFORM_RULES_SOURCE]; ?>" />
 
-  <div style="padding: 10px; border: 1px solid #ccc; background-color: #f0f0f0;">
+  <!--<div style="padding: 10px; border: 1px solid #ccc; background-color: #f0f0f0;"> -->
 
-  <table>
+  <table style="background-color: #f0f0f0; border: 1px solid #ccc;">
     <tbody style="padding: 20px;">
 
       <tr>
@@ -245,7 +273,20 @@ $(function() {
           <?php $rules = $properties[Configuration::TRANSFORM_RULES_TEXT];?>
           <textarea rows="14" cols="70" name="<?php echo Configuration::TRANSFORM_RULES_TEXT;?>"><?php echo $rules;?></textarea>
         </td>
-        <td><input type="submit" name="submit" value="Auto-Generate"</td>
+        <td>
+          <p><input type="submit" name="submit" value="Auto-Generate"></p>
+          <p>
+          <button type="submit" value="Upload CSV file" name="submitValue">
+            <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>"> Upload CSV file
+          </button>
+          <input type="file" name="uploadCsvFile" id="uploadCsvFile" style="display: inline;">
+          </p>
+          <p>
+          <button type="submit" value="Download CSV file" name="submitValue">
+            <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>"> Download CSV file
+          </button>
+          </p>
+        </td>
       </tr>
 
       <tr>
@@ -308,7 +349,7 @@ $(function() {
       </tr>
     </tbody>
   </table>
-  </div>
+  <!--</div> -->
 </form>
 
 <?php } ?>
