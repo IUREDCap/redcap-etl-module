@@ -223,8 +223,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
     
     public function copyServerConfig($fromServerName, $toServerName)
     {
-        $fromServerConfig = $this->getServerConfig($fromServerName);
-        $json = $fromServerConfig->toJson();
+        $toServerConfig = $this->getServerConfig($fromServerName);
+        $toServerConfig->setName($toServerName);
+        $json = $toServerConfig->toJson();
         $key = self::SERVER_CONFIG_KEY_PREFIX . $toServerName;
         $this->setSystemSetting($key, $json);
     }

@@ -80,7 +80,7 @@ class ServerConfig implements \JsonSerializable
         } elseif ($this->authMethod == self::AUTH_METHOD_SSH_KEY) {
             $keyFile = $this->getSshKeyFile();
             $key = new RSA();
-            $key->setPassword($this->serverKeyPassword);
+            $key->setPassword($this->sshKeyPassword);
             $keyFileContents = file_get_contents($keyFile);
             if ($keyFileContents === false) {
                 throw new \Exception('SSH key file "'.$keyFile.'" could not be accessed.');

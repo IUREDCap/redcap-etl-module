@@ -132,7 +132,7 @@ include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 ?>
 
 <?php
-print "submitValue {$submitValue}\n";
+#print "submitValue {$submitValue}\n";
 #print "PROJECTS:<br />\n";
 #while ($row = db_fetch_assoc($q)) {
 #    print $row['project_id']." ".$row['app_title']." ".$row['api_token']."<br />";
