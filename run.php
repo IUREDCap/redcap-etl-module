@@ -39,6 +39,16 @@ if (!empty($configName)) {
     $configuration = $module->getConfiguration($configName);
 }
 
+#------------------------------------------
+# Get the server
+#------------------------------------------
+$server = $_POST['server'];
+if (empty($server)) {
+    $server = $_SESSION['server'];
+} else {
+    $_SESSION['server'] = $server;
+}
+
 #-------------------------
 # Set the submit value
 #-------------------------
@@ -55,7 +65,6 @@ if (strcasecmp($submit, 'Run') === 0) {
         $error = 'ERROR: No ETL configuration found for '.$configName.'.';
     } else {
         try {
-            $server = $_POST['server'];
             if (empty($server)) {
                 $logger = new \IU\REDCapETL\NullLogger('REDCap-ETL');
                 $properties = $configuration->getProperties();
@@ -147,8 +156,12 @@ if (!empty($success)) { ?>
   <?php
   echo '<select name="server">'."\n";
   echo '<option value="">(embedded server)</option>'."\n";
-  foreach ($servers as $server) {
-      echo '<option value="'.$server.'">'.$server."</option>\n";
+  foreach ($servers as $serverName) {
+      $selected = '';
+      if ($serverName === $server) {
+          $selected = 'selected';
+      }
+      echo '<option value="'.$serverName.'" '.$selected.'>'.$serverName."</option>\n";
   }
   echo "</select>\n";
   ?>
