@@ -20,15 +20,29 @@ $configureUrl = $module->getUrl('server_configure.php');
 $serversUrl   = $module->getUrl('servers.php');
 
 $submit = $_POST['submit'];
+
+#-------------------------------------------
+# Get the server name
+#-------------------------------------------
 $serverName = $_POST['serverName'];
 if (empty($serverName)) {
     $serverName = $_GET['serverName'];
+    if (empty($serverName)) {
+        $serverName = $_SESSION['serverName'];
+    }
 }
 
+if (!empty($serverName)) {
+    $_SESSION['serverName'] = $serverName;
+}
 
+#-------------------------------------------------------------------
+# If the server name is set, get the configuration for that server
+#-------------------------------------------------------------------
 if (!empty($serverName)) {
     $serverConfig = $module->getServerConfig($serverName);
 }
+
 
 $testOutput = '';
 
@@ -51,42 +65,10 @@ if (strcasecmp($submit, 'Save') === 0) {
 } elseif (strcasecmp($submit, 'Cancel') === 0) {
     header('Location: '.$serversUrl);
 } elseif (strcasecmp($submit, 'Test Server Connection') === 0) {
-    try {
-        if (!isset($serverConfig)) {
-            $testOutput = 'ERROR: no server configuration found.';
-        } else {
-            $serverAddress = $serverConfig->getServerAddress();
-            $username = $serverConfig->getUsername();
-            if ($serverConfig->getAuthMethod() == ServerConfig::AUTH_METHOD_SSH_KEY) {
-                $keyFile = $serverConfig->getSshKeyFile();
-                $keyPassword = $serverConfig->getSshKeyPassword();
-                $key = new RSA();
-                $key->setPassword($keyPassword);
-                $keyFileContents = file_get_contents($keyFile);
-                if ($keyFileContents === false) {
-                    throw new Exception('SSH key file could not be accessed.');
-                }
-                $key->loadKey($keyFileContents);
-
-                $ssh = new SSH2($serverAddress);
-                $ssh->login($username, $key);
-            } else {
-                $password = $serverConfig->getPassword();
-                
-                $ssh = new SSH2($serverAddress);
-                $ssh->login($username, $password);
-            }
-
-            $output = $ssh->exec('hostname');
-            if (!$output) {
-                $testOutput = "ERROR: ssh command failed.";
-            } else {
-                $testOutput = "SUCCESS:\noutput of hostname command:\n"
-                    .$output."\n";
-            }
-        }
-    } catch (Exception $exception) {
-        $testOutput = 'ERROR: '.$exception->getMessage();
+    if (!isset($serverConfig)) {
+        $testOutput = 'ERROR: no server configuration found.';
+    } else {
+        $testOutput = $serverConfig->test();
     }
 }
 ?>
@@ -107,7 +89,7 @@ echo $buffer;
 
 
 <?php
-print "SUBMIT = {$submit} <br/> \n";
+#print "SUBMIT = {$submit} <br/> \n";
 #print "serverName: = {$serverName} <br/> \n";
 #print "ServerConfig: <pre><br />\n"; print_r($serverConfig); print "</pre> <br/> \n";
 #print "POST: <pre><br />\n"; print_r($_POST); print "</pre> <br/> \n";
@@ -131,7 +113,9 @@ if (!empty($error)) { ?>
 
 
 <?php
+#---------------------------------
 # Server selection form
+#---------------------------------
 ?>
 <form action="<?php echo $selfUrl;?>" method="post" style="padding: 4px; margin-bottom: 12px; border: 1px solid #ccc; background-color: #ccc;">
     <span style="font-weight: bold;">Server:</span>

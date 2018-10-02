@@ -22,20 +22,32 @@ if (!empty($serverName)) {
     }
 }
 
-$delete = $_POST['delete'];
-if (!empty($delete)) {
-    $module->removeServer($delete);
-}
 
 $copyFromServerName = $_POST['copy-from-server-name'];
 $copyToServerName   = $_POST['copy-to-server-name'];
 if (!empty($copyFromServerName) && !empty($copyToServerName)) {
     try {
-        $module->copyServerConfig($copyFromServerName, $copyToServerName);
+        $module->copyServer($copyFromServerName, $copyToServerName);
     } catch (Exception $exception) {
         $error = 'ERROR: ' . $exception->getMessage();
     }
 }
+
+$renameServerName    = $_POST['rename-server-name'];
+$renameNewServerName = $_POST['rename-new-server-name'];
+if (!empty($renameServerName) && !empty($renameNewServerName)) {
+    try {
+        $module->renameServer($renameServerName, $renameNewServerName);
+    } catch (Exception $exception) {
+        $error = 'ERROR: ' . $exception->getMessage();
+    }
+}
+
+$deleteServerName = $_POST['delete-server-name'];
+if (!empty($deleteServerName)) {
+    $module->removeServer($deleteServerName);
+}
+
 
 $servers = $module->getServers();
 
@@ -94,8 +106,8 @@ if (!empty($error)) { ?>
 <?php # echo "username-result: ".$_POST['username-result']."<br/>\n"; ?>
 <?php # print "<pre>"; print_r($userInfo); print "</pre>"; ?>
 
-<form action="<?php echo $selfUrl;?>" method="post">
-Server: <input type="text" id="server-name" name="server-name" size="48">
+<form action="<?php echo $selfUrl;?>" method="post" style="margin-bottom: 12px;">
+Server: <input type="text" id="server-name" name="server-name" size="40">
 <input type="submit" name="submit" value="Add Server"><br />
 </form>
     <!--
@@ -107,7 +119,7 @@ Server: <input type="text" id="server-name" name="server-name" size="48">
 
 <table class="dataTable">
   <thead>
-    <tr> <th>Server Name</th> <th>Configure</th> <th>Copy</th> <th>Delete</th> </th></tr>
+    <tr> <th>Server Name</th> <th>Configure</th> <th>Copy</th> <th>Rename</th> </th><th>Delete</th> </th></tr>
   </thead>
   <tbody>
     <?php
@@ -129,13 +141,14 @@ Server: <input type="text" id="server-name" name="server-name" size="48">
       print '<td style="text-align:center;">'
           .'<img src="'.APP_PATH_IMAGES.'page_copy.png" id="copy-'.$server.'" class="copyServer" style="cursor: pointer;">'
           ."</td>\n";
+
+      print '<td style="text-align:center;">'
+          .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" id="rename-'.$server.'" class="renameServer" style="cursor: pointer;">'
+          ."</td>\n";
           
-      print '<td style="text-align:center;">';
-      print '<form action="'.$selfUrl.'" method="post">'
-            .'<input type="hidden" name="delete" value="'.$server.'">'
-            .'<img src='.APP_PATH_IMAGES.'delete.png onclick="$(this).closest(\'form\').submit();" style="cursor: pointer;">'
-            .'</form>';
-      print "</td>\n";
+      print '<td style="text-align:center;">'
+            .'<img src="'.APP_PATH_IMAGES.'delete.png" id="delete-'.$server.'" class="deleteServer" style="cursor: pointer;">'
+            ."</td>\n";
       
       print "</tr>\n";
       $row++;
@@ -144,6 +157,11 @@ Server: <input type="text" id="server-name" name="server-name" size="48">
   </tbody>
 </table>
 
+<?php
+#--------------------------------------
+# Copy server dialog
+#--------------------------------------
+?>
 <div id="copy-dialog"
     title="Server Configuration Copy"
     style="display: none;"
@@ -152,12 +170,46 @@ Server: <input type="text" id="server-name" name="server-name" size="48">
     To copy the server <span id="server-to-copy" style="font-weight: bold;"></span>,
     enter the name of the new server below, and click on the <span style="font-weight: bold;">Copy server</span> button.
     <p>
-    <span style="font-weight: bold;">New server name:</span> <input type="text" name="copy-to-server-name" id="new-server-name">
+    <span style="font-weight: bold;">New server name:</span> <input type="text" name="copy-to-server-name" id="copy-to-server-name">
     </p>
     <input type="hidden" name="copy-from-server-name" id="copy-from-server-name" value="">
     </form>
 </div>
 
+<?php
+#--------------------------------------
+# Rename server dialog
+#--------------------------------------
+?>
+<div id="rename-dialog"
+    title="Server Configuration Rename"
+    style="display: none;"
+    >
+    <form id="rename-form" action="<?php echo $selfUrl;?>" method="post">
+    To rename the server <span id="server-to-rename" style="font-weight: bold;"></span>,
+    enter the new name for the new server below, and click on the <span style="font-weight: bold;">Rename server</span> button.
+    <p>
+    <span style="font-weight: bold;">New server name:</span> <input type="text" name="rename-new-server-name" id="rename-new-server-name">
+    </p>
+    <input type="hidden" name="rename-server-name" id="rename-server-name" value="">
+    </form>
+</div>
+
+<?php
+#--------------------------------------
+# Delete server dialog
+#--------------------------------------
+?>
+<div id="delete-dialog"
+    title="Server Configuration Delete"
+    style="display: none;"
+    >
+    <form id="delete-form" action="<?php echo $selfUrl;?>" method="post">
+    To delete the server <span id="server-to-delete" style="font-weight: bold;"></span>,
+    click on the <span style="font-weight: bold;">Delete server</span> button.
+    <input type="hidden" name="delete-server-name" id="delete-server-name" value="">
+    </form>
+</div>
 
 
 <?php include APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>

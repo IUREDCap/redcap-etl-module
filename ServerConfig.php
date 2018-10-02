@@ -129,9 +129,54 @@ class ServerConfig implements \JsonSerializable
         return $output;
     }
     
+    public function test()
+    {
+        $testOutput = '';
+        try {
+            $serverAddress = $this->getServerAddress();
+            $username = $this->getUsername();
+            if ($this->getAuthMethod() == ServerConfig::AUTH_METHOD_SSH_KEY) {
+                $keyFile = $this->getSshKeyFile();
+                $keyPassword = $this->getSshKeyPassword();
+                $key = new RSA();
+                $key->setPassword($keyPassword);
+                $keyFileContents = file_get_contents($keyFile);
+                if ($keyFileContents === false) {
+                    throw new \Exception('SSH key file could not be accessed.');
+                }
+                $key->loadKey($keyFileContents);
+
+                $ssh = new SSH2($serverAddress);
+                $ssh->login($username, $key);
+            } else {
+                $password = $this->getPassword();
+                
+                $ssh = new SSH2($serverAddress);
+                $ssh->login($username, $password);
+            }
+
+            $output = $ssh->exec('hostname');
+            if (!$output) {
+                $testOutput = "ERROR: ssh command failed.";
+            } else {
+                $testOutput = "SUCCESS:\noutput of hostname command:\n"
+                    .$output."\n";
+            }
+        } catch (\Exception $exception) {
+            $testOutput = 'ERROR: '.$exception->getMessage();
+        }
+        return $testOutput;      
+    }
+    
+    
     public function getName()
     {
         return $this->name;
+    }
+    
+    public function setName($name)
+    {
+        $this->name = $name;
     }
     
     public function getServerAddress()

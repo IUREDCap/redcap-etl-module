@@ -69,6 +69,31 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         $json = $servers->toJson();
         $this->setSystemSetting(self::SERVERS_KEY, $json);
     }
+
+    public function copyServer($fromServerName, $toServerName)
+    {
+        $servers = new Servers();
+        $json = $this->getSystemSetting(self::SERVERS_KEY, true);
+        $servers->fromJson($json);
+        $servers->addServer($toServerName);
+        $json = $servers->toJson();
+        $this->setSystemSetting(self::SERVERS_KEY, $json);
+        
+        $this->copyServerConfig($fromServerName, $toServerName);
+    }
+    
+    public function renameServer($serverName, $newServerName)
+    {
+        $servers = new Servers();
+        $json = $this->getSystemSetting(self::SERVERS_KEY, true);
+        $servers->fromJson($json);
+        $servers->addServer($newServerName);
+        $servers->removeServer($serverName);
+        $json = $servers->toJson();
+        $this->setSystemSetting(self::SERVERS_KEY, $json);
+        
+        $this->renameServerConfig($serverName, $newServerName);
+    }
     
     public function removeServer($serverName)
     {
@@ -201,15 +226,15 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         $fromServerConfig = $this->getServerConfig($fromServerName);
         $json = $fromServerConfig->toJson();
         $key = self::SERVER_CONFIG_KEY_PREFIX . $toServerName;
-        
-        $servers = $this->getServers();
-        if (in_array($toServerName, $servers)) {
-            throw new \Exception('The server "'.$toServerName.'" already exists.');
-        }
-        
-        $this->addServer($toServerName);
         $this->setSystemSetting($key, $json);
     }
+    
+    public function renameServerConfig($serverName, $newServerName)
+    {
+        $this->copyServerConfig($serverName, $newServerName);
+        $this->removeServerConfig($serverName);    
+    }
+    
     
     public function removeServerConfig($serverName)
     {
