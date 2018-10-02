@@ -43,4 +43,21 @@ class RedCapDb
         return $users;
     }
 
+    // Get user projects:
+    // select project_id, username [, api_token, api_export]
+    //     from redcap_user_rights
+    //     where username = '<user-name>';
+    //
+    // select u.username, p.project_id, p.app_title
+    //     from redcap_projects p, redcap_user_rights u
+    //     where p.project_id = u.project_id;
+    //
+    // select u.username, p.project_id, p.app_title,
+    //     if(u.api_token is null, 0, 1) as has_api_token, u.api_export
+    //     from redcap_projects p, redcap_user_rights u
+    //     where p.project_id = u.project_id;
+    //
+    //     p.date_deleted indicates if project deleted (if not null?)
+    //
+
 }

@@ -113,8 +113,8 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
     }
 } elseif (strcasecmp($submitValue, 'Download CSV file') === 0) {
     $downloadFileName = 'rules.csv';
-    header('Content-Type: application/octet-stream');
-    header("Content-Transfer-Encoding: Binary"); 
+    header('Content-Type: text/csv');
+    //header("Content-Transfer-Encoding: Binary"); 
     header("Content-disposition: attachment; filename=\"" . $downloadFileName . "\""); 
     echo $properties[Configuration::TRANSFORM_RULES_TEXT];
     return;
@@ -276,14 +276,15 @@ $(function() {
         <td>
           <p><input type="submit" name="submit" value="Auto-Generate"></p>
           <p>
-          <button type="submit" value="Upload CSV file" name="submitValue">
+          <button type="submit" value="Upload CSV file" name="submitValue" style="vertical-align: middle;">
             <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>"> Upload CSV file
           </button>
           <input type="file" name="uploadCsvFile" id="uploadCsvFile" style="display: inline;">
           </p>
           <p>
           <button type="submit" value="Download CSV file" name="submitValue">
-            <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>"> Download CSV file
+            <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>" style="vertical-align: middle;">
+            <span  style="vertical-align: middle;"> Download CSV file</span>
           </button>
           </p>
         </td>

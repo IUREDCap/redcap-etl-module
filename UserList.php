@@ -5,6 +5,7 @@ namespace IU\RedCapEtlModule;
 
 class UserList implements \JsonSerializable
 {
+    // Map from usernames to array map of projects IDs
     private $userList;
 
     public function __construct()
@@ -26,14 +27,33 @@ class UserList implements \JsonSerializable
 
     public function addUser($username)
     {
-        $this->userList[$username] = 1;
+        $this->userList[$username] = array();
     }
 
     public function deleteUser($username)
     {
+        unset($this->userList[$username]);
+    }
+    
+    public function getProjects($username)
+    {
+        return $this->userList[$username];    
+    }
+    
+    public function addProject($username, $projectId)
+    {
+        if (array_key_exists($username, $this->userList)) {
+            $this->userList[$username][$projectId] = 1;
+        }
     }
 
-
+    public function removeProject($username, $projectId)
+    {
+        if (array_key_exists($username, $this->userList)) {
+            unset($this->userList[$username][$projectId]);
+        }
+    }
+    
     public function fromJson($json)
     {
         if (!empty($json)) {

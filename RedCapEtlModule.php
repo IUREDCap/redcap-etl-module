@@ -130,6 +130,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
     {
     }
 
+
     public function getUserConfigurationNames()
     {
         $userInfo = $this->getUserInfo();
@@ -138,6 +139,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         return $names;
     }
 
+
+    /**
+     * Gets the specified configuration for the current user.
+     * 
+     * @param string $name the name of the configuration to get.
+     * @return Configuration the specified configuration.
+     */
     public function getConfiguration($name)
     {
         $configuraion = null;
@@ -147,11 +155,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         $configValues = json_decode($setting, true);
         if (isset($configValues) && is_array($configValues)) {
             $configuration = new Configuration($configValues['name']);
-            try {
-                $configuration->set($configValues['properties']);
-            } catch(\Exception $exception) {
-                ; // should not happen here
-            }
+            $configuration->set($configValues['properties']);
         }
         return $configuration;
     }
@@ -191,6 +195,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         \REDCap::logEvent('Added REDCap-ETL configuration '.$name.'.');
     }
 
+    public function removeConfiguration($configName)
+    {
+        
+    }
+
+
     public function getAdminConfig()
     {
         $adminConfig = new AdminConfig();
@@ -204,6 +214,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         $json = $adminConfig->toJson();
         $this->setSystemSetting(self::ADMIN_CONFIG_KEY, $json);
     }
+
+
 
     public function getServerConfig($serverName)
     {
