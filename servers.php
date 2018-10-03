@@ -105,10 +105,6 @@ if (!empty($error)) { ?>
 <?php } ?>
 
 
-<?php # echo "user-search: ".$_POST['user-search']."<br/>\n"; ?>
-<?php # echo "username-result: ".$_POST['username-result']."<br/>\n"; ?>
-<?php # print "<pre>"; print_r($userInfo); print "</pre>"; ?>
-
 <form action="<?php echo $selfUrl;?>" method="post" style="margin-bottom: 12px;">
 Server: <input type="text" id="server-name" name="server-name" size="40">
 <input type="submit" name="submit" value="Add Server"><br />

@@ -108,18 +108,17 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     private function getUserInfo()
     {
         $key = $this->getUserKey();
-        $userInfo = json_decode($this->getSystemSetting($key), true);
-        if (empty($userInfo)) {
-            $userInfo = array();
-        }
+        $json = $this->getSystemSetting($key);
+        $userInfo = new UserInfo(USERID);
+        $userInfo->fromJson($json);
         return $userInfo;
     }
 
     private function setUserInfo($userInfo)
     {
         $key = $this->getUserKey();
-        $userInfo = json_encode($userInfo);
-        $this->setSystemSetting($key, $userInfo);
+        $json = $userInfo->toJson();
+        $this->setSystemSetting($key, $json);
     }
 
     private function getUserInfos()
@@ -130,8 +129,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function getUserConfigurationNames()
     {
         $userInfo = $this->getUserInfo();
-        $names = array_keys($userInfo);
-        sort($names);
+        $names = $userInfo->getConfigNames();
         return $names;
     }
 
@@ -170,13 +168,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         # Add configuration entry for user
         $userInfo = $this->getUserInfo();
         if (!isset($userInfo)) {
-            $userInfo = array();
+            $userInfo = new UserInfo(USERID);
         }
 
-        if (!array_key_exists($name, $userInfo)) {
-            $userInfo[$name] = 1;
+        if (!$userInfo->hasConfigName($name)) {
+            $userInfo->addConfigName($name);
+            $json = $userInfo->toJson();
             $userKey = $this->getUserKey();
-            $this->setSystemSetting($userKey, json_encode($userInfo));
+            $this->setSystemSetting($userKey, $json);
         }
         
         # Add the actual configuration
@@ -193,6 +192,22 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function removeConfiguration($configName)
     {
+        #-----------------------------------------------------------
+        # Remove the configuration name from the user's information
+        #-----------------------------------------------------------
+        $userInfo = $this->getUserInfo();
+        if (isset($userInfo) && $userInfo->hasConfigName($name)) {
+            $userInfo->removeConfigName($configName);
+            $json = $userInfo->toJson();
+            $userKey = $this->getUserKey();
+            $this->setSystemSetting($userKey, $json);
+        }
+        
+        #------------------------------------------------
+        # Remove the actual configuration
+        #------------------------------------------------
+        $key = $this->getConfigurationKey($configName);
+        $this->removeSystemSetting($key);
     }
 
 
@@ -261,13 +276,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $key = 'user:'.USERID.';configuration:'.$name;
         return $key;
-    }
-
-    public function getEtlProjects()
-    {
-        $userInfo = $this->getUserInfo();
-        echo "select";
-        // ...
     }
 
 

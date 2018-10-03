@@ -8,7 +8,6 @@ $selfUrl = $redCapEtl->getUrl("add.php");
 
 $error = '';
 
-$userInfo = $redCapEtl->getUserInfo();
 $submit = $_POST['submit'];
 
 #----------------------------------------------

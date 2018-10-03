@@ -23,7 +23,16 @@ class UserInfo implements \JsonSerializable
         return (object) get_object_vars($this);
     }
 
-    public function getConfigurationNames()
+    public function hasConfigName($configName)
+    {
+        $has = false;
+        if (array_key_exists($configName, $this->configs)) {
+            $has = true;
+        }
+        return $has;
+    }
+    
+    public function getConfigNames()
     {
         $configNames = array_keys($this->configs);
         sort($configNames);
