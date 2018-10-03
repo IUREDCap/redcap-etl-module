@@ -9,14 +9,12 @@ class AdminConfig implements \JsonSerializable
     const DAY_LABELS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     private $allowCron;
-    private $allowDailyCron;  # if cron is allowed, but not daily, then weekly is allowed
     private $allowedCronTimes;
     private $maxJobsPerTime;
 
     public function __construct()
     {
         $this->allowCron      = true;
-        $this->allowDailyCron = true;
         $this->maxJobsPerTime = 10;
 
         $this->allowedCronTimes = array();
@@ -185,11 +183,6 @@ class AdminConfig implements \JsonSerializable
     public function getAllowCron()
     {
         return $this->allowCron;
-    }
-
-    public function getAllowDailyCron()
-    {
-        return $this->allowDailyCron;
     }
 
 }

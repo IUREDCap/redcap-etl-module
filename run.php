@@ -213,25 +213,6 @@ $(function () {
 <form style="margin-top: 14px;">
   <fieldset style="border: 2px solid #ccc; border-radius: 7px; padding: 7px;">
   <legend style="font-weight: bold;">Schedule Automated Repeating Run</legend>
-  <?php
-  #-----------------------------------------------
-  # Daily cron jobs allowed
-  #-----------------------------------------------
-  if ($adminConfig->getAllowDailyCron()) {
-      $daily = true;
-  ?>
-    <p>Maximum frequency: daily</p>
-  <?php
-  #-----------------------------------------------
-  # Weekly cron jobs allowed
-  #-----------------------------------------------
-  } else {
-      $daily = false;
-  ?>
-    <p>Maximum frequency: weekly</p>
-  <?php
-  }
-  ?>
 
   <table class="cron-schedule">
     <thead>
@@ -261,13 +242,8 @@ $(function () {
           }
           echo "<td>".($adminConfig->getTimeLabel($time))."</td>";
           foreach (AdminConfig::DAY_LABELS as $day => $label) {
-              if ($daily) {
-                  $radioName = $label;
-                  $value = $time;
-              } else {
-                  $value = ($day * 100) + $time;
-                  $radioName = 'Week';
-              }
+              $value = ($day * 100) + $time;
+              $radioName = 'Week';
 
               if ($adminConfig->isAllowedCronTime($day, $time)) {
                   echo '<td class="day" ><input type="radio" name="'.$radioName.'" value="'.$value.'"></td>'."\n";
