@@ -31,7 +31,7 @@ class Configuration implements \JsonSerializable
 
     public function __construct($name)
     {
-        global $project_id;
+        global $projectId;
 
         $this->name = $name;
 
@@ -45,9 +45,9 @@ class Configuration implements \JsonSerializable
         $this->properties[self::BATCH_SIZE] = 100;
         $this->properties[self::TRANSFORM_RULES_SOURCE] = '1';
 
-        if (!empty($project_id)) {
+        if (!empty($projectId)) {
             $sql = "select api_token from redcap_user_rights "
-                    . " where project_id = {$project_id} "
+                    . " where project_id = {$projectId} "
                     . " and username = '".USERID."'"
                     . " and api_export = 1 "
                     ;

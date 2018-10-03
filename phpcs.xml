@@ -7,6 +7,15 @@
 
     <rule ref="PSR1"/>
     <rule ref="PSR2"/>
+    
+    <!-- local variables need to use lower camel case -->
+    <rule ref="Squiz.NamingConventions.ValidVariableName.NotCamelCaps"/>
+    
+    <!-- member variables need to use lower camel case -->
+    <rule ref="Squiz.NamingConventions.ValidVariableName.MemberNotCamelCaps"/>
+    
+    <!-- variables embedded in strings need to use lower camel case -->
+    <rule ref="Squiz.NamingConventions.ValidVariableName.StringNotCamelCaps"/>
 
     <!-- Paths to check -->
     <file>.</file>

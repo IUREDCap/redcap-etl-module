@@ -328,17 +328,17 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         echo '<div id="sub-nav" style="margin:5px 0 20px;">'."\n";
         echo '<ul>'."\n";
-        foreach ($tabs as $this_url => $this_label) {
+        foreach ($tabs as $thisUrl => $thisLabel) {
             // Check for Active tab
             $isActive = false;
             $class = '';
-            if (strcasecmp($this_url, $activeUrl) === 0) {
+            if (strcasecmp($thisUrl, $activeUrl) === 0) {
                 $class = ' class="active"';
                 $isActive = true;
             }
             echo '<li '.$class.'>'."\n";
-            echo '<a href="'.$this_url.'" style="font-size:13px;color:#393733;padding:6px 9px 5px 10px;">';
-            echo $this_label.'</a>'."\n";
+            echo '<a href="'.$thisUrl.'" style="font-size:13px;color:#393733;padding:6px 9px 5px 10px;">';
+            echo $thisLabel.'</a>'."\n";
         }
         echo '</li>'."\n";
         echo '</ul>'."\n";
