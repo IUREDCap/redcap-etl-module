@@ -56,4 +56,3 @@ class DbHosts implements \JsonSerializable
         return $json;
     }
 }
-

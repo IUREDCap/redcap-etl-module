@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace IU\RedCapEtlModule;
 
@@ -26,7 +26,8 @@ class RedCapDb
     public function getUserSearchInfo($term)
     {
         $users = array();
-        $sql = "select ui_id as id, concat(username, ' (', user_firstname, ' ', user_lastname, ') - ', user_email) as value, username "
+        $sql = "select ui_id as id, "
+            ." concat(username, ' (', user_firstname, ' ', user_lastname, ') - ', user_email) as value, username "
             ." from redcap_user_information "
             ." where user_suspended_time is null and "
             ."     (username like '%".$term."%' "
@@ -59,5 +60,4 @@ class RedCapDb
     //
     //     p.date_deleted indicates if project deleted (if not null?)
     //
-
 }

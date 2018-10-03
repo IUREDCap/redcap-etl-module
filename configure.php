@@ -1,8 +1,9 @@
 <?php
 
-require_once __DIR__.'/Configuration.php';
+require_once __DIR__.'/dependencies/autoload.php';
 require_once __DIR__.'/redcap-etl/dependencies/autoload.php';
 
+use IU\REDCapETL\EtlRedCapProject;
 use IU\RedCapEtlModule\Configuration;
 
 $error = '';
@@ -61,7 +62,6 @@ if (array_key_exists('submitValue', $_POST)) {
 if (strcasecmp($submit, 'Auto-Generate') === 0) {
     # Check for API Token (or just let RedCapEtl class handle?)
     if (!empty($properties)) {
-
         $apiUrl    = $properties[Configuration::REDCAP_API_URL];
         $dataToken = $properties[Configuration::DATA_SOURCE_API_TOKEN];
         try {
@@ -76,18 +76,20 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
                     # WARN that existing rules will be overwritten
                     # ...
                     $areExistingRules = true;
-                    #echo 
+                    #echo
                     #"<script>\n"
                     #.'$("#rules-overwrite-dialog").dialog("open");'."\n"
                     #."</script>\n"
                     #;
                 }
-                $dataProject = new \IU\REDCapETL\EtlRedCapProject($apiUrl, $dataToken); // ADD ...$sslVerify = true, $caCertFile = null);
+                $dataProject = new \IU\REDCapETL\EtlRedCapProject($apiUrl, $dataToken);
+                // ADD ...$sslVerify = true, $caCertFile = null);
+                
                 $rulesGenerator = new \IU\REDCapETL\RulesGenerator();
                 $rulesText = $rulesGenerator->generate($dataProject);
                 $properties[Configuration::TRANSFORM_RULES_TEXT] = $rulesText;
                 # print "$rulesText\n";
-            } 
+            }
         } catch (Exception $exception) {
             $error = 'ERROR: '.$exception->getMessage();
         }
@@ -114,8 +116,8 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
 } elseif (strcasecmp($submitValue, 'Download CSV file') === 0) {
     $downloadFileName = 'rules.csv';
     header('Content-Type: text/csv');
-    //header("Content-Transfer-Encoding: Binary"); 
-    header("Content-disposition: attachment; filename=\"" . $downloadFileName . "\""); 
+    //header("Content-Transfer-Encoding: Binary");
+    header("Content-disposition: attachment; filename=\"" . $downloadFileName . "\"");
     echo $properties[Configuration::TRANSFORM_RULES_TEXT];
     return;
 } else {
@@ -170,7 +172,8 @@ if (!empty($error)) { ?>
 <?php
 # Configuration selection form
 ?>
-<form action="<?php echo $selfUrl;?>" method="post" style="padding: 4px; margin-bottom: 0px; border: 1px solid #ccc; background-color: #ccc;">
+<form action="<?php echo $selfUrl;?>" method="post" 
+      style="padding: 4px; margin-bottom: 0px; border: 1px solid #ccc; background-color: #ccc;">
     <span style="font-weight: bold;">Configuration:</span>
     <select name="configName" onchange="this.form.submit()">
     <?php
@@ -189,8 +192,6 @@ if (!empty($error)) { ?>
 
 <!-- Configuration part (displayed if the configuration name is set) -->
 <?php if (!empty($configName)) { ?>
-
-
 <!-- Rules overwrite dialog -->
 <div id="rules-overwrite-dialog" style="display:none;" title="Overwrite transformation rules?">
   Test...
@@ -264,14 +265,18 @@ $(function() {
       </tr>
 
       <tr>
-        <td colspan="3" style="border: 1px solid #ccc; background-color: #ddd;"><span style="font-weight: bold;">Transform</span><td>
+        <td colspan="3" style="border: 1px solid #ccc; background-color: #ddd;">
+            <span style="font-weight: bold;">Transform</span>
+        <td>
       <tr>
 
       <tr>
         <td>Transformation Rules</td>
         <td>
-          <?php $rules = $properties[Configuration::TRANSFORM_RULES_TEXT];?>
-          <textarea rows="14" cols="70" name="<?php echo Configuration::TRANSFORM_RULES_TEXT;?>"><?php echo $rules;?></textarea>
+            <?php $rules = $properties[Configuration::TRANSFORM_RULES_TEXT];?>
+            <textarea rows="14" cols="70" name="<?php echo Configuration::TRANSFORM_RULES_TEXT;?>">
+                <?php echo $rules;?>
+            </textarea>
         </td>
         <td>
           <p><input type="submit" name="submit" value="Auto-Generate"></p>
@@ -291,7 +296,9 @@ $(function() {
       </tr>
 
       <tr>
-        <td colspan="3" style="border: 1px solid #ccc; background-color: #ddd;"><span style="font-weight: bold;">Load</span><td>
+        <td colspan="3" style="border: 1px solid #ccc; background-color: #ddd;">
+            <span style="font-weight: bold;">Load</span>
+        <td>
       <tr>
 
       <tr>
@@ -319,7 +326,9 @@ $(function() {
       </tr>
 
       <tr>
-        <td colspan="3" style="border: 1px solid #ccc; background-color: #ddd;"><span style="font-weight: bold;">Processing</span><td>
+        <td colspan="3" style="border: 1px solid #ccc; background-color: #ddd;">
+            <span style="font-weight: bold;">Processing</span>
+        <td>
       </tr>
 
       <tr>

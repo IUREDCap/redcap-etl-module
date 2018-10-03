@@ -1,18 +1,17 @@
 <?php
 
-if (!SUPER_USER) exit("Only super users can access this page!");
+if (!SUPER_USER) {
+    exit("Only super users can access this page!");
+}
 
 require_once __DIR__.'/dependencies/autoload.php';
-require_once __DIR__.'/ServerConfig.php';
 
 use phpseclib\Crypt\RSA;
 use phpseclib\Net\SCP;
 use phpseclib\Net\SFTP;
 use phpseclib\Net\SSH2;
 
-
 use IU\RedCapEtlModule\ServerConfig;
-
 
 $module = new \IU\RedCapEtlModule\RedCapEtlModule();
 $selfUrl      = $module->getUrl(basename(__FILE__));
@@ -79,7 +78,7 @@ if (strcasecmp($submit, 'Save') === 0) {
 # Include REDCap's project page header
 #--------------------------------------------
 ob_start();
-include APP_PATH_DOCROOT . 'ControlCenter/header.php'; 
+include APP_PATH_DOCROOT . 'ControlCenter/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
 $link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
@@ -117,7 +116,8 @@ if (!empty($error)) { ?>
 # Server selection form
 #---------------------------------
 ?>
-<form action="<?php echo $selfUrl;?>" method="post" style="padding: 4px; margin-bottom: 12px; border: 1px solid #ccc; background-color: #ccc;">
+<form action="<?php echo $selfUrl;?>" method="post"
+      style="padding: 4px; margin-bottom: 12px; border: 1px solid #ccc; background-color: #ccc;">
     <span style="font-weight: bold;">Server:</span>
     <select name="serverName" onchange="this.form.submit()">
     <?php
@@ -155,11 +155,19 @@ if (!empty($serverName)) {
       <td style="padding-top: 4px; padding-bottom: 4px; vertical-align: top;">Authentication method:</td>
       <td style="padding: 4px;">
         <input type="radio" name="authMethod" value="<?php echo ServerConfig::AUTH_METHOD_SSH_KEY;?>"
-            <?php if ($authMethod == ServerConfig::AUTH_METHOD_SSH_KEY) echo ' checked '; ?>
+            <?php
+            if ($authMethod == ServerConfig::AUTH_METHOD_SSH_KEY) {
+                echo ' checked ';
+            }
+            ?>
             style="vertical-align: middle; margin: 0;">
         <span style="vertical-align: top; margin-right: 8px;">SSH Key</span>
         <input type="radio" name="authMethod" value="<?php echo ServerConfig::AUTH_METHOD_PASSWORD;?>"
-            <?php if ($authMethod == ServerConfig::AUTH_METHOD_PASSWORD) echo ' checked '; ?>
+            <?php
+            if ($authMethod == ServerConfig::AUTH_METHOD_PASSWORD) {
+                echo ' checked ';
+            }
+            ?>
             style="vertical-align: middle; margin: 0;">
         <span style="vertical-align: top; margin-right: 8px;">Password</span>
       </td>

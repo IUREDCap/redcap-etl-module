@@ -2,7 +2,6 @@
 
 namespace IU\RedCapEtlModule;
 
-
 class AdminConfig implements \JsonSerializable
 {
     const KEY = 'admin-config';
@@ -18,7 +17,7 @@ class AdminConfig implements \JsonSerializable
         $this->maxJobsPerTime = 10;
 
         $this->allowedCronTimes = array();
-        foreach (range(0,6) as $day) {
+        foreach (range(0, 6) as $day) {
             foreach (range(0, 23) as $hour) {
                 if ($day === 0 || $day === 6 || $hour < 8 || $hour > 17) {
                     $this->allowedCronTimes[$day][$hour] = '1';
@@ -53,7 +52,7 @@ class AdminConfig implements \JsonSerializable
 
     public function getTimes()
     {
-        return range(0,23);
+        return range(0, 23);
     }
 
     public function getTimeLabel($time)
@@ -93,7 +92,7 @@ class AdminConfig implements \JsonSerializable
     public function getTimeLabels()
     {
         $labels = array();
-        $labelNumbers = range(0,23);
+        $labelNumbers = range(0, 23);
         for ($i = 0; $i < count($labelNumbers); $i++) {
             $start = $i;
             $end   = $i + 1;
@@ -129,7 +128,7 @@ class AdminConfig implements \JsonSerializable
     public function getLongTimeLabels()
     {
         $labels = array();
-        $labelNumbers = range(0,23);
+        $labelNumbers = range(0, 23);
         for ($i = 0; $i < count($labelNumbers); $i++) {
             $start = $i;
             $end   = $i + 1;
@@ -184,6 +183,4 @@ class AdminConfig implements \JsonSerializable
     {
         return $this->allowCron;
     }
-
 }
-

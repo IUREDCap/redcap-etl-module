@@ -2,13 +2,10 @@
 
 namespace IU\RedCapEtlModule;
 
-require_once __DIR__.'/dependencies/autoload.php';
-
 use phpseclib\Crypt\RSA;
 use phpseclib\Net\SCP;
 use phpseclib\Net\SFTP;
 use phpseclib\Net\SSH2;
-
 
 class ServerConfig implements \JsonSerializable
 {
@@ -111,7 +108,7 @@ class ServerConfig implements \JsonSerializable
             $scpResult = $scp->put($rulesFilePath, $rulesText);
             if (!$scpResult) {
                 throw new \Exception('Copy of transformation rules file to "'.$rulesFilePath.'" failed.');
-            }      
+            }
         }
         
         $propertiesText = $etlConfig->getRedCapEtlPropertiesText($rulesFileName);
@@ -120,7 +117,7 @@ class ServerConfig implements \JsonSerializable
         $scpResult = $scp->put($configFilePath, $propertiesText);
         if (!$scpResult) {
             throw new \Exception('Copy of configuration file to "'.$configFilePath.'" failed.');
-        }       
+        }
         
         #$ssh->setTimeout(1);
         $command = $this->getEtlCommand() . ' ' . $configFileName . ' ' . $rulesFileName;
@@ -165,7 +162,7 @@ class ServerConfig implements \JsonSerializable
         } catch (\Exception $exception) {
             $testOutput = 'ERROR: '.$exception->getMessage();
         }
-        return $testOutput;      
+        return $testOutput;
     }
     
     

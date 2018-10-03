@@ -14,7 +14,8 @@
     },
 	"autoload" : {
 		"psr-4" : {
-			"IU\\RedCapEtlModule\\" : "./"
+			"IU\\RedCapEtlModule\\" : "./",
+            "IU\\REDCapETL\\" : "redcap-etl/src/"
 		}
 	},
     "autoload-dev": {

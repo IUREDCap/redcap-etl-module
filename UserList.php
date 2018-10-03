@@ -2,7 +2,6 @@
 
 namespace IU\RedCapEtlModule;
 
-
 class UserList implements \JsonSerializable
 {
     // Map from usernames to array map of projects IDs
@@ -37,7 +36,7 @@ class UserList implements \JsonSerializable
     
     public function getProjects($username)
     {
-        return $this->userList[$username];    
+        return $this->userList[$username];
     }
     
     public function addProject($username, $projectId)

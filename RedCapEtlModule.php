@@ -2,15 +2,11 @@
 
 namespace IU\RedCapEtlModule;
 
-include_once __DIR__.'/UserList.php';
-include_once __DIR__.'/ServerConfig.php';
-include_once __DIR__.'/Servers.php';
-
 /**
  * Main REDCap-ETL module class.
  */
-class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
-
+class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
+{
     const ADMIN_CONFIG_KEY         = 'admin-config';
     const SERVER_CONFIG_KEY_PREFIX = 'server-config:';
     const SERVERS_KEY              = 'servers';
@@ -142,7 +138,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
 
     /**
      * Gets the specified configuration for the current user.
-     * 
+     *
      * @param string $name the name of the configuration to get.
      * @return Configuration the specified configuration.
      */
@@ -197,7 +193,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
 
     public function removeConfiguration($configName)
     {
-        
     }
 
 
@@ -245,7 +240,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
     public function renameServerConfig($serverName, $newServerName)
     {
         $this->copyServerConfig($serverName, $newServerName);
-        $this->removeServerConfig($serverName);    
+        $this->removeServerConfig($serverName);
     }
     
     
@@ -273,7 +268,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
         $userInfo = $this->getUserInfo();
         echo "select";
         // ...
-
     }
 
 
@@ -327,29 +321,28 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule {
     }
 
 
-	/**
-	 * RENDER TABS FROM ARRAY WITH 'PAGE' AS KEY AND LABEL AS VALUE
-	 */
-	public function renderTabs($tabs=array(), $activeUrl = '')
-	{
-		echo '<div id="sub-nav" style="margin:5px 0 20px;">'."\n";
-		echo '<ul>'."\n";
-	    foreach ($tabs as $this_url => $this_label) {
-	        // Check for Active tab
-		    $isActive = false;
+    /**
+     * RENDER TABS FROM ARRAY WITH 'PAGE' AS KEY AND LABEL AS VALUE
+     */
+    public function renderTabs($tabs = array(), $activeUrl = '')
+    {
+        echo '<div id="sub-nav" style="margin:5px 0 20px;">'."\n";
+        echo '<ul>'."\n";
+        foreach ($tabs as $this_url => $this_label) {
+            // Check for Active tab
+            $isActive = false;
             $class = '';
-			if (strcasecmp($this_url, $activeUrl) === 0) {
+            if (strcasecmp($this_url, $activeUrl) === 0) {
                 $class = ' class="active"';
-	            $isActive = true;
-			}
-		    echo '<li '.$class.'>'."\n";
+                $isActive = true;
+            }
+            echo '<li '.$class.'>'."\n";
             echo '<a href="'.$this_url.'" style="font-size:13px;color:#393733;padding:6px 9px 5px 10px;">';
             echo $this_label.'</a>'."\n";
-		}
-		echo '</li>'."\n";
+        }
+        echo '</li>'."\n";
         echo '</ul>'."\n";
-		echo '</div>'."\n";
-		echo '<div class="clear"></div>'."\n";
-	}
-
+        echo '</div>'."\n";
+        echo '<div class="clear"></div>'."\n";
+    }
 }

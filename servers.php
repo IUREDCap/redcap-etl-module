@@ -1,9 +1,12 @@
 <?php
 
-if (!SUPER_USER) exit("Only super users can access this page!");
+if (!SUPER_USER) {
+    exit("Only super users can access this page!");
+}
 
-require_once __DIR__.'/Servers.php';
-require_once __DIR__.'/RedCapDb.php';
+require_once __DIR__.'/dependencies/autoload.php';
+#require_once __DIR__.'/Servers.php';
+#require_once __DIR__.'/RedCapDb.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\RedCapDb;
@@ -59,7 +62,7 @@ $servers = $module->getServers();
 # Include REDCap's project page header
 #--------------------------------------------
 ob_start();
-include APP_PATH_DOCROOT . 'ControlCenter/header.php'; 
+include APP_PATH_DOCROOT . 'ControlCenter/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
 $link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
@@ -125,33 +128,35 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
     <?php
     $row = 1;
     foreach ($servers as $server) {
-        
-      if ($row % 2 == 0) {
-          echo "<tr class=\"even\">\n";
-      } else {
-          echo "<tr class=\"odd\">\n";
-      }
-      print "<td>{$server}</td>\n";
+        if ($row % 2 == 0) {
+            echo "<tr class=\"even\">\n";
+        } else {
+            echo "<tr class=\"odd\">\n";
+        }
+        print "<td>{$server}</td>\n";
 
-      $serverConfigureUrl = $configureUrl.'&serverName='.$server;
-      print '<td style="text-align:center;">'
-          .'<a href="'.$serverConfigureUrl.'"><img src='.APP_PATH_IMAGES.'gear.png></a>'
-          ."</td>\n";
-
-      print '<td style="text-align:center;">'
-          .'<img src="'.APP_PATH_IMAGES.'page_copy.png" id="copy-'.$server.'" class="copyServer" style="cursor: pointer;">'
-          ."</td>\n";
-
-      print '<td style="text-align:center;">'
-          .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" id="rename-'.$server.'" class="renameServer" style="cursor: pointer;">'
-          ."</td>\n";
-          
-      print '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'delete.png" id="delete-'.$server.'" class="deleteServer" style="cursor: pointer;">'
+        $serverConfigureUrl = $configureUrl.'&serverName='.$server;
+        print '<td style="text-align:center;">'
+            .'<a href="'.$serverConfigureUrl.'"><img src='.APP_PATH_IMAGES.'gear.png></a>'
             ."</td>\n";
+
+        print '<td style="text-align:center;">'
+            .'<img src="'.APP_PATH_IMAGES.'page_copy.png" id="copy-'.$server.'"'
+            .' class="copyServer" style="cursor: pointer;">'
+            ."</td>\n";
+
+        print '<td style="text-align:center;">'
+            .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" id="rename-'.$server.'"'
+            .' class="renameServer" style="cursor: pointer;">'
+            ."</td>\n";
+          
+        print '<td style="text-align:center;">'
+              .'<img src="'.APP_PATH_IMAGES.'delete.png" id="delete-'.$server.'"'
+              .' class="deleteServer" style="cursor: pointer;">'
+              ."</td>\n";
       
-      print "</tr>\n";
-      $row++;
+        print "</tr>\n";
+        $row++;
     }
     ?>
   </tbody>
@@ -170,7 +175,8 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
     To copy the server <span id="server-to-copy" style="font-weight: bold;"></span>,
     enter the name of the new server below, and click on the <span style="font-weight: bold;">Copy server</span> button.
     <p>
-    <span style="font-weight: bold;">New server name:</span> <input type="text" name="copy-to-server-name" id="copy-to-server-name">
+    <span style="font-weight: bold;">New server name:</span>
+    <input type="text" name="copy-to-server-name" id="copy-to-server-name">
     </p>
     <input type="hidden" name="copy-from-server-name" id="copy-from-server-name" value="">
     </form>
@@ -187,9 +193,11 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
     >
     <form id="rename-form" action="<?php echo $selfUrl;?>" method="post">
     To rename the server <span id="server-to-rename" style="font-weight: bold;"></span>,
-    enter the new name for the new server below, and click on the <span style="font-weight: bold;">Rename server</span> button.
+    enter the new name for the new server below, and click on the
+    <span style="font-weight: bold;">Rename server</span> button.
     <p>
-    <span style="font-weight: bold;">New server name:</span> <input type="text" name="rename-new-server-name" id="rename-new-server-name">
+    <span style="font-weight: bold;">New server name:</span>
+    <input type="text" name="rename-new-server-name" id="rename-new-server-name">
     </p>
     <input type="hidden" name="rename-server-name" id="rename-server-name" value="">
     </form>

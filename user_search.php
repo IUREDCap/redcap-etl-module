@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/RedCapDb.php'; 
+require_once __DIR__.'/dependencies/autoload.php';
 
 use IU\RedCapEtlModule\RedCapDb;
 

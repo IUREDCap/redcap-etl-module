@@ -4,7 +4,8 @@ namespace IU\RedCapEtlModule;
 
 use PHPUnit\Framework\TestCase;
 
-class DbHostsTest extends TestCase {
+class DbHostsTest extends TestCase
+{
     public function setup()
     {
     }

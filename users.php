@@ -1,9 +1,13 @@
 <?php
 
-if (!SUPER_USER) exit("Only super users can access this page!");
+if (!SUPER_USER) {
+    exit("Only super users can access this page!");
+}
 
-require_once __DIR__.'/AdminConfig.php';
-require_once __DIR__.'/RedCapDb.php';
+require_once __DIR__.'/dependencies/autoload.php';
+
+#require_once __DIR__.'/AdminConfig.php';
+#require_once __DIR__.'/RedCapDb.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\RedCapDb;
@@ -35,7 +39,7 @@ if (!empty($username)) {
 # Include REDCap's project page header
 #--------------------------------------------
 ob_start();
-include APP_PATH_DOCROOT . 'ControlCenter/header.php'; 
+include APP_PATH_DOCROOT . 'ControlCenter/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
 $link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
@@ -94,22 +98,22 @@ $(function() {
 
 <h5 style="margin-top: 2em;">REDCap-ETL Users</h5>
 <table class="dataTable">
-  <thead>
-    <tr> <th>username</th> </tr>
-  </thead>
-  <tbody>
+    <thead>
+        <tr> <th>username</th> </tr>
+    </thead>
+    <tbody>
     <?php
     $row = 1;
     foreach ($users as $user) {
-      if ($row % 2 == 0) {
-          echo "<tr class=\"even\"><td>{$user}</td></tr>\n";
-      } else {
-          echo "<tr class=\"odd\"><td>{$user}</td></tr>\n";
-      }
-      $row++;
+        if ($row % 2 == 0) {
+            echo "<tr class=\"even\"><td>{$user}</td></tr>\n";
+        } else {
+            echo "<tr class=\"odd\"><td>{$user}</td></tr>\n";
+        }
+        $row++;
     }
     ?>
-  </tbody>
+    </tbody>
 </table>
 
 <?php include APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>

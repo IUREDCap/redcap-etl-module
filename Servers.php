@@ -2,7 +2,6 @@
 
 namespace IU\RedCapEtlModule;
 
-
 class Servers implements \JsonSerializable
 {
     private $servers;
@@ -51,4 +50,3 @@ class Servers implements \JsonSerializable
         return $json;
     }
 }
-

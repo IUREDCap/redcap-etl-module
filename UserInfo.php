@@ -2,7 +2,6 @@
 
 namespace IU\RedCapEtlModule;
 
-
 /**
  * Top-level class for storing user information.
  */
@@ -63,4 +62,3 @@ class UserInfo implements \JsonSerializable
         return $this->username;
     }
 }
-

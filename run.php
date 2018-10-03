@@ -1,7 +1,8 @@
 <?php
 
-require_once __DIR__.'/AdminConfig.php';
-require_once __DIR__.'/Configuration.php';
+require_once __DIR__.'/dependencies/autoload.php';
+#require_once __DIR__.'/AdminConfig.php';
+#require_once __DIR__.'/Configuration.php';
 require_once __DIR__.'/redcap-etl/dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
@@ -89,7 +90,7 @@ if (strcasecmp($submit, 'Run') === 0) {
 # Include REDCap's project page header
 #--------------------------------------------
 ob_start();
-include APP_PATH_DOCROOT . 'ProjectGeneral/header.php'; 
+include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
 $link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
@@ -120,7 +121,9 @@ if (!empty($error)) { ?>
 # Display success message, if any
 #-----------------------------------
 if (!empty($success)) { ?>
-<div align='center' class='darkgreen' style="margin: 20px 0;"><img src='/redcap/redcap_v8.5.11/Resources/images/accept.png'><?php echo $success;?></div>
+<div align='center' class='darkgreen' style="margin: 20px 0;">
+    <img src='/redcap/redcap_v8.5.11/Resources/images/accept.png'><?php echo $success;?>
+</div>
 <?php } ?>
 
 <?php
@@ -128,7 +131,8 @@ if (!empty($success)) { ?>
 # Configuration selection form
 #---------------------------------------
 ?>
-<form action="<?php echo $selfUrl;?>" method="post" style="padding: 4px; margin-bottom: 0px; border: 1px solid #ccc; background-color: #ccc;">
+<form action="<?php echo $selfUrl;?>" method="post" 
+      style="padding: 4px; margin-bottom: 0px; border: 1px solid #ccc; background-color: #ccc;">
     <span style="font-weight: bold;">Configuration:</span>
     <select name="configName" onchange="this.form.submit()">
     <?php
@@ -149,22 +153,22 @@ if (!empty($success)) { ?>
 
 <!-- Run form -->
 <form action="<?php echo $selfUrl;?>" method="post">
-  <fieldset style="border: 2px solid #ccc; border-radius: 7px; padding: 7px;">
-  <legend style="font-weight: bold;">Run Now</legend>
-  <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
-  <input type="submit" name="submit" value="Run" /> on
-  <?php
-  echo '<select name="server">'."\n";
-  echo '<option value="">(embedded server)</option>'."\n";
-  foreach ($servers as $serverName) {
-      $selected = '';
-      if ($serverName === $server) {
-          $selected = 'selected';
-      }
-      echo '<option value="'.$serverName.'" '.$selected.'>'.$serverName."</option>\n";
-  }
-  echo "</select>\n";
-  ?>
+    <fieldset style="border: 2px solid #ccc; border-radius: 7px; padding: 7px;">
+        <legend style="font-weight: bold;">Run Now</legend>
+        <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
+        <input type="submit" name="submit" value="Run" /> on
+        <?php
+        echo '<select name="server">'."\n";
+        echo '<option value="">(embedded server)</option>'."\n";
+        foreach ($servers as $serverName) {
+            $selected = '';
+            if ($serverName === $server) {
+                $selected = 'selected';
+            }
+            echo '<option value="'.$serverName.'" '.$selected.'>'.$serverName."</option>\n";
+        }
+        echo "</select>\n";
+        ?>
   <p><?php echo "<pre>{$runOutput}</pre>\n";?></p>
   </fieldset>
 </form>
@@ -226,36 +230,30 @@ $(function () {
       </tr>
     </thead>
     <tbody>
-      <!--
-      <tr>
-        <td>&nbsp;</td>
-        <td style="text-align:center;"><button type="button" onclick="$('input[name=Sunday]').prop('checked', false);">Clear</button></td>
-      </tr>
-      -->
-      <?php
-      $row = 1;
-      foreach ($adminConfig->getTimes() as $time) {
-          if ($row % 2 === 0) {
-              echo '<tr class="even-row">';
-          } else {
-              echo '<tr>';
-          }
-          echo "<td>".($adminConfig->getTimeLabel($time))."</td>";
-          foreach (AdminConfig::DAY_LABELS as $day => $label) {
-              $value = ($day * 100) + $time;
-              $radioName = 'Week';
+    <?php
+    $row = 1;
+    foreach ($adminConfig->getTimes() as $time) {
+        if ($row % 2 === 0) {
+            echo '<tr class="even-row">';
+        } else {
+            echo '<tr>';
+        }
+        echo "<td>".($adminConfig->getTimeLabel($time))."</td>";
+        foreach (AdminConfig::DAY_LABELS as $day => $label) {
+            $value = ($day * 100) + $time;
+            $radioName = 'Week';
 
-              if ($adminConfig->isAllowedCronTime($day, $time)) {
-                  echo '<td class="day" ><input type="radio" name="'.$radioName.'" value="'.$value.'"></td>'."\n";
-              } else {
-                  echo '<td class="day" ><input type="radio" name="'.$radioName.'" value="'.$value.'" disabled></td>'."\n";
-                  #echo '<td class="day cron-not-allowed"><span style="color: red;" class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span></td>'."\n";
-              }
-          }
-          echo "</tr>\n";
-          $row++;
-      }
-      ?>
+            if ($adminConfig->isAllowedCronTime($day, $time)) {
+                echo '<td class="day" ><input type="radio" name="'.$radioName.'" value="'.$value.'"></td>'."\n";
+            } else {
+                echo '<td class="day" ><input type="radio" name="'.$radioName.'"'
+                    .' value="'.$value.'" disabled></td>'."\n";
+            }
+        }
+        echo "</tr>\n";
+        $row++;
+    }
+    ?>
     </tbody>
   </table>
   </fieldset>

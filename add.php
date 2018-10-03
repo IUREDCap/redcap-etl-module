@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/Configuration.php';
+require_once __DIR__.'/dependencies/autoload.php';
 
 $redCapEtl = new \IU\RedCapEtlModule\RedCapEtlModule();
 
@@ -15,7 +15,7 @@ $submit = $_POST['submit'];
 # Add configuration submit
 #----------------------------------------------
 if (strcasecmp($submit, 'Add') === 0) {
-    if (!array_key_exists('configurationName',$_POST) || empty($_POST['configurationName'])) {
+    if (!array_key_exists('configurationName', $_POST) || empty($_POST['configurationName'])) {
         $error = 'ERROR: No configuration name was specified.';
     } else {
         $configurationName = $_POST['configurationName'];

@@ -1,8 +1,11 @@
 <?php
 
-if (!SUPER_USER) exit("Only super users can access this page!");
+if (!SUPER_USER) {
+    exit("Only super users can access this page!");
+}
 
-require_once __DIR__.'/AdminConfig.php';
+require_once __DIR__.'/dependencies/autoload.php';
+#require_once __DIR__.'/AdminConfig.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 
@@ -23,7 +26,7 @@ if (strcasecmp($submit, 'Save') === 0) {
 # Include REDCap's project page header
 #--------------------------------------------
 ob_start();
-include APP_PATH_DOCROOT . 'ControlCenter/header.php'; 
+include APP_PATH_DOCROOT . 'ControlCenter/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
 $link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
@@ -40,12 +43,12 @@ echo $buffer;
   <input type="checkbox"> Allow embedded REDCap-ETL server
   <br />
     
-  <?php
-  $checked = '';
-  if ($adminConfig->getAllowCron()) {;
-      $checked = 'checked';
-  }
-  ?>
+    <?php
+    $checked = '';
+    if ($adminConfig->getAllowCron()) {
+        $checked = 'checked';
+    }
+    ?>
   <input type="checkbox" name="allowCron" <?php echo $checked;?>>
   Allow ETL cron jobs? <br />
 
@@ -57,38 +60,38 @@ echo $buffer;
         <?php
         foreach (AdminConfig::DAY_LABELS as $dayLabel) {
             echo '<th style="width: 6em">'.$dayLabel."</th>\n";
-        } 
+        }
         ?>
       </tr>
     </thead>
     <tbody>
-      <?php
-      $row = 1;
-      foreach (range(0,23) as $time) {
-          if ($row % 2 === 0) {
-             print '<tr class="even-row">'."\n";
-          } else {
-              print '<tr>'."\n";
-          }
-          $row++;
-          $label = $adminConfig->getTimeLabel($time);
-      ?>
-          <td><?php echo $label;?></td>
-          <?php
-          foreach (range(0,6) as $day) {
-              echo '<td class="day">';
-              if ($adminConfig->isAllowedCronTime($day, $time)) {
-                 echo '<input type="checkbox" checked>';
-              } else {
-                 echo '<input type="checkbox">';
-              }
-              echo '</td>'."\n";
-          }
-          ?>
+    <?php
+    $row = 1;
+    foreach (range(0, 23) as $time) {
+        if ($row % 2 === 0) {
+            print '<tr class="even-row">'."\n";
+        } else {
+            print '<tr>'."\n";
+        }
+        $row++;
+        $label = $adminConfig->getTimeLabel($time);
+    ?>
+        <td><?php echo $label;?></td>
+        <?php
+        foreach (range(0, 6) as $day) {
+            echo '<td class="day">';
+            if ($adminConfig->isAllowedCronTime($day, $time)) {
+                echo '<input type="checkbox" checked>';
+            } else {
+                echo '<input type="checkbox">';
+            }
+            echo '</td>'."\n";
+        }
+        ?>
       </tr>
-      <?php
-      }
-      ?>
+    <?php
+    }
+    ?>
     </tbody>
   </table>
   <p>
