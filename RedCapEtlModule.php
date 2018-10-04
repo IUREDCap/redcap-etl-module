@@ -190,6 +190,35 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         \REDCap::logEvent('Added REDCap-ETL configuration '.$name.'.');
     }
 
+
+    public function copyConfiguration($fromConfigName, $toConfigName)
+    {
+        #--------------------------------------------------------
+        # Add the configuration name to the user's information
+        #--------------------------------------------------------
+        $userInfo = $this->getUserInfo();
+        $userInfo->addConfigName($toConfigName);
+        $json = $userInfo->toJson();
+        $userKey = $this->getUserKey();
+        $this->setSystemSetting($userKey, $json);
+        
+        #-----------------------------------------------------
+        # Copy the actual configuration
+        #-----------------------------------------------------
+        $toConfig = $this->getConfiguration($fromConfigName);
+        $toConfig->setName($toConfigName);
+        $json = $toConfig->toJson();
+        $key = $this->getConfigurationKey($toConfigName);
+        $this->setSystemSetting($key, $json);
+    }
+    
+
+    public function renameConfiguration($configName, $newConfigName)
+    {
+        $this->copyConfiguration($configName, $newConfigName);
+        $this->removeConfiguration($configName);
+    }
+    
     public function removeConfiguration($configName)
     {
         #-----------------------------------------------------------

@@ -4,6 +4,27 @@ require_once __DIR__.'/dependencies/autoload.php';
 
 $module = new \IU\RedCapEtlModule\RedCapEtlModule();
 
+$copyFromConfigName = $_POST['copyFromConfigName'];
+$copyToConfigName   = $_POST['copyToConfigName'];
+if (!empty($copyFromConfigName) && !empty($copyToConfigName)) {
+    try {
+        $module->copyConfiguration($copyFromConfigName, $copyToConfigName);
+    } catch (Exception $exception) {
+        $error = 'ERROR: ' . $exception->getMessage();
+    }
+}
+
+
+$renameConfigName    = $_POST['renameConfigName'];
+$renameNewConfigName = $_POST['renameNewConfigName'];
+if (!empty($renameConfigName) && !empty($renameNewConfigName)) {
+    try {
+        $module->renameConfiguration($renameConfigName, $renameNewConfigName);
+    } catch (Exception $exception) {
+        $error = 'ERROR: ' . $exception->getMessage();
+    }
+}
+
 $deleteConfigName = $_POST['deleteConfigName'];
 if (!empty($deleteConfigName)) {
     $module->removeConfiguration($deleteConfigName);
@@ -43,7 +64,14 @@ $runUrl    = $module->getUrl("run.php");
 
 <table class="dataTable">
 <thead>
-<tr class="hrd"> <th>Configuration Name</th> <th>Configure</th> <th>Run</th> <th>Delete</th> </tr>
+<tr class="hrd">
+    <th>Configuration Name</th>
+    <th>Configure</th>
+    <th>Run</th>
+    <th>Copy</th>
+    <th>Rename</th>
+    <th>Delete</th>
+</tr>
 </thead>
 <tbody>
 <?php
@@ -66,7 +94,16 @@ foreach ($configurationNames as $configurationName) {
         .'<a href="'.$runConfigurationUrl.'"><img src='.APP_PATH_IMAGES.'application_go.png></a>'
         ."</td>\n";
     print '<td style="text-align:center;">'
-        .'<img src="'.APP_PATH_IMAGES.'delete.png" class="deleteConfig" id="delete'.$configurationName.'"/>'
+        .'<img src="'.APP_PATH_IMAGES.'page_copy.png" class="copyConfig" style="cursor: pointer;"'
+        .' id="copy'.$configurationName.'"/>'
+        ."</td>\n";
+    print '<td style="text-align:center;">'
+        .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" class="renameConfig" style="cursor: pointer;"'
+        .' id="rename'.$configurationName.'"/>'
+        ."</td>\n";
+    print '<td style="text-align:center;">'
+        .'<img src="'.APP_PATH_IMAGES.'delete.png" class="deleteConfig" style="cursor: pointer;"'
+        .' id="delete'.$configurationName.'"/>'
         ."</td>\n";
 
     print "</tr>\n";
@@ -76,6 +113,97 @@ foreach ($configurationNames as $configurationName) {
 ?>
 </tbody>
 </table>
+
+
+
+<?php
+#--------------------------------------
+# Copy config dialog
+#--------------------------------------
+?>
+<script>
+$(function() {
+    copyForm = $("#copyForm").dialog({
+        autoOpen: false,
+        height: 200,
+        width: 400,
+        modal: true,
+        buttons: {
+            Cancel: function() {$(this).dialog("close");},
+            "Copy configuration": function() {copyForm.submit(); $(this).dialog("close");}
+        },
+        title: "Copy configuration"
+    });
+    $(".copyConfig").click(function(){
+        var id = this.id;
+        var configName = id.substring(4);
+        $("#configToCopy").text('"'+configName+'"');
+        $('#copyFromConfigName').val(configName);
+        $("#copyForm").dialog("open");
+    });
+});
+</script>
+<div id="copyDialog"
+    title="Configuration Copy"
+    style="display: none;"
+    >
+    <form id="copyForm" action="<?php echo $selfUrl;?>" method="post">
+    To copy the configuration <span id="configToCopy" style="font-weight: bold;"></span>,
+    enter the name of the new configuration below, and click on the
+    <span style="font-weight: bold;">Copy configuration</span> button.
+    <p>
+    <span style="font-weight: bold;">New configuration name:</span>
+    <input type="text" name="copyToConfigName" id="copyToConfigName">
+    </p>
+    <input type="hidden" name="copyFromConfigName" id="copyFromConfigName" value="">
+    </form>
+</div>
+
+<?php
+#--------------------------------------
+# Rename config dialog
+#--------------------------------------
+?>
+<script>
+$(function() {
+    // Rename ETL configuration form
+    renameForm = $("#renameForm").dialog({
+        autoOpen: false,
+        height: 220,
+        width: 400,
+        modal: true,
+        buttons: {
+            Cancel: function() {$(this).dialog("close");},
+            "Rename configuration": function() {renameForm.submit();}
+        },
+        title: "Rename configuration"
+    });
+    
+    $(".renameConfig").click(function(){
+        var id = this.id; // id contains the configuration name
+        var configName = id.substring(6);
+        $("#configToRename").text('"'+configName+'"');
+        $('#renameConfigName').val(configName);
+        $("#renameForm").dialog("open");
+    });
+});
+</script>
+<div id="renameDialog"
+    title="Configuration Rename"
+    style="display: none;"
+    >
+    <form id="renameForm" action="<?php echo $selfUrl;?>" method="post">
+    To rename the configuration <span id="configToRename" style="font-weight: bold;"></span>,
+    enter the new name for the new sconfiguration below, and click on the
+    <span style="font-weight: bold;">Rename configuration</span> button.
+    <p>
+    <span style="font-weight: bold;">New configuration name:</span>
+    <input type="text" name="renameNewConfigName" id="renameNewConfigName">
+    </p>
+    <input type="hidden" name="renameConfigName" id="renameConfigName" value="">
+    </form>
+</div>
+
 
 <?php
 #--------------------------------------
@@ -99,10 +227,10 @@ $(function() {
     
     $(".deleteConfig").click(function(){
         var id = this.id;
-        var server = id.substring(6);
-        $("#configToDelete").text('"'+server+'"');
-        $('#deleteConfigName').val(server);
-        $("#deleteForm").data('server', server).dialog("open");
+        var configName = id.substring(6);
+        $("#configToDelete").text('"'+configName+'"');
+        $('#deleteConfigName').val(configName);
+        $("#deleteForm").dialog("open");
     });
 });
 </script>

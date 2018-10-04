@@ -66,6 +66,23 @@ class Configuration implements \JsonSerializable
         return (object) get_object_vars($this);
     }
 
+
+    public function fromJson($json)
+    {
+        if (!empty($json)) {
+            $object = json_decode($json);
+            foreach (get_object_vars($this) as $var => $value) {
+                $this->$var = $object->$var;
+            }
+        }
+    }
+
+    public function toJson()
+    {
+        $json = json_encode($this);
+        return $json;
+    }
+
     public function set($properties)
     {
         #------------------------------------------------
@@ -169,6 +186,11 @@ class Configuration implements \JsonSerializable
     public function getName()
     {
         return $this->name;
+    }
+    
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
     public function getApiUrl()
