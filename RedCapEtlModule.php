@@ -196,7 +196,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         # Remove the configuration name from the user's information
         #-----------------------------------------------------------
         $userInfo = $this->getUserInfo();
-        if (isset($userInfo) && $userInfo->hasConfigName($name)) {
+        if (isset($userInfo) && $userInfo->hasConfigName($configName)) {
             $userInfo->removeConfigName($configName);
             $json = $userInfo->toJson();
             $userKey = $this->getUserKey();

@@ -2,7 +2,13 @@
 
 require_once __DIR__.'/dependencies/autoload.php';
 
-$redCapEtlModule = new \IU\RedCapEtlModule\RedCapEtlModule();
+$module = new \IU\RedCapEtlModule\RedCapEtlModule();
+
+$deleteConfigName = $_POST['deleteConfigName'];
+if (!empty($deleteConfigName)) {
+    $module->removeConfiguration($deleteConfigName);
+}
+
 
 # include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 
@@ -24,15 +30,15 @@ echo $buffer;
 <?php
 
 
-$configurationNames = $redCapEtlModule->getUserConfigurationNames();
+$configurationNames = $module->getUserConfigurationNames();
 
-$selfUrl   = $redCapEtlModule->getUrl(basename(__FILE__));
-$configUrl = $redCapEtlModule->getUrl("configure.php");
-$runUrl    = $redCapEtlModule->getUrl("run.php");
+$selfUrl   = $module->getUrl(basename(__FILE__));
+$configUrl = $module->getUrl("configure.php");
+$runUrl    = $module->getUrl("run.php");
 
 ?>
 
-<?php $redCapEtlModule->renderUserTabs($selfUrl); ?>
+<?php $module->renderUserTabs($selfUrl); ?>
 
 
 <table class="dataTable">
@@ -60,7 +66,7 @@ foreach ($configurationNames as $configurationName) {
         .'<a href="'.$runConfigurationUrl.'"><img src='.APP_PATH_IMAGES.'application_go.png></a>'
         ."</td>\n";
     print '<td style="text-align:center;">'
-        .'<a id="delete'.$row.'" href="'.$selfUrl.'"><img src="'.APP_PATH_IMAGES.'delete.png" /></a>'
+        .'<img src="'.APP_PATH_IMAGES.'delete.png" class="deleteConfig" id="delete'.$configurationName.'"/>'
         ."</td>\n";
 
     print "</tr>\n";
@@ -70,6 +76,47 @@ foreach ($configurationNames as $configurationName) {
 ?>
 </tbody>
 </table>
+
+<?php
+#--------------------------------------
+# Delete config dialog
+#--------------------------------------
+?>
+<script>
+$(function() {
+    // Delete ETL configuration form
+    deleteForm = $("#deleteForm").dialog({
+        autoOpen: false,
+        height: 170,
+        width: 400,
+        modal: true,
+        buttons: {
+            Cancel: function() {$(this).dialog("close");},
+            "Delete configuration": function() {deleteForm.submit();}
+        },
+        title: "Delete configuration"
+    });
+    
+    $(".deleteConfig").click(function(){
+        var id = this.id;
+        var server = id.substring(6);
+        $("#configToDelete").text('"'+server+'"');
+        $('#deleteConfigName').val(server);
+        $("#deleteForm").data('server', server).dialog("open");
+    });
+});
+</script>
+<div id="deleteDialog"
+    title="Configuration Delete"
+    style="display: none;"
+    >
+    <form id="deleteForm" action="<?php echo $selfUrl;?>" method="post">
+    To delete the ETL configuration <span id="configToDelete" style="font-weight: bold;"></span>,
+    click on the <span style="font-weight: bold;">Delete configuration</span> button.
+    <input type="hidden" name="deleteConfigName" id="deleteConfigName" value="">
+    </form>
+</div>
+
 
 
 <?php include APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
