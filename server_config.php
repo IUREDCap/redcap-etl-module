@@ -141,7 +141,7 @@ if (!empty($error)) { ?>
 #----------------------------------------------------
 if (!empty($serverName)) {
     $authMethod = $serverConfig->getAuthMethod();
-    print "authMethod: {$authMethod}<br />\n";
+    #print "authMethod: {$authMethod}<br />\n";
 ?>
 <form action=<?php echo $selfUrl;?> method="post">
   <input type="hidden" name="serverName" value="<?php echo $serverConfig->getName();?>">

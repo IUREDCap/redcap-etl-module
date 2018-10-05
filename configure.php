@@ -207,7 +207,40 @@ $(function() {
     });
 });
 </script>
-          
+
+
+<script>
+// Show/hide API Token
+$(function() {
+    $("#showApiToken").change(function() {
+        var newType = 'password';
+        if ($(this).is(':checked')) {
+            newType = 'text';
+        }
+        $("#apiToken").each(function(){
+            $("<input type='" + newType + "'>")
+                .attr({ id: this.id, name: this.name, value: this.value, size: this.size, style: this.style })
+                .insertBefore(this);
+        }).remove();       
+    })
+});    
+
+// Show/hide Db Password
+$(function() {
+    $("#showDbPassword").change(function() {
+        var newType = 'password';
+        if ($(this).is(':checked')) {
+            newType = 'text';
+        }
+        $("#dbPassword").each(function(){
+            $("<input type='" + newType + "'>")
+                .attr({ id: this.id, name: this.name, value: this.value, size: this.size, style: this.style })
+                .insertBefore(this);
+        }).remove();       
+    })
+});    
+</script>
+              
 <!-- Configuration form -->
 <form action="<?php echo $selfUrl;?>" method="post" enctype="multipart/form-data" style="margin-top: 17px;">
 
@@ -242,8 +275,10 @@ $(function() {
           Data Project API Token
         </td>
         <td>
-          <input size="32" value="<?php echo $properties[Configuration::DATA_SOURCE_API_TOKEN];?>"
-                           name="<?php echo Configuration::DATA_SOURCE_API_TOKEN;?>" type="text" />
+          <input type="password" size="34" value="<?php echo $properties[Configuration::DATA_SOURCE_API_TOKEN];?>"
+                           name="<?php echo Configuration::DATA_SOURCE_API_TOKEN;?>" id="apiToken" style="vertical-align: middle;"/>
+          <input type="checkbox" id="showApiToken" style="vertical-align: middle; margin: 0;">
+          <span style="vertical-align: middle;">Show</span>
         </td>
         <td>
           <div id="dialog" style="display:none;" title="Data Source API Token">
@@ -321,8 +356,12 @@ $(function() {
 
       <tr>
         <td>Database password</td>
-        <td><input type="text" name="<?php echo Configuration::DB_PASSWORD;?>"
-                   value="<?php echo $properties[Configuration::DB_PASSWORD]?>"/></td>
+        <td>
+          <input type="password" name="<?php echo Configuration::DB_PASSWORD;?>"
+                 value="<?php echo $properties[Configuration::DB_PASSWORD]?>" id="dbPassword"/>
+          <input type="checkbox" id="showDbPassword" style="vertical-align: middle; margin: 0;">
+          <span style="vertical-align: middle;">Show</span>
+        </td>
       </tr>
 
       <tr>

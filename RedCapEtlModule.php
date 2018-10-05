@@ -339,7 +339,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $listUrl = $this->getUrl('index.php');
         $listLabel = '<span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>'
-           .' My Configurations';
+           .' My ETL Configurations';
 
         $addUrl = $this->getUrl('add.php');
         $addLabel = '<span style="color: #008000;" class="glyphicon glyphicon-plus" aria-hidden="true"></span>'
