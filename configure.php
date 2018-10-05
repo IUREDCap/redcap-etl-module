@@ -276,7 +276,7 @@ $(function() {
         </td>
         <td>
           <input type="password" size="34" value="<?php echo $properties[Configuration::DATA_SOURCE_API_TOKEN];?>"
-                           name="<?php echo Configuration::DATA_SOURCE_API_TOKEN;?>" id="apiToken" style="vertical-align: middle;"/>
+                           name="<?php echo Configuration::DATA_SOURCE_API_TOKEN;?>" id="apiToken"/>
           <input type="checkbox" id="showApiToken" style="vertical-align: middle; margin: 0;">
           <span style="vertical-align: middle;">Show</span>
         </td>

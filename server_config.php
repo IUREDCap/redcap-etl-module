@@ -72,6 +72,8 @@ if (strcasecmp($submit, 'Save') === 0) {
 }
 ?>
 
+
+
 <?php #include APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>
 <?php
 #--------------------------------------------
@@ -135,6 +137,38 @@ if (!empty($error)) { ?>
 </form>
 
 
+<script>
+// Show/hide Password
+$(function() {
+    $("#showPassword").change(function() {
+        var newType = 'password';
+        if ($(this).is(':checked')) {
+            newType = 'text';
+        }
+        $("#password").each(function(){
+            $("<input type='" + newType + "' style='margin: 4px;' >")
+                .attr({ id: this.id, name: this.name, value: this.value, size: this.size})
+                .insertBefore(this);
+        }).remove();       
+    })
+});    
+
+// Show/hide SSH Key Password
+$(function() {
+    $("#showSshKeyPassword").change(function() {
+        var newType = 'password';
+        if ($(this).is(':checked')) {
+            newType = 'text';
+        }
+        $("#sshKeyPassword").each(function(){
+            $("<input type='" + newType + "' style='margin: 4px;' >")
+                .attr({ id: this.id, name: this.name, value: this.value, size: this.size })
+                .insertBefore(this);
+        }).remove();       
+    })
+});    
+</script>
+
 <?php
 #----------------------------------------------------
 # Server configuration form
@@ -179,8 +213,12 @@ if (!empty($serverName)) {
     </tr>
     <tr id="passwordRow">
       <td>Password:</td>
-      <td><input type="password" name="password" value="<?php echo $serverConfig->getPassword();?>"
-                 size="28" style="margin: 4px;"></td>
+      <td>
+        <input type="password" name="password" value="<?php echo $serverConfig->getPassword();?>"
+               size="28" style="margin: 4px;" id="password">
+        <input type="checkbox" id="showPassword" style="vertical-align: middle; margin: 0;">
+        <span style="vertical-align: middle;">Show</span>
+      </td>
     </tr>
     <tr id="sshKeyFileRow">
       <td>SSH key file:</td>
@@ -189,8 +227,12 @@ if (!empty($serverName)) {
     </tr>
     <tr id="sshKeyPasswordRow">
       <td>SSH key password:</td>
-      <td><input type="password" name="sshKeyPassword" value="<?php echo $serverConfig->getSshKeyPassword();?>"
-                 size="44" style="margin: 4px;"></td>
+      <td>
+        <input type="password" name="sshKeyPassword" value="<?php echo $serverConfig->getSshKeyPassword();?>"
+               size="44" style="margin: 4px;" id="sshKeyPassword">
+        <input type="checkbox" id="showSshKeyPassword" style="vertical-align: middle; margin: 0;">
+        <span style="vertical-align: middle;">Show</span>
+      </td>
     </tr>
         
     <tr>
