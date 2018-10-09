@@ -18,6 +18,7 @@ class AdminConfig implements \JsonSerializable
 
         $this->allowedCronTimes = array();
         foreach (range(0, 6) as $day) {
+            $this->allowedCronTimes[$day] = array();
             foreach (range(0, 23) as $hour) {
                 if ($day === 0 || $day === 6 || $hour < 8 || $hour > 17) {
                     $this->allowedCronTimes[$day][$hour] = '1';
@@ -31,12 +32,6 @@ class AdminConfig implements \JsonSerializable
     public function jsonSerialize()
     {
         return (object) get_object_vars($this);
-    }
-
-    public function isAllowedCronTime($day, $time)
-    {
-        $isAllowed = $this->allowedCronTimes[$day][$time];
-        return $isAllowed;
     }
 
     public function getDayLabel($dayNumber)
@@ -182,5 +177,32 @@ class AdminConfig implements \JsonSerializable
     public function getAllowCron()
     {
         return $this->allowCron;
+    }
+    
+    public function setAllowCron($allowCron)
+    {
+        $this->allowCron = $allowCron;
+    }
+
+    public function isAllowedCronTime($day, $time)
+    {
+        $isAllowed = $this->allowedCronTimes[$day][$time];
+        return $isAllowed;
+    }
+        
+    public function setAllowedCronTimes($times)
+    {
+        $this->allowedCronTimes = array();
+        foreach (range(0, 6) as $day) {
+            $this->allowedCronTimes[$day] = array();
+            
+            foreach (range(0, 23) as $hour) {
+                if (array_key_exists($day, $times) && array_key_exists($hour, $times[$day])) {
+                    $this->allowedCronTimes[$day][$hour] = 1;
+                } else {
+                    $this->allowedCronTimes[$day][$hour] = 0;
+                }
+            }
+        }
     }
 }

@@ -14,13 +14,22 @@ $selfUrl = $module->getUrl(basename(__FILE__));
 
 $adminConfig = $module->getAdminConfig();
 
-$submit = $_POST['submit'];
-if (strcasecmp($submit, 'Save') === 0) {
+$submitValue = $_POST['submitValue'];
+if (strcasecmp($submitValue, 'Save') === 0) {
+    $times = $_POST['times'];
+    $adminConfig->setAllowedCronTimes($times);
+    
+    $allowCron = $_POST['allowCron'];
+    $adminConfig->setAllowCron($allowCron);
+    
+    $module->setAdminConfig($adminConfig);
     $success = "Admin configuration saved.";
 }
+
 ?>
 
 <?php #include APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>
+
 <?php
 #--------------------------------------------
 # Include REDCap's project page header
@@ -36,9 +45,24 @@ echo $buffer;
 
 <h4><img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>table_gear.png">REDCap-ETL Admin</h4>
 
-<?php $module->renderAdminTabs($selfUrl); ?>
 
-<form>
+<?php
+
+$module->renderAdminTabs($selfUrl);
+
+#----------------------------
+# Display messages, if any
+#----------------------------
+$module->renderErrorMessageDiv($error);
+$module->renderSuccessMessageDiv($success);
+
+?>
+
+<?php
+#print "<pre>POST:\n"; print_r($_POST); print "</pre>\n";
+?>
+
+<form action="<?php echo $selfUrl;?>" method="post">
 
   <input type="checkbox"> Allow embedded REDCap-ETL server
   <br />
@@ -79,11 +103,12 @@ echo $buffer;
         <td><?php echo $label;?></td>
         <?php
         foreach (range(0, 6) as $day) {
-            echo '<td class="day">';
+            $name = 'times['.$day.']['.$time.']';
+            echo '<td class="day">'."\n";
             if ($adminConfig->isAllowedCronTime($day, $time)) {
-                echo '<input type="checkbox" checked>';
+                echo '<input type="checkbox" name="'.$name.'" checked>';
             } else {
-                echo '<input type="checkbox">';
+                echo '<input type="checkbox" name="'.$name.'">';
             }
             echo '</td>'."\n";
         }
@@ -95,7 +120,7 @@ echo $buffer;
     </tbody>
   </table>
   <p>
-    <input type="submit" name="submit" value="Save">
+    <input type="submit" name="submitValue" value="Save">
   </p>
 </form>
 

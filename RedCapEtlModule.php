@@ -77,6 +77,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         return $names;
     }
 
+    public function getUserCronJobs()
+    {
+        $users = $this->getUsers();
+        return $users;
+    }
 
     #==================================================================================
     # Configuration methods
@@ -402,13 +407,20 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $scheduleLabel = '<span class="glyphicon glyphicon-time" aria-hidden="true"></span>'
            .' Schedule';
 
-        $tabs = array(
-            $listUrl => $listLabel,
-            $addUrl => $addLabel,
-            $configUrl => $configLabel,
-            $scheduleUrl => $scheduleLabel,
-            $runUrl => $runLabel
-        );
+        $adminConfig = $this->getAdminConfig();
+        
+        $tabs = array();
+        
+        $tabs[$listUrl]     = $listLabel;
+        $tabs[$addUrl]      = $addLabel;
+        $tabs[$configUrl]   = $configLabel;
+        
+        if ($adminConfig->getAllowCron()) {
+            $tabs[$scheduleUrl] = $scheduleLabel;
+        }
+    
+        $tabs[$runUrl]      = $runLabel;
+        
         $this->renderTabs($tabs, $activeUrl);
     }
 
@@ -436,5 +448,26 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         echo '</ul>'."\n";
         echo '</div>'."\n";
         echo '<div class="clear"></div>'."\n";
+    }
+    
+    public function renderSuccessMessageDiv($message)
+    {
+        if (!empty($message)) {
+            echo '<div align="center" class="darkgreen" style="margin: 20px 0;">'."\n";
+            echo '<img src="'.(APP_PATH_IMAGES.'accept.png').'">';
+            echo "{$message}\n";
+            echo "</div>\n";
+        }
+    }
+    
+        
+    public function renderErrorMessageDiv($message)
+    {
+        if (!empty($message)) {
+            echo '<div align="center" class="red" style="margin: 20px 0;">'."\n";
+            echo '<img src="'.(APP_PATH_IMAGES.'exclamation.png').'">';
+            echo "{$message}\n";
+            echo "</div>\n";
+        }
     }
 }
