@@ -19,6 +19,9 @@ if (strcasecmp($submitValue, 'Save') === 0) {
     $times = $_POST['times'];
     $adminConfig->setAllowedCronTimes($times);
     
+    $allowOnDemand = $_POST['allowOnDemand'];
+    $adminConfig->setAllowOnDemand($allowOnDemand);
+    
     $allowCron = $_POST['allowCron'];
     $adminConfig->setAllowCron($allowCron);
     
@@ -64,8 +67,17 @@ $module->renderSuccessMessageDiv($success);
 
 <form action="<?php echo $selfUrl;?>" method="post">
 
-  <input type="checkbox"> Allow embedded REDCap-ETL server
-  <br />
+    <input type="checkbox"> Allow embedded REDCap-ETL server
+    <br />
+    
+    <?php
+    $checked = '';
+    if ($adminConfig->getAllowOnDemand()) {
+        $checked = 'checked';
+    }
+    ?>
+    <input type="checkbox" name="allowOnDemand" <?php echo $checked;?>>
+    Allow ETL jobs to be run on demand? <br />
     
     <?php
     $checked = '';
@@ -73,8 +85,8 @@ $module->renderSuccessMessageDiv($success);
         $checked = 'checked';
     }
     ?>
-  <input type="checkbox" name="allowCron" <?php echo $checked;?>>
-  Allow ETL cron jobs? <br />
+    <input type="checkbox" name="allowCron" <?php echo $checked;?>>
+    Allow ETL cron jobs? <br />
 
   <p>Allowed ETL cron job times</p>
   <table class="cron-schedule">

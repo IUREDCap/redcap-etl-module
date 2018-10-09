@@ -7,13 +7,18 @@ class AdminConfig implements \JsonSerializable
     const KEY = 'admin-config';
     const DAY_LABELS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+    private $allowOnDemand;  // Allow the ETL process to be run on demand
+    
     private $allowCron;
     private $allowedCronTimes;
+    
     private $maxJobsPerTime;
 
     public function __construct()
     {
-        $this->allowCron      = true;
+        $this->allowOnDemandRuns = true;
+        $this->allowCron         = true;
+        
         $this->maxJobsPerTime = 10;
 
         $this->allowedCronTimes = array();
@@ -174,6 +179,16 @@ class AdminConfig implements \JsonSerializable
         return $json;
     }
 
+    public function getAllowOnDemand()
+    {
+        return $this->allowOnDemand;
+    }
+    
+    public function setAllowOnDemand($allowOnDemand)
+    {
+        $this->allowOnDemand = $allowOnDemand;
+    }
+    
     public function getAllowCron()
     {
         return $this->allowCron;

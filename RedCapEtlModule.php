@@ -419,7 +419,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             $tabs[$scheduleUrl] = $scheduleLabel;
         }
     
-        $tabs[$runUrl]      = $runLabel;
+        if ($adminConfig->getAllowOnDemand()) {
+            $tabs[$runUrl] = $runLabel;
+        }
         
         $this->renderTabs($tabs, $activeUrl);
     }
