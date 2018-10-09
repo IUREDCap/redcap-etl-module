@@ -22,10 +22,13 @@ class Configuration implements \JsonSerializable
     
     const BATCH_SIZE = 'batch_size';
 
-    const EMAIL_FROM_ADDRESS     = 'email_from_address';
-    const EMAIL_SUBJECT          = 'email_subject';
-    const EMAIL_TO_LIST          = 'email_to_list';
+    const EMAIL_FROM_ADDRESS  = 'email_from_address';
+    const EMAIL_SUBJECT       = 'email_subject';
+    const EMAIL_TO_LIST       = 'email_to_list';
 
+    const CRON_SERVER   = 'cron_server';
+    const CRON_SCHEDULE = 'cron_schedule';
+    
     private $name;
     private $properties;
 
@@ -130,7 +133,7 @@ class Configuration implements \JsonSerializable
 
     public function setProperty($propertyName, $value)
     {
-        $this->$properties[$propertyName] = $value;
+        $this->properties[$propertyName] = $value;
     }
 
     public function getProperties()
@@ -142,13 +145,20 @@ class Configuration implements \JsonSerializable
     {
         $properties = $this->properties;
         
+        #---------------------------------------
+        # Remove properties that aren't used
+        # by REDCap-ETL
+        #---------------------------------------
         unset($properties[self::DB_HOST]);
         unset($properties[self::DB_NAME]);
         unset($properties[self::DB_USERNAME]);
         unset($properties[self::DB_PASSWORD]);
-        
+                
         unset($properties[self::TRANSFORM_RULES_TEXT]);
         
+        unset($properties[self::CRON_SERVER]);
+        unset($properties[self::CRON_SCHEDULE]);
+                     
         return $properties;
     }
     

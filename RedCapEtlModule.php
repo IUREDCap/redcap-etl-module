@@ -47,62 +47,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $this->setSystemSetting(self::USER_LIST_KEY, $json);
     }
 
-    public function getServers()
-    {
-        $servers = new Servers();
-        $json = $this->getSystemSetting(self::SERVERS_KEY, true);
-        $servers->fromJson($json);
-        $servers = $servers->getServers();
-        return $servers;
-    }
-
-    public function addServer($serverName)
-    {
-        $servers = new Servers();
-        $json = $this->getSystemSetting(self::SERVERS_KEY, true);
-        $servers->fromJson($json);
-        $servers->addServer($serverName);
-        $json = $servers->toJson();
-        $this->setSystemSetting(self::SERVERS_KEY, $json);
-    }
-
-    public function copyServer($fromServerName, $toServerName)
-    {
-        $servers = new Servers();
-        $json = $this->getSystemSetting(self::SERVERS_KEY, true);
-        $servers->fromJson($json);
-        $servers->addServer($toServerName);
-        $json = $servers->toJson();
-        $this->setSystemSetting(self::SERVERS_KEY, $json);
-        
-        $this->copyServerConfig($fromServerName, $toServerName);
-    }
-    
-    public function renameServer($serverName, $newServerName)
-    {
-        $servers = new Servers();
-        $json = $this->getSystemSetting(self::SERVERS_KEY, true);
-        $servers->fromJson($json);
-        $servers->addServer($newServerName);
-        $servers->removeServer($serverName);
-        $json = $servers->toJson();
-        $this->setSystemSetting(self::SERVERS_KEY, $json);
-        
-        $this->renameServerConfig($serverName, $newServerName);
-    }
-    
-    public function removeServer($serverName)
-    {
-        $this->removeServerConfig($serverName);
-        
-        $servers = new Servers();
-        $json = $this->getSystemSetting(self::SERVERS_KEY, true);
-        $servers->fromJson($json);
-        $servers->removeServer($serverName);
-        $json = $servers->toJson();
-        error_log('JSON: '.$json);
-        $this->setSystemSetting(self::SERVERS_KEY, $json);
-    }
 
 
     private function getUserInfo()
@@ -134,6 +78,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     }
 
 
+    #==================================================================================
+    # Configuration methods
+    #==================================================================================
+    
     /**
      * Gets the specified configuration for the current user.
      *
@@ -163,6 +111,15 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $setting = $this->setSystemSetting($key, $json);
     }
 
+    public function setConfigSchedule($configName, $server, $schedule)
+    {
+        $configuration = $this->getConfiguration($configName);
+        $configuration->setProperty(Configuration::CRON_SERVER, $server);
+        $configuration->setProperty(Configuration::CRON_SCHEDULE, $schedule);
+        $this->setConfiguration($configuration);
+    }
+    
+    
     public function addConfiguration($name)
     {
         # Add configuration entry for user
@@ -240,6 +197,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     }
 
 
+    #==================================================================================
+    # Admin Config methods
+    #==================================================================================
+
     public function getAdminConfig()
     {
         $adminConfig = new AdminConfig();
@@ -254,8 +215,87 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $this->setSystemSetting(self::ADMIN_CONFIG_KEY, $json);
     }
 
+    #==================================================================================
+    # Server methods
+    #==================================================================================
+    
+    public function getServers()
+    {
+        $servers = new Servers();
+        $json = $this->getSystemSetting(self::SERVERS_KEY, true);
+        $servers->fromJson($json);
+        $servers = $servers->getServers();
+        return $servers;
+    }
+
+    public function addServer($serverName)
+    {
+        $servers = new Servers();
+        $json = $this->getSystemSetting(self::SERVERS_KEY, true);
+        $servers->fromJson($json);
+        $servers->addServer($serverName);
+        $json = $servers->toJson();
+        $this->setSystemSetting(self::SERVERS_KEY, $json);
+    }
+
+    public function copyServer($fromServerName, $toServerName)
+    {
+        $servers = new Servers();
+        $json = $this->getSystemSetting(self::SERVERS_KEY, true);
+        $servers->fromJson($json);
+        $servers->addServer($toServerName);
+        $json = $servers->toJson();
+        $this->setSystemSetting(self::SERVERS_KEY, $json);
+        
+        $this->copyServerConfig($fromServerName, $toServerName);
+    }
+    
+    public function renameServer($serverName, $newServerName)
+    {
+        $isError = false;
+        try {
+            db_query("SET AUTOCOMMIT=0");
+            db_query("BEGIN");
+            $servers = new Servers();
+            $json = $this->getSystemSetting(self::SERVERS_KEY, true);
+            $servers->fromJson($json);
+            $servers->addServer($newServerName);
+            $servers->removeServer($serverName);
+            $json = $servers->toJson();
+            $this->setSystemSetting(self::SERVERS_KEY, $json);
+        
+            $this->renameServerConfig($serverName, $newServerName);
+        } catch (Exception $exception) {
+            $isError = true;
+        }
+        
+        if ($isError) {
+            db_query("ROLLBACK");
+        } else {
+            db_query("COMMIT");
+        }
+        db_query("SET AUTOCOMMIT=1");
+    }
+    
+    
+    public function removeServer($serverName)
+    {
+        $this->removeServerConfig($serverName);
+        
+        $servers = new Servers();
+        $json = $this->getSystemSetting(self::SERVERS_KEY, true);
+        $servers->fromJson($json);
+        $servers->removeServer($serverName);
+        $json = $servers->toJson();
+        error_log('JSON: '.$json);
+        $this->setSystemSetting(self::SERVERS_KEY, $json);
+    }
 
 
+    #==================================================================================
+    # Server Config methods
+    #==================================================================================
+    
     public function getServerConfig($serverName)
     {
         $serverConfig = new ServerConfig($serverName);
@@ -272,7 +312,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $this->setSystemSetting($key, $json);
     }
     
-    public function copyServerConfig($fromServerName, $toServerName)
+    private function copyServerConfig($fromServerName, $toServerName)
     {
         $toServerConfig = $this->getServerConfig($fromServerName);
         $toServerConfig->setName($toServerName);
@@ -294,6 +334,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $result = $this->removeSystemSetting($key);
         return $result;
     }
+
+
 
     public function getUserKey()
     {
@@ -335,6 +377,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $this->renderTabs($tabs, $activeUrl);
     }
 
+    /**
+     * Renders the top-level tabs for the user interface.
+     */
     public function renderUserTabs($activeUrl = '')
     {
         $listUrl = $this->getUrl('index.php');
@@ -353,7 +398,17 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $runLabel = '<span style="color: #008000;" class="glyphicon glyphicon-play-circle" aria-hidden="true"></span>'
            .' Run';
 
-        $tabs = array($listUrl => $listLabel, $addUrl => $addLabel, $configUrl => $configLabel, $runUrl => $runLabel);
+        $scheduleUrl = $this->getUrl('schedule.php');
+        $scheduleLabel = '<span class="glyphicon glyphicon-time" aria-hidden="true"></span>'
+           .' Schedule';
+
+        $tabs = array(
+            $listUrl => $listLabel,
+            $addUrl => $addLabel,
+            $configUrl => $configLabel,
+            $scheduleUrl => $scheduleLabel,
+            $runUrl => $runLabel
+        );
         $this->renderTabs($tabs, $activeUrl);
     }
 

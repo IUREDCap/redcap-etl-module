@@ -60,4 +60,15 @@ class RedCapDb
     //
     //     p.date_deleted indicates if project deleted (if not null?)
     //
+    
+    // TRANSACTIONS
+    //
+    //    db_query("SET AUTOCOMMIT=0");
+    //    db_query("BEGIN");
+    //    queries... (if false returned, consider it an error)
+    //    // If errors, do not commit
+    //    $commit = ($errors > 0) ? "ROLLBACK" : "COMMIT";
+    //    db_query($commit);
+    //    // Set back to initial value
+    //    db_query("SET AUTOCOMMIT=1");
 }
