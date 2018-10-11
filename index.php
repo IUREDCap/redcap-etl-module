@@ -53,9 +53,12 @@ echo $buffer;
 
 $configurationNames = $module->getUserConfigurationNames();
 
-$selfUrl   = $module->getUrl(basename(__FILE__));
-$configUrl = $module->getUrl("configure.php");
-$runUrl    = $module->getUrl("run.php");
+$adminConfig = $module->getAdminConfig();
+
+$selfUrl     = $module->getUrl(basename(__FILE__));
+$configUrl   = $module->getUrl("configure.php");
+$scheduleUrl = $module->getUrl("schedule.php");
+$runUrl      = $module->getUrl("run.php");
 
 ?>
 
@@ -67,7 +70,16 @@ $runUrl    = $module->getUrl("run.php");
 <tr class="hrd">
     <th>Configuration Name</th>
     <th>Configure</th>
-    <th>Run</th>
+    <?php
+    
+    if ($adminConfig->getAllowOnDemand()) {
+        echo "<th>Run</th>\n";
+    }
+
+    if ($adminConfig->getAllowCron()) {
+        echo "<th>Schedule</th>\n";
+    }
+    ?>
     <th>Copy</th>
     <th>Rename</th>
     <th>Delete</th>
@@ -86,13 +98,25 @@ foreach ($configurationNames as $configurationName) {
     
     $configureUrl = $configUrl.'&configName='.$configurationName;
     $runConfigurationUrl = $runUrl.'&configName='.$configurationName;
+    $scheduleConfigUrl = $scheduleUrl.'&configName='.$configurationName;
+    
     print "<td>{$configurationName}</td>\n";
     print '<td style="text-align:center;">'
         .'<a href="'.$configureUrl.'"><img src='.APP_PATH_IMAGES.'gear.png></a>'
         ."</td>\n";
-    print '<td style="text-align:center;">'
-        .'<a href="'.$runConfigurationUrl.'"><img src='.APP_PATH_IMAGES.'application_go.png></a>'
-        ."</td>\n";
+        
+    if ($adminConfig->getAllowOnDemand()) {
+        print '<td style="text-align:center;">'
+            .'<a href="'.$runConfigurationUrl.'"><img src='.APP_PATH_IMAGES.'application_go.png></a>'
+            ."</td>\n";
+    }
+
+    if ($adminConfig->getAllowCron()) {
+        print '<td style="text-align:center;">'
+            .'<a href="'.$scheduleConfigUrl.'"><img src='.APP_PATH_IMAGES.'clock_frame.png></a>'
+            ."</td>\n";
+    }
+        
     print '<td style="text-align:center;">'
         .'<img src="'.APP_PATH_IMAGES.'page_copy.png" class="copyConfig" style="cursor: pointer;"'
         .' id="copy'.$configurationName.'"/>'

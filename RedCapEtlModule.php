@@ -16,6 +16,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const SERVER_CONFIG_KEY_PREFIX = 'server-config:';
     const SERVERS_KEY              = 'servers';
     const USER_LIST_KEY            = 'user-list';
+    const LAST_RUN_TIME_KEY        = 'last-run-time'; // for storing day and time of last run
 
     const CONFIG_SESSION_KEY = 'redcap-etl-config';
     
@@ -27,20 +28,26 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $day  = date('w');  // 0-6 (day of week; Sunday = 0)
         $hour = date('G');  // 0-23 (24-hour format without leading zeroes)
+        $date = date('Y-m-d');
         \REDCap::logEvent('REDCap-ETL cron check for day '.$day.' and hour '.$hour);
                 
-        $cronJobs = $this->getCronJobs($day, $hour);
+        if ($this->isLastRunTime($date, $hour)) {
+            ; // This time has already been processed, so don't do anything'
+        } else {
+            $cronJobs = $this->getCronJobs($day, $hour);
         
-        foreach ($cronJobs as $cronJob) {
-            $username   = $cronJob['username'];
-            $serverName = $cronJob['server'];
-            $configName = $cronJob['config'];
+            foreach ($cronJobs as $cronJob) {
+                $username   = $cronJob['username'];
+                $serverName = $cronJob['server'];
+                $configName = $cronJob['config'];
             
-            $etlConfig    = $this->getConfiguration($configName, $username);
-            $serverConfig = $this->getServerConfig($serverName);
-            \REDCap::logEvent('REDCap-ETL cron job config "'.$configName.'" for user "'
-                .$username.'" on server "'.$serverName.'" on day '.$day.', hour '.$hour);
-            $serverConfig->run($etlConfig);
+                $etlConfig    = $this->getConfiguration($configName, $username);
+                $serverConfig = $this->getServerConfig($serverName);
+                \REDCap::logEvent('REDCap-ETL cron job config "'.$configName.'" for user "'
+                    .$username.'" on server "'.$serverName.'" on day '.$day.', hour '.$hour);
+                $serverConfig->run($etlConfig);
+                $this->setLastRunTime($date, $hour);
+            }
         }
     }
 
@@ -431,6 +438,33 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $key = self::SERVER_CONFIG_KEY_PREFIX . $serverName;
         $result = $this->removeSystemSetting($key);
         return $result;
+    }
+
+
+    #==================================================================================
+    # Last run time methods
+    #==================================================================================
+    
+    public function getLastRunTime()
+    {
+        $dateAndTime = $this->getSystemSetting(self::LAST_RUN_TIME_KEY);
+        if (empty($dateAndTime)) {
+            $dateAndTime = array(-1, -1);
+        }
+        $lastRunTime = explode(',', $dateAndTime);
+        return $lastRunTime;
+    }
+
+    public function setLastRunTime($date, $time)
+    {
+        $lastRunTime = $date.','.$time;
+        $this->setSystemSetting(self::LAST_RUN_TIME_KEY, $lastRunTime);
+    }
+    
+    public function isLastRunTime($date, $time)
+    {
+        $lastRunTime = $this->getLastRunTime();
+        return $lastRunTime[0] == $date && $lastRunTime[1] == $time;
     }
 
 
