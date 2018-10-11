@@ -12,6 +12,8 @@ use IU\RedCapEtlModule\AdminConfig;
 $module = new \IU\RedCapEtlModule\RedCapEtlModule();
 $selfUrl = $module->getUrl(basename(__FILE__));
 
+$cronInfoUrl = $module->getUrl('cron_jobs.php');
+
 $adminConfig = $module->getAdminConfig();
 
 $submitValue = $_POST['submitValue'];
@@ -89,19 +91,20 @@ $module->renderSuccessMessageDiv($success);
     Allow ETL cron jobs? <br />
 
   <p>Allowed ETL cron job times</p>
-  <table class="cron-schedule">
+  <table class="cron-schedule admin-cron-schedule">
     <thead>
       <tr>
         <th>&nbsp;</th>
         <?php
         foreach (AdminConfig::DAY_LABELS as $dayLabel) {
-            echo '<th style="width: 6em">'.$dayLabel."</th>\n";
+            echo '<th class="day">'.$dayLabel."</th>\n";
         }
         ?>
       </tr>
     </thead>
     <tbody>
     <?php
+    $cronJobs = $module->getAllCronJobs();
     $row = 1;
     foreach (range(0, 23) as $time) {
         if ($row % 2 === 0) {
@@ -110,17 +113,25 @@ $module->renderSuccessMessageDiv($success);
             print '<tr>'."\n";
         }
         $row++;
-        $label = $adminConfig->getTimeLabel($time);
+        $label = $adminConfig->getHtmlTimeLabel($time);
     ?>
-        <td><?php echo $label;?></td>
+        <td class="time-range"><?php echo $label;?></td>
+        
         <?php
         foreach (range(0, 6) as $day) {
             $name = 'times['.$day.']['.$time.']';
-            echo '<td class="day">'."\n";
+            $count = count($cronJobs[$day][$time]);
+            
+            $jobsUrl = $cronInfoUrl.'&selectedDay='.$day.'&selectedTime='.$time;
+
+            $checked = '';
             if ($adminConfig->isAllowedCronTime($day, $time)) {
-                echo '<input type="checkbox" name="'.$name.'" checked>';
-            } else {
-                echo '<input type="checkbox" name="'.$name.'">';
+                $checked = ' checked ';
+            }
+            echo '<td class="day" style="position: relative;">'."\n";
+            echo '<input type="checkbox" name="'.$name.'" '.$checked.'>';
+            if ($count > 0) {
+                echo '<a href="'.$jobsUrl.'" style="position: absolute; top: 1px; right: 4px;">'.$count.'</a>';
             }
             echo '</td>'."\n";
         }
@@ -135,5 +146,9 @@ $module->renderSuccessMessageDiv($success);
     <input type="submit" name="submitValue" value="Save">
   </p>
 </form>
+
+<?php
+#print "<pre>\n"; print_r($cronJobs); print "</pre>\n";
+?>
 
 <?php include APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>

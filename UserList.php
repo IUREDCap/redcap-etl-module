@@ -17,6 +17,9 @@ class UserList implements \JsonSerializable
         return (object) get_object_vars($this);
     }
 
+    /**
+     * Gets a sorted list of usernames.
+     */
     public function getUsers()
     {
         $users = array_keys($this->userList);

@@ -73,8 +73,10 @@ if (strcasecmp($submitValue, 'Save') === 0) {
     }
 } else {
     # Just displaying page
-    $server   = $configuration->getProperty(Configuration::CRON_SERVER);
-    $schedule = $configuration->getProperty(Configuration::CRON_SCHEDULE);
+    if (isset($configuration)) {
+        $server   = $configuration->getProperty(Configuration::CRON_SERVER);
+        $schedule = $configuration->getProperty(Configuration::CRON_SCHEDULE);
+    }
 }
 
 ?>
@@ -102,28 +104,10 @@ echo $buffer;
 # Display module tabs
 #------------------------------
 $module->renderUserTabs($selfUrl);
+$module->renderErrorMessageDiv($error);
+$module->renderSuccessMessageDiv($success);
 ?>
 
-<?php
-#----------------------------
-# Display error, if any
-#----------------------------
-if (!empty($error)) { ?>
-<div class="red" style="margin:20px 0;font-weight:bold;">
-    <img src="/redcap/redcap_v8.5.11/Resources/images/exclamation.png">
-    <?php echo $error; ?>
-    </div>
-<?php } ?>
-
-<?php
-#-----------------------------------
-# Display success message, if any
-#-----------------------------------
-if (!empty($success)) { ?>
-<div align='center' class='darkgreen' style="margin: 20px 0;">
-    <img src='/redcap/redcap_v8.5.11/Resources/images/accept.png'><?php echo $success;?>
-</div>
-<?php } ?>
 
 <?php
 #---------------------------------------
@@ -235,7 +219,9 @@ echo "</select>\n";
         } else {
             echo '<tr>';
         }
-        echo "<td>".($adminConfig->getTimeLabel($time))."</td>";
+        
+        echo '<td class="time-range">'.($adminConfig->getHtmlTimeLabel($time))."</td>";
+        
         foreach (AdminConfig::DAY_LABELS as $day => $label) {
             $radioName = $label;
             $value = $time;

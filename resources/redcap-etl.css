@@ -6,6 +6,10 @@ table.cron-schedule {
     border-top: 1px solid #ccc;
 }
 
+table.admin-cron-schedule {
+    font-size: 80%;
+}
+
 table.cron-schedule th {
     background-color: #ECECEC;
     text-align: center;
@@ -43,4 +47,8 @@ table.cron-schedule input[type="checkbox"] {
     height: 6px;
     width: 6px;
     */
+}
+
+td.time-range {
+    font-family: "Courier New", Courier, monospace;
 }

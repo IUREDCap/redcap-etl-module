@@ -14,8 +14,17 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     const CONFIG_SESSION_KEY = 'redcap-etl-config';
     
+    /**
+     * Cron method that is called by REDCap as configured in the
+     * config.json file for this module.
+     */
     public function cron()
     {
+        $day  = date('w');  // 0-6 (day of week; Sunday = 0) 
+        $hour = date('G');  // 0-23 (24-hour format without leading zeroes)
+        $message = date('Y-m-d h:i:sa l').': '.$day.' '.$hour."\n";
+        file_put_contents("cron-log.txt", $message, FILE_APPEND);
+        \REDCap::logEvent('REDCap-ETL cron', 'Cron check for day '.$day.' and hour '.$hour);
     }
 
     public function getVersionNumber()
@@ -93,10 +102,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      * @param string $name the name of the configuration to get.
      * @return Configuration the specified configuration.
      */
-    public function getConfiguration($name)
+    public function getConfiguration($name, $username = USERID)
     {
         $configuraion = null;
-        $key = $this->getConfigurationKey($name);
+        $key = $this->getConfigurationKey($name, $username);
 
         $setting = $this->getSystemSetting($key);
         $configValues = json_decode($setting, true);
@@ -122,6 +131,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $configuration->setProperty(Configuration::CRON_SERVER, $server);
         $configuration->setProperty(Configuration::CRON_SCHEDULE, $schedule);
         $this->setConfiguration($configuration);
+        
+        \REDCap::logEvent('REDCap-ETL cron schedule change', 'Cron schedule changed for configuration "'.$configName.'".');
     }
     
     
@@ -199,6 +210,66 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         #------------------------------------------------
         $key = $this->getConfigurationKey($configName);
         $this->removeSystemSetting($key);
+    }
+    
+    public function getAllCronJobs()
+    {
+        $cronJobs = array();
+        foreach (range(0, 6) as $day) {
+            $cronJobs[$day] = array();
+            foreach (range(0, 23) as $hour) {
+                $cronJobs[$day][$hour] = array();
+            }
+        }
+        
+        $usernames = $this->getUsers();
+        foreach ($usernames as $username) {
+            $user = $this->getUserInfo($username);
+            $configNames = $user->getConfigNames();
+            foreach ($configNames as $configName) {
+                $config = $this->getConfiguration($configName, $username);
+                if (isset($config)) {
+                    $server = $config->getProperty(Configuration::CRON_SERVER);
+                    $times = $config->getProperty(Configuration::CRON_SCHEDULE);
+                    for ($day = 0; $day < 7; $day++) {
+                        $hour = $times[$day];
+                        if (isset($hour)) {
+                            $run = array('username' => $username, 'config' => $configName, 'server' => $server);
+                            array_push($cronJobs[$day][$hour], $run);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return $cronJobs;
+    }
+    
+    public function getCronJobs($day, $time)
+    {
+        $cronJobs = array();
+        
+        $usernames = $this->getUsers();
+        foreach ($usernames as $username) {
+            $user = $this->getUserInfo($username);
+            $configNames = $user->getConfigNames();
+            foreach ($configNames as $configName) {
+                $config = $this->getConfiguration($configName, $username);
+                if (isset($config)) {
+                    $server = $config->getProperty(Configuration::CRON_SERVER);
+                    $times  = $config->getProperty(Configuration::CRON_SCHEDULE);
+                    for ($cronDay = 0; $cronDay < 7; $cronDay++) {
+                        $cronTime = $times[$cronDay];
+                        if (isset($cronTime) && $time == $cronTime && $day == $cronDay) {
+                            $job = array('username' => $username, 'config' => $configName, 'server' => $server);
+                            array_push($cronJobs, $job);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return $cronJobs;
     }
 
 
@@ -342,15 +413,25 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
 
 
-    public function getUserKey()
+    /**
+     * Gets the key for REDCap's external module settings table
+     * for the specified username, or the current username,
+     * if no username was specified.
+     */
+    public function getUserKey($username = null)
     {
-        $key = 'user:'.USERID;
+        if (empty($username)) {
+            $key = 'user:'.USERID;
+        } else {
+            $key = 'user:'.$username;
+        }
+
         return $key;
     }
 
-    public function getConfigurationKey($name)
+    public function getConfigurationKey($name, $username = USERID)
     {
-        $key = 'user:'.USERID.';configuration:'.$name;
+        $key = 'user:'.$username.';configuration:'.$name;
         return $key;
     }
 
@@ -360,6 +441,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $adminUrl = $this->getUrl('admin.php');
         $adminLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
            .' Configure';
+
+        $cronJobsUrl = $this->getUrl('cron_jobs.php');
+        $cronJobsLabel = '<span class="glyphicon glyphicon-time" aria-hidden="true"></span>'
+           .' Cron Detail';
 
         $manageUsersUrl = $this->getUrl('users.php');
         #$manageUsersLabel = '<span>Manage Users</span>';
@@ -375,10 +460,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $serverConfigLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
            .' ETL Server Config';
 
-        $tabs = array($adminUrl => $adminLabel, $manageUsersUrl => $manageUsersLabel
-            , $serversUrl => $serversLabel
-            , $serverConfigUrl => $serverConfigLabel
-        );
+        $tabs = array();
+        
+        $tabs[$adminUrl]        = $adminLabel;
+        $tabs[$cronJobsUrl]     = $cronJobsLabel;
+        $tabs[$manageUsersUrl]  = $manageUsersLabel;
+        $tabs[$serversUrl]      = $serversLabel;
+        $tabs[$serverConfigUrl] = $serverConfigLabel;
+        
         $this->renderTabs($tabs, $activeUrl);
     }
 

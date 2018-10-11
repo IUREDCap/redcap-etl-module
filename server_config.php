@@ -99,18 +99,11 @@ echo $buffer;
 
 <h4><img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>table_gear.png">REDCap-ETL Admin</h4>
 
-<?php $module->renderAdminTabs($selfUrl); ?>
-
 <?php
-#----------------------------
-# Display error, if any
-#----------------------------
-if (!empty($error)) { ?>
-<div class="red" style="margin:20px 0;font-weight:bold;">
-    <img src="/redcap/redcap_v8.5.11/Resources/images/exclamation.png">
-    <?php echo $error; ?>
-    </div>
-<?php } ?>
+$module->renderAdminTabs($selfUrl);
+$module->renderErrorMessageDiv($error);
+$module->renderSuccessMessageDiv($success);
+?>
 
 
 <?php

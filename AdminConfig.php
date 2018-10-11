@@ -49,13 +49,12 @@ class AdminConfig implements \JsonSerializable
         return $label;
     }
 
-
     public function getTimes()
     {
         return range(0, 23);
     }
 
-    public function getTimeLabel($time)
+    public function getHtmlTimeLabel($time)
     {
         $label = '';
         $startTime = $time;
@@ -73,8 +72,12 @@ class AdminConfig implements \JsonSerializable
         if ($startTime > 12) {
             $startTime -= 12;
         }
+        
+        if ($startTime < 10) {
+            $startTime = "&nbsp;".$startTime;
+        }
 
-        if ($endTime < 12) {
+        if ($endTime < 12 || $endTime == 24) {
             $endTimeSuffix = 'am';
         } else {
             $endTimeSuffix = 'pm';
@@ -83,8 +86,12 @@ class AdminConfig implements \JsonSerializable
         if ($endTime > 12) {
             $endTime -= 12;
         }
-
-        $label = "{$startTime}{$startTimeSuffix} - {$endTime}{$endTimeSuffix}";
+            
+        if ($endTime < 10) {
+            $endTime = "&nbsp;".$endTime;
+        }
+        
+        $label = "{$startTime}{$startTimeSuffix}&nbsp;-&nbsp;{$endTime}{$endTimeSuffix}";
 
         return $label;
     }
@@ -110,7 +117,10 @@ class AdminConfig implements \JsonSerializable
 
             $endSuffix = 'am';
             if ($end >= 12) {
-                $endSuffix = 'pm';
+                if ($end < 24) {
+                    $endSuffix = 'pm';
+                }
+                
                 if ($end > 12) {
                     $end -= 12;
                 }
@@ -120,7 +130,7 @@ class AdminConfig implements \JsonSerializable
 
             $end .= $endSuffix;
 
-            $labels[$i] = $start.'-'.$end;
+            $labels[$i] = $start.' - '.$end;
         }
         return $labels;
     }
