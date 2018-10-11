@@ -15,7 +15,7 @@
            "cron_description": "Cron that runs every 15 minutes check for jobs to run",
            "method": "cron",
            "cron_frequency": "900",
-           "cron_max_run_time": "300"
+           "cron_max_run_time": "720"
         }
     ],
    "links": {

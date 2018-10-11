@@ -2,6 +2,11 @@
 
 namespace IU\RedCapEtlModule;
 
+# This is required for cron jobs
+// phpcs:disable
+require_once(__DIR__.'/dependencies/autoload.php');
+// phpcs:enable
+
 /**
  * Main REDCap-ETL module class.
  */
@@ -20,11 +25,23 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function cron()
     {
-        $day  = date('w');  // 0-6 (day of week; Sunday = 0) 
+        $day  = date('w');  // 0-6 (day of week; Sunday = 0)
         $hour = date('G');  // 0-23 (24-hour format without leading zeroes)
-        $message = date('Y-m-d h:i:sa l').': '.$day.' '.$hour."\n";
-        file_put_contents("cron-log.txt", $message, FILE_APPEND);
-        \REDCap::logEvent('REDCap-ETL cron', 'Cron check for day '.$day.' and hour '.$hour);
+        \REDCap::logEvent('REDCap-ETL cron check for day '.$day.' and hour '.$hour);
+                
+        $cronJobs = $this->getCronJobs($day, $hour);
+        
+        foreach ($cronJobs as $cronJob) {
+            $username   = $cronJob['username'];
+            $serverName = $cronJob['server'];
+            $configName = $cronJob['config'];
+            
+            $etlConfig    = $this->getConfiguration($configName, $username);
+            $serverConfig = $this->getServerConfig($serverName);
+            \REDCap::logEvent('REDCap-ETL cron job config "'.$configName.'" for user "'
+                .$username.'" on server "'.$serverName.'" on day '.$day.', hour '.$hour);
+            $serverConfig->run($etlConfig);
+        }
     }
 
     public function getVersionNumber()
@@ -58,39 +75,29 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
 
 
-    private function getUserInfo()
+    private function getUserInfo($username = USERID)
     {
-        $key = $this->getUserKey();
+        $key = $this->getUserKey($username);
         $json = $this->getSystemSetting($key);
-        $userInfo = new UserInfo(USERID);
+        $userInfo = new UserInfo($username);
         $userInfo->fromJson($json);
         return $userInfo;
     }
 
-    private function setUserInfo($userInfo)
+    private function setUserInfo($userInfo, $username = USERID)
     {
-        $key = $this->getUserKey();
+        $key = $this->getUserKey($username);
         $json = $userInfo->toJson();
         $this->setSystemSetting($key, $json);
     }
 
-    private function getUserInfos()
+    public function getUserConfigurationNames($username = USERID)
     {
-    }
-
-
-    public function getUserConfigurationNames()
-    {
-        $userInfo = $this->getUserInfo();
+        $userInfo = $this->getUserInfo($username);
         $names = $userInfo->getConfigNames();
         return $names;
     }
 
-    public function getUserCronJobs()
-    {
-        $users = $this->getUsers();
-        return $users;
-    }
 
     #==================================================================================
     # Configuration methods
@@ -132,16 +139,19 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $configuration->setProperty(Configuration::CRON_SCHEDULE, $schedule);
         $this->setConfiguration($configuration);
         
-        \REDCap::logEvent('REDCap-ETL cron schedule change', 'Cron schedule changed for configuration "'.$configName.'".');
+        \REDCap::logEvent(
+            'REDCap-ETL cron schedule change',
+            'Cron schedule changed for configuration "'.$configName.'".'
+        );
     }
     
     
-    public function addConfiguration($name)
+    public function addConfiguration($name, $username = USERID)
     {
         # Add configuration entry for user
         $userInfo = $this->getUserInfo();
         if (!isset($userInfo)) {
-            $userInfo = new UserInfo(USERID);
+            $userInfo = new UserInfo($username);
         }
 
         if (!$userInfo->hasConfigName($name)) {
@@ -245,30 +255,42 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         return $cronJobs;
     }
     
+    /**
+     * Gets the cron jobs for the specified day (0 = Sunday, 1 = Monday, ...)
+     * and time (0 = 12am - 1am, 1 = 1am - 2am, ..., 23 = 11pm - 12am).
+     */
     public function getCronJobs($day, $time)
     {
         $cronJobs = array();
         
         $usernames = $this->getUsers();
+        #\REDCap::logEvent('REDCap-ETL getCronJobs: usernames: '.print_r($usernames, true));
+        
         foreach ($usernames as $username) {
+            #\REDCap::logEvent('REDCap-ETL getCronJobs: username: '.$username);
             $user = $this->getUserInfo($username);
             $configNames = $user->getConfigNames();
+            #\REDCap::logEvent('REDCap-ETL getCronJobs: configNames: '.print_r($configNames, true));
+            
             foreach ($configNames as $configName) {
                 $config = $this->getConfiguration($configName, $username);
                 if (isset($config)) {
                     $server = $config->getProperty(Configuration::CRON_SERVER);
                     $times  = $config->getProperty(Configuration::CRON_SCHEDULE);
-                    for ($cronDay = 0; $cronDay < 7; $cronDay++) {
-                        $cronTime = $times[$cronDay];
-                        if (isset($cronTime) && $time == $cronTime && $day == $cronDay) {
-                            $job = array('username' => $username, 'config' => $configName, 'server' => $server);
-                            array_push($cronJobs, $job);
+                    
+                    if (isset($times) && is_array($times)) {
+                        for ($cronDay = 0; $cronDay < 7; $cronDay++) {
+                            $cronTime = $times[$cronDay];
+                            if (isset($cronTime) && $time == $cronTime && $day == $cronDay) {
+                                $job = array('username' => $username, 'config' => $configName, 'server' => $server);
+                                array_push($cronJobs, $job);
+                            }
                         }
                     }
                 }
             }
         }
-        
+                
         return $cronJobs;
     }
 
@@ -418,14 +440,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      * for the specified username, or the current username,
      * if no username was specified.
      */
-    public function getUserKey($username = null)
+    public function getUserKey($username = USERID)
     {
-        if (empty($username)) {
-            $key = 'user:'.USERID;
-        } else {
-            $key = 'user:'.$username;
-        }
-
+        $key = 'user:'.$username;
         return $key;
     }
 

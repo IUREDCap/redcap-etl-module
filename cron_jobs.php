@@ -116,7 +116,7 @@ $times = $adminConfig->getTimeLabels();
             echo '<option value="'.$value.'" selected>'.$label."</option>\n";
         } else {
             echo '<option value="'.$value.'">'.$label."</option>\n";
-        }        
+        }
     }
     ?>
     </select>

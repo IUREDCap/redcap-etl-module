@@ -5,7 +5,6 @@ if (!SUPER_USER) {
 }
 
 require_once __DIR__.'/dependencies/autoload.php';
-#require_once __DIR__.'/AdminConfig.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 
