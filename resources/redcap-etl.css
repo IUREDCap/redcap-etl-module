@@ -1,4 +1,5 @@
 
+/* Cron schedule table */
 table.cron-schedule {
     border-spacing: 0;
     border-collapse: collapse;
@@ -48,6 +49,31 @@ table.cron-schedule input[type="checkbox"] {
     width: 6px;
     */
 }
+
+/* User projects table */
+table.user-projects {
+    border-spacing: 0;
+    border-collapse: collapse;
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+}
+
+table.user-projects tr.even-row {
+    background-color: #F3F3F3;
+}
+
+table.user-projects th {
+    background-color: #ECECEC;
+    text-align: center;
+    font-weight: bold;
+}
+
+table.user-projects th, table.user-projects td {
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding: 1px 4px;
+}
+
 
 td.time-range {
     font-family: "Courier New", Courier, monospace;

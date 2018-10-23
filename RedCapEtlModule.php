@@ -18,6 +18,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const USER_LIST_KEY            = 'user-list';
     const LAST_RUN_TIME_KEY        = 'last-run-time'; // for storing day and time of last run
 
+    const USER_PROJECTS_KEY_PREFIX = 'user-projects:';  // appdend with username to make key
+    
     const CONFIG_SESSION_KEY = 'redcap-etl-config';
     
     /**
@@ -64,7 +66,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function getUsers()
     {
         $userList = new UserList();
-        $json = $this->getSystemSetting(self::USER_LIST_KEY, true);
+        $json = $this->getSystemSetting(self::USER_LIST_KEY);
         $userList->fromJson($json);
         $users = $userList->getUsers();
         return $users;
@@ -73,7 +75,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function addUser($username)
     {
         $userList = new UserList();
-        $json = $this->getSystemSetting(self::USER_LIST_KEY, true);
+        $json = $this->getSystemSetting(self::USER_LIST_KEY);
         $userList->fromJson($json);
         $userList->addUser($username);
         $json = $userList->toJson();
@@ -105,6 +107,27 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         return $names;
     }
 
+    #------------------------------------------------------------
+    # User project methods
+    #------------------------------------------------------------
+    
+    /**
+     * @param array $projects an array of REDCap project IDS.
+     */
+    public function setUserProjects($username, $projects)
+    {
+        $key = self::USER_PROJECTS_KEY_PREFIX . $username;
+        $json = json_encode($projects);
+        $this->setSystemSetting($key, $json);
+    }
+    
+    public function getUserProjects($username = USERID)
+    {
+        $key = self::USER_PROJECTS_KEY_PREFIX . $username;
+        $json = $this->getSystemSetting($key);
+        $projects = $json_decode($json, true);
+        return $projects;
+    }
 
     #==================================================================================
     # Configuration methods

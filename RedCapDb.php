@@ -44,6 +44,22 @@ class RedCapDb
         return $users;
     }
 
+    public function getUserProjects($username)
+    {
+        $projects = array();
+        $sql = 'select u.username, p.project_id, p.app_title, '
+            .' if(u.api_token is null, 0, 1) as has_api_token, u.api_export '
+            .' from redcap_projects p, redcap_user_rights u '
+            ." where u.username = '".$username."' "
+            ." and p.project_id = u.project_id and p.date_deleted is null"
+            ;
+        $result = db_query($sql);
+        while ($row = db_fetch_assoc($result)) {
+            array_push($projects, $row);
+        }
+        return $projects;    
+    }
+    
     // Get user projects:
     // select project_id, username [, api_token, api_export]
     //     from redcap_user_rights
