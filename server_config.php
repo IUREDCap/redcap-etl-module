@@ -159,7 +159,22 @@ $(function() {
                 .insertBefore(this);
         }).remove();       
     })
-});    
+});
+
+$(function() {
+    $("input[name=authMethod]").change(function() {
+        var value = $(this).val();
+        if (value == 0) {
+            $("#passwordRow").hide();
+            $("#sshKeyFileRow").show();
+            $("#sshKeyPasswordRow").show();
+        } else if (value == 1) {
+            $("#passwordRow").show();
+            $("#sshKeyFileRow").hide();
+            $("#sshKeyPasswordRow").hide();
+        }
+    });
+});
 </script>
 
 <?php
@@ -204,25 +219,37 @@ if (!empty($serverName)) {
       <td><input type="text" name="username" value="<?php echo $serverConfig->getUsername();?>"
                  size="28" style="margin: 4px;"></td>
     </tr>
-    <tr id="passwordRow">
+    
+    <?php
+    $passwordStyle = '';
+    $sshStyle = '';
+    if ($authMethod == ServerConfig::AUTH_METHOD_PASSWORD) {
+        $sshStyle = ' style="display: none;" ';
+    } else {
+        $passwordStyle = ' style="display: none;" ';
+    }
+    ?>
+    
+    <tr id="passwordRow" <?php echo $passwordStyle; ?> >
       <td>Password:</td>
       <td>
         <input type="password" name="password" value="<?php echo $serverConfig->getPassword();?>"
-               size="28" style="margin: 4px;" id="password">
+               size="28" style="margin: 4px;" id="password" autocomplete="off">
         <input type="checkbox" id="showPassword" style="vertical-align: middle; margin: 0;">
         <span style="vertical-align: middle;">Show</span>
       </td>
     </tr>
-    <tr id="sshKeyFileRow">
+
+    <tr id="sshKeyFileRow" <?php echo $sshStyle; ?> >
       <td>SSH key file:</td>
       <td><input type="text" name="sshKeyFile" value="<?php echo $serverConfig->getSshKeyFile();?>"
-                 size="44" style="margin: 4px;"></td>
+                 size="44" style="margin: 4px;" autocomplete="off"></td>
     </tr>
-    <tr id="sshKeyPasswordRow">
+    <tr id="sshKeyPasswordRow" <?php echo $sshStyle; ?> >
       <td>SSH key password:</td>
       <td>
         <input type="password" name="sshKeyPassword" value="<?php echo $serverConfig->getSshKeyPassword();?>"
-               size="44" style="margin: 4px;" id="sshKeyPassword">
+               size="44" style="margin: 4px;" id="sshKeyPassword" autocomplete="off">
         <input type="checkbox" id="showSshKeyPassword" style="vertical-align: middle; margin: 0;">
         <span style="vertical-align: middle;">Show</span>
       </td>
@@ -243,6 +270,7 @@ if (!empty($serverName)) {
                  size="60" style="margin: 4px;"></td>
     </tr>
   </table>
+  
   <div style="margin-top: 20px;">
     <div style="width: 50%; float: left;">
       <input type="submit" name="submit" value="Save" style="margin: auto; display: block;">

@@ -10,6 +10,7 @@ use IU\RedCapEtlModule\AdminConfig;
 
 $module = new \IU\RedCapEtlModule\RedCapEtlModule();
 $selfUrl = $module->getUrl(basename(__FILE__));
+$serverConfigUrl = $module->getUrl('server_config.php');
 
 $adminConfig = $module->getAdminConfig();
     
@@ -130,6 +131,7 @@ $times = $adminConfig->getTimeLabels();
         <?php
         $row = 1;
         foreach ($cronJobs as $cronJob) {
+            $serverUrl = $serverConfigUrl.'&serverName='.$server;
             if ($row % 2 === 0) {
                 print '<tr class="even">'."\n";
             } else {
@@ -137,7 +139,7 @@ $times = $adminConfig->getTimeLabels();
             }
             print "<td>".$cronJob['username']."</td>\n";
             print "<td>".$cronJob['config']."</td>\n";
-            print "<td>".$cronJob['server']."</td>\n";
+            print "<td>".'<a href="'.$serverUrl.'">'.$cronJob['server'].'</a>'."</td>\n";
             print "</tr>\n";
             $row++;
         }
