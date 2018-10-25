@@ -2,6 +2,9 @@
 
 namespace IU\RedCapEtlModule;
 
+/**
+ * Class for methods that access the REDCap database directly.
+ */
 class RedCapDb
 {
     public function getUserInfo($username)
@@ -60,11 +63,27 @@ class RedCapDb
         return $projects;
     }
     
+    /**
+     * Get the API token for the specified user and project.
+     *
+     * @param string $username the username for the API token.
+     * @param string $projectId the project ID for the API token.
+     *
+     * @return string the API token for the specified user and project.
+     */
     public function getApiToken($username, $projectId)
     {
         $apiToken = null;
         
-        $sql = 'select '
+        $sql = "select api_token from redcap_user_rights "
+            . " where project_id = ".PROJECT_ID." "
+            . " and username = '".USERID."'"
+            . " and api_export = 1 "
+            ;
+        $result = db_query($sql);
+        if ($row = db_fetch_assoc($result)) {
+            $apiToken = $row['api_token'];
+        }
         return $apiToken;
     }
 

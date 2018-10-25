@@ -277,7 +277,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             $userInfo->removeConfigName($configName);
             $json = $userInfo->toJson();
             $userKey = $this->getUserKey();
-            $this->setProjectSetting($userKey, $json);
+            $this->setSystemProjectSetting($userKey, $json);
         }
         
         #------------------------------------------------
@@ -554,12 +554,16 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $cronJobsLabel = '<span class="glyphicon glyphicon-time" aria-hidden="true"></span>'
            .' Cron Detail';
 
-        $manageUsersUrl = $this->getUrl('users.php');
+        $usersUrl = $this->getUrl('users.php');
         #$manageUsersLabel = '<span>Manage Users</span>';
         #$manageUsersLabel = '<span><img aria-hidden="true" src="/redcap/redcap_v8.5.11/Resources/images/users3.png">'
-        $manageUsersLabel = '<span class="glyphicon glyphicon-user" aria-hidden="true"></span>'
-           .' Manage Users</span>';
+        $usersLabel = '<span class="glyphicon glyphicon-list" aria-hidden="true"></span>'
+           .' Users</span>';
 
+        $configureUserUrl = $this->getUrl('user.php');
+        $configureUserLabel = '<span class="glyphicon glyphicon-user" aria-hidden="true"></span>'
+           .' User Config</span>';
+           
         $serversUrl = $this->getUrl('servers.php');
         $serversLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
            .' ETL Servers';
@@ -570,11 +574,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
         $tabs = array();
         
-        $tabs[$adminUrl]        = $adminLabel;
-        $tabs[$cronJobsUrl]     = $cronJobsLabel;
-        $tabs[$manageUsersUrl]  = $manageUsersLabel;
-        $tabs[$serversUrl]      = $serversLabel;
-        $tabs[$serverConfigUrl] = $serverConfigLabel;
+        $tabs[$adminUrl]         = $adminLabel;
+        $tabs[$cronJobsUrl]      = $cronJobsLabel;
+        $tabs[$usersUrl]         = $usersLabel;
+        $tabs[$configureUserUrl] = $configureUserLabel;
+        $tabs[$serversUrl]       = $serversLabel;
+        $tabs[$serverConfigUrl]  = $serverConfigLabel;
         
         $this->renderTabs($tabs, $activeUrl);
     }

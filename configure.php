@@ -303,6 +303,21 @@ $(function() {
           </script>
         </td>
       </tr>
+      
+      <tr>
+        <td>
+          SSL Certificate Verification
+        </td>
+        <td>
+            <?php
+            $checked = '';
+            if ($properties[Configuration::SSL_VERIFY]) {
+                $checked = ' checked ';
+            }
+            ?>
+          <input type="checkbox" name="<?php echo Configuration::SSL_VERIFY?>" <?php echo $checked;?> >
+        </td>
+      </tr>
 
       <tr>
         <td colspan="3" style="border: 1px solid #ccc; background-color: #ddd;">

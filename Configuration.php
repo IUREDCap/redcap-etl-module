@@ -6,6 +6,7 @@ class Configuration implements \JsonSerializable
 {
     const REDCAP_API_URL = 'redcap_api_url';
     const DATA_SOURCE_API_TOKEN = 'data_source_api_token';
+    const SSL_VERIFY = 'ssl_verify';
 
     const TRANSFORM_RULES_FILE   = 'transform_rules_file';
     const TRANSFORM_RULES_TEXT   = 'transform_rules_text';
@@ -43,21 +44,15 @@ class Configuration implements \JsonSerializable
 
         # Set non-blank defaults
         $this->properties[self::REDCAP_API_URL]    = APP_PATH_WEBROOT_FULL.'api/';
+        $this->properties[self::SSL_VERIFY]        = true;
         $this->properties[self::BATCH_SIZE] = 100;
         $this->properties[self::TRANSFORM_RULES_SOURCE] = '1';
 
         if (!empty(PROJECT_ID)) {
-            $sql = "select api_token from redcap_user_rights "
-                    . " where project_id = ".PROJECT_ID." "
-                    . " and username = '".USERID."'"
-                    . " and api_export = 1 "
-                    ;
-            $result = db_query($sql);
-            if ($row = db_fetch_assoc($result)) {
-                $apiToken = $row['api_token'];
-                if (!empty(api_token)) {
-                    $this->properties[self::DATA_SOURCE_API_TOKEN] = $apiToken;
-                }
+            $redCapDb = new RedCapDb();
+            $apiToken = $redCapDb->getApiToken(USERID, PROJECT_ID);
+            if (!empty(api_token)) {
+                $this->properties[self::DATA_SOURCE_API_TOKEN] = $apiToken;
             }
         }
     }
