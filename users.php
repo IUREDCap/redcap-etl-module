@@ -77,13 +77,18 @@ echo $buffer;
 <h5 style="margin-top: 2em;">REDCap-ETL Users</h5>
 <table class="dataTable">
     <thead>
-        <tr> <th>username</th> <th>ETL Projects</th> </tr>
+        <tr> <th>username</th> <th>ETL Project Permissions</th> <th>ETL Configurations</th> </tr>
     </thead>
     <tbody>
     <?php
     $row = 1;
     foreach ($users as $user) {
         $etlProjects = $module->getUserEtlProjects($user);
+        $configCount = 0;
+        foreach ($etlProjects as $etlProject) {
+            $configNames = $module->getUserConfigurationNames($user, $etlProject);
+            $configCount += count($configNames);
+        }
         $userConfigUrl = $userUrl.'&username='.$user;
         if ($row % 2 == 0) {
             echo "<tr class=\"even\">\n";
@@ -92,6 +97,7 @@ echo $buffer;
         }
         echo '<td><a href="'.$userConfigUrl.'">'.$user.'</td>'."\n";
         echo '<td style="text-align: right;">'.count($etlProjects)."</td>\n";
+        echo '<td style="text-align: right;">'.$configCount."</td>\n";
         echo "</tr>\n";
         $row++;
     }

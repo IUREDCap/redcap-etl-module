@@ -315,18 +315,21 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         
         $usernames = $this->getUsers();
         foreach ($usernames as $username) {
-            $user = $this->getUserInfo($username);
-            $configNames = $user->getConfigNames();
-            foreach ($configNames as $configName) {
-                $config = $this->getConfiguration($configName, $username);
-                if (isset($config)) {
-                    $server = $config->getProperty(Configuration::CRON_SERVER);
-                    $times = $config->getProperty(Configuration::CRON_SCHEDULE);
-                    for ($day = 0; $day < 7; $day++) {
-                        $hour = $times[$day];
-                        if (isset($hour)) {
-                            $run = array('username' => $username, 'config' => $configName, 'server' => $server);
-                            array_push($cronJobs[$day][$hour], $run);
+            $etlProjects = $this->getUserEtlProjects($username);
+            foreach ($etlProjects as $etlProject) {
+                $user = $this->getUserInfo($username, $etlProject);
+                $configNames = $user->getConfigNames();
+                foreach ($configNames as $configName) {
+                    $config = $this->getConfiguration($configName, $username, $etlProject);
+                    if (isset($config)) {
+                        $server = $config->getProperty(Configuration::CRON_SERVER);
+                        $times = $config->getProperty(Configuration::CRON_SCHEDULE);
+                        for ($day = 0; $day < 7; $day++) {
+                            $hour = $times[$day];
+                            if (isset($hour)) {
+                                $run = array('username' => $username, 'config' => $configName, 'server' => $server);
+                                array_push($cronJobs[$day][$hour], $run);
+                            }
                         }
                     }
                 }
@@ -348,23 +351,26 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         #\REDCap::logEvent('REDCap-ETL getCronJobs: usernames: '.print_r($usernames, true));
         
         foreach ($usernames as $username) {
-            #\REDCap::logEvent('REDCap-ETL getCronJobs: username: '.$username);
-            $user = $this->getUserInfo($username);
-            $configNames = $user->getConfigNames();
-            #\REDCap::logEvent('REDCap-ETL getCronJobs: configNames: '.print_r($configNames, true));
+            $etlProjects = $this->getUserEtlProjects($username);
+            foreach ($etlProjects as $etlProject) {
+                #\REDCap::logEvent('REDCap-ETL getCronJobs: username: '.$username);
+                $user = $this->getUserInfo($username, $etlProject);
+                $configNames = $user->getConfigNames();
+                #\REDCap::logEvent('REDCap-ETL getCronJobs: configNames: '.print_r($configNames, true));
             
-            foreach ($configNames as $configName) {
-                $config = $this->getConfiguration($configName, $username);
-                if (isset($config)) {
-                    $server = $config->getProperty(Configuration::CRON_SERVER);
-                    $times  = $config->getProperty(Configuration::CRON_SCHEDULE);
+                foreach ($configNames as $configName) {
+                    $config = $this->getConfiguration($configName, $username, $etlProject);
+                    if (isset($config)) {
+                        $server = $config->getProperty(Configuration::CRON_SERVER);
+                        $times  = $config->getProperty(Configuration::CRON_SCHEDULE);
                     
-                    if (isset($times) && is_array($times)) {
-                        for ($cronDay = 0; $cronDay < 7; $cronDay++) {
-                            $cronTime = $times[$cronDay];
-                            if (isset($cronTime) && $time == $cronTime && $day == $cronDay) {
-                                $job = array('username' => $username, 'config' => $configName, 'server' => $server);
-                                array_push($cronJobs, $job);
+                        if (isset($times) && is_array($times)) {
+                            for ($cronDay = 0; $cronDay < 7; $cronDay++) {
+                                $cronTime = $times[$cronDay];
+                                if (isset($cronTime) && $time == $cronTime && $day == $cronDay) {
+                                    $job = array('username' => $username, 'config' => $configName, 'server' => $server);
+                                    array_push($cronJobs, $job);
+                                }
                             }
                         }
                     }
