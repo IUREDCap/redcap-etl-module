@@ -36,7 +36,11 @@ if (!empty($configName)) {
 
 if (!empty($configName)) {
     $configuration = $module->getConfiguration($configName);
-    $properties = $configuration->getProperties();
+    if (!empty($configuration)) {
+        $properties = $configuration->getProperties();
+    } else {
+        $configName = null;
+    }
 }
 
 

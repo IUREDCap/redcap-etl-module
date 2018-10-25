@@ -57,13 +57,14 @@ class RedCapDb
         while ($row = db_fetch_assoc($result)) {
             array_push($projects, $row);
         }
-        return $projects;    
+        return $projects;
     }
     
     public function getApiToken($username, $projectId)
     {
         $apiToken = null;
         
+        $sql = 'select '
         return $apiToken;
     }
 

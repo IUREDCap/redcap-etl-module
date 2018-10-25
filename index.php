@@ -81,7 +81,7 @@ $projectId = $module->getProjectId();
 
 <?php
 
-$module->renderUserTabs($selfUrl); 
+$module->renderUserTabs($selfUrl);
 $module->renderErrorMessageDiv($error);
 $module->renderSuccessMessageDiv($success);
 
@@ -95,27 +95,31 @@ if (!in_array($projectId, $userEtlProjects)) {
     $label = 'Request ETL access for this project';
     $projectUrl = APP_PATH_WEBROOT_FULL.'index.php?pid='.$projectId;
 
-    echo '<a href="mailto:'.$homepage_contact_email
+    # The underscore variable names are internal REDCap variables
+    // phpcs:disable
+    $homepageContactEmail = $homepage_contact_email;
+    $redcapVervaion = $redcap_version;
+    $userFirstName = $user_firstname;
+    $userLastName  = $user_lastname;
+    // phpcs:enable
+    
+    echo '<a href="mailto:'.$homepageContactEmail
         .'?subject='.rawurlencode('REDCap-ETL Access Request')
         .'&body='
-        .rawurlencode('Username: '.USERID."\n"
+        .rawurlencode(
+            'Username: '.USERID."\n"
             .'Project title: "'.' '.strip_tags(REDCap::getProjectTitle()).'"'."\n"
-            .'Project link: '.APP_PATH_WEBROOT_FULL."redcap_v{$redcap_version}/index.php?pid={$projectId}\n\n"
+            .'Project link: '.APP_PATH_WEBROOT_FULL."redcap_v{$redcapVersion}/index.php?pid={$projectId}\n\n"
             .'Dear REDCap administrator,'."\n\n"
             .'Please add REDCap-ETL access for me to project "'.REDCap::getProjectTitle().'"'."\n\n"
             ."Sincerely,\n"
-            .$user_firstname.' '.$user_lastname
+            .$userFirstName.' '.$userLastName
         )
         .'" '
         .' class="btn-contact-admin btn btn-primary btn-xs" style="color:#fff;">'
         .'<span class="glyphicon glyphicon-envelope"></span> '.$label
         .'</a>'."\n";
     ;
-
-    #echo "<br />".$user_firstname."\n";
-    #echo "<br />Project ID: ".PROJECT_ID."\n";
-    
-    #."&body=".rawurlencode($lang['global_11'].$lang['colon']." ".USERID."\n".$lang['control_center_107']." \"".strip_tags($app_title)."\"\n".$lang['bottom_81']." ".APP_PATH_WEBROOT_FULL."redcap_v{$redcap_version}/index.php?pid=$project_id\n\n".$lang['bottom_78']."\n\n".$lang['bottom_79']."\n\n".$lang['bottom_80']."\n$user_firstname $user_lastname\n")."' class='btn-contact-admin btn btn-primary btn-xs' style='color:#fff;'><span class='glyphicon glyphicon-envelope'></span> {$lang['bottom_76']}</a>
     echo "</div>\n";
 } else {
 ?>

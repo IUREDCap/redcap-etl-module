@@ -131,12 +131,14 @@ if (!empty($username)) {
             if (!empty($userEtlProjects) && in_array($projectId, $userEtlProjects)) {
                 $checked = ' checked ';
             }
-            echo '<td style="text-align: center;"><input type="checkbox" name="checkbox['.$projectId.']" '.$checked.'></td>'."\n";
+            echo '<td style="text-align: center;"><input type="checkbox" name="checkbox['.$projectId.']" '
+                .$checked.'></td>'."\n";
             echo '<td style="text-align: right">'.$projectId."</td>\n";
             
             # Project title
             echo "<td>\n";
-            echo '<a href="'.APP_PATH_WEBROOT.'index.php?pid='.$project['project_id'].'" target="_blank">'.$project['app_title']."</a>\n";
+            echo '<a href="'.APP_PATH_WEBROOT.'index.php?pid='.$project['project_id'].'" target="_blank">'
+                .$project['app_title']."</a>\n";
             echo "</td>\n";
             
             echo "</tr>\n";

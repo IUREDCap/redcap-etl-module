@@ -32,12 +32,16 @@ if (empty($configName)) {
         $configName = $_SESSION['configName'];
     }
 }
+
 if (!empty($configName)) {
     $_SESSION['configName'] = $configName;
 }
 
 if (!empty($configName)) {
     $configuration = $module->getConfiguration($configName);
+    if (empty($configuration)) {
+        $configName = null;
+    }
 }
 
 #------------------------------------------
