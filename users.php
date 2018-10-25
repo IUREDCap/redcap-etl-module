@@ -6,39 +6,43 @@ if (!SUPER_USER) {
 
 require_once __DIR__.'/dependencies/autoload.php';
 
-#require_once __DIR__.'/AdminConfig.php';
-#require_once __DIR__.'/RedCapDb.php';
-
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\RedCapDb;
 
 $module = new \IU\RedCapEtlModule\RedCapEtlModule();
 $selfUrl = $module->getUrl(basename(__FILE__));
 $userSearchUrl = $module->getUrl('user_search.php');
+$adminUrl = $module->getURL('admin.php');
 
 $adminConfigJson = $module->getSystemSetting(AdminConfig::KEY);
 $adminConfig = new AdminConfig();
 
 
-$submit = $_POST['submit'];
-
+$submitValue = $_POST['submitValue'];
 $username = $_POST['username-result'];
 $userLabel = $_POST['userLabel'];
+
 if (!empty($username)) {
-    if (strcasecmp($submit, 'Add User') === 0) {
+    #if (strcasecmp($submitValue, 'Add User') === 0) {
+    #    $module->addUser($username);
+    if (strcasecmp($submitValue, 'Save') === 0) {
+        $checkbox = $_POST['checkbox'];
+        $userEtlProjects = array();
+        foreach (array_keys($checkbox) as $projectId) {
+            array_push($userEtlProjects, $projectId);
+        }
         $module->addUser($username);
+        $module->setUserEtlProjects($username, $userEtlProjects);
+        header('Location: '.$adminUrl);
     }
     $db = new RedCapDb();
     $userProjects = $db->getUserProjects($username);
+    $userEtlProjects = $module->getUserEtlProjects($username);
 }
 
-?>
-
-<?php #include APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>
-<?php
-#--------------------------------------------
-# Include REDCap's project page header
-#--------------------------------------------
+#---------------------------------------------
+# Include REDCap's Control Center page header
+#---------------------------------------------
 ob_start();
 include APP_PATH_DOCROOT . 'ControlCenter/header.php';
 $buffer = ob_get_clean();
@@ -53,6 +57,7 @@ echo $buffer;
 #print "SUBMIT = {$submit} <br/> \n";
 #$users = $module->getUsers();
 #print "Users: <pre><br />\n"; print_r($users); print "</pre> <br/> \n";
+#print "<pre><br />\n"; print_r($_POST); print "</pre> <br/> \n";
 ?>
 
 
@@ -67,7 +72,7 @@ echo $buffer;
 
 <form id="searchForm" action="<?php echo $selfUrl;?>" method="post">
 User: <input type="text" id="user-search" name="user-search" size="48" value="<?php echo $username; ?>">
-<input type="submit" name="submitValue" value="Add User"><br />
+<!-- <input type="submit" name="submitValue" value="Add User"><br /> -->
 <input type="hidden" name="username-result" id="username-result">
 <input type="hidden" name="userLabel" id="userLabel">
 </form>
@@ -105,6 +110,7 @@ if (!empty($username)) {
     echo "<p>Projects for user {$userLabel}</p>\n";
 ?>
 <form action="<?php echo $selfUrl;?>" method="post">
+<input type="hidden" name="username-result" value="<?php echo $username;?>">
 <table class="user-projects">
     <thead>
         <tr> <th>ETL Access?</th> </th><th>ID</th> <th>Name</th> </tr>
@@ -113,13 +119,20 @@ if (!empty($username)) {
         <?php
         $row = 1;
         foreach ($userProjects as $project) {
+            $projectId = $project['project_id'];
+            
             if ($row % 2 == 0) {
                 echo '<tr class="even-row">'."\n";
             } else {
                 echo '<tr class="odd-row">'."\n";
             }
-            echo '<td style="text-align: center;"><input type="checkbox"></td>'."\n";
-            echo '<td style="text-align: right">'.$project['project_id']."</td>\n";
+            
+            $checked = '';
+            if (!empty($userEtlProjects) && in_array($projectId, $userEtlProjects)) {
+                $checked = ' checked ';
+            }
+            echo '<td style="text-align: center;"><input type="checkbox" name="checkbox['.$projectId.']" '.$checked.'></td>'."\n";
+            echo '<td style="text-align: right">'.$projectId."</td>\n";
             
             # Project title
             echo "<td>\n";
@@ -139,7 +152,6 @@ if (!empty($username)) {
 <?php
 }
 ?>
-
 
 <!--
 <h5 style="margin-top: 2em;">REDCap-ETL Users</h5>

@@ -53,6 +53,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         }
     }
 
+    /**
+     * Gets the module version number based on its directory.
+     *
+     * NOTE: version is stored in the database, we should
+     * probably just used that value (system setting,
+     * key = 'version').
+     */
     public function getVersionNumber()
     {
         $versionNumber = '';
@@ -62,6 +69,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         }
         return $versionNumber;
     }
+
+    #-------------------------------------------------------------------
+    # UserList methods
+    #-------------------------------------------------------------------
 
     public function getUsers()
     {
@@ -83,54 +94,71 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     }
 
 
-
-    private function getUserInfo($username = USERID)
+    #-------------------------------------------------------------------
+    # UserInfo methods
+    #-------------------------------------------------------------------
+    
+    private function getUserInfo($username = USERID, $projectId = PROJECT_ID)
     {
         $key = $this->getUserKey($username);
-        $json = $this->getSystemSetting($key);
+        $json = $this->getProjectSetting($key, $projectId);
         $userInfo = new UserInfo($username);
         $userInfo->fromJson($json);
         return $userInfo;
     }
 
-    private function setUserInfo($userInfo, $username = USERID)
+    private function setUserInfo($userInfo, $username = USERID, $projectId = PROJECT_ID)
     {
         $key = $this->getUserKey($username);
         $json = $userInfo->toJson();
-        $this->setSystemSetting($key, $json);
+        $this->setProjectSetting($key, $json, $projectId);
     }
 
-    public function getUserConfigurationNames($username = USERID)
+    public function getUserConfigurationNames($username = USERID, $projectId = PROJECT_ID)
     {
-        $userInfo = $this->getUserInfo($username);
+        $userInfo = $this->getUserInfo($username, $projectId);
         $names = $userInfo->getConfigNames();
         return $names;
     }
 
-    #------------------------------------------------------------
-    # User project methods
-    #------------------------------------------------------------
+    /**
+     * Gets the key for REDCap's external module settings table
+     * for the specified username, or the current username,
+     * if no username was specified.
+     */
+    public function getUserKey($username = USERID, $projectId = PROJECT_ID)
+    {
+        $key = 'user:'.$username;
+        return $key;
+    }
+
+
+    #===================================================================
+    # User ETL project methods
+    #===================================================================
     
     /**
-     * @param array $projects an array of REDCap project IDS.
+     * @param array $projects an array of REDCap project IDS
+     *     for which the user has ETL permission.
      */
-    public function setUserProjects($username, $projects)
+    public function setUserEtlProjects($username, $projects)
     {
         $key = self::USER_PROJECTS_KEY_PREFIX . $username;
         $json = json_encode($projects);
         $this->setSystemSetting($key, $json);
     }
     
-    public function getUserProjects($username = USERID)
+    public function getUserEtlProjects($username = USERID)
     {
         $key = self::USER_PROJECTS_KEY_PREFIX . $username;
         $json = $this->getSystemSetting($key);
-        $projects = $json_decode($json, true);
+        $projects = json_decode($json, true);
         return $projects;
     }
 
+
     #==================================================================================
-    # Configuration methods
+    # (ETL) Configuration methods
     #==================================================================================
     
     /**
@@ -139,12 +167,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      * @param string $name the name of the configuration to get.
      * @return Configuration the specified configuration.
      */
-    public function getConfiguration($name, $username = USERID)
+    public function getConfiguration($name, $username = USERID, $projectId = PROJECT_ID)
     {
         $configuraion = null;
         $key = $this->getConfigurationKey($name, $username);
 
-        $setting = $this->getSystemSetting($key);
+        $setting = $this->getProjectSetting($key, $projectId);
         $configValues = json_decode($setting, true);
         if (isset($configValues) && is_array($configValues)) {
             $configuration = new Configuration($configValues['name']);
@@ -154,20 +182,20 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     }
 
 
-    public function setConfiguration($configuration)
+    public function setConfiguration($configuration, $username = USERID, $projectId = PROJECT_ID)
     {
         $key = $this->getConfigurationKey($configuration->getName());
 
         $json = json_encode($configuration);
-        $setting = $this->setSystemSetting($key, $json);
+        $setting = $this->setProjectSetting($key, $json, $projectId);
     }
 
-    public function setConfigSchedule($configName, $server, $schedule)
+    public function setConfigSchedule($configName, $server, $schedule, $username = USERID, $projectId = PROJECT_ID)
     {
-        $configuration = $this->getConfiguration($configName);
+        $configuration = $this->getConfiguration($configName, $username, $projectId);
         $configuration->setProperty(Configuration::CRON_SERVER, $server);
         $configuration->setProperty(Configuration::CRON_SCHEDULE, $schedule);
-        $this->setConfiguration($configuration);
+        $this->setConfiguration($configuration, $username, $projectId);
         
         \REDCap::logEvent(
             'REDCap-ETL cron schedule change',
@@ -176,7 +204,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     }
     
     
-    public function addConfiguration($name, $username = USERID)
+    public function addConfiguration($name, $username = USERID, $projectId = PROJECT_ID)
     {
         # Add configuration entry for user
         $userInfo = $this->getUserInfo();
@@ -188,7 +216,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             $userInfo->addConfigName($name);
             $json = $userInfo->toJson();
             $userKey = $this->getUserKey();
-            $this->setSystemSetting($userKey, $json);
+            $this->setProjectSetting($userKey, $json, $projectId);
         }
         
         # Add the actual configuration
@@ -197,13 +225,17 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         if (!isset($configuration)) {
             $configuration = new Configuration($name);
             $jsonConfiguration = json_encode($configuration);
-            $this->setSystemSetting($key, $jsonConfiguration);
+            $this->setProjectSetting($key, $jsonConfiguration, $projectId);
         }
 
         \REDCap::logEvent('Added REDCap-ETL configuration '.$name.'.');
     }
 
 
+    /**
+     * Copy configuration (only supports copying from/to same
+     * user and project).
+     */
     public function copyConfiguration($fromConfigName, $toConfigName)
     {
         #--------------------------------------------------------
@@ -225,7 +257,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $this->setSystemSetting($key, $json);
     }
     
-
+    /**
+     * Rename configuration (only supports rename from/to same
+     * user and project).
+     */
     public function renameConfiguration($configName, $newConfigName)
     {
         $this->copyConfiguration($configName, $newConfigName);
@@ -242,16 +277,32 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             $userInfo->removeConfigName($configName);
             $json = $userInfo->toJson();
             $userKey = $this->getUserKey();
-            $this->setSystemSetting($userKey, $json);
+            $this->setProjectSetting($userKey, $json);
         }
         
         #------------------------------------------------
         # Remove the actual configuration
         #------------------------------------------------
         $key = $this->getConfigurationKey($configName);
-        $this->removeSystemSetting($key);
+        $this->removeProjectSetting($key);
+    }
+
+
+
+    public function getConfigurationKey($name, $username = USERID)
+    {
+        $key = 'user:'.$username.';configuration:'.$name;
+        return $key;
     }
     
+    
+    #-------------------------------------------------------------------
+    # Cron job methods
+    #-------------------------------------------------------------------
+     
+    /**
+     * Gets all the cron jobs (for all users and all projects).
+     */
     public function getAllCronJobs()
     {
         $cronJobs = array();
@@ -492,23 +543,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
 
 
-    /**
-     * Gets the key for REDCap's external module settings table
-     * for the specified username, or the current username,
-     * if no username was specified.
-     */
-    public function getUserKey($username = USERID)
-    {
-        $key = 'user:'.$username;
-        return $key;
-    }
-
-    public function getConfigurationKey($name, $username = USERID)
-    {
-        $key = 'user:'.$username.';configuration:'.$name;
-        return $key;
-    }
-
 
     public function renderAdminTabs($activeUrl = '')
     {
@@ -554,9 +588,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $listLabel = '<span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>'
            .' My ETL Configurations';
 
-        $addUrl = $this->getUrl('add.php');
-        $addLabel = '<span style="color: #008000;" class="glyphicon glyphicon-plus" aria-hidden="true"></span>'
-           .' New Configuration';
+        #$addUrl = $this->getUrl('add.php');
+        #$addLabel = '<span style="color: #008000;" class="glyphicon glyphicon-plus" aria-hidden="true"></span>'
+        #   .' New Configuration';
 
         $configUrl = $this->getUrl('configure.php');
         $configLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
@@ -575,7 +609,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $tabs = array();
         
         $tabs[$listUrl]     = $listLabel;
-        $tabs[$addUrl]      = $addLabel;
+        #$tabs[$addUrl]      = $addLabel;
         $tabs[$configUrl]   = $configLabel;
         
         if ($adminConfig->getAllowCron()) {

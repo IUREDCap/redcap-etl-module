@@ -30,8 +30,22 @@ if (!empty($deleteConfigName)) {
     $module->removeConfiguration($deleteConfigName);
 }
 
-
-# include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
+$submitValue = $_POST['submitValue'];
+if (strcasecmp($submitValue, 'Add') === 0) {
+    if (!array_key_exists('configurationName', $_POST) || empty($_POST['configurationName'])) {
+        $error = 'ERROR: No configuration name was specified.';
+    } else {
+        $configurationName = $_POST['configurationName'];
+        $configuration = $module->getConfiguration($configurationName);
+        if (isset($configuration)) {
+            $error = 'ERROR: configuration "'.$configurationName.'" already exists.';
+        } else {
+            $indexUrl = $module->getUrl("index.php");
+            $module->addConfiguration($configurationName);
+            header('Location: '.$indexUrl);
+        }
+    }
+}
 
 #----------------------------------
 # How to add to <head>
@@ -60,9 +74,62 @@ $configUrl   = $module->getUrl("configure.php");
 $scheduleUrl = $module->getUrl("schedule.php");
 $runUrl      = $module->getUrl("run.php");
 
+$userEtlProjects = $module->getUserEtlProjects();
+$projectId = $module->getProjectId();
+
 ?>
 
-<?php $module->renderUserTabs($selfUrl); ?>
+<?php
+
+$module->renderUserTabs($selfUrl); 
+$module->renderErrorMessageDiv($error);
+$module->renderSuccessMessageDiv($success);
+
+?>
+
+
+
+<?php
+if (!in_array($projectId, $userEtlProjects)) {
+    echo '<div style="padding-top:15px; padding-bottom:15px;">'."\n";
+    $label = 'Request ETL access for this project';
+    $projectUrl = APP_PATH_WEBROOT_FULL.'index.php?pid='.$projectId;
+
+    echo '<a href="mailto:'.$homepage_contact_email
+        .'?subject='.rawurlencode('REDCap-ETL Access Request')
+        .'&body='
+        .rawurlencode('Username: '.USERID."\n"
+            .'Project title: "'.' '.strip_tags(REDCap::getProjectTitle()).'"'."\n"
+            .'Project link: '.APP_PATH_WEBROOT_FULL."redcap_v{$redcap_version}/index.php?pid={$projectId}\n\n"
+            .'Dear REDCap administrator,'."\n\n"
+            .'Please add REDCap-ETL access for me to project "'.REDCap::getProjectTitle().'"'."\n\n"
+            ."Sincerely,\n"
+            .$user_firstname.' '.$user_lastname
+        )
+        .'" '
+        .' class="btn-contact-admin btn btn-primary btn-xs" style="color:#fff;">'
+        .'<span class="glyphicon glyphicon-envelope"></span> '.$label
+        .'</a>'."\n";
+    ;
+
+    #echo "<br />".$user_firstname."\n";
+    #echo "<br />Project ID: ".PROJECT_ID."\n";
+    
+    #."&body=".rawurlencode($lang['global_11'].$lang['colon']." ".USERID."\n".$lang['control_center_107']." \"".strip_tags($app_title)."\"\n".$lang['bottom_81']." ".APP_PATH_WEBROOT_FULL."redcap_v{$redcap_version}/index.php?pid=$project_id\n\n".$lang['bottom_78']."\n\n".$lang['bottom_79']."\n\n".$lang['bottom_80']."\n$user_firstname $user_lastname\n")."' class='btn-contact-admin btn btn-primary btn-xs' style='color:#fff;'><span class='glyphicon glyphicon-envelope'></span> {$lang['bottom_76']}</a>
+    echo "</div>\n";
+} else {
+?>
+
+<?php
+#------------------------------------------------------------
+# Add configuration form
+#------------------------------------------------------------
+?>
+<form action="<?=$selfUrl;?>" method="post" style="margin-bottom: 12px;">
+    REDCap-ETL configuration name: <input name="configurationName" type="text">
+    <input type="submit" name="submitValue" value="Add" />
+</form>
+
 
 
 <table class="dataTable">
@@ -138,7 +205,9 @@ foreach ($configurationNames as $configurationName) {
 </tbody>
 </table>
 
-
+<?php
+}
+?>
 
 <?php
 #--------------------------------------

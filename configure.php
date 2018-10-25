@@ -30,7 +30,13 @@ if (!empty($configName)) {
 
 if (!empty($configName)) {
     $configuration = $redCapEtlModule->getConfiguration($configName);
-    $properties = $configuration->getProperties();
+    if (!empty($configuration)) {
+        $properties = $configuration->getProperties();
+    } else {
+        # May have changed projects, and session config name
+        # does not exist in the new project
+        $configName = null;
+    }
 }
 
 #-------------------------------
@@ -272,7 +278,7 @@ $(function() {
 
       <tr>
         <td>
-          Data Project API Token
+          Project API Token
         </td>
         <td>
           <input type="password" size="34" value="<?php echo $properties[Configuration::DATA_SOURCE_API_TOKEN];?>"

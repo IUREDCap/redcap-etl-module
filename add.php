@@ -40,7 +40,9 @@ if (strcasecmp($submit, 'Add') === 0) {
 </div>
 
 
-<?php $redCapEtl->renderUserTabs($selfUrl); ?>
+<?php 
+$redCapEtl->renderUserTabs($selfUrl);
+?>
 
 
 <?php
