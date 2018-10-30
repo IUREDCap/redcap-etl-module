@@ -77,6 +77,10 @@ class ServerConfig implements \JsonSerializable
         } elseif ($this->authMethod == self::AUTH_METHOD_SSH_KEY) {
             $keyFile = $this->getSshKeyFile();
             
+            if (empty($keyFile)) {
+                throw new \Exception('No SSH key file found.');
+            }
+            
             \REDCap::logEvent('REDCap-ETL run key file: '.$keyFile);
             \REDCap::logEvent('REDCap-ETL run current user: '.get_current_user());
                         
@@ -103,7 +107,7 @@ class ServerConfig implements \JsonSerializable
         $fileNameSuffix = uniqid('', true);
         $scp = new SCP($ssh);
         
-                
+        /*        
         $rulesFileName = '';
         $rulesFilePath = '';
         
@@ -117,17 +121,22 @@ class ServerConfig implements \JsonSerializable
                 throw new \Exception('Copy of transformation rules file to "'.$rulesFilePath.'" failed.');
             }
         }
+        */
         
-        $propertiesText = $etlConfig->getRedCapEtlPropertiesText($rulesFileName);
-        $configFileName = 'etl_config_'.$fileNameSuffix.'.ini';
+        #$propertiesText = $etlConfig->getRedCapEtlPropertiesText($rulesFileName);
+        $propertiesJson = $etlConfig->getRedCapEtlJsonProperties();
+        #$configFileName = 'etl_config_'.$fileNameSuffix.'.ini';
+        $configFileName = 'etl_config_'.$fileNameSuffix.'.json';
         $configFilePath = $this->configDir.'/'.$configFileName;
-        $scpResult = $scp->put($configFilePath, $propertiesText);
+        #$scpResult = $scp->put($configFilePath, $propertiesText);
+        $scpResult = $scp->put($configFilePath, $propertiesJson);
         if (!$scpResult) {
             throw new \Exception('Copy of configuration file to "'.$configFilePath.'" failed.');
         }
         
         #$ssh->setTimeout(1);
-        $command = $this->getEtlCommand() . ' ' . $configFileName . ' ' . $rulesFileName;
+        #$command = $this->getEtlCommand() . ' ' . $configFileName . ' ' . $rulesFileName;
+        $command = $this->getEtlCommand() . ' ' . $configFilePath;
         \REDCap::logEvent('REDCap-ETL run command: '.$command);
         $output = $ssh->exec($command);
         \REDCap::logEvent('REDCap-ETL run output: '.$output);
@@ -137,15 +146,37 @@ class ServerConfig implements \JsonSerializable
     
     public function test()
     {
+        \REDCap::logEvent('REDCap-ETL server config test.');
+        
         $testOutput = '';
         try {
             $serverAddress = $this->getServerAddress();
+            if (empty($serverAddress)) {
+                throw new \Exception('No server address found.');    
+            }
+            \REDCap::logEvent('REDCap-ETL server config test. Server address: '.$serverAddress);
+                    
             $username = $this->getUsername();
             if ($this->getAuthMethod() == ServerConfig::AUTH_METHOD_SSH_KEY) {
+                \REDCap::logEvent('REDCap-ETL server config test. SSH authentication method.');
+                
                 $keyFile = $this->getSshKeyFile();
+                if (empty($keyFile)) {
+                    throw new \Exception('SSH key file cound not be found.');    
+                }
+                
+                \REDCap::logEvent('REDCap-ETL server config test. SSH key file: '.$keyFile);
+                            
                 $keyPassword = $this->getSshKeyPassword();
+                
+                \REDCap::logEvent('REDCap-ETL server config test. SSH key password: '.$keyPassword);
+                                
                 $key = new RSA();
-                $key->setPassword($keyPassword);
+                
+                #if (!empty($keyPassword)) {
+                    $key->setPassword($keyPassword);
+                #}
+            
                 $keyFileContents = file_get_contents($keyFile);
                 if ($keyFileContents === false) {
                     throw new \Exception('SSH key file could not be accessed.');

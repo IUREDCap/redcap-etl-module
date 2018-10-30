@@ -424,6 +424,18 @@ $(function() {
 
 <?php } ?>
 
+<?php
+// See JSON output of properties for REDCap-ETL
+/*
+if (isset($configuration)) {
+    $json = $configuration->getRedCapEtlJsonProperties();
+    $json = json_encode(json_decode($json), JSON_PRETTY_PRINT);
+    print "<pre>\n";
+    print_r($json);
+    print "</pre>\n";
+}
+*/
+?>
 
 <?php include APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
 

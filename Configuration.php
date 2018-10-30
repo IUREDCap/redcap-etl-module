@@ -156,6 +156,39 @@ class Configuration implements \JsonSerializable
     }
     
     /**
+     * Gets configuration properties in JSON, formatted for use
+     * by REDCap-ETL.
+     */
+    public function getRedCapEtlJsonProperties()
+    {
+        $properties = $this->properties;
+       
+        #---------------------------------------
+        # Remove properties that aren't used
+        # by REDCap-ETL
+        #---------------------------------------
+        unset($properties[self::DB_HOST]);
+        unset($properties[self::DB_NAME]);
+        unset($properties[self::DB_USERNAME]);
+        unset($properties[self::DB_PASSWORD]);
+        
+        unset($properties[self::CRON_SERVER]);
+        unset($properties[self::CRON_SCHEDULE]);
+
+        # Convert the transformation rules from text to
+        # an array of strings
+        if (arrary_key_exists)
+        $rulesText = $properties[self::TRANSFORM_RULES_TEXT];
+        $rules = preg_split("/\r\n|\n|\r/", $rulesText);
+        $properties[self::TRANSFORM_RULES_TEXT] = $rules;
+        
+        $jsonProperties = json_encode($properties);
+        
+        return $jsonProperties;
+    }
+    
+    
+    /**
      * Gets a REDCap-ETL compatible text version (for inclusion in a file) or
      * the configuration properties.
      */
