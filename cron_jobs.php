@@ -11,6 +11,7 @@ use IU\RedCapEtlModule\AdminConfig;
 $module = new \IU\RedCapEtlModule\RedCapEtlModule();
 $selfUrl = $module->getUrl(basename(__FILE__));
 $serverConfigUrl = $module->getUrl('server_config.php');
+$userUrl = $module->getURL('user.php');
 
 $adminConfig = $module->getAdminConfig();
     
@@ -67,7 +68,7 @@ $buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
 echo $buffer;
 ?>
 
-<h4><img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>table_gear.png">Cron Jobs</h4>
+<h4><img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>table_gear.png">REDCap-ETL Admin</h4>
 
 
 <?php
@@ -125,20 +126,26 @@ $times = $adminConfig->getTimeLabels();
 
 <table class="dataTable">
     <thead>
-        <tr> <th>User</th> <th>Configuration</th> <th>Server</th> </tr>
+        <tr> <th>User</th> <th>Project ID</th> <th>Configuration</th> <th>Server</th> </tr>
     </thead>
     <tbody>
         <?php
         $row = 1;
         foreach ($cronJobs as $cronJob) {
             $serverUrl = $serverConfigUrl.'&serverName='.$server;
+            $username  = $cronJob['username'];
+            $projectId = $cronJob['projectId'];
+            $config    = $cronJob['config'];
+            $userConfigUrl = $userUrl.'&username='.$username;
             if ($row % 2 === 0) {
                 print '<tr class="even">'."\n";
             } else {
                 print '<tr class="odd">'."\n";
             }
-            print "<td>".$cronJob['username']."</td>\n";
-            print "<td>".$cronJob['config']."</td>\n";
+            print "<td>".'<a href="'.$userConfigUrl.'">'.$cronJob['username'].'</a>'."</td>\n";
+            print "<td>".'<a href="'.APP_PATH_WEBROOT.'index.php?pid='.$projectId.'" target="_blank">'
+                .$projectId.'</a>'."</td>\n";
+            print "<td>".'<a href="#" class="copyConfig">'.$cronJob['config'].'</a>'."</td>\n";
             print "<td>".'<a href="'.$serverUrl.'">'.$cronJob['server'].'</a>'."</td>\n";
             print "</tr>\n";
             $row++;
@@ -146,6 +153,43 @@ $times = $adminConfig->getTimeLabels();
         ?>
     </tbody>
 </table>
+
+<div id="popup" style="display: none;"></div>
+
+<script>
+$(function() {
+$('#popup').dialog({
+    autoOpen: false,
+    open: function(event, ui) {
+        $('#popup').load(
+            "<?php echo $module->getURL(
+                "config_dialog.php?config={$config}&username={$username}"
+                ."&projectId={$projectId}"
+            ) ?>",
+            function() {}
+        );
+    },
+  modal: true,
+  minHeight: 600,
+  minWidth: 800,
+  buttons: {
+    'Save Changes': function(){
+        $(this).dialog('close');
+    },
+    'Discard & Exit' : function(){
+      $(this).dialog('close');
+    }
+  }
+});
+    $(".copyConfig").click(function(){
+        var id = this.id;
+        var configName = id.substring(4);
+        $("#configToCopy").text('"'+configName+'"');
+        $('#copyFromConfigName').val(configName);
+        $("#popup").dialog("open");
+    });
+});
+</script>
 
 <?php
 #print "<pre>\n"; print_r($cronJobs); print "</pre>";

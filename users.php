@@ -67,6 +67,9 @@ echo $buffer;
 <h4><img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>table_gear.png">REDCap-ETL Admin</h4>
 
 <?php $module->renderAdminTabs($selfUrl); ?>
+<div style="border-left: 1px solid black; border-bottom: 1px solid black;">
+    User List | User Config
+</div>
 
 <?php #echo "user-search: ".$_POST['user-search']."<br/>\n"; ?>
 <?php #echo "user label: ".$_POST['userLabel']."<br/>\n"; ?>
@@ -104,5 +107,6 @@ echo $buffer;
     ?>
     </tbody>
 </table>
+
 
 <?php include APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>

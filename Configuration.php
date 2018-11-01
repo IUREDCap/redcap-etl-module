@@ -31,11 +31,15 @@ class Configuration implements \JsonSerializable
     const CRON_SCHEDULE = 'cron_schedule';
     
     private $name;
+    private $username;
+    private $projectId;
     private $properties;
 
-    public function __construct($name)
+    public function __construct($name, $username = USERID, $projectId = PROJECT_ID)
     {
-        $this->name = $name;
+        $this->name      = $name;
+        $this->username  = $username;
+        $this->projectId = $projectId;
 
         $this->properties = array();
         foreach (self::getPropertyNames() as $name) {
@@ -104,9 +108,12 @@ class Configuration implements \JsonSerializable
         foreach (self::getPropertyNames() as $name) {
             if (array_key_exists($name, $properties)) {
                 $this->properties[$name] = $properties[$name];
-            } else {
-                $this->properties[$name] = '';
+            } elseif ($name === self::SSL_VERIFY) {
+                $this->properties[$name] = false;
             }
+            # else {
+            #    $this->properties[$name] = '';
+            #}
         }
         
         $dbHost = $properties[self::DB_HOST];
@@ -174,15 +181,24 @@ class Configuration implements \JsonSerializable
         
         unset($properties[self::CRON_SERVER]);
         unset($properties[self::CRON_SCHEDULE]);
+        
+        if (is_bool($properties[self::SSL_VERIFY])) {
+            if ($properties[self::SSL_VERIFY]) {
+                $properties[self::SSL_VERIFY] = 'true';
+            } else {
+                $properties[self::SSL_VERIFY] = 'false';
+            }
+        }
 
         # Convert the transformation rules from text to
         # an array of strings
-        if (arrary_key_exists)
-        $rulesText = $properties[self::TRANSFORM_RULES_TEXT];
-        $rules = preg_split("/\r\n|\n|\r/", $rulesText);
-        $properties[self::TRANSFORM_RULES_TEXT] = $rules;
-        
-        $jsonProperties = json_encode($properties);
+        if (array_key_exists(self::TRANSFORM_RULES_TEXT, $properties)) {
+            $rulesText = $properties[self::TRANSFORM_RULES_TEXT];
+            $rules = preg_split("/\r\n|\n|\r/", $rulesText);
+            $properties[self::TRANSFORM_RULES_TEXT] = $rules;
+        }
+
+        $jsonProperties = json_encode($properties, JSON_PRETTY_PRINT);
         
         return $jsonProperties;
     }

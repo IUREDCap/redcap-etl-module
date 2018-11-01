@@ -118,13 +118,15 @@ if (!empty($username)) {
 <input type="hidden" name="username-result" value="<?php echo $username;?>">
 <table class="user-projects">
     <thead>
-        <tr> <th>ETL Access?</th> </th><th>ID</th> <th>Name</th> </tr>
+        <tr> <th>ETL Access?</th> </th><th>PID</th> <th>Project</th> <th>ETL Configurations</th> </tr>
     </thead>
     <tbody>
         <?php
         $row = 1;
         foreach ($userProjects as $project) {
             $projectId = $project['project_id'];
+            
+            $configNames = $module->getUserConfigurationNames($username, $projectId);
             
             if ($row % 2 == 0) {
                 echo '<tr class="even-row">'."\n";
@@ -144,6 +146,19 @@ if (!empty($username)) {
             echo "<td>\n";
             echo '<a href="'.APP_PATH_WEBROOT.'index.php?pid='.$project['project_id'].'" target="_blank">'
                 .$project['app_title']."</a>\n";
+            echo "</td>\n";
+            
+            echo "<td>\n";
+            $isFirst = true;
+            foreach ($configNames as $configName) {
+                if ($isFirst) {
+                    $isFirst = false;
+                } else {
+                    echo ", ";
+                }
+                echo $configName;
+            }
+            echo "\n";
             echo "</td>\n";
             
             echo "</tr>\n";

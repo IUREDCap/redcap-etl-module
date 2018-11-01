@@ -7,6 +7,7 @@ class AdminConfig implements \JsonSerializable
     const KEY = 'admin-config';
     const DAY_LABELS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+    private $allowEmbeddedServer;  // Allow embedded REDCap-ETL server to be used
     private $allowOnDemand;  // Allow the ETL process to be run on demand
     
     private $allowCron;
@@ -189,6 +190,16 @@ class AdminConfig implements \JsonSerializable
         return $json;
     }
 
+    public function getAllowEmbeddedServer()
+    {
+        return $this->allowEmbeddedServer;
+    }
+    
+    public function setAllowEmbeddedServer($allowEmbeddedServer)
+    {
+        $this->allowEmbeddedServer = $allowEmbeddedServer;
+    }
+    
     public function getAllowOnDemand()
     {
         return $this->allowOnDemand;

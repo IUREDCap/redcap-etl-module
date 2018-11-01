@@ -102,7 +102,7 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
 } elseif (strcasecmp($submit, 'Cancel') === 0) {
     header('Location: '.$listUrl);
 } elseif (strcasecmp($submit, 'Save') === 0) {
-    $configuration = new Configuration($configName);
+    #$configuration = new Configuration($configName);
 
     try {
         $configuration->set($_POST);
@@ -255,7 +255,7 @@ $(function() {
          value="<?php echo $properties[Configuration::CONFIG_API_TOKEN]; ?>" />
   <input type="hidden" name="<?php echo Configuration::TRANSFORM_RULES_SOURCE; ?>"
          value="<?php echo $properties[Configuration::TRANSFORM_RULES_SOURCE]; ?>" />
-
+         
   <!--<div style="padding: 10px; border: 1px solid #ccc; background-color: #f0f0f0;"> -->
 
   <table style="background-color: #f0f0f0; border: 1px solid #ccc;">
@@ -310,12 +310,16 @@ $(function() {
         </td>
         <td>
             <?php
+            $value = '';
             $checked = '';
             if ($properties[Configuration::SSL_VERIFY]) {
                 $checked = ' checked ';
+                $value = ' value="true" ';
             }
             ?>
-          <input type="checkbox" name="<?php echo Configuration::SSL_VERIFY?>" <?php echo $checked;?> >
+          <input type="checkbox" name="<?php echo Configuration::SSL_VERIFY;?>"
+                    <?php echo $checked;?>
+                    <?php echo $value;?> >
         </td>
       </tr>
 

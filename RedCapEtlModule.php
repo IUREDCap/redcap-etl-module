@@ -40,10 +40,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         
             foreach ($cronJobs as $cronJob) {
                 $username   = $cronJob['username'];
+                $projectId  = $cronJob['projectId'];
                 $serverName = $cronJob['server'];
                 $configName = $cronJob['config'];
             
-                $etlConfig    = $this->getConfiguration($configName, $username);
+                $etlConfig    = $this->getConfiguration($configName, $username, $projectId);
                 $serverConfig = $this->getServerConfig($serverName);
                 \REDCap::logEvent('REDCap-ETL cron job config "'.$configName.'" for user "'
                     .$username.'" on server "'.$serverName.'" on day '.$day.', hour '.$hour);
@@ -184,7 +185,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function setConfiguration($configuration, $username = USERID, $projectId = PROJECT_ID)
     {
-        $key = $this->getConfigurationKey($configuration->getName());
+        $key = $this->getConfigurationKey($configuration->getName(), $username);
 
         $json = json_encode($configuration);
         $setting = $this->setProjectSetting($key, $json, $projectId);
@@ -323,11 +324,16 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                     $config = $this->getConfiguration($configName, $username, $etlProject);
                     if (isset($config)) {
                         $server = $config->getProperty(Configuration::CRON_SERVER);
-                        $times = $config->getProperty(Configuration::CRON_SCHEDULE);
+                        $times  = $config->getProperty(Configuration::CRON_SCHEDULE);
                         for ($day = 0; $day < 7; $day++) {
                             $hour = $times[$day];
                             if (isset($hour)) {
-                                $run = array('username' => $username, 'config' => $configName, 'server' => $server);
+                                $run = array(
+                                    'username'  => $username,
+                                    'projectId' => $etlProject,
+                                    'config'    => $configName,
+                                    'server'    => $server
+                                );
                                 array_push($cronJobs[$day][$hour], $run);
                             }
                         }
@@ -335,7 +341,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 }
             }
         }
-        
         return $cronJobs;
     }
     
@@ -368,7 +373,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                             for ($cronDay = 0; $cronDay < 7; $cronDay++) {
                                 $cronTime = $times[$cronDay];
                                 if (isset($cronTime) && $time == $cronTime && $day == $cronDay) {
-                                    $job = array('username' => $username, 'config' => $configName, 'server' => $server);
+                                    $job = array(
+                                        'username'  => $username,
+                                        'projectId' => $etlProject,
+                                        'config'    => $configName,
+                                        'server'    => $server
+                                    );
                                     array_push($cronJobs, $job);
                                 }
                             }
@@ -554,7 +564,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $adminUrl = $this->getUrl('admin.php');
         $adminLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
-           .' Configure';
+           .' Config';
 
         $cronJobsUrl = $this->getUrl('cron_jobs.php');
         $cronJobsLabel = '<span class="glyphicon glyphicon-time" aria-hidden="true"></span>'
@@ -584,6 +594,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $tabs[$cronJobsUrl]      = $cronJobsLabel;
         $tabs[$usersUrl]         = $usersLabel;
         $tabs[$configureUserUrl] = $configureUserLabel;
+
         $tabs[$serversUrl]       = $serversLabel;
         $tabs[$serverConfigUrl]  = $serverConfigLabel;
         

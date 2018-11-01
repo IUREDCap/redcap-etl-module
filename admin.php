@@ -20,6 +20,9 @@ if (strcasecmp($submitValue, 'Save') === 0) {
     $times = $_POST['times'];
     $adminConfig->setAllowedCronTimes($times);
     
+    $allowEmbeddedServer = $_POST['allowEmbeddedServer'];
+    $adminConfig->setAllowEmbeddedServer($allowEmbeddedServer);
+    
     $allowOnDemand = $_POST['allowOnDemand'];
     $adminConfig->setAllowOnDemand($allowOnDemand);
     
@@ -68,7 +71,13 @@ $module->renderSuccessMessageDiv($success);
 
 <form action="<?php echo $selfUrl;?>" method="post">
 
-    <input type="checkbox"> Allow embedded REDCap-ETL server
+    <?php
+    $checked = '';
+    if ($adminConfig->getAllowEmbeddedServer()) {
+        $checked = 'checked';
+    }
+    ?>
+    <input type="checkbox" name="allowEmbeddedServer" <?php echo $checked;?>> Allow embedded REDCap-ETL server
     <br />
     
     <?php
