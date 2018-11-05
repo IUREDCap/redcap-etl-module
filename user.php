@@ -151,12 +151,13 @@ if (!empty($username)) {
             echo "<td>\n";
             $isFirst = true;
             foreach ($configNames as $configName) {
+                $configUrl = $module->getURL('admin_etl_config.php'.'?config='.$configName.'&username='.$username.'&pid='.$projectId);
                 if ($isFirst) {
                     $isFirst = false;
                 } else {
                     echo ", ";
                 }
-                echo $configName;
+                echo '<a href="'.$configUrl.'">'.$configName."</a>\n";
             }
             echo "\n";
             echo "</td>\n";

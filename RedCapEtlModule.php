@@ -246,7 +246,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $userInfo->addConfigName($toConfigName);
         $json = $userInfo->toJson();
         $userKey = $this->getUserKey();
-        $this->setSystemSetting($userKey, $json);
+        $this->setProjectSetting($userKey, $json);
         
         #-----------------------------------------------------
         # Copy the actual configuration
@@ -255,7 +255,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $toConfig->setName($toConfigName);
         $json = $toConfig->toJson();
         $key = $this->getConfigurationKey($toConfigName);
-        $this->setSystemSetting($key, $json);
+        $this->setProjectSetting($key, $json);
     }
     
     /**
@@ -278,7 +278,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             $userInfo->removeConfigName($configName);
             $json = $userInfo->toJson();
             $userKey = $this->getUserKey();
-            $this->setSystemProjectSetting($userKey, $json);
+            $this->setProjectSetting($userKey, $json);
         }
         
         #------------------------------------------------
