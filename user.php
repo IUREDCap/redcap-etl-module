@@ -151,7 +151,10 @@ if (!empty($username)) {
             echo "<td>\n";
             $isFirst = true;
             foreach ($configNames as $configName) {
-                $configUrl = $module->getURL('admin_etl_config.php'.'?config='.$configName.'&username='.$username.'&pid='.$projectId);
+                $configUrl = $module->getURL(
+                    'admin_etl_config.php'.'?config='.$configName
+                    .'&username='.$username.'&pid='.$projectId
+                );
                 if ($isFirst) {
                     $isFirst = false;
                 } else {
