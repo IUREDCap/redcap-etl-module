@@ -9,6 +9,8 @@ use phpseclib\Net\SSH2;
 
 class ServerConfig implements \JsonSerializable
 {
+    const EMBEDDED_SERVER_NAME = '(embedded server)';
+    
     const AUTH_METHOD_SSH_KEY  = 0;
     const AUTH_METHOD_PASSWORD = 1;
     

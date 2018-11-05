@@ -7,6 +7,7 @@ require_once __DIR__.'/redcap-etl/dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Configuration;
+use IU\RedCapEtlModule\ServerConfig;
 
 $error   = '';
 $success = '';
@@ -70,7 +71,7 @@ if (strcasecmp($submit, 'Run') === 0) {
         $error = 'ERROR: No ETL configuration found for '.$configName.'.';
     } else {
         try {
-            if (empty($server)) {
+            if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
                 $logger = new \IU\REDCapETL\NullLogger('REDCap-ETL');
                 $properties = $configuration->getProperties();
                 $redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
@@ -110,6 +111,7 @@ echo $buffer;
 <?php $module->renderUserTabs($selfUrl); ?>
 
 <?php
+echo "SERVER: {$server}<br />\n";
 #----------------------------
 # Display error, if any
 #----------------------------
@@ -156,14 +158,25 @@ if (!empty($success)) { ?>
 <br />
 
 <!-- Run form -->
+<?php
+$allowEmbeddedServer = $adminConfig->getAllowEmbeddedServer();
+?>
 <form action="<?php echo $selfUrl;?>" method="post">
     <fieldset style="border: 2px solid #ccc; border-radius: 7px; padding: 7px;">
         <legend style="font-weight: bold;">Run Now</legend>
         <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
         <input type="submit" name="submit" value="Run" /> on
         <?php
+        $selected = '';
+        if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
+            $selected = 'selected';
+        }
         echo '<select name="server">'."\n";
-        echo '<option value="">(embedded server)</option>'."\n";
+        if ($allowEmbeddedServer) {
+            echo '<option value="'.ServerConfig::EMBEDDED_SERVER_NAME.'" '.$selected.'>'
+                .ServerConfig::EMBEDDED_SERVER_NAME
+                .'</option>'."\n";
+        }
         foreach ($servers as $serverName) {
             $selected = '';
             if ($serverName === $server) {
