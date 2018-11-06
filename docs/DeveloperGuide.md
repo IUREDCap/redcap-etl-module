@@ -17,6 +17,17 @@ To update REDCap-ETL to a new version, use, for example:
     git subtree pull --squash --prefix redcap-etl https://github.com/IUREDCap/redcap-etl/ tags/0.6.0 -m 'Updated subtree redcap-etl to 0.6.0'
 
 
+Updating Dependencies
+--------------------------
+To avoid requiring Composer to be run when the module is installed, the non-development dependencies
+are copied to the __dependencies/__ directory, and this directory is committed to Git.
+To update the contents of this directory, the following commands
+can be used from the top-level directory:
+
+    composer install --no-dev
+    rm -rf dependencies
+    mv vendor dependencies
+
 
 Coding Standards Compliance
 -----------------------------
