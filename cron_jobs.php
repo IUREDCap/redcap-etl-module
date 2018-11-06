@@ -7,6 +7,7 @@ if (!SUPER_USER) {
 require_once __DIR__.'/dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
+use IU\RedCapEtlModule\ServerConfig;
 
 $module = new \IU\RedCapEtlModule\RedCapEtlModule();
 $selfUrl = $module->getUrl(basename(__FILE__));
@@ -132,11 +133,18 @@ $times = $adminConfig->getTimeLabels();
         <?php
         $row = 1;
         foreach ($cronJobs as $cronJob) {
+            $server = $cronJob['server'];
             $serverUrl = $serverConfigUrl.'&serverName='.$server;
             $username  = $cronJob['username'];
             $projectId = $cronJob['projectId'];
             $config    = $cronJob['config'];
             $userConfigUrl = $userUrl.'&username='.$username;
+            
+            $configUrl = $module->getURL(
+                'admin_etl_config.php'.'?config='.$config
+                .'&username='.$username.'&pid='.$projectId
+            );
+
             if ($row % 2 === 0) {
                 print '<tr class="even">'."\n";
             } else {
@@ -145,8 +153,15 @@ $times = $adminConfig->getTimeLabels();
             print "<td>".'<a href="'.$userConfigUrl.'">'.$cronJob['username'].'</a>'."</td>\n";
             print "<td>".'<a href="'.APP_PATH_WEBROOT.'index.php?pid='.$projectId.'" target="_blank">'
                 .$projectId.'</a>'."</td>\n";
-            print "<td>".'<a href="#" class="copyConfig">'.$cronJob['config'].'</a>'."</td>\n";
-            print "<td>".'<a href="'.$serverUrl.'">'.$cronJob['server'].'</a>'."</td>\n";
+            #print "<td>".'<a href="#" class="copyConfig">'.$cronJob['config'].'</a>'."</td>\n";
+            print "<td>".'<a href="'.$configUrl.'">'.$config.'</a>'."</td>\n";
+            
+            if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) == 0) {
+                print "<td>".$server."</td>\n";
+            } else {
+                print "<td>".'<a href="'.$serverUrl.'">'.$server.'</a>'."</td>\n";
+            }
+            
             print "</tr>\n";
             $row++;
         }

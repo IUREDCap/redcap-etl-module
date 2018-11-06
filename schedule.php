@@ -5,6 +5,7 @@ require_once __DIR__.'/redcap-etl/dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Configuration;
+use IU\RedCapEtlModule\ServerConfig;
 
 $error   = '';
 $success = '';
@@ -43,7 +44,6 @@ if (!empty($configName)) {
     }
 }
 
-
 #-------------------------
 # Set the submit value
 #-------------------------
@@ -53,8 +53,9 @@ if (array_key_exists('submitValue', $_POST)) {
 }
 
 if (strcasecmp($submitValue, 'Save') === 0) {
-    # Saving the schedule values
     $server = $_POST['server'];
+    
+    # Saving the schedule values
     $schedule = array();
     
     $schedule[0] = $_POST['Sunday'];
@@ -121,7 +122,7 @@ $module->renderSuccessMessageDiv($success);
 <form action="<?php echo $selfUrl;?>" method="post" 
       style="padding: 4px; margin-bottom: 0px; border: 1px solid #ccc; background-color: #ccc;">
     <span style="font-weight: bold;">Configuration:</span>
-    <select name="configName" onchange="this.form.submit()">
+    <select name="configName" onchange="this.form.submit();">
     <?php
     $values = $module->getUserConfigurationNames();
     array_unshift($values, '');
@@ -187,8 +188,21 @@ $(function () {
 <div style="margin-bottom: 12px;">
 <span style="font-weight: bold">Server:</span>
 <?php
+
 echo '<select name="server">'."\n";
-echo '<option value="'.$serverName.'" >'."</option>\n";
+echo '<option value=""></option>'."\n";
+
+if ($adminConfig->getAllowEmbeddedServer()) {
+    $selected = '';
+    if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
+        $selected = 'selected';
+    }
+
+    echo '<option value="'.ServerConfig::EMBEDDED_SERVER_NAME.'" '.$selected.'>'
+         .ServerConfig::EMBEDDED_SERVER_NAME
+         .'</option>'."\n";
+}
+
 foreach ($servers as $serverName) {
     $selected = '';
     if ($serverName === $server) {

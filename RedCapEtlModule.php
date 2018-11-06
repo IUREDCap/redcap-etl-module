@@ -28,37 +28,59 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function cron()
     {
-        $day  = date('w');  // 0-6 (day of week; Sunday = 0)
-        $hour = date('G');  // 0-23 (24-hour format without leading zeroes)
-        $date = date('Y-m-d');
-        \REDCap::logEvent('REDCap-ETL cron check for day '.$day.' and hour '.$hour);
-                
-        if ($this->isLastRunTime($date, $hour)) {
-            ; // This time has already been processed, so don't do anything'
-        } else {
-            $cronJobs = $this->getCronJobs($day, $hour);
+        $adminConfig = $this->getAdminConfig();
         
-            foreach ($cronJobs as $cronJob) {
-                $username   = $cronJob['username'];
-                $projectId  = $cronJob['projectId'];
-                $serverName = $cronJob['server'];
-                $configName = $cronJob['config'];
+        if ($adminConfig->getAllowCron()) {
+            $now = new DateTime();
+            $day  = $now->format('w');  // 0-6 (day of week; Sunday = 0)
+            $hour = $now->format('G');  // 0-23 (24-hour format without leading zeroes)
+            $date = $now->format('Y-m-d');
+
+            if ($adminConfig->isAllowedCronTime($day, $hour)) {
+                if ($this->isLastRunTime($date, $hour)) {
+                    ; // This time has already been processed, so don't do anything'
+                } else {
+                    $cronJobs = $this->getCronJobs($day, $hour);
+        
+                    foreach ($cronJobs as $cronJob) {
+                        $username   = $cronJob['username'];
+                        $projectId  = $cronJob['projectId'];
+                        $serverName = $cronJob['server'];
+                        $configName = $cronJob['config'];
             
-                $etlConfig    = $this->getConfiguration($configName, $username, $projectId);
-                $serverConfig = $this->getServerConfig($serverName);
-                \REDCap::logEvent('REDCap-ETL cron job config "'.$configName.'" for user "'
-                    .$username.'" on server "'.$serverName.'" on day '.$day.', hour '.$hour);
-                $serverConfig->run($etlConfig);
-                $this->setLastRunTime($date, $hour);
+                        $etlConfig    = $this->getConfiguration($configName, $username, $projectId);
+                        $serverConfig = $this->getServerConfig($serverName);
+                        \REDCap::logEvent(
+                            'REDCap-ETL cron job config "'.$configName.'" for user "'
+                            .$username.'" on server "'.$serverName.'" on day '.$day.', hour '.$hour
+                        );
+                
+                        if (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) == 0) {
+                            if ($adminConfig->getAllowEmbeddedServer()) {
+                                $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
+                                $logger->turnOff();
+                                $logger->setPrintInfo(true);
+                                $properties = $etlConfig->getPropertiesArray();
+                                $redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
+                                $redCapEtl->run();
+                            }
+                        } else {
+                            $serverConfig->run($etlConfig);
+                        }
+
+                        $this->setLastRunTime($date, $hour);
+                    }
+                }
             }
         }
     }
+
 
     /**
      * Gets the module version number based on its directory.
      *
      * NOTE: version is stored in the database, we should
-     * probably just used that value (system setting,
+     * probably have just used that value (system setting,
      * key = 'version').
      */
     public function getVersionNumber()

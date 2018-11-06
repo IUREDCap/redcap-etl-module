@@ -140,6 +140,8 @@ class ServerConfig implements \JsonSerializable
         #$command = $this->getEtlCommand() . ' ' . $configFileName . ' ' . $rulesFileName;
         $command = $this->getEtlCommand() . ' ' . $configFilePath;
         \REDCap::logEvent('REDCap-ETL run command: '.$command);
+
+        #$ssh->setTimeout(0.1);  # to prevent blocking
         $output = $ssh->exec($command);
         \REDCap::logEvent('REDCap-ETL run output: '.$output);
         

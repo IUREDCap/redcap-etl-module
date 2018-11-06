@@ -24,5 +24,7 @@ Coding Standards Compliance
 To check for coding standards compliance, enter the following command in the top-level directory:
 
     ./vendor/bin/phpcs
+    
+The configuration for phpcs is in file __phpcs.xml__ in the top-level directory.
 
 

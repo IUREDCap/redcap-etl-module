@@ -7,6 +7,7 @@ require_once __DIR__.'/redcap-etl/dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Configuration;
+use IU\RedCapEtlModule\Logger;
 use IU\RedCapEtlModule\ServerConfig;
 
 $error   = '';
@@ -72,11 +73,23 @@ if (strcasecmp($submit, 'Run') === 0) {
     } else {
         try {
             if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
-                $logger = new \IU\REDCapETL\NullLogger('REDCap-ETL');
-                $properties = $configuration->getProperties();
+                # Embedded serv er
+                if (!$adminConfig->getAllowEmbeddedServer()) {
+                    throw new \Exception('Running on the embedded REDCap-ETL server is not allowed.');
+                }
+                $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
+                $logger->turnOff();
+                $logger->setPrintInfo(true);
+                $properties = $configuration->getPropertiesArray();
                 $redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
+                
+                # Capture run command print output
+                ob_start();
                 $redCapEtl->run();
-                $success = 'Run completed.';
+                $runOutput = ob_get_contents();
+                ob_end_clean();
+
+                #$runOutput = 'Job submitted to '.ServerConfig::EMBEDDED_SERVER_NAME.'.';
                 \REDCap::logEvent('Run REDCap-ETL configuration '.$configName.'.');
             } else {
                 $serverConfig = $module->getServerConfig($server);
@@ -111,7 +124,6 @@ echo $buffer;
 <?php $module->renderUserTabs($selfUrl); ?>
 
 <?php
-echo "SERVER: {$server}<br />\n";
 #----------------------------
 # Display error, if any
 #----------------------------
@@ -167,16 +179,20 @@ $allowEmbeddedServer = $adminConfig->getAllowEmbeddedServer();
         <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
         <input type="submit" name="submit" value="Run" /> on
         <?php
-        $selected = '';
-        if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
-            $selected = 'selected';
-        }
+
         echo '<select name="server">'."\n";
-        if ($allowEmbeddedServer) {
+            
+        if ($adminConfig->getAllowEmbeddedServer()) {
+            $selected = '';
+            if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
+                $selected = 'selected';
+            }
+      
             echo '<option value="'.ServerConfig::EMBEDDED_SERVER_NAME.'" '.$selected.'>'
                 .ServerConfig::EMBEDDED_SERVER_NAME
                 .'</option>'."\n";
         }
+        
         foreach ($servers as $serverName) {
             $selected = '';
             if ($serverName === $server) {
