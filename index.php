@@ -222,7 +222,7 @@ foreach ($configurationNames as $configurationName) {
 $(function() {
     copyForm = $("#copyForm").dialog({
         autoOpen: false,
-        height: 200,
+        height: 220,
         width: 400,
         modal: true,
         buttons: {
