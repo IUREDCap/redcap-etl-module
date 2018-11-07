@@ -5,7 +5,7 @@ use IU\RedCapEtlModule\Configuration;
 # WARNING: this page can be accessed directly,
 # so don't put any code in here that retrieves
 # data from, or stores data to, the database.
-#---------------------------------------------- 
+#----------------------------------------------
 ?>
 
 
