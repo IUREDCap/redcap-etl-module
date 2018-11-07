@@ -108,7 +108,7 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
         $configuration->set($_POST);
         $redCapEtlModule->setConfiguration($configuration);
         header('Location: '.$listUrl);
-    } catch (Exception $exception) {
+    } catch (\Exception $exception) {
         $error = 'ERROR: '.$exception->getMessage();
     }
 } elseif (strcasecmp($submitValue, 'Upload CSV file') === 0) {

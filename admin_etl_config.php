@@ -11,18 +11,31 @@ use IU\RedCapEtlModule\AdminConfig;
 $module = new \IU\RedCapEtlModule\RedCapEtlModule();
 $selfUrl = $module->getUrl(basename(__FILE__));
 
-$configName = $_GET['config'];
-$username   = $_GET['username'];
-$projectId  = $_GET['pid'];
-
-$configuration = $module->getConfiguration($configName, $username, $projectId);
-$properties = $configuration->getProperties();
-
 $submitValue = $_POST['submitValue'];
 
 if (strcasecmp($submitValue, 'Save') === 0) {
+    $configName = $_POST['configName'];
+    $username   = $_POST['username'];
+    $projectId  = $_POST['projectId'];
+    $configuration = $module->getConfiguration($configName, $username, $projectId);
+
+    try {
+        $configuration->set($_POST);
+        $module->setConfiguration($configuration, $username, $projectId);
+        #header('Location: '.$selfUrl);
+    } catch (\Exception $exception) {
+        $error = 'ERROR: '.$exception->getMessage();
+    }
+} else {
+    $configName = $_GET['config'];
+    $username   = $_GET['username'];
+    $projectId  = $_GET['pid'];
+
+    $configuration = $module->getConfiguration($configName, $username, $projectId);
 }
 
+$properties = $configuration->getProperties();
+    
 ?>
 
 <?php #include APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>

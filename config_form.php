@@ -46,8 +46,12 @@ $(function() {
 <form action="<?php echo $selfUrl;?>" method="post" enctype="multipart/form-data" style="margin-top: 17px;">
 
   <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
+  <input type="hidden" name="username" value="<?php echo $username; ?>" />
+  <input type="hidden" name="projectId" value="<?php echo $projectId; ?>" />
+    
   <input type="hidden" name="<?php echo Configuration::CONFIG_API_TOKEN; ?>"
          value="<?php echo $properties[Configuration::CONFIG_API_TOKEN]; ?>" />
+
   <input type="hidden" name="<?php echo Configuration::TRANSFORM_RULES_SOURCE; ?>"
          value="<?php echo $properties[Configuration::TRANSFORM_RULES_SOURCE]; ?>" />
          
@@ -209,8 +213,8 @@ $(function() {
       </tr>
 
       <tr>
-        <td style="text-align: center;"><input type="submit" name="submit" value="Save" /></td>
-        <td style="text-align: center;"><input type="submit" name="submit" value="Cancel" /></td>
+        <td style="text-align: center;"><input type="submit" name="submitValue" value="Save" /></td>
+        <td style="text-align: center;"><input type="submit" name="submitValue" value="Cancel" /></td>
       </tr>
     </tbody>
   </table>

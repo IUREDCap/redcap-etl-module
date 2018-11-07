@@ -204,7 +204,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         return $configuration;
     }
 
-
+    /**
+     * @param Configuration $configuration
+     * @param string $username
+     * @param string $projectId
+     */
     public function setConfiguration($configuration, $username = USERID, $projectId = PROJECT_ID)
     {
         $key = $this->getConfigurationKey($configuration->getName(), $username);
