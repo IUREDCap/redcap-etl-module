@@ -1,7 +1,46 @@
 <?php
 use IU\RedCapEtlModule\Configuration;
 
+#----------------------------------------------
+# WARNING: this page can be accessed directly,
+# so don't put any code in here that retrieves
+# data from, or stores data to, the database.
+#---------------------------------------------- 
 ?>
+
+
+<script>
+// Show/hide API Token
+$(function() {
+    $("#showApiToken").change(function() {
+        var newType = 'password';
+        if ($(this).is(':checked')) {
+            newType = 'text';
+        }
+        $("#apiToken").each(function(){
+            $("<input type='" + newType + "'>")
+                .attr({ id: this.id, name: this.name, value: this.value, size: this.size, style: this.style })
+                .insertBefore(this);
+        }).remove();       
+    })
+});    
+
+// Show/hide Db Password
+$(function() {
+    $("#showDbPassword").change(function() {
+        var newType = 'password';
+        if ($(this).is(':checked')) {
+            newType = 'text';
+        }
+        $("#dbPassword").each(function(){
+            $("<input type='" + newType + "'>")
+                .attr({ id: this.id, name: this.name, value: this.value, size: this.size, style: this.style })
+                .insertBefore(this);
+        }).remove();       
+    })
+});    
+</script>
+
 
 <!-- Configuration form -->
 <form action="<?php echo $selfUrl;?>" method="post" enctype="multipart/form-data" style="margin-top: 17px;">
@@ -26,7 +65,7 @@ use IU\RedCapEtlModule\Configuration;
       <tr>
         <td>REDCap API URL</td>
         <td>
-          <input type="text" size="40" 
+          <input type="text" size="52" 
                  value="<?php echo $properties[Configuration::REDCAP_API_URL];?>"
                  name="<?php echo Configuration::REDCAP_API_URL?>" />
         </td>

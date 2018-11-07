@@ -19,21 +19,8 @@ $configuration = $module->getConfiguration($configName, $username, $projectId);
 $properties = $configuration->getProperties();
 
 $submitValue = $_POST['submitValue'];
+
 if (strcasecmp($submitValue, 'Save') === 0) {
-    $times = $_POST['times'];
-    $adminConfig->setAllowedCronTimes($times);
-    
-    $allowEmbeddedServer = $_POST['allowEmbeddedServer'];
-    $adminConfig->setAllowEmbeddedServer($allowEmbeddedServer);
-    
-    $allowOnDemand = $_POST['allowOnDemand'];
-    $adminConfig->setAllowOnDemand($allowOnDemand);
-    
-    $allowCron = $_POST['allowCron'];
-    $adminConfig->setAllowCron($allowCron);
-    
-    $module->setAdminConfig($adminConfig);
-    $success = "Admin configuration saved.";
 }
 
 ?>
