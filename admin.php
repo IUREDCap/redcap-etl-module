@@ -38,9 +38,9 @@ if (strcasecmp($submitValue, 'Save') === 0) {
 <?php #include APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>
 
 <?php
-#--------------------------------------------
-# Include REDCap's project page header
-#--------------------------------------------
+#---------------------------------------------
+# Include REDCap's control center page header
+#---------------------------------------------
 ob_start();
 include APP_PATH_DOCROOT . 'ControlCenter/header.php';
 $buffer = ob_get_clean();

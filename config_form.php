@@ -43,7 +43,7 @@ $(function() {
 
 
 <!-- Configuration form -->
-<form action="<?php echo $selfUrl;?>" method="post" enctype="multipart/form-data" style="margin-top: 17px;">
+<form action="<?php echo $selfUrl;?>" method="post" style="margin-top: 17px;">
 
   <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
   <input type="hidden" name="username" value="<?php echo $username; ?>" />

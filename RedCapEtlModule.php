@@ -31,17 +31,25 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $adminConfig = $this->getAdminConfig();
         
         if ($adminConfig->getAllowCron()) {
-            $now = new DateTime();
+            $now = new \DateTime();
             $day  = $now->format('w');  // 0-6 (day of week; Sunday = 0)
             $hour = $now->format('G');  // 0-23 (24-hour format without leading zeroes)
             $date = $now->format('Y-m-d');
 
+            #\REDCap::logEvent('REDCap-ETL cron check on day '.$day.', hour '.$hour);
+            
             if ($adminConfig->isAllowedCronTime($day, $hour)) {
+                #\REDCap::logEvent('REDCap-ETL cron - cron allowed for day '.$day.', hour '.$hour);
+                
                 if ($this->isLastRunTime($date, $hour)) {
+                    #\REDCap::logEvent('REDCap-ETL cron - cron already processed for day '.$day.', hour '.$hour);
                     ; // This time has already been processed, so don't do anything'
                 } else {
                     $cronJobs = $this->getCronJobs($day, $hour);
         
+                    #\REDCap::logEvent('REDCap-ETL cron - processing '
+                    #    .count($cronJobs).' jobs for day '.$day.', hour '.$hour);
+                    
                     foreach ($cronJobs as $cronJob) {
                         $username   = $cronJob['username'];
                         $projectId  = $cronJob['projectId'];
