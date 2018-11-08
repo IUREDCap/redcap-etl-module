@@ -56,7 +56,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                         $serverName = $cronJob['server'];
                         $configName = $cronJob['config'];
                         
-                        $userEtlProjects = $module->getUserEtlProjects($username);
+                        $userEtlProjects = $this->getUserEtlProjects($username);
                         
                         #------------------------------------------------------
                         # If user has permission to run ETL for this project
