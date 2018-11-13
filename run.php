@@ -1,9 +1,6 @@
 <?php
 
 require_once __DIR__.'/dependencies/autoload.php';
-#require_once __DIR__.'/AdminConfig.php';
-#require_once __DIR__.'/Configuration.php';
-require_once __DIR__.'/redcap-etl/dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Configuration;

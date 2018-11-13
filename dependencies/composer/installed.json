@@ -1,17 +1,17 @@
 [
     {
         "name": "phpseclib/phpseclib",
-        "version": "2.0.11",
-        "version_normalized": "2.0.11.0",
+        "version": "2.0.12",
+        "version_normalized": "2.0.12.0",
         "source": {
             "type": "git",
             "url": "https://github.com/phpseclib/phpseclib.git",
-            "reference": "7053f06f91b3de78e143d430e55a8f7889efc08b"
+            "reference": "8814dc7841db159daed0b32c2b08fb7e03c6afe7"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/7053f06f91b3de78e143d430e55a8f7889efc08b",
-            "reference": "7053f06f91b3de78e143d430e55a8f7889efc08b",
+            "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/8814dc7841db159daed0b32c2b08fb7e03c6afe7",
+            "reference": "8814dc7841db159daed0b32c2b08fb7e03c6afe7",
             "shasum": ""
         },
         "require": {
@@ -29,7 +29,7 @@
             "ext-mcrypt": "Install the Mcrypt extension in order to speed up a few other cryptographic operations.",
             "ext-openssl": "Install the OpenSSL extension in order to speed up a wide variety of cryptographic operations."
         },
-        "time": "2018-04-15 16:55:05",
+        "time": "2018-11-04 05:45:48",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -91,6 +91,96 @@
             "twofish",
             "x.509",
             "x509"
+        ]
+    },
+    {
+        "name": "phpcap/phpcap",
+        "version": "0.3.2",
+        "version_normalized": "0.3.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/aarenson/PHPCap.git",
+            "reference": "bc28965391bd40cc34ba4e33f7fb755d138e7dee"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/aarenson/PHPCap/zipball/bc28965391bd40cc34ba4e33f7fb755d138e7dee",
+            "reference": "bc28965391bd40cc34ba4e33f7fb755d138e7dee",
+            "shasum": ""
+        },
+        "require": {
+            "ext-curl": "*",
+            "ext-openssl": "*",
+            "php": ">=5.6.0"
+        },
+        "require-dev": {
+            "apigen/apigen": "v4.1.2",
+            "erusev/parsedown": "1.6.2",
+            "kzykhys/php-csv-parser": "1.4.1",
+            "phpunit/phpunit": "5.7.15",
+            "squizlabs/php_codesniffer": "2.8.1"
+        },
+        "time": "2018-04-20 19:37:19",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "IU\\PHPCap\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "Apache-2.0"
+        ],
+        "description": "PHP API for REDCap",
+        "keywords": [
+            "redcap"
+        ]
+    },
+    {
+        "name": "iu-redcap/redcap-etl",
+        "version": "0.5.8",
+        "version_normalized": "0.5.8.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/IUREDCap/redcap-etl.git",
+            "reference": "7afae6ba50d329bc5d769c9d2c17e7ccc3a708a9"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/7afae6ba50d329bc5d769c9d2c17e7ccc3a708a9",
+            "reference": "7afae6ba50d329bc5d769c9d2c17e7ccc3a708a9",
+            "shasum": ""
+        },
+        "require": {
+            "ext-curl": "*",
+            "ext-dom": "*",
+            "ext-openssl": "*",
+            "php": ">=5.6.0",
+            "phpcap/phpcap": "^0.3.2"
+        },
+        "require-dev": {
+            "apigen/apigen": "v4.1.2",
+            "kzykhys/php-csv-parser": "1.4.1",
+            "phpunit/phpunit": "6.5.8",
+            "squizlabs/php_codesniffer": "3.2.3"
+        },
+        "time": "2018-11-13 18:47:25",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "IU\\REDCapETL\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "Apache-2.0"
+        ],
+        "description": "REDCap-ETL",
+        "keywords": [
+            "etl",
+            "redcap"
         ]
     }
 ]
