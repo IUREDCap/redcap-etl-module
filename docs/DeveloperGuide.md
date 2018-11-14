@@ -12,6 +12,7 @@ can be used from the top-level directory:
     composer install --no-dev
     rm -rf dependencies
     mv vendor dependencies
+    composer install
 
 
 Coding Standards Compliance
