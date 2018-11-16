@@ -7,7 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'phpseclib\\' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
-    'IU\\RedCapEtlModule\\' => array($baseDir . '/'),
+    'IU\\RedCapEtlModule\\' => array($baseDir . '/', $baseDir . '/classes'),
     'IU\\REDCapETL\\' => array($vendorDir . '/iu-redcap/redcap-etl/src'),
     'IU\\PHPCap\\' => array($vendorDir . '/phpcap/phpcap/src'),
 );

@@ -15,14 +15,18 @@ class ServerConfig implements \JsonSerializable
     const AUTH_METHOD_PASSWORD = 1;
     
     private $name;
+    
     private $serverAddress; # address of REDCap-ETL server
     private $authMethod;
     private $username;
     private $password;
     private $sshKeyFile;
     private $sshKeyPassword;
+
     private $configDir;
     private $etlCommand;  # full path of command to run on REDCap-ETL server
+
+    private $summaryEmail; # 0: don't send; 1: user option to send; 2: always send (if e-mail list defined)
 
     public function __construct($name)
     {
@@ -258,5 +262,10 @@ class ServerConfig implements \JsonSerializable
     public function getEtlCommand()
     {
         return $this->etlCommand;
+    }
+    
+    public function getSummaryEmail()
+    {
+        return $this->summaryEmail;
     }
 }

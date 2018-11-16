@@ -15,7 +15,7 @@
     },
 	"autoload" : {
 		"psr-4" : {
-			"IU\\RedCapEtlModule\\" : "./"
+			"IU\\RedCapEtlModule\\" : ["./", "./classes/"]
 		}
 	},
     "autoload-dev": {
