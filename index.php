@@ -47,20 +47,23 @@ if (strcasecmp($submitValue, 'Add') === 0) {
     }
 }
 
-#----------------------------------
-# How to add to <head>
-#----------------------------------
+#---------------------------------------------
+# Add custom files to head section of page
+#---------------------------------------------
 ob_start();
 include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 $buffer = ob_get_clean();
-$buffer = str_replace('</head>', "\n<!-- my comment -->\n</head>", $buffer);
+$cssFile = $module->getUrl('resources/redcap-etl.css');
+$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+
+#$buffer = $module->renderProjectPageHeader();
 echo $buffer;
 ?>
 
-<div class="projhdr"> <!--h4 style="color:#800000;margin:0 0 10px;"> -->
+<div class="projhdr">
 <img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>database_table.png">REDCap-ETL
 </div>
-<!-- </h4> -->
 
 <?php
 
@@ -81,15 +84,18 @@ $projectId = $module->getProjectId();
 
 <?php
 
-$module->renderUserTabs($selfUrl);
-$module->renderErrorMessageDiv($error);
-$module->renderSuccessMessageDiv($success);
+$module->renderProjectPageContentHeader($selfUrl, $error, $success);
 
 ?>
 
 
 
 <?php
+
+#--------------------------------------------------------------------
+# If the user does NOT have permission to use ETL for this project,
+# display a link to send e-mail to request access
+#--------------------------------------------------------------------
 if (!in_array($projectId, $userEtlProjects)) {
     echo '<div style="padding-top:15px; padding-bottom:15px;">'."\n";
     $label = 'Request ETL access for this project';
@@ -156,9 +162,14 @@ if (!in_array($projectId, $userEtlProjects)) {
     <th>Delete</th>
 </tr>
 </thead>
+
+
 <tbody>
 <?php
-    
+
+#----------------------------------------------------------
+# Displays rows of table of user's ETL configurations
+#----------------------------------------------------------
 $row = 1;
 foreach ($configurationNames as $configurationName) {
     if ($row % 2 === 0) {
@@ -171,7 +182,7 @@ foreach ($configurationNames as $configurationName) {
     $runConfigurationUrl = $runUrl.'&configName='.$configurationName;
     $scheduleConfigUrl = $scheduleUrl.'&configName='.$configurationName;
     
-    print "<td>{$configurationName}</td>\n";
+    print "<td>".REDCap::escapeHtml($configurationName)."</td>\n";
     print '<td style="text-align:center;">'
         .'<a href="'.$configureUrl.'"><img src='.APP_PATH_IMAGES.'gear.png></a>'
         ."</td>\n";
@@ -188,6 +199,7 @@ foreach ($configurationNames as $configurationName) {
             ."</td>\n";
     }
         
+    print '<script>var test1 = 123;</script>'."\n";
     print '<td style="text-align:center;">'
         .'<img src="'.APP_PATH_IMAGES.'page_copy.png" class="copyConfig" style="cursor: pointer;"'
         .' id="copy'.$configurationName.'"/>'
@@ -232,6 +244,7 @@ $(function() {
         title: "Copy configuration"
     });
     $(".copyConfig").click(function(){
+        alert(window.test1);
         var id = this.id;
         var configName = id.substring(4);
         $("#configToCopy").text('"'+configName+'"');

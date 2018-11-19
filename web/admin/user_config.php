@@ -4,15 +4,16 @@ if (!SUPER_USER) {
     exit("Only super users can access this page!");
 }
 
-require_once __DIR__.'/dependencies/autoload.php';
+require_once __DIR__.'/../../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\RedCapDb;
+use IU\RedCapEtlModule\RedCapEtlModule;
 
-$module = new \IU\RedCapEtlModule\RedCapEtlModule();
-$selfUrl = $module->getUrl(basename(__FILE__));
+$module = new RedCapEtlModule();
+$selfUrl = $module->getUrl(RedCapEtlModule::USER_CONFIG_PAGE);
 $userSearchUrl = $module->getUrl('user_search.php');
-$adminUrl = $module->getURL('admin.php');
+$adminUrl = $module->getURL(RedCapEtlModule::ADMIN_HOME_PAGE);
 
 $adminConfigJson = $module->getSystemSetting(AdminConfig::KEY);
 $adminConfig = new AdminConfig();
@@ -152,7 +153,7 @@ if (!empty($username)) {
             $isFirst = true;
             foreach ($configNames as $configName) {
                 $configUrl = $module->getURL(
-                    'admin_etl_config.php'.'?config='.$configName
+                    RedCapEtlModule::ADMIN_ETL_CONFIG_PAGE.'?config='.$configName
                     .'&username='.$username.'&pid='.$projectId
                 );
                 if ($isFirst) {

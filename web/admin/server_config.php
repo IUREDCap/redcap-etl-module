@@ -4,7 +4,7 @@ if (!SUPER_USER) {
     exit("Only super users can access this page!");
 }
 
-require_once __DIR__.'/dependencies/autoload.php';
+require_once __DIR__.'/../../dependencies/autoload.php';
 
 use phpseclib\Crypt\RSA;
 use phpseclib\Net\SCP;
@@ -12,11 +12,11 @@ use phpseclib\Net\SFTP;
 use phpseclib\Net\SSH2;
 
 use IU\RedCapEtlModule\ServerConfig;
+use IU\RedCapEtlModule\RedCapEtlModule;
 
-$module = new \IU\RedCapEtlModule\RedCapEtlModule();
-$selfUrl      = $module->getUrl(basename(__FILE__));
-$configureUrl = $module->getUrl('server_configure.php');
-$serversUrl   = $module->getUrl('servers.php');
+$module = new RedCapEtlModule();
+$selfUrl      = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
+$serversUrl   = $module->getUrl(RedCapEtlModule::SERVERS_PAGE);
 
 $submit = $_POST['submit'];
 
@@ -268,6 +268,21 @@ if (!empty($serverName)) {
       <td>ETL command:</td>
       <td><input type="text" name="etlCommand" value="<?php echo $serverConfig->getEtlCommand();?>"
                  size="60" style="margin: 4px;"></td>
+    </tr>
+    
+    <tr>
+      <td>&nbsp;</td><td>&nbsp</td>
+    </tr>
+    
+    <tr>
+      <td>Summary e-mail:</td>
+      <td>
+        <select name="summaryEmail">
+          <option value="0">don't send</option>
+          <option value="1">give user option to send</option>
+          <option value="2">send</option>
+        </select>
+      </td>
     </tr>
   </table>
   

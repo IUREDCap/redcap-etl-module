@@ -23,7 +23,7 @@
            {
                "name": "REDCap-ETL",
                "icon": "table_gear",
-               "url": "admin.php"
+               "url": "web/admin/config.php"
            }
        ],
        "project": [

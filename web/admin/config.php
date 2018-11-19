@@ -4,14 +4,15 @@ if (!SUPER_USER) {
     exit("Only super users can access this page!");
 }
 
-require_once __DIR__.'/dependencies/autoload.php';
+require_once __DIR__.'/../../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
+use \IU\RedCapEtlModule\RedCapEtlModule;
 
-$module = new \IU\RedCapEtlModule\RedCapEtlModule();
-$selfUrl = $module->getUrl(basename(__FILE__));
+$module = new RedCapEtlModule();
+$selfUrl = $module->getUrl(RedCapEtlModule::ADMIN_HOME_PAGE);
 
-$cronInfoUrl = $module->getUrl('cron_jobs.php');
+$cronInfoUrl = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);
 
 $adminConfig = $module->getAdminConfig();
 

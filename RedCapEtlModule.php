@@ -22,6 +22,15 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     
     const CONFIG_SESSION_KEY = 'redcap-etl-config';
     
+    const ADMIN_HOME_PAGE    = 'web/admin/config.php';
+    const CRON_DETAIL_PAGE   = 'web/admin/cron_detail.php';
+    const USERS_PAGE         = 'web/admin/users.php';
+    const USER_CONFIG_PAGE   = 'web/admin/user_config.php';
+    const SERVERS_PAGE       = 'web/admin/servers.php';
+    const SERVER_CONFIG_PAGE = 'web/admin/server_config.php';
+    const ADMIN_ETL_CONFIG_PAGE = 'web/admin/admin_etl_config.php';
+             
+                
     /**
      * Cron method that is called by REDCap as configured in the
      * config.json file for this module.
@@ -603,29 +612,29 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function renderAdminTabs($activeUrl = '')
     {
-        $adminUrl = $this->getUrl('admin.php');
+        $adminUrl = $this->getUrl(self::ADMIN_HOME_PAGE);
         $adminLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
            .' Config';
 
-        $cronJobsUrl = $this->getUrl('cron_jobs.php');
+        $cronJobsUrl = $this->getUrl(self::CRON_DETAIL_PAGE);
         $cronJobsLabel = '<span class="glyphicon glyphicon-time" aria-hidden="true"></span>'
            .' Cron Detail';
 
-        $usersUrl = $this->getUrl('users.php');
+        $usersUrl = $this->getUrl(self::USERS_PAGE);
         #$manageUsersLabel = '<span>Manage Users</span>';
         #$manageUsersLabel = '<span><img aria-hidden="true" src="/redcap/redcap_v8.5.11/Resources/images/users3.png">'
         $usersLabel = '<span class="glyphicon glyphicon-list" aria-hidden="true"></span>'
            .' Users</span>';
 
-        $configureUserUrl = $this->getUrl('user.php');
+        $configureUserUrl = $this->getUrl(self::USER_CONFIG_PAGE);
         $configureUserLabel = '<span class="glyphicon glyphicon-user" aria-hidden="true"></span>'
            .' User Config</span>';
            
-        $serversUrl = $this->getUrl('servers.php');
+        $serversUrl = $this->getUrl(self::SERVERS_PAGE);
         $serversLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
            .' ETL Servers';
 
-        $serverConfigUrl = $this->getUrl('server_config.php');
+        $serverConfigUrl = $this->getUrl(self::SERVER_CONFIG_PAGE);
         $serverConfigLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
            .' ETL Server Config';
 
@@ -731,5 +740,30 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             echo "{$message}\n";
             echo "</div>\n";
         }
+    }
+    
+    /**
+     * Renders the page content header for a project page.
+     *
+     * @param string $selfUrl the URL of the page where the content header is to rendered.
+     * @param string $errorMessage the error message to print (if any).
+     * @param string $successMessage the success message to print (if any).
+     */
+    public function renderProjectPageContentHeader($selfUrl, $errorMessage, $successMessage)
+    {
+        $this->renderUserTabs($selfUrl);
+        $this->renderErrorMessageDiv($errorMessage);
+        $this->renderSuccessMessageDiv($successMessage);
+    }
+    
+    public function renderProjectPageHeader()
+    {
+        ob_start();
+        include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
+        $buffer = ob_get_clean();
+        #$cssFile = $this->getUrl('resources/redcap-etl.css');
+        #$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
+        #$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+        return $buffer;
     }
 }
