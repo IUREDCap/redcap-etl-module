@@ -30,7 +30,7 @@
            {
                "name": "REDCap-ETL",
                "icon": "database_table",
-               "url": "index.php"
+               "url": "web/index.php"
            }
        ]
     },

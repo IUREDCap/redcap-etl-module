@@ -1,16 +1,16 @@
 <?php
 
-require_once __DIR__.'/dependencies/autoload.php';
+require_once __DIR__.'/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Configuration;
-use IU\RedCapEtlModule\Logger;
+use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
 $error   = '';
 $success = '';
 
-$module = new \IU\RedCapEtlModule\RedCapEtlModule();
+$module = new RedCapEtlModule();
 
 $adminConfig = $module->getAdminConfig();
 
@@ -18,8 +18,8 @@ $servers = $module->getServers();
 
 $configurationNames = $module->getUserConfigurationNames();
 
-$selfUrl   = $module->getUrl(basename(__FILE__));
-$listUrl = $module->getUrl("index.php");
+$selfUrl   = $module->getUrl('web/run.php');
+$listUrl   = $module->getUrl('web/index.php');
 
 #-------------------------------------------
 # Get the configuration name

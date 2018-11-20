@@ -1,15 +1,16 @@
 <?php
 
-require_once __DIR__.'/dependencies/autoload.php';
+require_once __DIR__.'/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Configuration;
+use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
 $error   = '';
 $success = '';
 
-$module = new \IU\RedCapEtlModule\RedCapEtlModule();
+$module = new RedCapEtlModule();
 
 $adminConfig = $module->getAdminConfig();
 
@@ -17,8 +18,8 @@ $servers = $module->getServers();
 
 $configurationNames = $module->getUserConfigurationNames();
 
-$selfUrl   = $module->getUrl(basename(__FILE__));
-$listUrl = $module->getUrl("index.php");
+$selfUrl = $module->getUrl('web/schedule.php');
+$listUrl = $module->getUrl('web/index.php');
 
 #-------------------------------------------
 # Get the configuration name
@@ -89,6 +90,7 @@ if (strcasecmp($submitValue, 'Save') === 0) {
 #--------------------------------------------
 # Include REDCap's project page header
 #--------------------------------------------
+/*
 ob_start();
 include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 $buffer = ob_get_clean();
@@ -96,6 +98,12 @@ $cssFile = $module->getUrl('resources/redcap-etl.css');
 $link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
 $buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
 echo $buffer;
+*/
+include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
+
+$cssFile = $module->getUrl('resources/redcap-etl.css');
+$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
+echo "{$link}\n";
 ?>
 
 <div class="projhdr"> <!--h4 style="color:#800000;margin:0 0 10px;"> -->
@@ -107,9 +115,7 @@ echo $buffer;
 #------------------------------
 # Display module tabs
 #------------------------------
-$module->renderUserTabs($selfUrl);
-$module->renderErrorMessageDiv($error);
-$module->renderSuccessMessageDiv($success);
+$module->renderProjectPageContentHeader($selfUrl, $error, $success);
 ?>
 
 

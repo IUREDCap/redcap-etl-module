@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/dependencies/autoload.php';
+require_once __DIR__.'/../dependencies/autoload.php';
 
 $module = new \IU\RedCapEtlModule\RedCapEtlModule();
 
@@ -40,7 +40,7 @@ if (strcasecmp($submitValue, 'Add') === 0) {
         if (isset($configuration)) {
             $error = 'ERROR: configuration "'.$configurationName.'" already exists.';
         } else {
-            $indexUrl = $module->getUrl("index.php");
+            $indexUrl = $module->getUrl("web/index.php");
             $module->addConfiguration($configurationName);
             header('Location: '.$indexUrl);
         }
@@ -72,10 +72,10 @@ $configurationNames = $module->getUserConfigurationNames();
 
 $adminConfig = $module->getAdminConfig();
 
-$selfUrl     = $module->getUrl(basename(__FILE__));
-$configUrl   = $module->getUrl("configure.php");
-$scheduleUrl = $module->getUrl("schedule.php");
-$runUrl      = $module->getUrl("run.php");
+$selfUrl     = $module->getUrl('web/index.php');
+$configUrl   = $module->getUrl("web/configure.php");
+$scheduleUrl = $module->getUrl("web/schedule.php");
+$runUrl      = $module->getUrl("web/run.php");
 
 $userEtlProjects = $module->getUserEtlProjects();
 $projectId = $module->getProjectId();
@@ -244,7 +244,7 @@ $(function() {
         title: "Copy configuration"
     });
     $(".copyConfig").click(function(){
-        alert(window.test1);
+        //alert(window.test1);
         var id = this.id;
         var configName = id.substring(4);
         $("#configToCopy").text('"'+configName+'"');

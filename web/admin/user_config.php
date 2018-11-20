@@ -12,7 +12,7 @@ use IU\RedCapEtlModule\RedCapEtlModule;
 
 $module = new RedCapEtlModule();
 $selfUrl = $module->getUrl(RedCapEtlModule::USER_CONFIG_PAGE);
-$userSearchUrl = $module->getUrl('user_search.php');
+$userSearchUrl = $module->getUrl('web/admin/user_search.php');
 $adminUrl = $module->getURL(RedCapEtlModule::ADMIN_HOME_PAGE);
 
 $adminConfigJson = $module->getSystemSetting(AdminConfig::KEY);

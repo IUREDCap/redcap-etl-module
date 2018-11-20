@@ -656,7 +656,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function renderUserTabs($activeUrl = '')
     {
-        $listUrl = $this->getUrl('index.php');
+        $listUrl = $this->getUrl('web/index.php');
         $listLabel = '<span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>'
            .' My ETL Configurations';
 
@@ -664,15 +664,15 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         #$addLabel = '<span style="color: #008000;" class="glyphicon glyphicon-plus" aria-hidden="true"></span>'
         #   .' New Configuration';
 
-        $configUrl = $this->getUrl('configure.php');
+        $configUrl = $this->getUrl('web/configure.php');
         $configLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
            .' Configure';
 
-        $runUrl = $this->getUrl('run.php');
+        $runUrl = $this->getUrl('web/run.php');
         $runLabel = '<span style="color: #008000;" class="glyphicon glyphicon-play-circle" aria-hidden="true"></span>'
            .' Run';
 
-        $scheduleUrl = $this->getUrl('schedule.php');
+        $scheduleUrl = $this->getUrl('web/schedule.php');
         $scheduleLabel = '<span class="glyphicon glyphicon-time" aria-hidden="true"></span>'
            .' Schedule';
 

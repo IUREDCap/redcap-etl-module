@@ -1,16 +1,18 @@
 <?php
 
-require_once __DIR__.'/dependencies/autoload.php';
+require_once __DIR__.'/../dependencies/autoload.php';
 
 use IU\REDCapETL\EtlRedCapProject;
+
 use IU\RedCapEtlModule\Configuration;
+use IU\RedCapEtlModule\RedCapEtlModule;
 
 $error = '';
 
-$redCapEtlModule = new \IU\RedCapEtlModule\RedCapEtlModule();
+$redCapEtlModule = new RedCapEtlModule();
 
-$listUrl  = $redCapEtlModule->getUrl("index.php");
-$selfUrl  = $redCapEtlModule->getUrl("configure.php");
+$listUrl  = $redCapEtlModule->getUrl("web/index.php");
+$selfUrl  = $redCapEtlModule->getUrl("web/configure.php");
 
 
 #-------------------------------------------
