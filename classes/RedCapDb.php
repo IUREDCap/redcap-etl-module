@@ -12,7 +12,7 @@ class RedCapDb
         $userInfo = array();
         $sql = "select ui_id, username, user_firstname, user_lastname, user_email "
             ." from redcap_user_information "
-            ." where username = '".$username."' and user_suspended_time is null "
+            ." where username = '".db_escape($username)."' and user_suspended_time is null "
             ;
         $result = db_query($sql);
         if ($row = db_fetch_assoc($result)) {
@@ -33,10 +33,10 @@ class RedCapDb
             ." concat(username, ' (', user_firstname, ' ', user_lastname, ') - ', user_email) as value, username "
             ." from redcap_user_information "
             ." where user_suspended_time is null and "
-            ."     (username like '%".$term."%' "
-            ."     or user_firstname like '%".$term."%'"
-            ."     or user_lastname like '%".$term."%'"
-            ."     or user_email like '%".$term."%'"
+            ."     (username like '%".db_escape($term)."%' "
+            ."     or user_firstname like '%".db_escape($term)."%'"
+            ."     or user_lastname like '%".db_escape($term)."%'"
+            ."     or user_email like '%".db_escape($term)."%'"
             ."     ) "
             ;
         $result = db_query($sql);
@@ -53,7 +53,7 @@ class RedCapDb
         $sql = 'select u.username, p.project_id, p.app_title, '
             .' if(u.api_token is null, 0, 1) as has_api_token, u.api_export '
             .' from redcap_projects p, redcap_user_rights u '
-            ." where u.username = '".$username."' "
+            ." where u.username = '".db_escape($username)."' "
             ." and p.project_id = u.project_id and p.date_deleted is null"
             ;
         $result = db_query($sql);
@@ -76,8 +76,8 @@ class RedCapDb
         $apiToken = null;
         
         $sql = "select api_token from redcap_user_rights "
-            . " where project_id = ".PROJECT_ID." "
-            . " and username = '".USERID."'"
+            . " where project_id = ".((int) PROJECT_ID)." "
+            . " and username = '".db_escape(USERID)."'"
             . " and api_export = 1 "
             ;
         $result = db_query($sql);
@@ -99,4 +99,39 @@ class RedCapDb
     //    db_query($commit);
     //    // Set back to initial value
     //    db_query("SET AUTOCOMMIT=1");
+    
+    public function startTransaction()
+    {
+        db_query("SET AUTOCOMMIT=0");
+        db_query("BEGIN");
+    }
+    
+    /**
+     * Ends a database transaction.
+     *
+     * @param boolean $commit indicates if the transaction should be committed.
+     */
+    public function endTransaction($commit)
+    {
+        if ($commit) {
+            db_query("COMMIT");
+        } else {
+            db_query("ROLLBACK");
+        }
+        db_query("SET AUTOCOMMIT=1");
+    }
+    
+    /*
+    #-------------------------------
+    # Get API token information
+    #-------------------------------
+    $sql = "select p.project_id, p.app_title, ur.api_token "
+        . " from redcap_user_rights ur, redcap_projects p"
+        . " where ur.project_id = p.project_id "
+        . " and ur.username = '".USERID.'"'
+        . " and ur.api_export = 1 "
+        . " order by p.app_title "
+        ;
+        $q = db_query($sql);
+    */
 }
