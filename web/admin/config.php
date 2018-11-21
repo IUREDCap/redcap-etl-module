@@ -1,5 +1,7 @@
 <?php
 
+/** @var RedCapEtlModule $module */
+
 if (!SUPER_USER) {
     exit("Only super users can access this page!");
 }
@@ -9,7 +11,6 @@ require_once __DIR__.'/../../dependencies/autoload.php';
 use IU\RedCapEtlModule\AdminConfig;
 use \IU\RedCapEtlModule\RedCapEtlModule;
 
-$module = new RedCapEtlModule();
 $selfUrl = $module->getUrl(RedCapEtlModule::ADMIN_HOME_PAGE);
 
 $cronInfoUrl = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);

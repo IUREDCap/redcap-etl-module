@@ -1,5 +1,7 @@
 <?php
 
+/** @var RedCapEtlModule $module */
+
 if (!SUPER_USER) {
     exit("Only super users can access this page!");
 }
@@ -10,10 +12,9 @@ use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
-$module = new RedCapEtlModule();
-$selfUrl = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);
-$serverConfigUrl = $module->getUrl('server_config.php');
-$userUrl = $module->getURL(RedCapEtlModule::USER_CONFIG_PAGE);
+$selfUrl         = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);
+$serverConfigUrl = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
+$userUrl         = $module->getURL(RedCapEtlModule::USER_CONFIG_PAGE);
 
 $adminConfig = $module->getAdminConfig();
     

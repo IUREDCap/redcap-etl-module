@@ -1,5 +1,7 @@
 <?php
 
+/** @var RedCapEtlModule $module */
+
 if (!SUPER_USER) {
     exit("Only super users can access this page!");
 }
@@ -9,7 +11,6 @@ require_once __DIR__.'/../../dependencies/autoload.php';
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\RedCapEtlModule;
 
-$module = new RedCapEtlModule();
 $selfUrl = $module->getUrl(RedCapEtlModule::ADMIN_ETL_CONFIG_PAGE);
 
 $submitValue = $_POST['submitValue'];

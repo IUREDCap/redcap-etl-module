@@ -1,6 +1,5 @@
 <?php
 
-
 if (!SUPER_USER) {
     exit("Only super users can access this page!");
 }

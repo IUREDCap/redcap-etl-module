@@ -1,5 +1,7 @@
 <?php
 
+/** @var RedCapEtlModule $module */
+
 require_once __DIR__.'/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
@@ -9,8 +11,6 @@ use IU\RedCapEtlModule\ServerConfig;
 
 $error   = '';
 $success = '';
-
-$module = new RedCapEtlModule();
 
 $adminConfig = $module->getAdminConfig();
 

@@ -1,5 +1,7 @@
 <?php
 
+/** @var RedCapEtlModule $module */
+
 if (!SUPER_USER) {
     exit("Only super users can access this page!");
 }
@@ -14,7 +16,6 @@ use phpseclib\Net\SSH2;
 use IU\RedCapEtlModule\ServerConfig;
 use IU\RedCapEtlModule\RedCapEtlModule;
 
-$module = new RedCapEtlModule();
 $selfUrl      = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
 $serversUrl   = $module->getUrl(RedCapEtlModule::SERVERS_PAGE);
 

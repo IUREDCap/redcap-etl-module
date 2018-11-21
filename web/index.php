@@ -1,8 +1,10 @@
 <?php
 
+/** @var RedCapEtlModule $module */
+
 require_once __DIR__.'/../dependencies/autoload.php';
 
-$module = new \IU\RedCapEtlModule\RedCapEtlModule();
+use IU\RedCapEtlModule\RedCapEtlModule;
 
 $copyFromConfigName = $_POST['copyFromConfigName'];
 $copyToConfigName   = $_POST['copyToConfigName'];

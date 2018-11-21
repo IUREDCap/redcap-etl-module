@@ -1,5 +1,7 @@
 <?php
 
+/** @var RedCapEtlModule $module */
+
 require_once __DIR__.'/../dependencies/autoload.php';
 
 use IU\REDCapETL\EtlRedCapProject;
@@ -9,10 +11,8 @@ use IU\RedCapEtlModule\RedCapEtlModule;
 
 $error = '';
 
-$redCapEtlModule = new RedCapEtlModule();
-
-$listUrl  = $redCapEtlModule->getUrl("web/index.php");
-$selfUrl  = $redCapEtlModule->getUrl("web/configure.php");
+$listUrl  = $module->getUrl("web/index.php");
+$selfUrl  = $module->getUrl("web/configure.php");
 
 
 #-------------------------------------------
@@ -30,7 +30,7 @@ if (!empty($configName)) {
 }
 
 if (!empty($configName)) {
-    $configuration = $redCapEtlModule->getConfiguration($configName);
+    $configuration = $module->getConfiguration($configName);
     if (!empty($configuration)) {
         $properties = $configuration->getProperties();
     } else {
@@ -107,7 +107,7 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
 
     try {
         $configuration->set($_POST);
-        $redCapEtlModule->setConfiguration($configuration);
+        $module->setConfiguration($configuration);
         header('Location: '.$listUrl);
     } catch (\Exception $exception) {
         $error = 'ERROR: '.$exception->getMessage();
@@ -161,7 +161,7 @@ include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 </div>
 
 
-<?php $redCapEtlModule->renderUserTabs($selfUrl); ?>
+<?php $module->renderUserTabs($selfUrl); ?>
 
 <?php
 #----------------------------
@@ -183,7 +183,7 @@ if (!empty($error)) { ?>
     <span style="font-weight: bold;">Configuration:</span>
     <select name="configName" onchange="this.form.submit()">
     <?php
-    $values = $redCapEtlModule->getUserConfigurationNames();
+    $values = $module->getUserConfigurationNames();
     array_unshift($values, '');
     foreach ($values as $value) {
         if (strcmp($value, $configName) === 0) {

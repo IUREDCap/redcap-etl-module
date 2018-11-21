@@ -1,5 +1,7 @@
 <?php
 
+/** @var RedCapEtlModule $module */
+
 if (!SUPER_USER) {
     exit("Only super users can access this page!");
 }
@@ -10,7 +12,6 @@ use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
 
-$module = new RedCapEtlModule();
 $selfUrl  = $module->getUrl(RedCapEtlModule::USERS_PAGE);
 $adminUrl = $module->getURL(RedCapEtlModule::ADMIN_HOME_PAGE);
 $userUrl  = $module->getURL(RedCapEtlModule::USER_CONFIG_PAGE);
@@ -26,8 +27,6 @@ $userLabel = $_POST['userLabel'];
 $users = $module->getUsers();
 
 if (!empty($username)) {
-    #if (strcasecmp($submitValue, 'Add User') === 0) {
-    #    $module->addUser($username);
     if (strcasecmp($submitValue, 'Save') === 0) {
         $checkbox = $_POST['checkbox'];
         $userEtlProjects = array();
@@ -37,6 +36,7 @@ if (!empty($username)) {
         $module->addUser($username);
         $module->setUserEtlProjects($username, $userEtlProjects);
         header('Location: '.$adminUrl);
+        exit;
     }
     $db = new RedCapDb();
     $userProjects = $db->getUserProjects($username);
