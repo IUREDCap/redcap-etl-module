@@ -29,8 +29,18 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const SERVERS_PAGE       = 'web/admin/servers.php';
     const SERVER_CONFIG_PAGE = 'web/admin/server_config.php';
     const ADMIN_ETL_CONFIG_PAGE = 'web/admin/admin_etl_config.php';
-             
-                
+
+    private $db;
+    private $settings;
+
+    public function __construct()
+    {
+        $this->db = new RedCapDb();
+        $this->settings = new Settings($this);
+        parent::__construct();
+    }
+    
+
     /**
      * Cron method that is called by REDCap as configured in the
      * config.json file for this module.
@@ -123,21 +133,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function getUsers()
     {
-        $userList = new UserList();
-        $json = $this->getSystemSetting(self::USER_LIST_KEY);
-        $userList->fromJson($json);
-        $users = $userList->getUsers();
-        return $users;
+        return $this->settings->getUsers();
     }
 
     public function addUser($username)
     {
-        $userList = new UserList();
-        $json = $this->getSystemSetting(self::USER_LIST_KEY);
-        $userList->fromJson($json);
-        $userList->addUser($username);
-        $json = $userList->toJson();
-        $this->setSystemSetting(self::USER_LIST_KEY, $json);
+        $this->settings->addUser($username);
     }
 
 
@@ -497,10 +498,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     
     public function renameServer($serverName, $newServerName)
     {
-        $isError = false;
+        $commit = true;
         try {
-            db_query("SET AUTOCOMMIT=0");
-            db_query("BEGIN");
+            $db->startTransaction();
             $servers = new Servers();
             $json = $this->getSystemSetting(self::SERVERS_KEY, true);
             $servers->fromJson($json);
@@ -511,15 +511,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         
             $this->renameServerConfig($serverName, $newServerName);
         } catch (Exception $exception) {
-            $isError = true;
+            $commit = false;
         }
         
-        if ($isError) {
-            db_query("ROLLBACK");
-        } else {
-            db_query("COMMIT");
-        }
-        db_query("SET AUTOCOMMIT=1");
+        $db->endTransaction($commit);
     }
     
     
@@ -740,6 +735,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             echo "{$message}\n";
             echo "</div>\n";
         }
+    }
+    
+    
+    public function renderAdminPageContentHeader($selfUrl, $errorMessage, $successMessage)
+    {
+        $this->renderAdminTabs($selfUrl);
+        $this->renderErrorMessageDiv($errorMessage);
+        $this->renderSuccessMessageDiv($successMessage);
     }
     
     /**

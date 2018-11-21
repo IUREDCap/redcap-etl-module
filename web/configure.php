@@ -1,6 +1,6 @@
 <?php
 
-/** @var RedCapEtlModule $module */
+/** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
 require_once __DIR__.'/../dependencies/autoload.php';
 
@@ -40,17 +40,7 @@ if (!empty($configName)) {
     }
 }
 
-#-------------------------------
-# Get API token information
-#-------------------------------
-$sql = "select p.project_id, p.app_title, ur.api_token "
-    . " from redcap_user_rights ur, redcap_projects p"
-    . " where ur.project_id = p.project_id "
-    . " and ur.username = '".USERID.'"'
-    . " and ur.api_export = 1 "
-    . " order by p.app_title "
-    ;
-$q = db_query($sql);
+
 
 #-------------------------
 # Set the submit value
@@ -176,7 +166,9 @@ if (!empty($error)) { ?>
 
 
 <?php
+#-------------------------------------
 # Configuration selection form
+#-------------------------------------
 ?>
 <form action="<?php echo $selfUrl;?>" method="post" 
       style="padding: 4px; margin-bottom: 0px; border: 1px solid #ccc; background-color: #ccc;">
@@ -248,7 +240,9 @@ $(function() {
 });    
 </script>
               
-<!-- Configuration form -->
+<!-- ====================================
+Configuration form
+===================================== -->
 <form action="<?php echo $selfUrl;?>" method="post" enctype="multipart/form-data" style="margin-top: 17px;">
 
   <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
@@ -410,14 +404,17 @@ $(function() {
       <tr>
         <td>E-mail subject</td>
         <td><input type="text" name="<?php echo Configuration::EMAIL_SUBJECT;?>" size="64"
-                   value="<?php echo $properties[Configuration::EMAIL_SUBJECT];?>"/></td>
+                   value="<?php echo $properties[Configuration::EMAIL_SUBJECT];?>"
+                   />
+        </td>
       </tr>
       <tr>
         <td>E-mail to list</td>
         <td><input type="text" name="<?php echo Configuration::EMAIL_TO_LIST;?>" size="64"
-                   value="<?php echo $properties[Configuration::EMAIL_TO_LIST];?>"/></td>
+                   value="<?php echo $properties[Configuration::EMAIL_TO_LIST];?>"
+                   />
+        </td>
       </tr>
-
       <tr>
         <td style="text-align: center;"><input type="submit" name="submit" value="Save" /></td>
         <td style="text-align: center;"><input type="submit" name="submit" value="Cancel" /></td>

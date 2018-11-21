@@ -1,6 +1,6 @@
 <?php
 
-/** @var RedCapEtlModule $module */
+/** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
 if (!SUPER_USER) {
     exit("Only super users can access this page!");
@@ -40,7 +40,9 @@ if (!empty($username)) {
         }
         $module->addUser($username);
         $module->setUserEtlProjects($username, $userEtlProjects);
-        header('Location: '.$adminUrl);
+        $success = 'User '.$username.' saved.';
+        $url = $module->getUrl(RedCapEtlModule::USERS_PAGE.'?success='.$success);
+        header('Location: '.$url);
     }
     $db = new RedCapDb();
     $userProjects = $db->getUserProjects($username);

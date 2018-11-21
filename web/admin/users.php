@@ -1,6 +1,6 @@
 <?php
 
-/** @var RedCapEtlModule $module */
+/** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
 if (!SUPER_USER) {
     exit("Only super users can access this page!");
@@ -25,6 +25,7 @@ $username = $_POST['username-result'];
 $userLabel = $_POST['userLabel'];
 
 $users = $module->getUsers();
+
 
 if (!empty($username)) {
     if (strcasecmp($submitValue, 'Save') === 0) {
@@ -66,7 +67,13 @@ echo $buffer;
 
 <h4><img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>table_gear.png">REDCap-ETL Admin</h4>
 
-<?php $module->renderAdminTabs($selfUrl); ?>
+<?php
+
+$errorMessage = $_GET['error'];
+$successMessage = $_GET['success'];
+$module->renderAdminPageContentHeader($selfUrl, $errorMessage, $successMessage);
+
+?>
 
 <?php #echo "user-search: ".$_POST['user-search']."<br/>\n"; ?>
 <?php #echo "user label: ".$_POST['userLabel']."<br/>\n"; ?>

@@ -1,6 +1,6 @@
 <?php
 
-/** @var RedCapEtlModule $module */
+/** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
 if (!SUPER_USER) {
     exit("Only super users can access this page!");
@@ -24,7 +24,6 @@ if (strcasecmp($submitValue, 'Save') === 0) {
     try {
         $configuration->set($_POST);
         $module->setConfiguration($configuration, $username, $projectId);
-        #header('Location: '.$selfUrl);
     } catch (\Exception $exception) {
         $error = 'ERROR: '.$exception->getMessage();
     }

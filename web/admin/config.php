@@ -1,6 +1,6 @@
 <?php
 
-/** @var RedCapEtlModule $module */
+/** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
 if (!SUPER_USER) {
     exit("Only super users can access this page!");
