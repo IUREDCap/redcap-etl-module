@@ -355,6 +355,124 @@ class Settings
     }
 
     #-------------------------------------------------------------------
+    # Cron job methods
+    #-------------------------------------------------------------------
+     
+    /**
+     * Gets all the cron jobs (for all users and all projects).
+     */
+    public function getAllCronJobs($transaction = true)
+    {
+        $commit = true;
+        $errorMessage = '';
+        
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        $cronJobs = array();
+        foreach (range(0, 6) as $day) {
+            $cronJobs[$day] = array();
+            foreach (range(0, 23) as $hour) {
+                $cronJobs[$day][$hour] = array();
+            }
+        }
+        
+        $usernames = $this->getUsers();
+        foreach ($usernames as $username) {
+            $etlProjects = $this->getUserEtlProjects($username);
+            foreach ($etlProjects as $etlProject) {
+                $user = $this->getUserInfo($username, $etlProject);
+                $configNames = $user->getConfigNames();
+                foreach ($configNames as $configName) {
+                    $config = $this->getConfiguration($configName, $username, $etlProject);
+                    if (isset($config)) {
+                        $server = $config->getProperty(Configuration::CRON_SERVER);
+                        $times  = $config->getProperty(Configuration::CRON_SCHEDULE);
+                        for ($day = 0; $day < 7; $day++) {
+                            $hour = $times[$day];
+                            if (isset($hour)) {
+                                $run = array(
+                                    'username'  => $username,
+                                    'projectId' => $etlProject,
+                                    'config'    => $configName,
+                                    'server'    => $server
+                                );
+                                array_push($cronJobs[$day][$hour], $run);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+                                        
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+        
+        return $cronJobs;
+    }
+    
+    /**
+     * Gets the cron jobs for the specified day (0 = Sunday, 1 = Monday, ...)
+     * and time (0 = 12am - 1am, 1 = 1am - 2am, ..., 23 = 11pm - 12am).
+     */
+    public function getCronJobs($day, $time, $transaction = true)
+    {
+        $commit = true;
+        $errorMessage = '';
+        
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        $cronJobs = array();
+        
+        $usernames = $this->getUsers();
+        #\REDCap::logEvent('REDCap-ETL getCronJobs: usernames: '.print_r($usernames, true));
+        
+        foreach ($usernames as $username) {
+            $etlProjects = $this->getUserEtlProjects($username);
+            foreach ($etlProjects as $etlProject) {
+                #\REDCap::logEvent('REDCap-ETL getCronJobs: username: '.$username);
+                $user = $this->getUserInfo($username, $etlProject);
+                $configNames = $user->getConfigNames();
+                #\REDCap::logEvent('REDCap-ETL getCronJobs: configNames: '.print_r($configNames, true));
+            
+                foreach ($configNames as $configName) {
+                    $config = $this->getConfiguration($configName, $username, $etlProject);
+                    if (isset($config)) {
+                        $server = $config->getProperty(Configuration::CRON_SERVER);
+                        $times  = $config->getProperty(Configuration::CRON_SCHEDULE);
+                    
+                        if (isset($times) && is_array($times)) {
+                            for ($cronDay = 0; $cronDay < 7; $cronDay++) {
+                                $cronTime = $times[$cronDay];
+                                if (isset($cronTime) && $time == $cronTime && $day == $cronDay) {
+                                    $job = array(
+                                        'username'  => $username,
+                                        'projectId' => $etlProject,
+                                        'config'    => $configName,
+                                        'server'    => $server
+                                    );
+                                    array_push($cronJobs, $job);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+                        
+        return $cronJobs;
+    }
+
+
+    #-------------------------------------------------------------------
     # Admin Config methods
     #-------------------------------------------------------------------
 
