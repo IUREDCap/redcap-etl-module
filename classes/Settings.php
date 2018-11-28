@@ -58,4 +58,533 @@ class Settings
             $this->db->endTransaction($commit);
         }
     }
+
+    #----------------------------------------------------------
+    # UserInfo settings methods
+    #----------------------------------------------------------
+    
+    /**
+     * Gets the key for REDCap's external module settings table
+     * for the specified username, or the current username,
+     * if no username was specified.
+     */
+    private function getUserKey($username = USERID, $projectId = PROJECT_ID)
+    {
+        $key = 'user:'.$username;
+        return $key;
+    }
+
+
+    public function getUserInfo($username = USERID, $projectId = PROJECT_ID)
+    {
+        $key = $this->getUserKey($username);
+        $json = $this->module->getProjectSetting($key, $projectId);
+        $userInfo = new UserInfo($username);
+        $userInfo->fromJson($json);
+        return $userInfo;
+    }
+    
+    public function setUserInfo($userInfo, $username = USERID, $projectId = PROJECT_ID)
+    {
+        $key = $this->getUserKey($username);
+        $json = $userInfo->toJson();
+        $this->module->setProjectSetting($key, $json, $projectId);
+    }
+
+    /**
+     * Gets the ETL configurations for the specified user and project.
+     *
+     * @param string $username the REDCap username.
+     * @param int $projectId the REDCap project ID.
+     *
+     * @return array array of ETL configuration names for the specified
+     *     username and project ID.
+     */
+    public function getUserConfigurationNames($username = USERID, $projectId = PROJECT_ID)
+    {
+        $userInfo = $this->getUserInfo($username, $projectId);
+        $names = $userInfo->getConfigNames();
+        return $names;
+    }
+    
+    
+    #-------------------------------------------------------------------
+    # User ETL project methods
+    #-------------------------------------------------------------------
+    
+        
+    public function getUserEtlProjects($username = USERID)
+    {
+        $key = self::USER_PROJECTS_KEY_PREFIX . $username;
+        $json = $this->module->getSystemSetting($key);
+        $projects = json_decode($json, true);
+        return $projects;
+    }
+    
+    /**
+     * Sets the projects to which a user has permission to use ETL.
+     *
+     * @param array $projects an array of REDCap project IDS
+     *     for which the user has ETL permission.
+     */
+    public function setUserEtlProjects($username, $projects)
+    {
+        $key = self::USER_PROJECTS_KEY_PREFIX . $username;
+        $json = json_encode($projects);
+        $this->module->setSystemSetting($key, $json);
+    }
+    
+    
+    #-------------------------------------------------------------------
+    # (ETL) Configuration methods
+    #-------------------------------------------------------------------
+    
+        
+    public function getConfigurationKey($name, $username = USERID)
+    {
+        $key = 'user:'.$username.';configuration:'.$name;
+        return $key;
+    }
+
+
+    /**
+     * Gets the specified configuration from the REDCap database.
+     *
+     * @param string $name the name of the configuration to get.
+     * @return Configuration the specified configuration, or null if no
+     *     configuration is found.
+     */
+    public function getConfiguration($name, $username = USERID, $projectId = PROJECT_ID)
+    {
+        $configuraion = null;
+        $key = $this->getConfigurationKey($name, $username);
+
+        $setting = $this->module->getProjectSetting($key, $projectId);
+        $configValues = json_decode($setting, true);
+        if (isset($configValues) && is_array($configValues)) {
+            $configuration = new Configuration($configValues['name']);
+            $configuration->set($configValues['properties']);
+        }
+        return $configuration;
+    }
+    
+    
+    /**
+     * Set the specified configuration in the REDCap database.
+     *
+     * @param Configuration $configuration
+     * @param string $username
+     * @param string $projectId
+     */
+    public function setConfiguration($configuration, $username = USERID, $projectId = PROJECT_ID)
+    {
+        $key = $this->getConfigurationKey($configuration->getName(), $username);
+
+        $json = json_encode($configuration);
+        $this->module->setProjectSetting($key, $json, $projectId);
+    }
+    
+    /**
+     * Sets the schedule for a configuration.
+     *
+     * @param string $configName the name of the configuration to set.
+     * @param string $server the name of the server to use for the cron schedule.
+     * @param array $schedule array of schedule hours, indexed by day of week.
+     */
+    public function setConfigSchedule(
+        $configName,
+        $server,
+        $schedule,
+        $username = USERID,
+        $projectId = PROJECT_ID,
+        $transaction = true
+    ) {
+        $commit = true;
+        $errorMessage = '';
+        
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        $configuration = $this->module->getConfiguration($configName, $username, $projectId);
+        if (empty($configuration)) {
+            $commit = false;
+            $errorMessage = 'Configuration "'.$configName.'" not found for user '
+                .$username.' and project ID '.$projectId.'.';
+        }
+        $configuration->setProperty(Configuration::CRON_SERVER, $server);
+        $configuration->setProperty(Configuration::CRON_SCHEDULE, $schedule);
+        $this->module->setConfiguration($configuration, $username, $projectId);
+        
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+        
+        if (!empty($errorMessage)) {
+            throw new \Exception($errorMessage);
+        }
+    }
+    
+    /**
+     * Adds an ETL configuration for a user.
+     *
+     * @param string $name the name of the configuration.
+     */
+    public function addConfiguration($name, $username = USERID, $projectId = PROJECT_ID, $transaction = true)
+    {
+        $commit = true;
+        $errorMessage = '';
+        
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        # Add configuration entry for user
+        $userInfo = $this->getUserInfo();
+        if (!isset($userInfo)) {
+            $userInfo = new UserInfo($username);
+        }
+
+        if (!$userInfo->hasConfigName($name)) {
+            $userInfo->addConfigName($name);
+            $json = $userInfo->toJson();
+            $userKey = $this->getUserKey();
+            $this->module->setProjectSetting($userKey, $json, $projectId);
+        }
+        
+        # Add the actual configuration
+        $key = $this->getConfigurationKey($name);
+        $configuration = $this->module->getSystemSetting($key);
+        if (!isset($configuration)) {
+            $configuration = new Configuration($name);
+            $jsonConfiguration = json_encode($configuration);
+            $this->module->setProjectSetting($key, $jsonConfiguration, $projectId);
+        }
+        
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+    }
+    
+    /**
+     * Copy configuration (only supports copying from/to same
+     * user and project).
+     */
+    public function copyConfiguration($fromConfigName, $toConfigName, $transaction = true)
+    {
+        $commit = true;
+        $errorMessage = '';
+        
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        #--------------------------------------------------------
+        # Add the configuration name to the user's information
+        #--------------------------------------------------------
+        $userInfo = $this->getUserInfo();
+        $userInfo->addConfigName($toConfigName);
+        $json = $userInfo->toJson();
+        $userKey = $this->getUserKey();
+        $this->module->setProjectSetting($userKey, $json);
+        
+        #-----------------------------------------------------
+        # Copy the actual configuration
+        #-----------------------------------------------------
+        $toConfig = $this->getConfiguration($fromConfigName);
+        $toConfig->setName($toConfigName);
+        $json = $toConfig->toJson();
+        $key = $this->getConfigurationKey($toConfigName);
+        $this->module->setProjectSetting($key, $json);
+        
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+    }
+    
+    /**
+     * Rename configuration (only supports rename from/to same
+     * user and project).
+     */
+    public function renameConfiguration($configName, $newConfigName, $transaction = true)
+    {
+        $commit = true;
+        $errorMessage = '';
+        
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        $this->copyConfiguration($configName, $newConfigName, false);
+        $this->removeConfiguration($configName, false);
+                
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+    }
+    
+    public function removeConfiguration($configName, $transaction = true)
+    {
+        $commit = true;
+        $errorMessage = '';
+        
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        #-----------------------------------------------------------
+        # Remove the configuration name from the user's information
+        #-----------------------------------------------------------
+        $userInfo = $this->getUserInfo();
+        if (isset($userInfo) && $userInfo->hasConfigName($configName)) {
+            $userInfo->removeConfigName($configName);
+            $json = $userInfo->toJson();
+            $userKey = $this->getUserKey();
+            $this->module->setProjectSetting($userKey, $json);
+        }
+        
+        #------------------------------------------------
+        # Remove the actual configuration
+        #------------------------------------------------
+        $key = $this->getConfigurationKey($configName);
+        $this->module->removeProjectSetting($key);
+                        
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+    }
+
+    #-------------------------------------------------------------------
+    # Admin Config methods
+    #-------------------------------------------------------------------
+
+    public function getAdminConfig()
+    {
+        $adminConfig = new AdminConfig();
+        $setting = $this->module->getSystemSetting(self::ADMIN_CONFIG_KEY);
+        $adminConfig->fromJson($setting);
+        return $adminConfig;
+    }
+    
+    public function setAdminConfig($adminConfig)
+    {
+        $json = $adminConfig->toJson();
+        $this->module->setSystemSetting(self::ADMIN_CONFIG_KEY, $json);
+    }
+    
+    #-------------------------------------------------------------------
+    # Server methods
+    #-------------------------------------------------------------------
+    
+    public function getServers()
+    {
+        $servers = new Servers();
+        $json = $this->module->getSystemSetting(self::SERVERS_KEY, true);
+        $servers->fromJson($json);
+        $servers = $servers->getServers();
+        return $servers;
+    }
+
+    public function addServer($serverName, $transaction = true)
+    {
+        $commit = true;
+        $errorMessage = '';
+        
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        $servers = new Servers();
+        $json = $this->module->getSystemSetting(self::SERVERS_KEY, true);
+        $servers->fromJson($json);
+        $servers->addServer($serverName);
+        $json = $servers->toJson();
+        $this->module->setSystemSetting(self::SERVERS_KEY, $json);
+                                
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+    }
+
+    public function copyServer($fromServerName, $toServerName, $transaction = true)
+    {
+        $commit = true;
+        $errorMessage = '';
+        
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        $servers = new Servers();
+        $json = $this->module->getSystemSetting(self::SERVERS_KEY, true);
+        $servers->fromJson($json);
+        $servers->addServer($toServerName, false);
+        $json = $servers->toJson();
+        $this->module->setSystemSetting(self::SERVERS_KEY, $json);
+        
+        $this->copyServerConfig($fromServerName, $toServerName, false);
+                                        
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+    }
+    
+    public function renameServer($serverName, $newServerName, $transaction = true)
+    {
+        $commit = true;
+        $errorMessage = '';
+        
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        try {
+            $servers = new Servers();
+            $json = $this->module->getSystemSetting(self::SERVERS_KEY, true);
+            $servers->fromJson($json);
+            $servers->addServer($newServerName, false);
+            $servers->removeServer($serverName, false);
+            $json = $servers->toJson();
+            $this->module->setSystemSetting(self::SERVERS_KEY, $json);
+        
+            $this->renameServerConfig($serverName, $newServerName, false);
+        } catch (Exception $exception) {
+            $commit = false;
+        }
+        
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+    }
+    
+    /**
+     * Removes the server from the REDCap database.
+     */
+    public function removeServer($serverName)
+    {
+        $commit = true;
+        $errorMessage = '';
+        
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        $this->removeServerConfig($serverName, false);
+        
+        $servers = new Servers();
+        $json = $this->module->getSystemSetting(self::SERVERS_KEY, true);
+        $servers->fromJson($json);
+        $servers->removeServer($serverName, false);
+        $json = $servers->toJson();
+        $this->module->setSystemSetting(self::SERVERS_KEY, $json);
+        
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+    }
+
+
+    #-------------------------------------------------------------------
+    # Server Config methods
+    #-------------------------------------------------------------------
+    
+    public function getServerConfig($serverName)
+    {
+        $serverConfig = new ServerConfig($serverName);
+        $key = self::SERVER_CONFIG_KEY_PREFIX . $serverName;
+        $setting = $this->module->getSystemSetting($key);
+        $serverConfig->fromJson($setting);
+        return $serverConfig;
+    }
+    
+    public function setServerConfig($serverConfig)
+    {
+        $json = $serverConfig->toJson();
+        $key = self::SERVER_CONFIG_KEY_PREFIX . $serverConfig->getName();
+        $this->module->setSystemSetting($key, $json);
+    }
+    
+    private function copyServerConfig($fromServerName, $toServerName, $transaction = true)
+    {
+        $commit = true;
+        $errorMessage = '';
+        
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        $toServerConfig = $this->getServerConfig($fromServerName);
+        $toServerConfig->setName($toServerName);
+        $json = $toServerConfig->toJson();
+        $key = self::SERVER_CONFIG_KEY_PREFIX . $toServerName;
+        $this->module->setSystemSetting($key, $json);
+        
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+    }
+    
+    public function renameServerConfig($serverName, $newServerName, $transaction = true)
+    {
+        $commit = true;
+        $errorMessage = '';
+        
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        $this->copyServerConfig($serverName, $newServerName, false);
+        $this->removeServerConfig($serverName, false);
+        
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+    }
+    
+    
+    public function removeServerConfig($serverName, $transaction = true)
+    {
+        $commit = true;
+        $errorMessage = '';
+        
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        $key = self::SERVER_CONFIG_KEY_PREFIX . $serverName;
+        $result = $this->module->removeSystemSetting($key);
+        
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+        
+        return $result;
+    }
+
+
+    #-------------------------------------------------------------------
+    # Last run time methods
+    #-------------------------------------------------------------------
+    
+    public function getLastRunTime()
+    {
+        $dateAndTime = $this->module->getSystemSetting(self::LAST_RUN_TIME_KEY);
+        if (empty($dateAndTime)) {
+            $dateAndTime = array(-1, -1);
+        }
+        $lastRunTime = explode(',', $dateAndTime);
+        return $lastRunTime;
+    }
+
+    public function setLastRunTime($date, $time)
+    {
+        $lastRunTime = $date.','.$time;
+        $this->module->setSystemSetting(self::LAST_RUN_TIME_KEY, $lastRunTime);
+    }
+    
+    public function isLastRunTime($date, $time)
+    {
+        $lastRunTime = $this->getLastRunTime();
+        return $lastRunTime[0] == $date && $lastRunTime[1] == $time;
+    }
 }
