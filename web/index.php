@@ -203,7 +203,7 @@ foreach ($configurationNames as $configurationName) {
     print '<script>var test1 = 123;</script>'."\n";
     print '<td style="text-align:center;">'
         .'<img src="'.APP_PATH_IMAGES.'page_copy.png" class="copyConfig" style="cursor: pointer;"'
-        .' id="copy'.$configurationName.'"/>'
+        .' id="copyConfig'.$row.'"/>'
         ."</td>\n";
     print '<td style="text-align:center;">'
         .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" class="renameConfig" style="cursor: pointer;"'
@@ -244,14 +244,19 @@ $(function() {
         },
         title: "Copy configuration"
     });
-    $(".copyConfig").click(function(){
-        //alert(window.test1);
-        var id = this.id;
-        var configName = id.substring(4);
+    <?php
+    $row = 1;
+    foreach ($configurationNames as $configurationName) {
+        echo '$("#copyConfig'.$row.'").click({fromConfig: "'.$configurationName.'"}, copyConfig);'."\n";
+        $row++;
+    }
+    ?>
+    function copyConfig(event) {
+        var configName = event.data.fromConfig;
         $("#configToCopy").text('"'+configName+'"');
         $('#copyFromConfigName').val(configName);
         $("#copyForm").dialog("open");
-    });
+    }
 });
 </script>
 <div id="copyDialog"
