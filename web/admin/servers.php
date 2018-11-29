@@ -136,17 +136,17 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
             ."</td>\n";
 
         print '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'page_copy.png" id="copy-'.$server.'"'
+            .'<img src="'.APP_PATH_IMAGES.'page_copy.png" id="copyServer'.$row.'"'
             .' class="copyServer" style="cursor: pointer;">'
             ."</td>\n";
 
         print '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" id="rename-'.$server.'"'
+            .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" id="renameServer'.$row.'"'
             .' class="renameServer" style="cursor: pointer;">'
             ."</td>\n";
           
         print '<td style="text-align:center;">'
-              .'<img src="'.APP_PATH_IMAGES.'delete.png" id="delete-'.$server.'"'
+              .'<img src="'.APP_PATH_IMAGES.'delete.png" id="deleteServer'.$row.'"'
               .' class="deleteServer" style="cursor: pointer;">'
               ."</td>\n";
       
@@ -214,5 +214,22 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
     </form>
 </div>
 
+<?php
+
+#-----------------------------------------------------------------------
+# Set up click event handlers for the server copy/rename/delete buttons
+#-----------------------------------------------------------------------
+echo "<script>\n";
+
+$row = 1;
+foreach ($servers as $server) {
+    echo '$("#copyServer'.$row.'").click({server: "'.$server.'"}, copyServer);'."\n";
+    echo '$("#renameServer'.$row.'").click({server: "'.$server.'"}, renameServer);'."\n";
+    echo '$("#deleteServer'.$row.'").click({server: "'.$server.'"}, deleteServer);'."\n";
+    $row++;
+}
+
+echo "</script>\n";
+?>
 
 <?php include APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>

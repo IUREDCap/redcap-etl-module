@@ -299,7 +299,7 @@ $(function() {
     });
 
     <?php
-    # Set up click event handlers for the Copy Configuration  buttons
+    # Set up click event handlers for the Rename Configuration  buttons
     $row = 1;
     foreach ($configurationNames as $configurationName) {
         echo '$("#renameConfig'.$row.'").click({configName: "'.$configurationName.'"}, renameConfig);'."\n";
@@ -353,7 +353,7 @@ $(function() {
     });
   
     <?php
-    # Set up click event handlers for the Copy Configuration  buttons
+    # Set up click event handlers for the Delete Configuration  buttons
     $row = 1;
     foreach ($configurationNames as $configurationName) {
         echo '$("#deleteConfig'.$row.'").click({configName: "'.$configurationName.'"}, deleteConfig);'."\n";

@@ -11,13 +11,7 @@ $(function() {
         },
         title: "Copy server"
     });
-    $(".copyServer").click(function(){
-        var id = this.id;
-        var server = id.substring(5);
-        $("#server-to-copy").text('"'+server+'"');
-        $('#copy-from-server-name').val(server);
-        $("#copy-form").data('server', server).dialog("open");
-    });
+
     
     // Rename server form
     renameForm = $("#rename-form").dialog({
@@ -30,14 +24,6 @@ $(function() {
             "Rename server": function() {renameForm.submit();}
         },
         title: "Rename server"
-    });
-    
-    $(".renameServer").click(function(){
-        var id = this.id;
-        var server = id.substring(7);
-        $("#server-to-rename").text('"'+server+'"');
-        $('#rename-server-name').val(server);
-        $("#rename-form").data('server', server).dialog("open");
     });
     
         
@@ -53,12 +39,26 @@ $(function() {
         },
         title: "Delete server"
     });
-    
-    $(".deleteServer").click(function(){
-        var id = this.id;
-        var server = id.substring(7);
-        $("#server-to-delete").text('"'+server+'"');
-        $('#delete-server-name').val(server);
-        $("#delete-form").data('server', server).dialog("open");
-    });
 });
+
+    
+function copyServer(event) {
+    var server = event.data.server;
+    $("#server-to-copy").text('"'+server+'"');
+    $('#copy-from-server-name').val(server);
+    $("#copy-form").data('server', server).dialog("open");
+}
+
+function renameServer(event) {
+    var server = event.data.server;
+    $("#server-to-rename").text('"'+server+'"');
+    $('#rename-server-name').val(server);
+    $("#rename-form").data('server', server).dialog("open");
+}
+
+function deleteServer(event) {
+    var server = event.data.server;
+    $("#server-to-delete").text('"'+server+'"');
+    $('#delete-server-name').val(server);
+    $("#delete-form").data('server', server).dialog("open");
+}
