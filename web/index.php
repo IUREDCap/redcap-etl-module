@@ -4,49 +4,56 @@
 
 require_once __DIR__.'/../dependencies/autoload.php';
 
-
-$copyFromConfigName = $_POST['copyFromConfigName'];
-$copyToConfigName   = $_POST['copyToConfigName'];
-if (!empty($copyFromConfigName) && !empty($copyToConfigName)) {
-    try {
-        $module->copyConfiguration($copyFromConfigName, $copyToConfigName);
-    } catch (Exception $exception) {
-        $error = 'ERROR: ' . $exception->getMessage();
-    }
-}
-
-
-$renameConfigName    = $_POST['renameConfigName'];
-$renameNewConfigName = $_POST['renameNewConfigName'];
-if (!empty($renameConfigName) && !empty($renameNewConfigName)) {
-    try {
-        $module->renameConfiguration($renameConfigName, $renameNewConfigName);
-    } catch (Exception $exception) {
-        $error = 'ERROR: ' . $exception->getMessage();
-    }
-}
-
-$deleteConfigName = $_POST['deleteConfigName'];
-if (!empty($deleteConfigName)) {
-    $module->removeConfiguration($deleteConfigName);
-}
-
+#-----------------------------------------------------------------
+# Process form submissions (configuration add/copy/delete/rename)
+#-----------------------------------------------------------------
 $submitValue = $_POST['submitValue'];
-if (strcasecmp($submitValue, 'Add') === 0) {
+if (strcasecmp($submitValue, 'add') === 0) {
     if (!array_key_exists('configurationName', $_POST) || empty($_POST['configurationName'])) {
         $error = 'ERROR: No configuration name was specified.';
     } else {
-        $configurationName = $_POST['configurationName'];
-        $configuration = $module->getConfiguration($configurationName);
-        if (isset($configuration)) {
-            $error = 'ERROR: configuration "'.$configurationName.'" already exists.';
-        } else {
-            $indexUrl = $module->getUrl("web/index.php");
-            $module->addConfiguration($configurationName);
-            header('Location: '.$indexUrl);
+        try {
+            $configurationName = $_POST['configurationName'];
+            $configuration = $module->getConfiguration($configurationName);
+            if (isset($configuration)) {
+                $error = 'ERROR: configuration "'.$configurationName.'" already exists.';
+            } else {
+                $indexUrl = $module->getUrl("web/index.php");
+                $module->addConfiguration($configurationName);
+                header('Location: '.$indexUrl);
+            }
+        } catch (\Exception $exception) {
+            $error = 'ERROR: '.$exception->getMessage();
+        }
+    }
+} elseif (strcasecmp($submitValue, 'copy') === 0) {
+    $copyFromConfigName = $_POST['copyFromConfigName'];
+    $copyToConfigName   = $_POST['copyToConfigName'];
+    if (!empty($copyFromConfigName) && !empty($copyToConfigName)) {
+        try {
+            $module->copyConfiguration($copyFromConfigName, $copyToConfigName);
+        } catch (Exception $exception) {
+            $error = 'ERROR: ' . $exception->getMessage();
+        }
+    }
+} elseif (strcasecmp($submitValue, 'delete') === 0) {
+    $deleteConfigName = $_POST['deleteConfigName'];
+    if (!empty($deleteConfigName)) {
+        $module->removeConfiguration($deleteConfigName);
+    }
+} elseif (strcasecmp($submitValue, 'rename') === 0) {
+    $renameConfigName    = $_POST['renameConfigName'];
+    $renameNewConfigName = $_POST['renameNewConfigName'];
+    if (!empty($renameConfigName) && !empty($renameNewConfigName)) {
+        try {
+            $module->renameConfiguration($renameConfigName, $renameNewConfigName);
+        } catch (Exception $exception) {
+            $error = 'ERROR: ' . $exception->getMessage();
         }
     }
 }
+
+
 
 #---------------------------------------------
 # Add custom files to head section of page
@@ -275,6 +282,7 @@ $(function() {
     <input type="text" name="copyToConfigName" id="copyToConfigName">
     </p>
     <input type="hidden" name="copyFromConfigName" id="copyFromConfigName" value="">
+    <input type="hidden" name="submitValue" value="copy">
     </form>
 </div>
 
@@ -328,6 +336,7 @@ $(function() {
     <input type="text" name="renameNewConfigName" id="renameNewConfigName">
     </p>
     <input type="hidden" name="renameConfigName" id="renameConfigName" value="">
+    <input type="hidden" name="submitValue" value="rename">
     </form>
 </div>
 
@@ -377,6 +386,7 @@ $(function() {
     To delete the ETL configuration <span id="configToDelete" style="font-weight: bold;"></span>,
     click on the <span style="font-weight: bold;">Delete configuration</span> button.
     <input type="hidden" name="deleteConfigName" id="deleteConfigName" value="">
+    <input type="hidden" name="submitValue" value="delete">
     </form>
 </div>
 

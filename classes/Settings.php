@@ -239,27 +239,34 @@ class Settings
             $this->db->startTransaction();
         }
         
-        # Add configuration entry for user
-        $userInfo = $this->getUserInfo();
-        if (!isset($userInfo)) {
-            $userInfo = new UserInfo($username);
+        try {
+            # Add configuration entry for user
+            $userInfo = $this->getUserInfo();
+            if (!isset($userInfo)) {
+                $userInfo = new UserInfo($username);
+            }
+
+            if (!$userInfo->hasConfigName($name)) {
+                $userInfo->addConfigName($name);
+                $json = $userInfo->toJson();
+                $userKey = $this->getUserKey();
+                $this->module->setProjectSetting($userKey, $json, $projectId);
+            }
+        
+            # Add the actual configuration
+            $key = $this->getConfigurationKey($name);
+            $configuration = $this->module->getSystemSetting($key);
+            if (!isset($configuration)) {
+                $configuration = new Configuration($name);
+                $jsonConfiguration = json_encode($configuration);
+                $this->module->setProjectSetting($key, $jsonConfiguration, $projectId);
+            }
+        } catch (\Exception $exception) {
+            $commit = false;
+            $this->db->endTransaction($commit);
+            throw $exception;
         }
 
-        if (!$userInfo->hasConfigName($name)) {
-            $userInfo->addConfigName($name);
-            $json = $userInfo->toJson();
-            $userKey = $this->getUserKey();
-            $this->module->setProjectSetting($userKey, $json, $projectId);
-        }
-        
-        # Add the actual configuration
-        $key = $this->getConfigurationKey($name);
-        $configuration = $this->module->getSystemSetting($key);
-        if (!isset($configuration)) {
-            $configuration = new Configuration($name);
-            $jsonConfiguration = json_encode($configuration);
-            $this->module->setProjectSetting($key, $jsonConfiguration, $projectId);
-        }
         
         if ($transaction) {
             $this->db->endTransaction($commit);
@@ -279,24 +286,30 @@ class Settings
             $this->db->startTransaction();
         }
         
-        #--------------------------------------------------------
-        # Add the configuration name to the user's information
-        #--------------------------------------------------------
-        $userInfo = $this->getUserInfo();
-        $userInfo->addConfigName($toConfigName);
-        $json = $userInfo->toJson();
-        $userKey = $this->getUserKey();
-        $this->module->setProjectSetting($userKey, $json);
+        try {
+            #--------------------------------------------------------
+            # Add the configuration name to the user's information
+            #--------------------------------------------------------
+            $userInfo = $this->getUserInfo();
+            $userInfo->addConfigName($toConfigName);
+            $json = $userInfo->toJson();
+            $userKey = $this->getUserKey();
+            $this->module->setProjectSetting($userKey, $json);
         
-        #-----------------------------------------------------
-        # Copy the actual configuration
-        #-----------------------------------------------------
-        $toConfig = $this->getConfiguration($fromConfigName);
-        $toConfig->setName($toConfigName);
-        $json = $toConfig->toJson();
-        $key = $this->getConfigurationKey($toConfigName);
-        $this->module->setProjectSetting($key, $json);
-        
+            #-----------------------------------------------------
+            # Copy the actual configuration
+            #-----------------------------------------------------
+            $toConfig = $this->getConfiguration($fromConfigName);
+            $toConfig->setName($toConfigName);
+            $json = $toConfig->toJson();
+            $key = $this->getConfigurationKey($toConfigName);
+            $this->module->setProjectSetting($key, $json);
+        } catch (\Exception $exception) {
+            $commit = false;
+            $this->db->endTransaction($commit);
+            throw $exception;
+        }
+    
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
@@ -315,9 +328,15 @@ class Settings
             $this->db->startTransaction();
         }
         
-        $this->copyConfiguration($configName, $newConfigName, false);
-        $this->removeConfiguration($configName, false);
-                
+        try {
+            $this->copyConfiguration($configName, $newConfigName, false);
+            $this->removeConfiguration($configName, false);
+        } catch (\Exception $exception) {
+            $commit = false;
+            $this->db->endTransaction($commit);
+            throw $exception;
+        }
+        
         if ($transaction) {
             $this->db->endTransaction($commit);
         }

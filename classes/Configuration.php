@@ -37,6 +37,8 @@ class Configuration implements \JsonSerializable
 
     public function __construct($name, $username = USERID, $projectId = PROJECT_ID)
     {
+        self::validateName($name);
+        
         $this->name      = $name;
         $this->username  = $username;
         $this->projectId = $projectId;
@@ -52,6 +54,8 @@ class Configuration implements \JsonSerializable
         $this->properties[self::BATCH_SIZE] = 100;
         $this->properties[self::TRANSFORM_RULES_SOURCE] = '1';
 
+        # Set the API token property, if the project has an API token
+        # for this user.
         if (!empty(PROJECT_ID)) {
             $redCapDb = new RedCapDb();
             $apiToken = $redCapDb->getApiToken(USERID, PROJECT_ID);
@@ -61,17 +65,18 @@ class Configuration implements \JsonSerializable
         }
     }
 
-    public static function isValidName($name, & $error = null)
+    public static function validateName($name)
     {
-        $isValid = true;
+        $matches = array();
         if (empty($name)) {
-            $isValid = false;
+            throw new \Exception('No configuration name specified.');
         } elseif (!is_string($name)) {
-            $isValid = false;
-        } elseif (preg_match('/[&<>";@\*]/', $name) === 1) {
-            $isValid = false;
+            throw new \Exception('Configuration name is not a string; has type: '.gettype($name).'.');
+        } elseif (preg_match('/([&<>";@\*])/', $name, $matches) === 1) {
+            $errorMessage = 'Invalid character in configuration name: '.$matches[0];
+            throw new \Exception($errorMessage);
         }
-        return $isValid;
+        return true;
     }
     
     public function jsonSerialize()
@@ -272,6 +277,7 @@ class Configuration implements \JsonSerializable
     
     public function setName($name)
     {
+        self::validateName($name);
         $this->name = $name;
     }
 
@@ -295,14 +301,16 @@ class Configuration implements \JsonSerializable
 }
 
 /*
-$names = ['', 'test', 123, '<script>', '&34;', 'test-1 234', 'a"test', 'test\'s 1'];
+$names = ['', 'test', 123, '<script>&27;</script>', '&34;', 'test-1 234', 'a"test', 'test\'s 1'];
 
 foreach ($names as $name) {
-    print 'Name "'.$name.'" is ';
-    if (Configuration::isValidName($name)) {
-        print "valid\n";
-    } else {
-        print "invalid\n";
+
+    try {
+        if (Configuration::validateName($name)) {
+            print 'Name "'.$name.'" is '."valid\n";
+        }
+    } catch (\Exception $exception) {
+        print "Error: ".$exception->getMessage()."\n";
     }
 }
 */
