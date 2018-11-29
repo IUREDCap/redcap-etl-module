@@ -207,11 +207,11 @@ foreach ($configurationNames as $configurationName) {
         ."</td>\n";
     print '<td style="text-align:center;">'
         .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" class="renameConfig" style="cursor: pointer;"'
-        .' id="rename'.$configurationName.'"/>'
+        .' id="renameConfig'.$row.'"/>'
         ."</td>\n";
     print '<td style="text-align:center;">'
         .'<img src="'.APP_PATH_IMAGES.'delete.png" class="deleteConfig" style="cursor: pointer;"'
-        .' id="delete'.$configurationName.'"/>'
+        .' id="deleteConfig'.$row.'"/>'
         ."</td>\n";
 
     print "</tr>\n";
@@ -244,13 +244,16 @@ $(function() {
         },
         title: "Copy configuration"
     });
+    
     <?php
+    # Set up click event handlers for the Copy Configuration  buttons
     $row = 1;
     foreach ($configurationNames as $configurationName) {
         echo '$("#copyConfig'.$row.'").click({fromConfig: "'.$configurationName.'"}, copyConfig);'."\n";
         $row++;
     }
     ?>
+    
     function copyConfig(event) {
         var configName = event.data.fromConfig;
         $("#configToCopy").text('"'+configName+'"');
@@ -294,14 +297,22 @@ $(function() {
         },
         title: "Rename configuration"
     });
+
+    <?php
+    # Set up click event handlers for the Copy Configuration  buttons
+    $row = 1;
+    foreach ($configurationNames as $configurationName) {
+        echo '$("#renameConfig'.$row.'").click({configName: "'.$configurationName.'"}, renameConfig);'."\n";
+        $row++;
+    }
+    ?>
     
-    $(".renameConfig").click(function(){
-        var id = this.id; // id contains the configuration name
-        var configName = id.substring(6);
+    function renameConfig(event) {
+        var configName = event.data.configName;
         $("#configToRename").text('"'+configName+'"');
         $('#renameConfigName').val(configName);
         $("#renameForm").dialog("open");
-    });
+    }
 });
 </script>
 <div id="renameDialog"
@@ -340,14 +351,22 @@ $(function() {
         },
         title: "Delete configuration"
     });
+  
+    <?php
+    # Set up click event handlers for the Copy Configuration  buttons
+    $row = 1;
+    foreach ($configurationNames as $configurationName) {
+        echo '$("#deleteConfig'.$row.'").click({configName: "'.$configurationName.'"}, deleteConfig);'."\n";
+        $row++;
+    }
+    ?>
     
-    $(".deleteConfig").click(function(){
-        var id = this.id;
-        var configName = id.substring(6);
+    function deleteConfig(event) {
+        var configName = event.data.configName;
         $("#configToDelete").text('"'+configName+'"');
         $('#deleteConfigName').val(configName);
         $("#deleteForm").dialog("open");
-    });
+    }
 });
 </script>
 <div id="deleteDialog"

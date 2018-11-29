@@ -61,6 +61,19 @@ class Configuration implements \JsonSerializable
         }
     }
 
+    public static function isValidName($name, & $error = null)
+    {
+        $isValid = true;
+        if (empty($name)) {
+            $isValid = false;
+        } elseif (!is_string($name)) {
+            $isValid = false;
+        } elseif (preg_match('/[&<>";@\*]/', $name) === 1) {
+            $isValid = false;
+        }
+        return $isValid;
+    }
+    
     public function jsonSerialize()
     {
         return (object) get_object_vars($this);
@@ -280,3 +293,16 @@ class Configuration implements \JsonSerializable
         return $properyNames;
     }
 }
+
+/*
+$names = ['', 'test', 123, '<script>', '&34;', 'test-1 234', 'a"test', 'test\'s 1'];
+
+foreach ($names as $name) {
+    print 'Name "'.$name.'" is ';
+    if (Configuration::isValidName($name)) {
+        print "valid\n";
+    } else {
+        print "invalid\n";
+    }
+}
+*/
