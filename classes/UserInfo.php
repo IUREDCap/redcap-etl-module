@@ -41,6 +41,7 @@ class UserInfo implements \JsonSerializable
 
     public function addConfigName($configName)
     {
+        Configuration::validateName($configName);
         $this->configs[$configName] = 1;
     }
     
