@@ -143,7 +143,7 @@ $times = $adminConfig->getTimeLabels();
             $userConfigUrl = $userUrl.'&username='.$username;
             
             $configUrl = $module->getURL(
-                'admin_etl_config.php'.'?config='.$config
+                RedCapEtlModule::ADMIN_ETL_CONFIG_PAGE.'?config='.$config
                 .'&username='.$username.'&pid='.$projectId
             );
 
