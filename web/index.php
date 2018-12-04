@@ -4,6 +4,8 @@
 
 require_once __DIR__.'/../dependencies/autoload.php';
 
+use IU\RedCapEtlModule\Filter;
+
 #-----------------------------------------------------------------
 # Process form submissions (configuration add/copy/delete/rename)
 #-----------------------------------------------------------------
@@ -190,7 +192,7 @@ foreach ($configurationNames as $configurationName) {
     $runConfigurationUrl = $runUrl.'&configName='.$configurationName;
     $scheduleConfigUrl = $scheduleUrl.'&configName='.$configurationName;
     
-    print "<td>".REDCap::escapeHtml($configurationName)."</td>\n";
+    print "<td>".Filter::escapeForHtml($configurationName)."</td>\n";
     print '<td style="text-align:center;">'
         .'<a href="'.$configureUrl.'"><img src='.APP_PATH_IMAGES.'gear.png></a>'
         ."</td>\n";

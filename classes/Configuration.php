@@ -65,6 +65,13 @@ class Configuration implements \JsonSerializable
         }
     }
 
+    /**
+     * Validates a configuration name.
+     *
+     * @param string $name the configuration name to check.
+     * @return boolean returns true if the configuration name is valid, or throws an
+     *     exception if not.
+     */
     public static function validateName($name)
     {
         $matches = array();
