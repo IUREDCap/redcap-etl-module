@@ -33,17 +33,5 @@
                "url": "web/index.php"
            }
        ]
-    },
-    "system-settings": [
-        {
-            "key": "admin-config",
-            "name": "Admin configuration data.",
-            "type": "string"
-        },
-        {
-            "key": "user-list",
-            "name": "REDCap-ETL user list.",
-            "type": "string"
-        }
-    ]
+    }
 }
