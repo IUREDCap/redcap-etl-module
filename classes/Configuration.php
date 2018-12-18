@@ -65,6 +65,22 @@ class Configuration implements \JsonSerializable
         }
     }
 
+
+    /**
+     * Validate the configuration.
+     */
+    public function validate()
+    {
+        self::validateName($this->name);
+        
+        $apiToken =  $this->getProperty(self::DATA_SOURCE_API_TOKEN);
+        self::validateApiToken($apiToken);
+        
+        $batchSize = $this->getProperty(self::BATCH_SIZE);
+        self::validateBatchSize($batchSize);
+    }
+    
+    
     /**
      * Validates a configuration name.
      *
@@ -82,6 +98,34 @@ class Configuration implements \JsonSerializable
         } elseif (preg_match('/([&<>";@\*])/', $name, $matches) === 1) {
             $errorMessage = 'Invalid character in configuration name: '.$matches[0];
             throw new \Exception($errorMessage);
+        }
+        return true;
+    }
+    
+    public static function validateApiToken($apiToken)
+    {
+        if (!empty($apiToken)) {
+            if (!ctype_xdigit($apiToken)) {   # ctype_xdigit - check token for hexidecimal
+                $message = 'The REDCap API token has an invalid format.'
+                    .' It should only contain numbers and the letters A, B, C, D, E and F.';
+                throw new \Exception($message);
+            } elseif (strlen($apiToken) != 32) { # check token for correct length
+                $message = 'The REDCap API token has an invalid format.'
+                    .' It has a length of '.strlen($apiToken).' characters, but should have a length of'
+                    .' 32.';
+                throw new \Exception($message);
+            } // @codeCoverageIgnore
+        }
+        return true;
+    }
+    
+    public static function validateBatchSize($batchSize)
+    {
+        if (ctype_digit($value) && intval($value) > 0) {
+            ; // OK
+        } else {
+            $message = 'The batch size needs to be a positive integer.';
+            throw new \Exception($message);
         }
         return true;
     }

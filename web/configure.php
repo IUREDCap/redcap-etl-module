@@ -97,6 +97,7 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
 
     try {
         $configuration->set($_POST);
+        $configuration->validate();
         $module->setConfiguration($configuration);
         header('Location: '.$listUrl);
     } catch (\Exception $exception) {

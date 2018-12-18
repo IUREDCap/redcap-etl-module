@@ -28,6 +28,11 @@ class Filter
         return js_escape2($value);
     }
     
+    public static function escapeForMysql($value)
+    {
+        return db_escape($value);
+    }
+    
     public static function stripTags($value)
     {
         return strip_tags($value);

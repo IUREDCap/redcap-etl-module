@@ -68,13 +68,23 @@ class ServerConfig implements \JsonSerializable
         return $json;
     }
 
+
+    private function createServerErrorMessageForUser($message)
+    {
+        $errorMessage = 'Server "'.$this->name.'" has the following configuration error: '.$message
+            .'. Please contact your system administrator or use another server.';
+        return $errorMessage;
+    }
+    
+    
     /**
      * Run the ETL process for this server.
      */
     public function run($etlConfig)
     {
         if (empty($this->serverAddress)) {
-            throw new \Exeption('No server address specified.');
+            $message = $this->createServerErrorMessageForUser('no server address specified');
+            throw new \Exception($message);
         }
         
         if ($this->authMethod == self::AUTH_METHOD_PASSWORD) {
@@ -84,11 +94,11 @@ class ServerConfig implements \JsonSerializable
             $keyFile = $this->getSshKeyFile();
             
             if (empty($keyFile)) {
-                throw new \Exception('No SSH key file found.');
+                $message = $this->createServerErrorMessageForUser('no SSH key file was specified');
+                throw new \Exception($message);
             }
             
-            \REDCap::logEvent('REDCap-ETL run key file: '.$keyFile);
-            \REDCap::logEvent('REDCap-ETL run current user: '.get_current_user());
+            #\REDCap::logEvent('REDCap-ETL run current user: '.get_current_user());
                         
             $key = new RSA();
             $key->setPassword($this->sshKeyPassword);
@@ -96,14 +106,15 @@ class ServerConfig implements \JsonSerializable
             $keyFileContents = file_get_contents($keyFile);
             
             if ($keyFileContents === false) {
-                throw new \Exception('SSH key file "'.$keyFile.'" could not be accessed.');
+                $message = $this->createServerErrorMessageForUser('SSH key file could not be accessed');
+                throw new \Exception($message);
             }
             $key->loadKey($keyFileContents);
             $ssh = new SSH2($this->serverAddress);
             $ssh->login($this->username, $key);
         } else {
-            throw new \Exception('Unrecognized authentication method: '
-                .$this->authMethod);
+            $message = $this->createServerErrorMessageForUser('unrecognized authentication menthod');
+            throw new \Exception($message);
         }
                 
         #------------------------------------------------
@@ -137,7 +148,9 @@ class ServerConfig implements \JsonSerializable
         #$scpResult = $scp->put($configFilePath, $propertiesText);
         $scpResult = $scp->put($configFilePath, $propertiesJson);
         if (!$scpResult) {
-            throw new \Exception('Copy of configuration file to "'.$configFilePath.'" failed.');
+            $message = 'Copy of ETL configuration to server failed.'
+                . ' Please contact your system administrator for assistance.';
+            throw new \Exception($message);
         }
         
         #$ssh->setTimeout(1);
@@ -162,22 +175,15 @@ class ServerConfig implements \JsonSerializable
             if (empty($serverAddress)) {
                 throw new \Exception('No server address found.');
             }
-            \REDCap::logEvent('REDCap-ETL server config test. Server address: '.$serverAddress);
                     
             $username = $this->getUsername();
             if ($this->getAuthMethod() == ServerConfig::AUTH_METHOD_SSH_KEY) {
-                \REDCap::logEvent('REDCap-ETL server config test. SSH authentication method.');
-                
                 $keyFile = $this->getSshKeyFile();
                 if (empty($keyFile)) {
                     throw new \Exception('SSH key file cound not be found.');
                 }
-                
-                \REDCap::logEvent('REDCap-ETL server config test. SSH key file: '.$keyFile);
                             
                 $keyPassword = $this->getSshKeyPassword();
-                
-                \REDCap::logEvent('REDCap-ETL server config test. SSH key password: '.$keyPassword);
                                 
                 $key = new RSA();
                 
@@ -213,7 +219,20 @@ class ServerConfig implements \JsonSerializable
         return $testOutput;
     }
     
-    
+    public static function validateName($name)
+    {
+        $matches = array();
+        if (empty($name)) {
+            throw new \Exception('No server configuration name specified.');
+        } elseif (!is_string($name)) {
+            throw new \Exception('Server configuration name is not a string; has type: '.gettype($name).'.');
+        } elseif (preg_match('/([&<>";@\*])/', $name, $matches) === 1) {
+            $errorMessage = 'Invalid character in server configuration name: '.$matches[0];
+            throw new \Exception($errorMessage);
+        }
+        return true;
+    }
+        
     public function getName()
     {
         return $this->name;

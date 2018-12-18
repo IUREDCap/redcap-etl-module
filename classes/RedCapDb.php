@@ -12,7 +12,7 @@ class RedCapDb
         $userInfo = array();
         $sql = "select ui_id, username, user_firstname, user_lastname, user_email "
             ." from redcap_user_information "
-            ." where username = '".db_escape($username)."' and user_suspended_time is null "
+            ." where username = '".Filter::escapeForMysql($username)."' and user_suspended_time is null "
             ;
         $result = db_query($sql);
         if ($row = db_fetch_assoc($result)) {
@@ -33,10 +33,10 @@ class RedCapDb
             ." concat(username, ' (', user_firstname, ' ', user_lastname, ') - ', user_email) as value, username "
             ." from redcap_user_information "
             ." where user_suspended_time is null and "
-            ."     (username like '%".db_escape($term)."%' "
-            ."     or user_firstname like '%".db_escape($term)."%'"
-            ."     or user_lastname like '%".db_escape($term)."%'"
-            ."     or user_email like '%".db_escape($term)."%'"
+            ."     (username like '%".Filter::escapeForMysql($term)."%' "
+            ."     or user_firstname like '%".Filter::escapeForMysql($term)."%'"
+            ."     or user_lastname like '%".Filter::escapeForMysql($term)."%'"
+            ."     or user_email like '%".Filter::escapeForMysql($term)."%'"
             ."     ) "
             ;
         $result = db_query($sql);
@@ -53,7 +53,7 @@ class RedCapDb
         $sql = 'select u.username, p.project_id, p.app_title, '
             .' if(u.api_token is null, 0, 1) as has_api_token, u.api_export '
             .' from redcap_projects p, redcap_user_rights u '
-            ." where u.username = '".db_escape($username)."' "
+            ." where u.username = '".Filter::escapeForMysql($username)."' "
             ." and p.project_id = u.project_id and p.date_deleted is null"
             ;
         $result = db_query($sql);
@@ -77,7 +77,7 @@ class RedCapDb
         
         $sql = "select api_token from redcap_user_rights "
             . " where project_id = ".((int) PROJECT_ID)." "
-            . " and username = '".db_escape(USERID)."'"
+            . " and username = '".Filter::escapeForMysql(USERID)."'"
             . " and api_export = 1 "
             ;
         $result = db_query($sql);

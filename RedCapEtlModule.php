@@ -39,7 +39,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $adminConfig = $this->getAdminConfig();
         
-        
         #---------------------------------------------------
         # If ETL cron jobs are allowed
         #---------------------------------------------------
@@ -478,7 +477,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         if (!empty($message)) {
             echo '<div align="center" class="darkgreen" style="margin: 20px 0;">'."\n";
             echo '<img src="'.(APP_PATH_IMAGES.'accept.png').'">';
-            echo "{$message}\n";
+            echo Filter::escapeForHtml($message)."\n";
             echo "</div>\n";
         }
     }
@@ -489,7 +488,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         if (!empty($message)) {
             echo '<div align="center" class="red" style="margin: 20px 0;">'."\n";
             echo '<img src="'.(APP_PATH_IMAGES.'exclamation.png').'">';
-            echo "{$message}\n";
+            echo Filter::escapeForHtml($message)."\n";
             echo "</div>\n";
         }
     }

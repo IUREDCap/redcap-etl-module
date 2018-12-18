@@ -100,7 +100,8 @@ $module->renderSuccessMessageDiv($success);
     <input type="checkbox" name="allowCron" <?php echo $checked;?>>
     Allow ETL cron jobs? <br />
 
-  <p style="text-align: center; margin-top: 14px;">Allowed ETL cron job times and number of jobs per time</p>
+  <p style="text-align: center; margin-top: 14px;">Allowed ETL cron job times
+  and number of scheduled jobs per time</p>
   <table class="cron-schedule admin-cron-schedule">
     <thead>
       <tr>
