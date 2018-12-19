@@ -37,4 +37,16 @@ class Filter
     {
         return strip_tags($value);
     }
+    
+    public function isEmail($value)
+    {
+        # Use REDCap's function
+        return isEmail($value);
+    }
+    
+    public function isUrl($value)
+    {
+        # Use REDCap's function
+        return isUrl($value);
+    }
 }

@@ -73,6 +73,9 @@ class Configuration implements \JsonSerializable
     {
         self::validateName($this->name);
         
+        $redcapApiUrl =  $this->getProperty(self::REDCAP_API_URL);
+        self::validateRedcapApiUrl($redcapApiUrl);
+        
         $apiToken =  $this->getProperty(self::DATA_SOURCE_API_TOKEN);
         self::validateApiToken($apiToken);
         
@@ -102,6 +105,18 @@ class Configuration implements \JsonSerializable
         return true;
     }
     
+    public static function validateRedcapApiUrl($url)
+    {
+        if (!empty($url)) {
+            if (!Filter::isUrl($url)) {
+                $message = 'The REDCap API URL specified "'.$url.'" is not a valid URL.';
+                throw new \Exception($message);
+            }
+        }
+        return true;
+    }
+    
+    
     public static function validateApiToken($apiToken)
     {
         if (!empty($apiToken)) {
@@ -121,10 +136,10 @@ class Configuration implements \JsonSerializable
     
     public static function validateBatchSize($batchSize)
     {
-        if (ctype_digit($value) && intval($value) > 0) {
+        if (ctype_digit($batchSize) && intval($batchSize) > 0) {
             ; // OK
         } else {
-            $message = 'The batch size needs to be a positive integer.';
+            $message = 'The batch size "'.$batchSize.'" needs to be a positive integer.';
             throw new \Exception($message);
         }
         return true;
@@ -157,6 +172,7 @@ class Configuration implements \JsonSerializable
         #------------------------------------------------
         # Validate values
         #------------------------------------------------
+        /*
         foreach (self::getPropertyNames() as $name) {
             if (array_key_exists($name, $properties)) {
                 $value = $properties[$name];
@@ -170,6 +186,7 @@ class Configuration implements \JsonSerializable
                 }
             }
         }
+        */
 
         #------------------------------------------------
         # Set values
