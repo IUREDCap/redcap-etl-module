@@ -5,6 +5,7 @@
     <testsuites>
         <testsuite name="unit">
             <file>tests/unit/AdminConfigTest.php</file>
+            <file>tests/unit/ConfigurationTest.php</file>
             <file>tests/unit/DbHostsTest.php</file>
             <file>tests/unit/ServerConfigTest.php</file>
             <file>tests/unit/UserInfoTest.php</file>

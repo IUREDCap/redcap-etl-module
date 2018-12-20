@@ -10,6 +10,7 @@ require_once __DIR__.'/../../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\RedCapEtlModule;
+use IU\RedCapEtlModule\ServerConfig;
 
 $selfUrl = $module->getUrl(RedCapEtlModule::SERVERS_PAGE);
 $configureUrl = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
@@ -20,7 +21,13 @@ $serverName = $_POST['server-name'];
 
 if (!empty($serverName)) {
     if (strcasecmp($submit, 'Add Server') === 0) {
-        $module->addServer($serverName);
+        try {
+            ServerConfig::validateName($serverName);
+            $isActive = false;
+            $module->addServer($serverName);
+        } catch (Exception $exception) {
+            $error = 'ERROR: ' . $exception->getMessage();
+        }
     }
 }
 
@@ -117,12 +124,15 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
 
 <table class="dataTable">
   <thead>
-    <tr> <th>Server Name</th> <th>Configure</th> <th>Copy</th> <th>Rename</th> </th><th>Delete</th> </th></tr>
+    <tr> <th>Server Name</th> <th>Active</th> </th><th>Configure</th>
+    <th>Copy</th> <th>Rename</th> </th><th>Delete</th> </th></tr>
   </thead>
   <tbody>
     <?php
     $row = 1;
     foreach ($servers as $server) {
+        $serverConfig = $module->getServerConfig($server);
+        
         if ($row % 2 == 0) {
             echo "<tr class=\"even\">\n";
         } else {
@@ -131,6 +141,15 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
         print "<td>{$server}</td>\n";
 
         $serverConfigureUrl = $configureUrl.'&serverName='.$server;
+        
+        print '<td style="text-align:center;">';
+        if ($serverConfig->getIsActive()) {
+            print '<img src='.APP_PATH_IMAGES.'tick.png>';
+        } else {
+            print '<img src='.APP_PATH_IMAGES.'cross.png>';
+        }
+        print "</td>\n";
+
         print '<td style="text-align:center;">'
             .'<a href="'.$serverConfigureUrl.'"><img src='.APP_PATH_IMAGES.'gear.png></a>'
             ."</td>\n";

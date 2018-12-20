@@ -113,10 +113,14 @@ class RedCapDb
      */
     public function endTransaction($commit)
     {
-        if ($commit) {
-            db_query("COMMIT");
-        } else {
-            db_query("ROLLBACK");
+        try {
+            if ($commit) {
+                db_query("COMMIT");
+            } else {
+                db_query("ROLLBACK");
+            }
+        } catch (\Exception $exception) {
+            ;
         }
         db_query("SET AUTOCOMMIT=1");
     }

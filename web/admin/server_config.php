@@ -56,6 +56,7 @@ if (strcasecmp($submit, 'Save') === 0) {
          $serverConfig = new ServerConfig($serverName);
         try {
             $serverConfig->set($_POST);
+            $serverConfig->validate();
             $module->setServerConfig($serverConfig);
             header('Location: '.$serversUrl);
         } catch (Exception $exception) {
@@ -184,11 +185,19 @@ $(function() {
 #----------------------------------------------------
 if (!empty($serverName)) {
     $authMethod = $serverConfig->getAuthMethod();
-    #print "authMethod: {$authMethod}<br />\n";
+    $isActive   = $serverConfig->getIsActive();
+    $activeChecked = '';
+    if ($isActive) {
+        $activeChecked = ' checked ';
+    }
 ?>
 <form action=<?php echo $selfUrl;?> method="post">
   <input type="hidden" name="serverName" value="<?php echo $serverConfig->getName();?>">
   <table>
+    <tr>
+      <td>Active:</td>
+      <td><input type="checkbox" name="isActive" value="checked" <?php echo $activeChecked; ?> ></td>
+    </tr>
     <tr>
       <td>Server address:</td>
       <td><input type="text" name="serverAddress" value="<?php echo $serverConfig->getServerAddress();?>"

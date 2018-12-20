@@ -76,22 +76,28 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                         if (!empty($userEtlProjects) && in_array($projectId, $userEtlProjects)) {
                             $etlConfig    = $this->getConfiguration($configName, $username, $projectId);
                             $serverConfig = $this->getServerConfig($serverName);
-                            \REDCap::logEvent(
-                                'REDCap-ETL cron job config "'.$configName.'" for user "'
-                                .$username.'" on server "'.$serverName.'" on day '.$day.', hour '.$hour
-                            );
+                            
+                            #----------------------------------------------------
+                            # If the server is active
+                            #----------------------------------------------------
+                            if ($serverConfig->getIsActive()) {
+                                \REDCap::logEvent(
+                                    'REDCap-ETL cron job config "'.$configName.'" for user "'
+                                    .$username.'" on server "'.$serverName.'" on day '.$day.', hour '.$hour
+                                );
                 
-                            if (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) == 0) {
-                                if ($adminConfig->getAllowEmbeddedServer()) {
-                                    $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
-                                    $logger->turnOff();
-                                    $logger->setPrintInfo(true);
-                                    $properties = $etlConfig->getPropertiesArray();
-                                    $redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
-                                    $redCapEtl->run();
+                                if (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) == 0) {
+                                    if ($adminConfig->getAllowEmbeddedServer()) {
+                                        $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
+                                        $logger->turnOff();
+                                        $logger->setPrintInfo(true);
+                                        $properties = $etlConfig->getPropertiesArray();
+                                        $redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
+                                        $redCapEtl->run();
+                                    }
+                                } else {
+                                    $serverConfig->run($etlConfig);
                                 }
-                            } else {
-                                $serverConfig->run($etlConfig);
                             }
                         }
                     } # END - foreach cron job
@@ -120,6 +126,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         return $versionNumber;
     }
 
+    /**
+     * Gets the settings for this module.
+     *
+     * @return Settings the settings for this module.
+     */
     public function getSettings()
     {
         return $this->settings;

@@ -16,6 +16,10 @@ class ServerConfig implements \JsonSerializable
     
     private $name;
     
+    /** @var boolean indicates if the server is active or not; inactive servers
+                     don't show up as choices for users. */
+    private $isActive;
+    
     private $serverAddress; # address of REDCap-ETL server
     private $authMethod;
     private $username;
@@ -30,7 +34,11 @@ class ServerConfig implements \JsonSerializable
 
     public function __construct($name)
     {
+        self::validateName($name);
+        
         $this->name = $name;
+        
+        $this->isActive = false;
         
         $this->authMethod = self::AUTH_METHOD_SSH_KEY;
         $this->sshKeyPassword = '';
@@ -38,10 +46,16 @@ class ServerConfig implements \JsonSerializable
 
     public function set($properties)
     {
-        # Add validation!!!!
-        
         foreach (get_object_vars($this) as $var => $value) {
             if (array_key_exists($var, $properties)) {
+                if ($var == 'isActive') {
+                    # convert 'isActive' to boolean
+                    if ($properties[$var]) {
+                        $properties[$var] = true;
+                    } else {
+                        $properties[$var] = false;
+                    }
+                }
                 $this->$var = $properties[$var];
             }
         }
@@ -82,6 +96,11 @@ class ServerConfig implements \JsonSerializable
      */
     public function run($etlConfig)
     {
+        if (!$this->isActive) {
+            $message = 'Server "'.$this->name.'" have been inactivated.';
+            throw new \Exception($message);
+        }
+        
         if (empty($this->serverAddress)) {
             $message = $this->createServerErrorMessageForUser('no server address specified');
             throw new \Exception($message);
@@ -219,6 +238,11 @@ class ServerConfig implements \JsonSerializable
         return $testOutput;
     }
     
+    public function validate()
+    {
+        self::validateName($this->name);
+    }
+    
     public static function validateName($name)
     {
         $matches = array();
@@ -241,6 +265,16 @@ class ServerConfig implements \JsonSerializable
     public function setName($name)
     {
         $this->name = $name;
+    }
+    
+    public function getIsActive()
+    {
+        return $this->isActive;
+    }
+    
+    public function setIsActive($isActive)
+    {
+        $this->isActive = $isActive;
     }
     
     public function getServerAddress()

@@ -531,13 +531,26 @@ class Settings
             $this->db->startTransaction();
         }
         
+        if (empty($serverName)) {
+            $message = 'No server name specified.';
+            throw new \Exception($message);
+        } elseif ($this->serverConfigExists($serverName)) {
+            $message = 'Server "'.$serverName.'" already exists.';
+            throw new \Exception($message);
+        }
+        
+        # Add the server to the list of configurations
         $servers = new Servers();
         $json = $this->module->getSystemSetting(self::SERVERS_KEY, true);
         $servers->fromJson($json);
         $servers->addServer($serverName);
         $json = $servers->toJson();
         $this->module->setSystemSetting(self::SERVERS_KEY, $json);
-                                
+        
+        # Add the server configuration
+        $serverConfig = new ServerConfig($serverName);
+        $this->setServerConfig($serverConfig);
+        
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
@@ -552,17 +565,29 @@ class Settings
             $this->db->startTransaction();
         }
         
-        $servers = new Servers();
-        $json = $this->module->getSystemSetting(self::SERVERS_KEY, true);
-        $servers->fromJson($json);
-        $servers->addServer($toServerName, false);
-        $json = $servers->toJson();
-        $this->module->setSystemSetting(self::SERVERS_KEY, $json);
+        $copyException = null;
+        try {
+            $fromServer = $this->getServerConfig($fromServerName);
         
-        $this->copyServerConfig($fromServerName, $toServerName, false);
-                                        
+            $servers = new Servers();
+            $json = $this->module->getSystemSetting(self::SERVERS_KEY, true);
+            $servers->fromJson($json);
+            $servers->addServer($toServerName, false);
+            $json = $servers->toJson();
+            $this->module->setSystemSetting(self::SERVERS_KEY, $json);
+        
+            $this->copyServerConfig($fromServerName, $toServerName, false);
+        } catch (\Exception $exception) {
+            $commit = false;
+            $copyException = $exception;
+        }
+                                                
         if ($transaction) {
             $this->db->endTransaction($commit);
+        }
+        
+        if (isset($copyException)) {
+            throw $copyException;
         }
     }
     
@@ -570,12 +595,14 @@ class Settings
     {
         $commit = true;
         $errorMessage = '';
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
         
+        $renameException = null;
         try {
+            $server = $this->getServerConfig($serverName);
             $servers = new Servers();
             $json = $this->module->getSystemSetting(self::SERVERS_KEY, true);
             $servers->fromJson($json);
@@ -585,12 +612,17 @@ class Settings
             $this->module->setSystemSetting(self::SERVERS_KEY, $json);
         
             $this->renameServerConfig($serverName, $newServerName, false);
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $commit = false;
+            $renameException = $exception;
         }
-        
+                    
         if ($transaction) {
             $this->db->endTransaction($commit);
+        }
+        
+        if (isset($renameException)) {
+            throw $renameException;
         }
     }
     
@@ -625,11 +657,28 @@ class Settings
     # Server Config methods
     #-------------------------------------------------------------------
     
+    public function serverConfigExists($name)
+    {
+        $exists = false;
+        $key = self::SERVER_CONFIG_KEY_PREFIX . $name;
+        \REDCap::logEvent("KEY = {$key}");
+        $setting = $this->module->getSystemSetting($key);
+        \REDCap::logEvent("SETTING = {$setting}");
+        if (!empty($setting)) {
+            $exists = true;
+        }
+        return $exists;
+    }
+    
     public function getServerConfig($serverName)
     {
-        $serverConfig = new ServerConfig($serverName);
         $key = self::SERVER_CONFIG_KEY_PREFIX . $serverName;
         $setting = $this->module->getSystemSetting($key);
+        if (empty($setting)) {
+            $message = 'Server "'.$serverName.'" not found.';
+            throw new \Exception($message);
+        }
+        $serverConfig = new ServerConfig($serverName);
         $serverConfig->fromJson($setting);
         return $serverConfig;
     }

@@ -209,11 +209,14 @@ if ($adminConfig->getAllowEmbeddedServer()) {
 }
 
 foreach ($servers as $serverName) {
-    $selected = '';
-    if ($serverName === $server) {
-        $selected = 'selected';
+    $serverConfig = $module->getServerConfig($serverName);
+    if (isset($serverConfig) && $serverConfig->getIsActive() === true) {
+        $selected = '';
+        if ($serverName === $server) {
+            $selected = 'selected';
+        }
+        echo '<option value="'.$serverName.'" '.$selected.'>'.$serverName."</option>\n";
     }
-    echo '<option value="'.$serverName.'" '.$selected.'>'.$serverName."</option>\n";
 }
 echo "</select>\n";
 ?>

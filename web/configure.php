@@ -7,6 +7,7 @@ require_once __DIR__.'/../dependencies/autoload.php';
 use IU\REDCapETL\EtlRedCapProject;
 
 use IU\RedCapEtlModule\Configuration;
+use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
 
 $error = '';
@@ -33,6 +34,16 @@ if (!empty($configName)) {
     $configuration = $module->getConfiguration($configName);
     if (!empty($configuration)) {
         $properties = $configuration->getProperties();
+        
+        # Set the API token property, if it is empty and the project
+        # has an API token for this user.
+        if (empty($properties[Configuration::DATA_SOURCE_API_TOKEN]) && !empty(PROJECT_ID)) {
+            $redCapDb = new RedCapDb();
+            $apiToken = $redCapDb->getApiToken(USERID, PROJECT_ID);
+            if (!empty(api_token)) {
+                $properties[Configuration::DATA_SOURCE_API_TOKEN] = $apiToken;
+            }
+        }
     } else {
         # May have changed projects, and session config name
         # does not exist in the new project

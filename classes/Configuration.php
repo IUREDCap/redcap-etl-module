@@ -53,16 +53,6 @@ class Configuration implements \JsonSerializable
         $this->properties[self::SSL_VERIFY]        = true;
         $this->properties[self::BATCH_SIZE] = 100;
         $this->properties[self::TRANSFORM_RULES_SOURCE] = '1';
-
-        # Set the API token property, if the project has an API token
-        # for this user.
-        if (!empty(PROJECT_ID)) {
-            $redCapDb = new RedCapDb();
-            $apiToken = $redCapDb->getApiToken(USERID, PROJECT_ID);
-            if (!empty(api_token)) {
-                $this->properties[self::DATA_SOURCE_API_TOKEN] = $apiToken;
-            }
-        }
     }
 
 

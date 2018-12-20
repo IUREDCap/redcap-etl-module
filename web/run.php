@@ -70,7 +70,7 @@ if (strcasecmp($submit, 'Run') === 0) {
     } else {
         try {
             if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
-                # Embedded serv er
+                # Embedded server
                 if (!$adminConfig->getAllowEmbeddedServer()) {
                     throw new \Exception('Running on the embedded REDCap-ETL server is not allowed.');
                 }
@@ -117,29 +117,9 @@ echo $buffer;
 <img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>database_table.png">REDCap-ETL
 </div>
 
-
-<?php $module->renderUserTabs($selfUrl); ?>
-
 <?php
-#----------------------------
-# Display error, if any
-#----------------------------
-if (!empty($error)) { ?>
-<div class="red" style="margin:20px 0;font-weight:bold;">
-    <img src="/redcap/redcap_v8.5.11/Resources/images/exclamation.png">
-    <?php echo $error; ?>
-    </div>
-<?php } ?>
-
-<?php
-#-----------------------------------
-# Display success message, if any
-#-----------------------------------
-if (!empty($success)) { ?>
-<div align='center' class='darkgreen' style="margin: 20px 0;">
-    <img src='/redcap/redcap_v8.5.11/Resources/images/accept.png'><?php echo $success;?>
-</div>
-<?php } ?>
+$module->renderProjectPageContentHeader($selfUrl, $error, $success);
+?>
 
 <?php
 #---------------------------------------
@@ -191,11 +171,14 @@ $allowEmbeddedServer = $adminConfig->getAllowEmbeddedServer();
         }
         
         foreach ($servers as $serverName) {
-            $selected = '';
-            if ($serverName === $server) {
-                $selected = 'selected';
+            $serverConfig = $module->getServerConfig($serverName);
+            if (isset($serverConfig) && $serverConfig->getIsActive() === true) {
+                $selected = '';
+                if ($serverName === $server) {
+                    $selected = 'selected';
+                }
+                echo '<option value="'.$serverName.'" '.$selected.'>'.$serverName."</option>\n";
             }
-            echo '<option value="'.$serverName.'" '.$selected.'>'.$serverName."</option>\n";
         }
         echo "</select>\n";
         ?>
