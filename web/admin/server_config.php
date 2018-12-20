@@ -281,19 +281,42 @@ if (!empty($serverName)) {
     </tr>
     
     <tr>
-      <td>&nbsp;</td><td>&nbsp</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
     </tr>
     
     <tr>
-      <td>Summary e-mail:</td>
+      <td>E-mail from address:</td>
+      <td><input type="text" name="emailFromAddress" value="<?php echo $serverConfig->getEmailFromAddress();?>"
+                 size="40" style="margin: 4px;"></td>
+    </tr>
+    
+    <tr>
+      <td>Enable error e-mail:</td>
       <td>
-        <select name="summaryEmail">
-          <option value="0">don't send</option>
-          <option value="1">give user option to send</option>
-          <option value="2">send</option>
-        </select>
+        <?php
+        $checked = '';
+        if ($serverConfig->getEnableErrorEmail()) {
+            $checked = ' checked ';
+        }
+        ?>
+        <input type="checkbox" name="enableErrorEmail" <?php echo $checked; ?> >
       </td>
     </tr>
+    
+    <tr>
+      <td>Enable summary e-mail:&nbsp;</td>
+      <td>
+        <?php
+        $checked = '';
+        if ($serverConfig->getEnableSummaryEmail()) {
+            $checked = ' checked ';
+        }
+        ?>
+        <input type="checkbox" name="enableSummaryEmail" <?php echo $checked; ?> >
+      </td>
+    </tr>   
+    
   </table>
   
   <div style="margin-top: 20px;">

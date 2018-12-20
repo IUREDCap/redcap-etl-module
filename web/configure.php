@@ -163,19 +163,11 @@ include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 </div>
 
 
-<?php $module->renderUserTabs($selfUrl); ?>
-
 <?php
-#----------------------------
-# Display error, if any
-#----------------------------
-if (!empty($error)) { ?>
-<div class="red" style="margin:20px 0;font-weight:bold;">
-    <img src="/redcap/redcap_v8.5.11/Resources/images/exclamation.png">
-    <?php echo $error; ?>
-    </div>
-<?php } ?>
 
+$module->renderProjectPageContentHeader($selfUrl, $error, $success);
+
+?>
 
 <?php
 #-------------------------------------
@@ -408,11 +400,6 @@ Configuration form
                    value="<?php echo $properties[Configuration::BATCH_SIZE];?>"/></td>
       </tr>
 
-      <tr>
-        <td>E-mail from address</td>
-        <td><input type="text" name="<?php echo Configuration::EMAIL_FROM_ADDRESS;?>" size="44"
-                   value="<?php echo $properties[Configuration::EMAIL_FROM_ADDRESS];?>"/></td>
-      </tr>
       <tr>
         <td>E-mail subject</td>
         <td><input type="text" name="<?php echo Configuration::EMAIL_SUBJECT;?>" size="64"

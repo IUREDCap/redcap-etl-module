@@ -23,6 +23,8 @@ class Configuration implements \JsonSerializable
     
     const BATCH_SIZE = 'batch_size';
 
+    const EMAIL_ERRORS        = 'email_errors';
+    const EMAIL_SUMMARY       = 'email_summary';
     const EMAIL_FROM_ADDRESS  = 'email_from_address';
     const EMAIL_SUBJECT       = 'email_subject';
     const EMAIL_TO_LIST       = 'email_to_list';

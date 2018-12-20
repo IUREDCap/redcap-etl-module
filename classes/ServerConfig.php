@@ -30,7 +30,10 @@ class ServerConfig implements \JsonSerializable
     private $configDir;
     private $etlCommand;  # full path of command to run on REDCap-ETL server
 
-    private $summaryEmail; # 0: don't send; 1: user option to send; 2: always send (if e-mail list defined)
+    private $emailFromAddres;
+    private $enableErrorEmail;
+    private $enableSummaryEmail;
+
 
     public function __construct($name)
     {
@@ -42,19 +45,27 @@ class ServerConfig implements \JsonSerializable
         
         $this->authMethod = self::AUTH_METHOD_SSH_KEY;
         $this->sshKeyPassword = '';
+        
+        $this->emailFromAddres = '';
+        $this->enableErrorEmail   = false;
+        $this->enableSummaryEmail = false;
     }
 
     public function set($properties)
     {
         foreach (get_object_vars($this) as $var => $value) {
             if (array_key_exists($var, $properties)) {
-                if ($var == 'isActive') {
-                    # convert 'isActive' to boolean
-                    if ($properties[$var]) {
-                        $properties[$var] = true;
-                    } else {
-                        $properties[$var] = false;
-                    }
+                switch ($var) {
+                    # convert true/false property values to boolean
+                    case 'enableErrorEmail':
+                    case 'enableSummaryEmail':
+                    case 'isActive':
+                        if ($properties[$var]) {
+                            $properties[$var] = true;
+                        } else {
+                            $properties[$var] = false;
+                        }
+                        break;
                 }
                 $this->$var = $properties[$var];
             }
@@ -92,10 +103,42 @@ class ServerConfig implements \JsonSerializable
     
     
     /**
+     * Modifies an ETL configuration based on this server configuration's
+     * properties.
+     *
+     * @param Configuration the ETL configuration to modify.
+     */
+    private function updateEtlConfig($etlConfig)
+    {
+        $etlConfig->setProperty(Configuration::EMAIL_FROM_ADDRESS, $this->emailFromAddres);
+        
+        # If e-mailing of errors has not been enabled for this server, make sure that
+        # the "e-mail errors" property is set to false in the ETL configuration
+        if (!$this->getEnableErrorEmail()) {
+            $etlConfig->setProperty(Configuration::EMAIL_ERRORS, false);
+        }
+        
+        # If e-mailing of a summary has not been enabled for this server, make sure that
+        # the "e-mail summary" property is set to false in the ETL configuration
+        if (!$this->getEnableSummaryEmail()) {
+            $etlConfig->setProperty(Configuration::EMAIL_SUMMARY, false);
+        }
+    }
+    
+    /**
      * Run the ETL process for this server.
+     *
+     * @param Configuration $etlConfig the ETL configuration to run.
      */
     public function run($etlConfig)
     {
+        if (!isset($etlConfig)) {
+            $message = 'No ETL configuration specified.';
+            throw new \Exception($message);
+        }
+        
+        $this->updateEtlConfig($etlConfig);
+        
         if (!$this->isActive) {
             $message = 'Server "'.$this->name.'" have been inactivated.';
             throw new \Exception($message);
@@ -316,9 +359,19 @@ class ServerConfig implements \JsonSerializable
     {
         return $this->etlCommand;
     }
-    
-    public function getSummaryEmail()
+
+    public function getEmailFromAddress()
     {
-        return $this->summaryEmail;
+        return $this->emailFromAddress;
+    }
+        
+    public function getEnableErrorEmail()
+    {
+        return $this->enableErrorEmail;
+    }
+        
+    public function getEnableSummaryEmail()
+    {
+        return $this->enableSummaryEmail;
     }
 }
