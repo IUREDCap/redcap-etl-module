@@ -86,6 +86,28 @@ class RedCapDb
         }
         return $apiToken;
     }
+    
+    public function getApiTokenWithPermissions($username, $projectId)
+    {
+        $result = null;
+        $apiToken = null;
+        $isExport = false;
+        $isImport = false;
+        
+        $sql = "select api_token, api_export, api_import from redcap_user_rights "
+            . " where project_id = ".((int) PROJECT_ID)." "
+            . " and username = '".Filter::escapeForMysql(USERID)."'"
+            . " and api_export = 1 "
+            ;
+        $queryResult = db_query($sql);
+        if ($row = db_fetch_assoc($queryResult)) {
+            $apiToken = $row['api_token'];
+            $isExport = $row['api_export'];
+            $isImport = $row['api_import'];
+            $result = array($apiToken, $isExport, $isImport);
+        }
+        return $result;
+    }
 
     //
     

@@ -7,6 +7,7 @@ require_once __DIR__.'/../dependencies/autoload.php';
 use IU\REDCapETL\EtlRedCapProject;
 
 use IU\RedCapEtlModule\Configuration;
+use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
 
@@ -22,9 +23,6 @@ $selfUrl  = $module->getUrl("web/configure.php");
 $configName = $_POST['configName'];
 if (empty($configName)) {
     $configName = $_GET['configName'];
-    if (empty($configName)) {
-        $configName = $_SESSION['configName'];
-    }
 }
 if (!empty($configName)) {
     $_SESSION['configName'] = $configName;
@@ -34,16 +32,6 @@ if (!empty($configName)) {
     $configuration = $module->getConfiguration($configName);
     if (!empty($configuration)) {
         $properties = $configuration->getProperties();
-        
-        # Set the API token property, if it is empty and the project
-        # has an API token for this user.
-        if (empty($properties[Configuration::DATA_SOURCE_API_TOKEN]) && !empty(PROJECT_ID)) {
-            $redCapDb = new RedCapDb();
-            $apiToken = $redCapDb->getApiToken(USERID, PROJECT_ID);
-            if (!empty(api_token)) {
-                $properties[Configuration::DATA_SOURCE_API_TOKEN] = $apiToken;
-            }
-        }
     } else {
         # May have changed projects, and session config name
         # does not exist in the new project
@@ -133,6 +121,43 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
 }
 
 ?>
+
+<?php
+
+$success = '';
+#---------------------------------------------------------------
+# If the configuration is not empty, then update the
+# API token if it has changed, UNLESS the REDCap API URL
+# being used does not match the one for the currently running
+# REDCap instance (which only admins should be allowed to do)
+#----------------------------------------------------------------
+if (!empty($configuration)) {
+    $properties = $configuration->getProperties();
+  
+    # Get API URL and currently stored token for this project, if any
+    $apiUrl = $module->getRedCapApiUrl();
+    $redCapDb = new RedCapDb();
+    $apiToken = $redCapDb->getApiToken(USERID, PROJECT_ID);
+        
+    # If the configuration's API URL matches the API URL of the
+    # REDCap instance that is running (which should always be
+    # the case for non-admin users)
+    if (strcasecmp(trim($properties[Configuration::REDCAP_API_URL]), trim($apiUrl)) === 0) {
+        # If the configuration's API Token does NOT match the current one for the project,
+        # then update the one in the configuration so it matches
+        if (strcasecmp(trim($properties[Configuration::DATA_SOURCE_API_TOKEN]), trim($apiToken)) !== 0) {
+            $configuration->setProperty(Configuration::DATA_SOURCE_API_TOKEN, $apiToken);
+            $module->setConfiguration($configuration, USERID, PROJECT_ID);
+            if (!empty($properties[Configuration::DATA_SOURCE_API_TOKEN])) {
+                $success = "Your API token has changed, and has been automatically updated in your configuration.";
+            }
+            $properties = $configuration->getProperties();
+        }
+    }
+}
+
+?>
+
 
 <?php
 #--------------------------------------------
@@ -249,110 +274,186 @@ Configuration form
 ===================================== -->
 <form action="<?php echo $selfUrl;?>" method="post" enctype="multipart/form-data" style="margin-top: 17px;">
 
-  <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
-  <input type="hidden" name="<?php echo Configuration::CONFIG_API_TOKEN; ?>"
-         value="<?php echo $properties[Configuration::CONFIG_API_TOKEN]; ?>" />
-  <input type="hidden" name="<?php echo Configuration::TRANSFORM_RULES_SOURCE; ?>"
-         value="<?php echo $properties[Configuration::TRANSFORM_RULES_SOURCE]; ?>" />
+    <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
+    <input type="hidden" name="<?php echo Configuration::CONFIG_API_TOKEN; ?>"
+           value="<?php echo $properties[Configuration::CONFIG_API_TOKEN]; ?>" />
+    <input type="hidden" name="<?php echo Configuration::TRANSFORM_RULES_SOURCE; ?>"
+           value="<?php echo $properties[Configuration::TRANSFORM_RULES_SOURCE]; ?>" />
          
-  <!--<div style="padding: 10px; border: 1px solid #ccc; background-color: #f0f0f0;"> -->
+    <!--<div style="padding: 10px; border: 1px solid #ccc; background-color: #f0f0f0;"> -->
 
-  <table style="background-color: #f0f0f0; border: 1px solid #ccc;">
-    <tbody style="padding: 20px;">
+    <table style="background-color: #f0f0f0; border: 1px solid #ccc;">
+        <tbody style="padding: 20px;">
 
-      <tr>
-        <td colspan="3" style="border: 1px solid #ccc; background-color: #ddd;">
-          <span style="font-weight: bold;">Extract</span>
-        </td>
-      </tr>
+            <tr>
+                <td colspan="3" style="border: 1px solid #ccc; background-color: #ddd;">
+                    <span style="font-weight: bold;">Extract</span>
+                </td>
+            </tr>
 
-      <tr>
-        <td>REDCap API URL</td>
-        <td>
-          <input type="text" size="40" 
-                 value="<?php echo $properties[Configuration::REDCAP_API_URL];?>"
-                 name="<?php echo Configuration::REDCAP_API_URL?>" />
-        </td>
-      </tr>
+            <?php if (SUPER_USER) { ?>
+            <tr>
+                <td>REDCap API URL</td>
+                <td>
+                    <input type="text" size="40" 
+                           value="<?php echo $properties[Configuration::REDCAP_API_URL];?>"
+                           name="<?php echo Configuration::REDCAP_API_URL?>" />
+                </td>
+            </tr>
 
-      <tr>
-        <td>
-          Project API Token
-        </td>
-        <td>
-          <input type="password" size="34" value="<?php echo $properties[Configuration::DATA_SOURCE_API_TOKEN];?>"
+            <tr>
+                <td>
+                Project API Token
+                </td>
+                <td>
+                    <input type="password" size="34"
+                           value="<?php echo $properties[Configuration::DATA_SOURCE_API_TOKEN];?>"
                            name="<?php echo Configuration::DATA_SOURCE_API_TOKEN;?>" id="apiToken"/>
-          <input type="checkbox" id="showApiToken" style="vertical-align: middle; margin: 0;">
-          <span style="vertical-align: middle;">Show</span>
-        </td>
-        <td>
-          <div id="dialog" style="display:none;" title="Data Source API Token">
-          Test...
-          </div>
-          <!-- <button type="button" id="api-token-button">...</button> -->
-          <script>
-            $(function() {
-              $("#dialog").dialog({
-                autoOpen: false
-              });
-              $("#api-token-button").click(function() {
-                $("#dialog").dialog("open");
-              });
-            });
-          </script>
-        </td>
-      </tr>
+                    <input type="checkbox" id="showApiToken" style="vertical-align: middle; margin: 0;">
+                    <span style="vertical-align: middle;">Show</span>
+                </td>
+                <td>
+                    <div id="dialog" style="display:none;" title="Data Source API Token">
+                    Test...
+                    </div>
+                    <!-- <button type="button" id="api-token-button">...</button> -->
+                    <script>
+                    $(function() {
+                        $("#dialog").dialog({
+                            autoOpen: false
+                        });
+                        $("#api-token-button").click(function() {
+                            $("#dialog").dialog("open");
+                        });
+                    });
+                    </script>
+                </td>
+            </tr>
       
-      <tr>
-        <td>
-          SSL Certificate Verification
-        </td>
-        <td>
-            <?php
-            $value = '';
-            $checked = '';
-            if ($properties[Configuration::SSL_VERIFY]) {
-                $checked = ' checked ';
-                $value = ' value="true" ';
-            }
-            ?>
-          <input type="checkbox" name="<?php echo Configuration::SSL_VERIFY;?>"
+            <tr>
+                <td>
+                SSL Certificate Verification
+                </td>
+                <td>
+                    <?php
+                    $value = '';
+                    $checked = '';
+                    if ($properties[Configuration::SSL_VERIFY]) {
+                        $checked = ' checked ';
+                        $value = ' value="true" ';
+                    }
+                    ?>
+                    <input type="checkbox" name="<?php echo Configuration::SSL_VERIFY;?>"
                     <?php echo $checked;?>
                     <?php echo $value;?> >
-        </td>
-      </tr>
+                </td>
+            </tr>
+            <?php } else { # end if (SUPER_USER) ?>
+            <tr>
+                <td>REDCap API URL</td>
+                <td>
+                    <div style="border: 1px solid #AAAAAA; margin: 4px 0px; padding: 4px; border-radius: 4px;">
+                    <?php echo Filter::escapeForHtml($properties[Configuration::REDCAP_API_URL]); ?>
+                    </div>
+                </td>
+            </tr>
+            <?php } ?>
+      
+            <tr>
+                <td>
+                API Token Status
+                </td>
+                <td>
+                    <?php
 
-      <tr>
-        <td colspan="3" style="border: 1px solid #ccc; background-color: #ddd;">
-            <span style="font-weight: bold;">Transform</span>
-        <td>
-      <tr>
+                    echo "<div style=\"border: 1px solid #AAAAAA; margin-bottom: 4px;"
+                        ." padding: 4px; border-radius: 4px;\">\n";
+                    $apiUrl = $module->getRedCapApiUrl();
+                    # If the configurations API URL doesn't match the project's API URL -
+                    # this case should only be possible for admins
+                    if (strcasecmp(trim($properties[Configuration::REDCAP_API_URL]), trim($apiUrl)) !== 0) {
+                        print '<span style="color: navy; font-weight: bold;">?</span>&nbsp;&nbsp;';
+                        if (empty($properties[Configuration::DATA_SOURCE_API_TOKEN])) {
+                            echo "No REDCap API token specified.";
+                        } elseif (empty($properties[Configuration::REDCAP_API_URL])) {
+                            echo "No REDCap API URL specified.";
+                        } else {
+                            echo "Non-local REDCap API URL specified - no API token information available.";
+                        }
+                    } else {
+                        # API token is for currently running REDCap server
+                        list($apiToken, $isExport, $isImport)
+                            = RedCapDb::getApiTokenWithPermissions(USERID, PROJECT_ID);
+                        $apiToken = trim($apiToken);
+                        if (!empty($apiToken)) {
+                            # If the project's API token does not match the configuration's API token
+                            $configApiToken = trim($properties[Configuration::DATA_SOURCE_API_TOKEN]);
+                            if (strcasecmp($configApiToken, $apiToken) !== 0) {
+                                # This case should only be possible for admin users
+                                print '<img alt="X" style="color: red; font-weight: bold;" src='
+                                    .APP_PATH_IMAGES.'cross.png>&nbsp;&nbsp;';
+                                echo "An API token has been created, "
+                                    ."but it does not match the token specified in the configuration.";
+                            } elseif ($isExport) {
+                                # If there is an API token and it has export permission
+                                print '<img alt="OK" style="color: green; font-weight: bold;" src='
+                                    .APP_PATH_IMAGES.'tick.png>&nbsp;&nbsp;';
+                                echo "An API token with export permission has been created for this project.";
+                            } else {
+                                # If there is an API token, but it does NOT have export permission
+                                print '<img alt="X" style="color: red; font-weight: bold;" src='
+                                    .APP_PATH_IMAGES.'cross.png>&nbsp;&nbsp;';
+                                    echo "An API token has been created, but it doesn't have export permission."
+                                    ."<br /><br />"
+                                    ."You need to request an API token"
+                                    ." for this project that has export permission.";
+                            }
+                        } else {
+                            # If this project does not have an API token (for the current user)
+                            print '<img alt="X" style="color: red; font-weight: bold;" src='
+                                .APP_PATH_IMAGES.'cross.png>&nbsp;&nbsp;';
+                            echo "No API token has been created for this project.<br /><br />"
+                                ."You need to request an API token for this project that has export permission.";
+                        }
+                    }
+                    echo "</div>\n";
+                    ?>
+                </td>
+            </tr>
 
-      <tr>
-        <td>Transformation Rules</td>
-        <td>
-            <?php
-            $rules = $properties[Configuration::TRANSFORM_RULES_TEXT];
-            $rulesName = Configuration::TRANSFORM_RULES_TEXT;
-            ?>
-            <textarea rows="14" cols="70" name="<?php echo $rulesName;?>"><?php echo $rules;?></textarea>
-        </td>
-        <td>
-          <p><input type="submit" name="submit" value="Auto-Generate"></p>
-          <p>
-          <button type="submit" value="Upload CSV file" name="submitValue" style="vertical-align: middle;">
-            <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>"> Upload CSV file
-          </button>
-          <input type="file" name="uploadCsvFile" id="uploadCsvFile" style="display: inline;">
-          </p>
-          <p>
-          <button type="submit" value="Download CSV file" name="submitValue">
-            <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>" style="vertical-align: middle;">
-            <span  style="vertical-align: middle;"> Download CSV file</span>
-          </button>
-          </p>
-        </td>
-      </tr>
+            <tr>
+                <td colspan="3" style="border: 1px solid #ccc; background-color: #ddd;">
+                    <span style="font-weight: bold;">Transform</span>
+                <td>
+            <tr>
+
+            <tr>
+                <td>Transformation Rules&nbsp;</td>
+                <td>
+                    <?php
+                    $rules = $properties[Configuration::TRANSFORM_RULES_TEXT];
+                    $rulesName = Configuration::TRANSFORM_RULES_TEXT;
+                    ?>
+                    <textarea rows="14" cols="70" style="margin-top: 4px; margin-bottom: 4px;" 
+                         name="<?php echo $rulesName;?>"><?php echo $rules;?></textarea>
+                </td>
+                <td>
+                    <p><input type="submit" name="submit" value="Auto-Generate"></p>
+                    <p>
+                        <button type="submit" value="Upload CSV file"
+                                name="submitValue" style="vertical-align: middle;">
+                            <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>"> Upload CSV file
+                        </button>
+                        <input type="file" name="uploadCsvFile" id="uploadCsvFile" style="display: inline;">
+                    </p>
+                    <p>
+                        <button type="submit" value="Download CSV file" name="submitValue">
+                            <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>" style="vertical-align: middle;">
+                            <span  style="vertical-align: middle;"> Download CSV file</span>
+                        </button>
+                    </p>
+                </td>
+            </tr>
 
       <tr>
         <td colspan="3" style="border: 1px solid #ccc; background-color: #ddd;">

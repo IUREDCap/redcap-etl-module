@@ -20,13 +20,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const SERVER_CONFIG_PAGE = 'web/admin/server_config.php';
     const ADMIN_ETL_CONFIG_PAGE = 'web/admin/admin_etl_config.php';
 
-    private $db;
     private $settings;
 
     public function __construct()
     {
-        $this->db = new RedCapDb();
-        $this->settings = new Settings($this);
+        $db = new RedCapDb();
+        $this->settings = new Settings($this, $db);
         parent::__construct();
     }
     
@@ -108,6 +107,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         }
     }
 
+
+    public static function getRedCapApiUrl()
+    {
+        return APP_PATH_WEBROOT_FULL.'api/';
+    }
 
     /**
      * Gets the module version number based on its directory.

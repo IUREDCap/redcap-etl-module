@@ -19,10 +19,10 @@ class Settings
     /** @var RedCapDb $db REDCap database object. */
     private $db;
     
-    public function __construct($module)
+    public function __construct($module, $db)
     {
         $this->module = $module;
-        $this->db     = new RedCapDb();
+        $this->db     = $db;
     }
     
     #----------------------------------------------------------
@@ -206,7 +206,7 @@ class Settings
             $this->db->startTransaction();
         }
         
-        $configuration = $this->module->getConfiguration($configName, $username, $projectId);
+        $configuration = $this->getConfiguration($configName, $username, $projectId);
         if (empty($configuration)) {
             $commit = false;
             $errorMessage = 'Configuration "'.$configName.'" not found for user '
@@ -214,7 +214,7 @@ class Settings
         }
         $configuration->setProperty(Configuration::CRON_SERVER, $server);
         $configuration->setProperty(Configuration::CRON_SCHEDULE, $schedule);
-        $this->module->setConfiguration($configuration, $username, $projectId);
+        $this->setConfiguration($configuration, $username, $projectId);
         
         if ($transaction) {
             $this->db->endTransaction($commit);
