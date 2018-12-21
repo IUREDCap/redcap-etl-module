@@ -23,12 +23,14 @@ $selfUrl  = $module->getUrl("web/configure.php");
 $configName = $_POST['configName'];
 if (empty($configName)) {
     $configName = $_GET['configName'];
-}
-if (!empty($configName)) {
-    $_SESSION['configName'] = $configName;
+    if (empty($configName)) {
+        $configName = $_SESSION['configName'];
+    }
 }
 
+
 if (!empty($configName)) {
+    $_SESSION['configName'] = $configName;
     $configuration = $module->getConfiguration($configName);
     if (!empty($configuration)) {
         $properties = $configuration->getProperties();
