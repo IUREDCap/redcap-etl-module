@@ -4,6 +4,11 @@ namespace IU\RedCapEtlModule;
 
 class Configuration implements \JsonSerializable
 {
+    #--------------------------------------------------
+    # Note: for this code to work, the properties
+    # here need to match those in REDCap-ETL's
+    # ConfigProperties class.
+    #--------------------------------------------------
     const REDCAP_API_URL = 'redcap_api_url';
     const DATA_SOURCE_API_TOKEN = 'data_source_api_token';
     const SSL_VERIFY = 'ssl_verify';
@@ -14,6 +19,10 @@ class Configuration implements \JsonSerializable
 
     const CONFIG_API_TOKEN = 'config_api_token';
 
+    const DB_LOGGING         = 'db_logging';
+    const DB_LOG_TABLE       = 'db_log_table';
+    const DB_EVENT_LOG_TABLE = 'db_event_log_table';
+    
     const DB_HOST = 'db_host';
     const DB_NAME = 'db_name';
     const DB_USERNAME = 'db_username';
@@ -51,10 +60,18 @@ class Configuration implements \JsonSerializable
         }
 
         # Set non-blank defaults
-        $this->properties[self::REDCAP_API_URL]    = APP_PATH_WEBROOT_FULL.'api/';
-        $this->properties[self::SSL_VERIFY]        = true;
+        $this->properties[self::REDCAP_API_URL] = APP_PATH_WEBROOT_FULL.'api/';
+        $this->properties[self::SSL_VERIFY]     = true;
+        
         $this->properties[self::BATCH_SIZE] = 100;
         $this->properties[self::TRANSFORM_RULES_SOURCE] = '1';
+        
+        $this->properties[self::DB_LOGGING]         = true;
+        $this->properties[self::DB_LOG_TABLE]       = \IU\REDCapETL\Configuration::DEFAULT_DB_LOG_TABLE;
+        $this->properties[self::DB_EVENT_LOG_TABLE] = \IU\REDCapETL\Configuration::DEFAULT_DB_EVENT_LOG_TABLE;
+        
+        $this->properties[self::EMAIL_ERRORS]  = false;
+        $this->properties[self::EMAIL_SUMMARY] = false;
     }
 
 
@@ -186,9 +203,16 @@ class Configuration implements \JsonSerializable
         foreach (self::getPropertyNames() as $name) {
             if (array_key_exists($name, $properties)) {
                 $this->properties[$name] = $properties[$name];
+            } elseif ($name === self::DB_LOGGING) {
+                $this->properties[$name] = false;
+            } elseif ($name === self::EMAIL_ERRORS) {
+                $this->properties[$name] = false;
+            } elseif ($name === self::EMAIL_SUMMARY) {
+                $this->properties[$name] = false;                
             } elseif ($name === self::SSL_VERIFY) {
                 $this->properties[$name] = false;
             }
+            
             # else {
             #    $this->properties[$name] = '';
             #}

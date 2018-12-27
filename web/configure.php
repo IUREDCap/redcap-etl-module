@@ -277,8 +277,10 @@ Configuration form
 <form action="<?php echo $selfUrl;?>" method="post" enctype="multipart/form-data" style="margin-top: 17px;">
 
     <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
+    
     <input type="hidden" name="<?php echo Configuration::CONFIG_API_TOKEN; ?>"
            value="<?php echo $properties[Configuration::CONFIG_API_TOKEN]; ?>" />
+           
     <input type="hidden" name="<?php echo Configuration::TRANSFORM_RULES_SOURCE; ?>"
            value="<?php echo $properties[Configuration::TRANSFORM_RULES_SOURCE]; ?>" />
          
@@ -334,7 +336,7 @@ Configuration form
       
             <tr>
                 <td>
-                SSL Certificate Verification
+                SSL Certificate Verification&nbsp;
                 </td>
                 <td>
                     <?php
@@ -502,7 +504,69 @@ Configuration form
         <td><input type="text" name="<?php echo Configuration::BATCH_SIZE;?>"
                    value="<?php echo $properties[Configuration::BATCH_SIZE];?>"/></td>
       </tr>
+      
+      <!--
+      <tr>
+        <td><hr style="color: blue; border: 1px solid black;"/></td>
+      </tr>
+      -->
+      <tr style="height: 10px;"></tr>
+      
+      <tr>
+        <td>Database logging</td>
+        <td>
+          <?php
+          $checked = '';
+          if ($properties[Configuration::DB_LOGGING]) {
+              $checked = ' checked ';
+          }
+          ?>
+          <input type="checkbox" name="<?php echo Configuration::DB_LOGGING;?>"
+                 <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
+         </td>
+      </tr>
+      <tr>
+        <td>Database log table</td>
+        <td><input type="text" name="<?php echo Configuration::DB_LOG_TABLE;?>"
+                   value="<?php echo $properties[Configuration::DB_LOG_TABLE];?>"/></td>
+      </tr>
+      <tr>
+        <td>Database event log table</td>
+        <td><input type="text" name="<?php echo Configuration::DB_EVENT_LOG_TABLE;?>"
+                   value="<?php echo $properties[Configuration::DB_EVENT_LOG_TABLE];?>"/></td>
+      </tr>
+      
+      <tr style="height: 10px;"></tr>
+                  
+      <tr>
+        <td>E-mail errors</td>
+        <td>
+          <?php
+          $checked = '';
+          if ($properties[Configuration::EMAIL_ERRORS]) {
+              $checked = ' checked ';
+          }
+          ?>
+          <input type="checkbox" name="<?php echo Configuration::EMAIL_ERRORS;?>"
+                 <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
+             <!-- <img title="test2" src="<?php echo APP_PATH_IMAGES ?>help.png"> -->
+         </td>
+      </tr>
 
+      <tr>
+        <td>E-mail summary</td>
+        <td>
+          <?php
+          $checked = '';
+          if ($properties[Configuration::EMAIL_SUMMARY]) {
+              $checked = ' checked ';
+          }
+          ?>
+          <input type="checkbox" name="<?php echo Configuration::EMAIL_SUMMARY;?>"
+                 <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
+        </td>
+      </tr>
+            
       <tr>
         <td>E-mail subject</td>
         <td><input type="text" name="<?php echo Configuration::EMAIL_SUBJECT;?>" size="64"
