@@ -32,6 +32,8 @@ class Configuration implements \JsonSerializable
     
     const BATCH_SIZE = 'batch_size';
 
+    const LOG_FILE  = 'log_file';
+    
     const EMAIL_ERRORS        = 'email_errors';
     const EMAIL_SUMMARY       = 'email_summary';
     const EMAIL_FROM_ADDRESS  = 'email_from_address';
@@ -208,7 +210,7 @@ class Configuration implements \JsonSerializable
             } elseif ($name === self::EMAIL_ERRORS) {
                 $this->properties[$name] = false;
             } elseif ($name === self::EMAIL_SUMMARY) {
-                $this->properties[$name] = false;                
+                $this->properties[$name] = false;
             } elseif ($name === self::SSL_VERIFY) {
                 $this->properties[$name] = false;
             }

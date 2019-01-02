@@ -30,6 +30,8 @@ class ServerConfig implements \JsonSerializable
     private $configDir;
     private $etlCommand;  # full path of command to run on REDCap-ETL server
 
+    private $logFile;
+    
     private $emailFromAddres;
     private $enableErrorEmail;
     private $enableSummaryEmail;
@@ -45,7 +47,9 @@ class ServerConfig implements \JsonSerializable
         
         $this->authMethod = self::AUTH_METHOD_SSH_KEY;
         $this->sshKeyPassword = '';
-        
+
+        $this->logFile = '';
+            
         $this->emailFromAddres = '';
         $this->enableErrorEmail   = false;
         $this->enableSummaryEmail = false;
@@ -110,6 +114,8 @@ class ServerConfig implements \JsonSerializable
      */
     private function updateEtlConfig($etlConfig)
     {
+        $etlConfig->setProperty(Configuration::LOG_FILE, $this->logFile);
+        
         $etlConfig->setProperty(Configuration::EMAIL_FROM_ADDRESS, $this->emailFromAddres);
         
         # If e-mailing of errors has not been enabled for this server, make sure that
@@ -360,6 +366,11 @@ class ServerConfig implements \JsonSerializable
         return $this->etlCommand;
     }
 
+    public function getLogFile()
+    {
+        return $this->logFile;
+    }
+    
     public function getEmailFromAddress()
     {
         return $this->emailFromAddress;

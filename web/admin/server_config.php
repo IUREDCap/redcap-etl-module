@@ -286,6 +286,17 @@ if (!empty($serverName)) {
     </tr>
     
     <tr>
+      <td>Log file:</td>
+      <td><input type="text" name="logFile" value="<?php echo $serverConfig->getLogFile();?>"
+                 size="40" style="margin: 4px;"></td>
+    </tr>
+       
+    <tr>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+        
+    <tr>
       <td>E-mail from address:</td>
       <td><input type="text" name="emailFromAddress" value="<?php echo $serverConfig->getEmailFromAddress();?>"
                  size="40" style="margin: 4px;"></td>

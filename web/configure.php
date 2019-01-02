@@ -459,133 +459,135 @@ Configuration form
                 </td>
             </tr>
 
-      <tr>
-        <td colspan="3" style="border: 1px solid #ccc; background-color: #ddd;">
-            <span style="font-weight: bold;">Load</span>
-        <td>
-      <tr>
+            <tr>
+                <td colspan="3" style="border: 1px solid #ccc; background-color: #ddd;">
+                    <span style="font-weight: bold;">Load</span>
+                <td>
+            <tr>
 
-      <tr>
-        <td>Database host</td>
-        <td><input type="text" name="<?php echo Configuration::DB_HOST;?>"
-                   value="<?php echo $properties[Configuration::DB_HOST]?>"/></td>
-      </tr>
+            <tr>
+                <td>Database host</td>
+                <td><input type="text" name="<?php echo Configuration::DB_HOST;?>"
+                    value="<?php echo $properties[Configuration::DB_HOST]?>"/></td>
+            </tr>
 
-      <tr>
-        <td>Database name</td>
-        <td><input type="text" name="<?php echo Configuration::DB_NAME;?>"
-                   value="<?php echo $properties[Configuration::DB_NAME]?>"></td>
-      </tr>
+            <tr>
+                <td>Database name</td>
+                <td><input type="text" name="<?php echo Configuration::DB_NAME;?>"
+                    value="<?php echo $properties[Configuration::DB_NAME]?>"></td>
+            </tr>
 
-      <tr>
-        <td>Database username</td>
-        <td><input type="text" name="<?php echo Configuration::DB_USERNAME;?>"
-                   value="<?php echo $properties[Configuration::DB_USERNAME]?>"/></td>
-      </tr>
+            <tr>
+                <td>Database username</td>
+                <td><input type="text" name="<?php echo Configuration::DB_USERNAME;?>"
+                    value="<?php echo $properties[Configuration::DB_USERNAME]?>"/></td>
+            </tr>
 
-      <tr>
-        <td>Database password</td>
-        <td>
-          <input type="password" name="<?php echo Configuration::DB_PASSWORD;?>"
-                 value="<?php echo $properties[Configuration::DB_PASSWORD]?>" id="dbPassword"/>
-          <input type="checkbox" id="showDbPassword" style="vertical-align: middle; margin: 0;">
-          <span style="vertical-align: middle;">Show</span>
-        </td>
-      </tr>
+            <tr>
+                <td>Database password</td>
+                <td>
+                    <input type="password" name="<?php echo Configuration::DB_PASSWORD;?>"
+                        value="<?php echo $properties[Configuration::DB_PASSWORD]?>" id="dbPassword"/>
+                    <input type="checkbox" id="showDbPassword" style="vertical-align: middle; margin: 0;">
+                    <span style="vertical-align: middle;">Show</span>
+                </td>
+            </tr>
 
-      <tr>
-        <td colspan="3" style="border: 1px solid #ccc; background-color: #ddd;">
-            <span style="font-weight: bold;">Processing</span>
-        <td>
-      </tr>
+            <tr>
+                <td colspan="3" style="border: 1px solid #ccc; background-color: #ddd;">
+                    <span style="font-weight: bold;">Processing</span>
+                <td>
+            </tr>
 
-      <tr>
-        <td>Batch size</td>
-        <td><input type="text" name="<?php echo Configuration::BATCH_SIZE;?>"
-                   value="<?php echo $properties[Configuration::BATCH_SIZE];?>"/></td>
-      </tr>
+            <tr>
+                <td>Batch size</td>
+                <td><input type="text" name="<?php echo Configuration::BATCH_SIZE;?>"
+                    value="<?php echo $properties[Configuration::BATCH_SIZE];?>"/></td>
+            </tr>
       
-      <!--
-      <tr>
-        <td><hr style="color: blue; border: 1px solid black;"/></td>
-      </tr>
-      -->
-      <tr style="height: 10px;"></tr>
+            <!--
+            <tr>
+                <td><hr style="color: blue; border: 1px solid black;"/></td>
+            </tr>
+            -->
       
-      <tr>
-        <td>Database logging</td>
-        <td>
-          <?php
-          $checked = '';
-          if ($properties[Configuration::DB_LOGGING]) {
-              $checked = ' checked ';
-          }
-          ?>
-          <input type="checkbox" name="<?php echo Configuration::DB_LOGGING;?>"
-                 <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
-         </td>
-      </tr>
-      <tr>
-        <td>Database log table</td>
-        <td><input type="text" name="<?php echo Configuration::DB_LOG_TABLE;?>"
-                   value="<?php echo $properties[Configuration::DB_LOG_TABLE];?>"/></td>
-      </tr>
-      <tr>
-        <td>Database event log table</td>
-        <td><input type="text" name="<?php echo Configuration::DB_EVENT_LOG_TABLE;?>"
-                   value="<?php echo $properties[Configuration::DB_EVENT_LOG_TABLE];?>"/></td>
-      </tr>
+            <tr style="height: 10px;"></tr>
       
-      <tr style="height: 10px;"></tr>
+            <tr>
+                <td>Database logging</td>
+                <td>
+                    <?php
+                    $checked = '';
+                    if ($properties[Configuration::DB_LOGGING]) {
+                        $checked = ' checked ';
+                    }
+                    ?>
+                    <input type="checkbox" name="<?php echo Configuration::DB_LOGGING;?>"
+                        <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
+                </td>
+            </tr>
+      
+            <tr>
+                <td>Database log table</td>
+                <td><input type="text" name="<?php echo Configuration::DB_LOG_TABLE;?>"
+                    value="<?php echo $properties[Configuration::DB_LOG_TABLE];?>"/></td>
+            </tr>
+            <tr>
+                <td>Database event log table</td>
+                <td><input type="text" name="<?php echo Configuration::DB_EVENT_LOG_TABLE;?>"
+                    value="<?php echo $properties[Configuration::DB_EVENT_LOG_TABLE];?>"/></td>
+            </tr>
+      
+            <tr style="height: 10px;"></tr>
                   
-      <tr>
-        <td>E-mail errors</td>
-        <td>
-          <?php
-          $checked = '';
-          if ($properties[Configuration::EMAIL_ERRORS]) {
-              $checked = ' checked ';
-          }
-          ?>
-          <input type="checkbox" name="<?php echo Configuration::EMAIL_ERRORS;?>"
-                 <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
-             <!-- <img title="test2" src="<?php echo APP_PATH_IMAGES ?>help.png"> -->
-         </td>
-      </tr>
+            <tr>
+                <td>E-mail errors</td>
+                <td>
+                    <?php
+                    $checked = '';
+                    if ($properties[Configuration::EMAIL_ERRORS]) {
+                        $checked = ' checked ';
+                    }
+                    ?>
+                    <input type="checkbox" name="<?php echo Configuration::EMAIL_ERRORS;?>"
+                        <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
+                    <!-- <img title="test2" src="<?php echo APP_PATH_IMAGES ?>help.png"> -->
+                </td>
+            </tr>
 
-      <tr>
-        <td>E-mail summary</td>
-        <td>
-          <?php
-          $checked = '';
-          if ($properties[Configuration::EMAIL_SUMMARY]) {
-              $checked = ' checked ';
-          }
-          ?>
-          <input type="checkbox" name="<?php echo Configuration::EMAIL_SUMMARY;?>"
-                 <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
-        </td>
-      </tr>
+            <tr>
+                <td>E-mail summary</td>
+                <td>
+                    <?php
+                    $checked = '';
+                    if ($properties[Configuration::EMAIL_SUMMARY]) {
+                        $checked = ' checked ';
+                    }
+                    ?>
+                    <input type="checkbox" name="<?php echo Configuration::EMAIL_SUMMARY;?>"
+                        <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
+                </td>
+            </tr>
             
-      <tr>
-        <td>E-mail subject</td>
-        <td><input type="text" name="<?php echo Configuration::EMAIL_SUBJECT;?>" size="64"
-                   value="<?php echo $properties[Configuration::EMAIL_SUBJECT];?>"
-                   />
-        </td>
-      </tr>
-      <tr>
-        <td>E-mail to list</td>
-        <td><input type="text" name="<?php echo Configuration::EMAIL_TO_LIST;?>" size="64"
-                   value="<?php echo $properties[Configuration::EMAIL_TO_LIST];?>"
-                   />
-        </td>
-      </tr>
-      <tr>
-        <td style="text-align: center;"><input type="submit" name="submit" value="Save" /></td>
-        <td style="text-align: center;"><input type="submit" name="submit" value="Cancel" /></td>
-      </tr>
-    </tbody>
+            <tr>
+                <td>E-mail subject</td>
+                <td><input type="text" name="<?php echo Configuration::EMAIL_SUBJECT;?>" size="64"
+                    value="<?php echo $properties[Configuration::EMAIL_SUBJECT];?>"
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td>E-mail to list</td>
+                <td><input type="text" name="<?php echo Configuration::EMAIL_TO_LIST;?>" size="64"
+                    value="<?php echo $properties[Configuration::EMAIL_TO_LIST];?>"
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: center;"><input type="submit" name="submit" value="Save" /></td>
+                <td style="text-align: center;"><input type="submit" name="submit" value="Cancel" /></td>
+            </tr>
+        </tbody>
   </table>
   <!--</div> -->
 </form>
