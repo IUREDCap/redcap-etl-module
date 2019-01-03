@@ -8,7 +8,9 @@ if (!SUPER_USER) {
 
 require_once __DIR__.'/../../dependencies/autoload.php';
 
-use IU\RedCapEtlModule\AdminConfig;
+use \IU\REDCapETL\Version;
+
+use \IU\RedCapEtlModule\AdminConfig;
 use \IU\RedCapEtlModule\RedCapEtlModule;
 
 $selfUrl = $module->getUrl(RedCapEtlModule::ADMIN_HOME_PAGE);
@@ -24,6 +26,9 @@ if (strcasecmp($submitValue, 'Save') === 0) {
     
     $allowEmbeddedServer = $_POST['allowEmbeddedServer'];
     $adminConfig->setAllowEmbeddedServer($allowEmbeddedServer);
+    
+    $emailFromAddress = $_POST['embeddedServerEmailFromAddress'];
+    $adminConfig->setEmbeddedServerEmailFromAddress($emailFromAddress);
     
     $allowOnDemand = $_POST['allowOnDemand'];
     $adminConfig->setAllowOnDemand($allowOnDemand);
@@ -80,6 +85,12 @@ $module->renderSuccessMessageDiv($success);
     }
     ?>
     <input type="checkbox" name="allowEmbeddedServer" <?php echo $checked;?>> Allow embedded REDCap-ETL server
+    (<?php echo Version::RELEASE_NUMBER;?>)
+    <br />
+    
+    <span  style="padding-left: 4em;">Embedded server e-mail from address: </span>
+    <input type="text" name="embeddedServerEmailFromAddress" size="50"
+        value="<?php echo $adminConfig->getEmbeddedServerEmailFromAddress();?>">
     <br />
     
     <?php

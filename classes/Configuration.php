@@ -32,6 +32,8 @@ class Configuration implements \JsonSerializable
     
     const BATCH_SIZE = 'batch_size';
 
+    const PRINT_LOGGING = 'print_logging';
+    
     const LOG_FILE  = 'log_file';
     
     const EMAIL_ERRORS        = 'email_errors';
@@ -252,6 +254,18 @@ class Configuration implements \JsonSerializable
     {
         $properties = $this->properties;
         
+        #---------------------------------------
+        # Remove properties that aren't used
+        # by REDCap-ETL
+        #---------------------------------------
+        unset($properties[self::DB_HOST]);
+        unset($properties[self::DB_NAME]);
+        unset($properties[self::DB_USERNAME]);
+        unset($properties[self::DB_PASSWORD]);
+        
+        unset($properties[self::CRON_SERVER]);
+        unset($properties[self::CRON_SCHEDULE]);
+        
         if (is_bool($properties[self::SSL_VERIFY])) {
             if ($properties[self::SSL_VERIFY]) {
                 $properties[self::SSL_VERIFY] = 'true';
@@ -259,29 +273,10 @@ class Configuration implements \JsonSerializable
                 $properties[self::SSL_VERIFY] = 'false';
             }
         }
+        
         return $properties;
     }
-    
- #   public function getRedCapEtlProperties()
- #   {
- #       $properties = $this->properties;
- #
- #       #---------------------------------------
- #       # Remove properties that aren't used
- #       # by REDCap-ETL
- #       #---------------------------------------
- #       unset($properties[self::DB_HOST]);
- #       unset($properties[self::DB_NAME]);
- #       unset($properties[self::DB_USERNAME]);
- #       unset($properties[self::DB_PASSWORD]);
- #
- #       unset($properties[self::TRANSFORM_RULES_TEXT]);
- #
- #       unset($properties[self::CRON_SERVER]);
- #       unset($properties[self::CRON_SCHEDULE]);
- #
- #       return $properties;
- #   }
+
     
     /**
      * Gets configuration properties in JSON, formatted for use
@@ -310,7 +305,7 @@ class Configuration implements \JsonSerializable
                 $properties[self::SSL_VERIFY] = 'false';
             }
         }
-
+        
         # Convert the transformation rules from text to
         # an array of strings
         if (array_key_exists(self::TRANSFORM_RULES_TEXT, $properties)) {

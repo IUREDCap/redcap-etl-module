@@ -32,7 +32,7 @@ class ServerConfig implements \JsonSerializable
 
     private $logFile;
     
-    private $emailFromAddres;
+    private $emailFromAddress;
     private $enableErrorEmail;
     private $enableSummaryEmail;
 
@@ -116,7 +116,7 @@ class ServerConfig implements \JsonSerializable
     {
         $etlConfig->setProperty(Configuration::LOG_FILE, $this->logFile);
         
-        $etlConfig->setProperty(Configuration::EMAIL_FROM_ADDRESS, $this->emailFromAddres);
+        $etlConfig->setProperty(Configuration::EMAIL_FROM_ADDRESS, $this->emailFromAddress);
         
         # If e-mailing of errors has not been enabled for this server, make sure that
         # the "e-mail errors" property is set to false in the ETL configuration

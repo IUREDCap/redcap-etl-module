@@ -311,7 +311,7 @@ if (!empty($serverName)) {
             $checked = ' checked ';
         }
         ?>
-        <input type="checkbox" name="enableErrorEmail" <?php echo $checked; ?> >
+        <input type="checkbox" name="enableErrorEmail" value="true" <?php echo $checked; ?> >
       </td>
     </tr>
     
@@ -324,7 +324,7 @@ if (!empty($serverName)) {
             $checked = ' checked ';
         }
         ?>
-        <input type="checkbox" name="enableSummaryEmail" <?php echo $checked; ?> >
+        <input type="checkbox" name="enableSummaryEmail" value="true" <?php echo $checked; ?> >
       </td>
     </tr>   
     

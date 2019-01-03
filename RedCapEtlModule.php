@@ -88,8 +88,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                                 if (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) == 0) {
                                     if ($adminConfig->getAllowEmbeddedServer()) {
                                         $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
-                                        $logger->turnOff();
-                                        $logger->setPrintInfo(true);
+                                        $logger->setPrintLogging(false);
                                         $properties = $etlConfig->getPropertiesArray();
                                         $redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
                                         $redCapEtl->run();
@@ -108,6 +107,24 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     }
 
 
+    /**
+     * Runs an ETL configuration on the embedded server.
+     */
+    public function runEmbedded($etlConfiguration, $adminConfig, $logger)
+    {
+        $properties = $etlConfiguration->getPropertiesArray();
+        
+        # Set the from e-mail address from the admin. configuration
+        $properties[Configuration::EMAIL_FROM_ADDRESS] = $adminConfig->getEmbeddedServerEmailFromAddress();
+        $properties[Configuration::PRINT_LOGGING] = false;
+        
+        $redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
+        $redCapEtl->run();
+        
+        return $properties;
+    }
+    
+    
     public static function getRedCapApiUrl()
     {
         return APP_PATH_WEBROOT_FULL.'api/';
@@ -431,16 +448,16 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         #   .' New Configuration';
 
         $configUrl = $this->getUrl('web/configure.php');
-        $configLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
+        $configLabel = '<span style="color: #808080;" class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
            .' Configure';
-
-        $runUrl = $this->getUrl('web/run.php');
-        $runLabel = '<span style="color: #008000;" class="glyphicon glyphicon-play-circle" aria-hidden="true"></span>'
-           .' Run';
 
         $scheduleUrl = $this->getUrl('web/schedule.php');
         $scheduleLabel = '<span class="glyphicon glyphicon-time" aria-hidden="true"></span>'
            .' Schedule';
+
+        $runUrl = $this->getUrl('web/run.php');
+        $runLabel = '<span style="color: #008000;" class="glyphicon glyphicon-play-circle" aria-hidden="true"></span>'
+           .' Run';
 
         $adminConfig = $this->getAdminConfig();
         

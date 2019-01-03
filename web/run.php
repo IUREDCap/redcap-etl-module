@@ -75,14 +75,17 @@ if (strcasecmp($submit, 'Run') === 0) {
                     throw new \Exception('Running on the embedded REDCap-ETL server is not allowed.');
                 }
                 $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
-                $logger->setOn(false);
-                $properties = $configuration->getPropertiesArray();
-                $redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
+
+                #$logger->setOn(false);
+
+                #$properties = $configuration->getPropertiesArray();
+                #$redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
+                #$redCapEtl->run();
+                $props = $module->runEmbedded($configuration, $adminConfig, $logger);
                 
-                $redCapEtl->run();
                 $runOutput = $logger->getLogArray();
                 $runOutput = implode("\n", $runOutput);
-
+                
                 #$runOutput = 'Job submitted to '.ServerConfig::EMBEDDED_SERVER_NAME.'.';
                 \REDCap::logEvent('Run REDCap-ETL configuration '.$configName.'.');
             } else {
@@ -116,6 +119,10 @@ echo $buffer;
 
 <?php
 $module->renderProjectPageContentHeader($selfUrl, $error, $success);
+?>
+
+<?php
+#print '<pre>'; print_r($props); print '</pre>'."\n";
 ?>
 
 <?php

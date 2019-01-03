@@ -522,7 +522,7 @@ Configuration form
                         $checked = ' checked ';
                     }
                     ?>
-                    <input type="checkbox" name="<?php echo Configuration::DB_LOGGING;?>"
+                    <input type="checkbox" name="<?php echo Configuration::DB_LOGGING;?>" value="true"
                         <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
                 </td>
             </tr>
@@ -549,7 +549,7 @@ Configuration form
                         $checked = ' checked ';
                     }
                     ?>
-                    <input type="checkbox" name="<?php echo Configuration::EMAIL_ERRORS;?>"
+                    <input type="checkbox" name="<?php echo Configuration::EMAIL_ERRORS;?>" value="true"
                         <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
                     <!-- <img title="test2" src="<?php echo APP_PATH_IMAGES ?>help.png"> -->
                 </td>
@@ -564,7 +564,7 @@ Configuration form
                         $checked = ' checked ';
                     }
                     ?>
-                    <input type="checkbox" name="<?php echo Configuration::EMAIL_SUMMARY;?>"
+                    <input type="checkbox" name="<?php echo Configuration::EMAIL_SUMMARY;?>" value="true"
                         <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
                 </td>
             </tr>

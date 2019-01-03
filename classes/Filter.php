@@ -20,11 +20,13 @@ class Filter
 
     public static function escapeForJavaScriptInSingleQuotes($value)
     {
+        # REDCap's JavaScript escape function for single quotes
         return js_escape($value);
     }
     
     public static function escapeForJavaScriptInDoubleQuotes($value)
     {
+        # REDCap's JavaScript escape function for double quotes
         return js_escape2($value);
     }
     
