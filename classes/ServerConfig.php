@@ -112,12 +112,19 @@ class ServerConfig implements \JsonSerializable
      *
      * @param Configuration the ETL configuration to modify.
      */
-    private function updateEtlConfig($etlConfig)
+    private function updateEtlConfig(& $etlConfig, $isCronJob)
     {
         $etlConfig->setProperty(Configuration::LOG_FILE, $this->logFile);
         
-        $etlConfig->setProperty(Configuration::EMAIL_FROM_ADDRESS, $this->emailFromAddress);
+        $projectId   = $etlConfig->getProjectId();
+        $configName  = $etlConfig->getName();
+        $configOwner = $etlConfig->getUsername();
         
+        $etlConfig->setProperty(Configuration::PROJECT_ID, $projectId);
+        $etlConfig->setProperty(Configuration::CONFIG_NAME, $configName);
+        $etlConfig->setProperty(Configuration::CONFIG_OWNER, $configOwner);
+
+        $etlConfig->setProperty(Configuration::EMAIL_FROM_ADDRESS, $this->emailFromAddress);
         # If e-mailing of errors has not been enabled for this server, make sure that
         # the "e-mail errors" property is set to false in the ETL configuration
         if (!$this->getEnableErrorEmail()) {
@@ -136,14 +143,14 @@ class ServerConfig implements \JsonSerializable
      *
      * @param Configuration $etlConfig the ETL configuration to run.
      */
-    public function run($etlConfig)
+    public function run($etlConfig, $isCronJob = false)
     {
         if (!isset($etlConfig)) {
             $message = 'No ETL configuration specified.';
             throw new \Exception($message);
         }
         
-        $this->updateEtlConfig($etlConfig);
+        $this->updateEtlConfig($etlConfig, $isCronJob);
         
         if (!$this->isActive) {
             $message = 'Server "'.$this->name.'" have been inactivated.';
@@ -227,6 +234,7 @@ class ServerConfig implements \JsonSerializable
         \REDCap::logEvent('REDCap-ETL run command: '.$command);
 
         #$ssh->setTimeout(0.1);  # to prevent blocking
+                
         $output = $ssh->exec($command);
         \REDCap::logEvent('REDCap-ETL run output: '.$output);
         
@@ -299,7 +307,7 @@ class ServerConfig implements \JsonSerializable
             throw new \Exception('No server configuration name specified.');
         } elseif (!is_string($name)) {
             throw new \Exception('Server configuration name is not a string; has type: '.gettype($name).'.');
-        } elseif (preg_match('/([&<>";@\*])/', $name, $matches) === 1) {
+        } elseif (preg_match('/([&<>";@\*\n\r\t\\\\])/', $name, $matches) === 1) {
             $errorMessage = 'Invalid character in server configuration name: '.$matches[0];
             throw new \Exception($errorMessage);
         }

@@ -299,7 +299,7 @@ Configuration form
             <tr>
                 <td>REDCap API URL</td>
                 <td>
-                    <input type="text" size="40" 
+                    <input type="text" size="60" 
                            value="<?php echo $properties[Configuration::REDCAP_API_URL];?>"
                            name="<?php echo Configuration::REDCAP_API_URL?>" />
                 </td>

@@ -18,7 +18,11 @@ class Configuration implements \JsonSerializable
     const TRANSFORM_RULES_SOURCE = 'transform_rules_source';
 
     const CONFIG_API_TOKEN = 'config_api_token';
-
+    const CONFIG_NAME      = 'config_name';
+    const CONFIG_OWNER     = 'config_owner';
+    
+    const CRON_JOB         = 'cron_job';
+    
     const DB_LOGGING         = 'db_logging';
     const DB_LOG_TABLE       = 'db_log_table';
     const DB_EVENT_LOG_TABLE = 'db_event_log_table';
@@ -33,6 +37,7 @@ class Configuration implements \JsonSerializable
     const BATCH_SIZE = 'batch_size';
 
     const PRINT_LOGGING = 'print_logging';
+    const PROJECT_ID = 'project_id';
     
     const LOG_FILE  = 'log_file';
     
@@ -111,7 +116,7 @@ class Configuration implements \JsonSerializable
             throw new \Exception('No configuration name specified.');
         } elseif (!is_string($name)) {
             throw new \Exception('Configuration name is not a string; has type: '.gettype($name).'.');
-        } elseif (preg_match('/([&<>";@\*])/', $name, $matches) === 1) {
+        } elseif (preg_match('/([&<>";@\*\n\r\t\\\\])/', $name, $matches) === 1) {
             $errorMessage = 'Invalid character in configuration name: '.$matches[0];
             throw new \Exception($errorMessage);
         }
@@ -360,6 +365,16 @@ class Configuration implements \JsonSerializable
     {
         self::validateName($name);
         $this->name = $name;
+    }
+    
+    public function getProjectId()
+    {
+        return $this->projectId;
+    }
+    
+    public function getUsername()
+    {
+        return $this->username;
     }
 
     public function getApiUrl()

@@ -288,7 +288,7 @@ if (!empty($serverName)) {
     <tr>
       <td>Log file:</td>
       <td><input type="text" name="logFile" value="<?php echo $serverConfig->getLogFile();?>"
-                 size="40" style="margin: 4px;"></td>
+                 size="60" style="margin: 4px;"></td>
     </tr>
        
     <tr>

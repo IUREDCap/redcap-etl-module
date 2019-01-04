@@ -76,11 +76,6 @@ if (strcasecmp($submit, 'Run') === 0) {
                 }
                 $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
 
-                #$logger->setOn(false);
-
-                #$properties = $configuration->getPropertiesArray();
-                #$redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
-                #$redCapEtl->run();
                 $props = $module->runEmbedded($configuration, $adminConfig, $logger);
                 
                 $runOutput = $logger->getLogArray();

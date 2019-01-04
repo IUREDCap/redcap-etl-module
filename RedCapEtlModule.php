@@ -88,13 +88,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                                 if (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) == 0) {
                                     if ($adminConfig->getAllowEmbeddedServer()) {
                                         $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
-                                        $logger->setPrintLogging(false);
-                                        $properties = $etlConfig->getPropertiesArray();
-                                        $redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
-                                        $redCapEtl->run();
+                                        #$logger->setPrintLogging(false);
+                                        #$properties = $etlConfig->getPropertiesArray();
+                                        #$redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
+                                        #$redCapEtl->run();
+                                        $this->runEmbedded($etlConfig, $adminConfig, $logger, true /* is cron job */);
                                     }
                                 } else {
-                                    $serverConfig->run($etlConfig);
+                                    $serverConfig->run($etlConfig, true /* is cron job */);
                                 }
                             }
                         }
@@ -110,15 +111,21 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     /**
      * Runs an ETL configuration on the embedded server.
      */
-    public function runEmbedded($etlConfiguration, $adminConfig, $logger)
+    public function runEmbedded($etlConfiguration, $adminConfig, $logger, $isCronJob = false)
     {
         $properties = $etlConfiguration->getPropertiesArray();
         
         # Set the from e-mail address from the admin. configuration
         $properties[Configuration::EMAIL_FROM_ADDRESS] = $adminConfig->getEmbeddedServerEmailFromAddress();
         $properties[Configuration::PRINT_LOGGING] = false;
-        
-        $redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
+
+        # Set process identifting properties
+        $properties[Configuration::PROJECT_ID]   = $etlConfiguration->getProjectId();
+        $properties[Configuration::CONFIG_NAME]  = $etlConfiguration->getName();
+        $properties[Configuration::CONFIG_OWNER] = $etlConfiguration->getUsername();
+        $properties[Configuration::CRON_JOB]     = $isCronJob;
+
+        $redCapEtl = new \IU\REDCapETL\RedCapEtl($logger, $properties);
         $redCapEtl->run();
         
         return $properties;
