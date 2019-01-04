@@ -30,6 +30,9 @@ if (strcasecmp($submitValue, 'Save') === 0) {
     $emailFromAddress = $_POST['embeddedServerEmailFromAddress'];
     $adminConfig->setEmbeddedServerEmailFromAddress($emailFromAddress);
     
+    $logFile = $_POST['embeddedServerLogFile'];
+    $adminConfig->setEmbeddedServerLogFile($logFile);
+    
     $allowOnDemand = $_POST['allowOnDemand'];
     $adminConfig->setAllowOnDemand($allowOnDemand);
     
@@ -92,7 +95,12 @@ $module->renderSuccessMessageDiv($success);
     <input type="text" name="embeddedServerEmailFromAddress" size="50"
         value="<?php echo $adminConfig->getEmbeddedServerEmailFromAddress();?>">
     <br />
-    
+
+    <span  style="padding-left: 4em;">Embedded server log file: </span>
+    <input type="text" name="embeddedServerLogFile" size="61"
+        value="<?php echo $adminConfig->getEmbeddedServerLogFile();?>">
+    <br />
+        
     <?php
     $checked = '';
     if ($adminConfig->getAllowOnDemand()) {

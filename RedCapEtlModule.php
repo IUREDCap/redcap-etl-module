@@ -117,6 +117,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         
         # Set the from e-mail address from the admin. configuration
         $properties[Configuration::EMAIL_FROM_ADDRESS] = $adminConfig->getEmbeddedServerEmailFromAddress();
+        $properties[Configuration::LOG_FILE]           = $adminConfig->getEmbeddedServerLogFile();
         $properties[Configuration::PRINT_LOGGING] = false;
 
         # Set process identifting properties

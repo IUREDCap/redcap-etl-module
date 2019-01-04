@@ -8,8 +8,11 @@ class AdminConfig implements \JsonSerializable
     const DAY_LABELS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     
     private $allowEmbeddedServer;  // Allow embedded REDCap-ETL server to be used
+    
+    private $embeddedServerLogFile;
     private $embeddedServerEmailFromAddress; // E-mail from address to use for embedded server
                                              // (must be set for e-mail logging to work for embedded server)
+    
     
     private $allowOnDemand;  // Allow the ETL process to be run on demand
     
@@ -203,7 +206,18 @@ class AdminConfig implements \JsonSerializable
         $this->allowEmbeddedServer = $allowEmbeddedServer;
     }
  
+
+    public function getEmbeddedServerLogFile()
+    {
+        return $this->embeddedServerLogFile;
+    }
+    
+    public function setEmbeddedServerLogFile($logFile)
+    {
+        $this->embeddedServerLogFile = $logFile;
+    }
  
+
     public function getEmbeddedServerEmailFromAddress()
     {
         return $this->embeddedServerEmailFromAddress;
@@ -214,7 +228,7 @@ class AdminConfig implements \JsonSerializable
         $this->embeddedServerEmailFromAddress = $fromEmail;
     }
  
-           
+
     public function getAllowOnDemand()
     {
         return $this->allowOnDemand;
