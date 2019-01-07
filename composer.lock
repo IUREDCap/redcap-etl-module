@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "09dbea9fb4c69fa0eb649cacde161f4a",
-    "content-hash": "2dc56e847652be17b75ce4472f0ee7dc",
+    "hash": "0cdf803f2a31aecb35cf9bcb4ff1359e",
+    "content-hash": "ebfff91d35e5cf5652bbdb84dc8c3f54",
     "packages": [
         {
             "name": "iu-redcap/redcap-etl",
-            "version": "0.6.1",
+            "version": "0.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/redcap-etl.git",
-                "reference": "354d4e0dbbbcc2392881df922e2b22f3373a205f"
+                "reference": "de821f48bc6d0445867f5df9f5d922b08be59046"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/354d4e0dbbbcc2392881df922e2b22f3373a205f",
-                "reference": "354d4e0dbbbcc2392881df922e2b22f3373a205f",
+                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/de821f48bc6d0445867f5df9f5d922b08be59046",
+                "reference": "de821f48bc6d0445867f5df9f5d922b08be59046",
                 "shasum": ""
             },
             "require": {
@@ -49,7 +49,7 @@
                 "etl",
                 "redcap"
             ],
-            "time": "2019-01-04 18:20:35"
+            "time": "2019-01-07 16:44:17"
         },
         {
             "name": "phpcap/phpcap",
