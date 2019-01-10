@@ -92,7 +92,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                                         #$properties = $etlConfig->getPropertiesArray();
                                         #$redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
                                         #$redCapEtl->run();
-                                        $this->runEmbedded($etlConfig, $adminConfig, $logger, true /* is cron job */);
+                                        $isCronJob = true;
+                                        $this->runEmbedded($etlConfig, $isCronJob);
                                     }
                                 } else {
                                     $serverConfig->run($etlConfig, true /* is cron job */);
@@ -107,17 +108,83 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         }
     }
 
+    
+    /**
+     * Runs an ETL job. Top-level method for running an ETL job that all code should call,
+     * so that there is one place to do REDCap logging
+     *
+     * @param Configuration $etlConfig REDCap-ETL configuration to run
+     * @param ServerConfig $serverConfig server to run on; if empty, use embedded server
+     * @param boolean $isCronJon indicates whether this is being called from a cron job or not.
+     *
+     * @return string the status of the run.
+     */
+    public function run($etlConfig, $serverConfig = null, $isCronJob = false)
+    {
+        $adminConfig = $this->getAdminConfig();
+        
+        $username   = $etlConfig->getUsername();
+        $configName = $etlConfig->getName();
+        $projectId  = $etlConfig->getProjectId();
+        
+        if (empty($serverName)) {
+            $serverName = ServerConfig::EMBEDDED_SERVER_NAME;
+        } else {
+            $serverName = $serverConfig->getName();
+        }
+        
+        $cron = 'no';
+        if ($isCronJob) {
+            $cron = 'yes';
+        }
+        
+        $status = '';
+        
+        $details =  '(pid='.$projectIdi."\n".'config='.$configName."\n";
+        $details .= 'server='.$serverName."\n";
+        $details .= "test\n";
+        if ($isCronJob) {
+            $details .= ',cron=yes';
+        } else {
+            $details .= ',cron=no';
+        }
+        $details .= ').';
+        
+        $action = 'Data Export (ETL)';
+        try {
+            if (empty($serverConfig)) {
+                $status = $this->runEmbedded($etlConfig, $isCronJob);
+            } else {
+                $status = $serverConfig->run($etlConfig, $isCronJob);
+            }
+            $details = 'Job submitted '.$details;
+            \REDCap::logEvent($action, $details);
+        } catch (\Exception $exception) {
+            $details = 'Job submission failed '.$details
+                .' - error: '.$exception->getMessage();
+            \REDCap::logEvent($action, $details);
+        }
+        
+        return $status;
+    }
+    
 
     /**
      * Runs an ETL configuration on the embedded server.
      */
-    public function runEmbedded($etlConfiguration, $adminConfig, $logger, $isCronJob = false)
+    private function runEmbedded($etlConfiguration, $isCronJob = false)
     {
         $properties = $etlConfiguration->getPropertiesArray();
+ 
+        $adminConfig = $this->getAdminConfig();
+        
+        $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
         
         # Set the from e-mail address from the admin. configuration
         $properties[Configuration::EMAIL_FROM_ADDRESS] = $adminConfig->getEmbeddedServerEmailFromAddress();
-        $properties[Configuration::LOG_FILE]           = $adminConfig->getEmbeddedServerLogFile();
+        
+        # Set the log file, and set print logging off
+        $properties[Configuration::LOG_FILE]      = $adminConfig->getEmbeddedServerLogFile();
         $properties[Configuration::PRINT_LOGGING] = false;
 
         # Set process identifting properties
@@ -129,7 +196,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $redCapEtl = new \IU\REDCapETL\RedCapEtl($logger, $properties);
         $redCapEtl->run();
         
-        return $properties;
+        $status = implode("\n", $logger->getLogArray());
+        return $status;
     }
     
     
@@ -243,7 +311,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function setConfiguration($configuration, $username = USERID, $projectId = PROJECT_ID)
     {
+        global $lang;
         $this->settings->setConfiguration($configuration, $username, $projectId);
+        $details = 'REDCap-ETL configuration "'.$configuration->getName()
+            .'" updated (pid='.$configuration->getProjectId().') ';
+        \REDCap::logEvent($lang['reporting_33'].' (ETL)', $details);
     }
 
     public function setConfigSchedule($configName, $server, $schedule, $username = USERID, $projectId = PROJECT_ID)
@@ -253,7 +325,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     
     public function addConfiguration($name, $username = USERID, $projectId = PROJECT_ID)
     {
+        global $lang;
         $this->settings->addConfiguration($name, $username, $projectId);
+        \REDCap::logEvent($lang['reporting_33'].' (ETL)', 'REDCap-ETL configuration "'.$name.'" created.');
     }
 
 

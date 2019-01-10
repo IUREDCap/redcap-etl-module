@@ -275,11 +275,21 @@ if (!empty($serverName)) {
                  size="60" style="margin: 4px;"></td>
     </tr>
     <tr>
+      <td>ETL command prefix:</td>
+      <td><input type="text" name="etlCommandPrefix" value="<?php echo $serverConfig->getEtlCommandPrefix();?>"
+                 size="60" style="margin: 4px;"></td>
+    </tr>    
+    <tr>
       <td>ETL command:</td>
       <td><input type="text" name="etlCommand" value="<?php echo $serverConfig->getEtlCommand();?>"
                  size="60" style="margin: 4px;"></td>
     </tr>
-    
+    <tr>
+      <td>ETL command suffix:</td>
+      <td><input type="text" name="etlCommandSuffix" value="<?php echo $serverConfig->getEtlCommandSuffix();?>"
+                 size="60" style="margin: 4px;"></td>
+    </tr>
+            
     <tr>
       <td>&nbsp;</td>
       <td>&nbsp;</td>

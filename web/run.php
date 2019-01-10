@@ -69,24 +69,12 @@ if (strcasecmp($submit, 'Run') === 0) {
         $error = 'ERROR: No ETL configuration found for '.$configName.'.';
     } else {
         try {
-            if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
-                # Embedded server
-                if (!$adminConfig->getAllowEmbeddedServer()) {
-                    throw new \Exception('Running on the embedded REDCap-ETL server is not allowed.');
-                }
-                $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
-
-                $props = $module->runEmbedded($configuration, $adminConfig, $logger);
-                
-                $runOutput = $logger->getLogArray();
-                $runOutput = implode("\n", $runOutput);
-                
-                #$runOutput = 'Job submitted to '.ServerConfig::EMBEDDED_SERVER_NAME.'.';
-                \REDCap::logEvent('Run REDCap-ETL configuration '.$configName.'.');
-            } else {
+            $serverConfig = null;
+            if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) !== 0) {
                 $serverConfig = $module->getServerConfig($server);
-                $runOutput = $serverConfig->run($configuration);
             }
+            $isCronJob = false;
+            $runOutput = $module->run($configuration, $serverConfig, $isCronJob);
         } catch (Exception $exception) {
             $error = 'ERROR: '.$exception->getMessage();
         }
@@ -153,7 +141,9 @@ $allowEmbeddedServer = $adminConfig->getAllowEmbeddedServer();
     <fieldset style="border: 2px solid #ccc; border-radius: 7px; padding: 7px;">
         <legend style="font-weight: bold;">Run Now</legend>
         <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
-        <input type="submit" name="submit" value="Run" /> on
+        <input type="submit" name="submit" value="Run"
+               onclick='$("#runOutput").text(""); $("body").css("cursor", "progress");'/>
+        on
         <?php
 
         echo '<select name="server">'."\n";
@@ -181,7 +171,7 @@ $allowEmbeddedServer = $adminConfig->getAllowEmbeddedServer();
         }
         echo "</select>\n";
         ?>
-  <p><?php echo "<pre>{$runOutput}</pre>\n";?></p>
+  <p><pre id="runOutput"><?php echo $runOutput;?></pre></p>
   </fieldset>
 </form>
 

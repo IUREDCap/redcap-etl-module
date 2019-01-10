@@ -661,9 +661,7 @@ class Settings
     {
         $exists = false;
         $key = self::SERVER_CONFIG_KEY_PREFIX . $name;
-        \REDCap::logEvent("KEY = {$key}");
         $setting = $this->module->getSystemSetting($key);
-        \REDCap::logEvent("SETTING = {$setting}");
         if (!empty($setting)) {
             $exists = true;
         }
