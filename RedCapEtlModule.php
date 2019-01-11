@@ -434,6 +434,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function setAdminConfig($adminConfig)
     {
         $this->settings->setAdminConfig($adminConfig);
+        $details = 'REDCap-ETL admin configuration "'.$configName.'" modified.';
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
     #==================================================================================
@@ -453,19 +455,21 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function addServer($serverName)
     {
         $this->settings->addServer($serverName);
-        $details = 'Server configuration "'.$serverName.'" created.';
+        $details = 'Server "'.$serverName.'" created.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
     public function copyServer($fromServerName, $toServerName)
     {
         $this->settings->copyServer($fromServerName, $toServerName);
+        $details = 'Server "'.$fromServerName.'" copied to "'.$toServerName.'".';
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
     
     public function renameServer($serverName, $newServerName)
     {
         $this->settings->renameServer($serverName, $newServerName);
-        $details = 'Server configuration "'.$serverName.'" renamed to "'.$newServerName.'".';
+        $details = 'Server "'.$serverName.'" renamed to "'.$newServerName.'".';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
     
@@ -473,7 +477,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function removeServer($serverName)
     {
         $this->settings->removeServer($serverName);
-        $details = 'Server configuration "'.$serverName.'" deleted.';
+        $details = 'Server "'.$serverName.'" deleted.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
@@ -490,23 +494,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function setServerConfig($serverConfig)
     {
         $this->settings->setServerConfig($serverConfig);
+        $details = 'Server "'.$serverName.'" modified.';
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
-    
-    private function copyServerConfig($fromServerName, $toServerName)
-    {
-        $this->settings->copyServerConfig($fromServerName, $toServerName);
-    }
-    
-    public function renameServerConfig($serverName, $newServerName)
-    {
-        $this->settings->renameServerConfig($serverName, $newServerName);
-    }
-        
-    public function removeServerConfig($serverName)
-    {
-        return $this->settings->removeServerConfig($serverName);
-    }
-
 
     #==================================================================================
     # Last run time methods
@@ -520,12 +510,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function setLastRunTime($date, $time)
     {
         $this->settings->setLastRunTime($date, $time);
+        # Don't log this because it is an internal event
     }
     
     public function isLastRunTime($date, $time)
     {
         return $this->settings->isLastRunTime($date, $time);
     }
+
 
 
 
