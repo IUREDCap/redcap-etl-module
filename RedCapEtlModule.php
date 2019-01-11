@@ -22,6 +22,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     const RUN_LOG_ACTION    = 'REDCap-ETL Export';
     const CHANGE_LOG_ACTION = 'REDCap-ETL Change';
+    const LOG_EVENT         = -1;
     
     private $settings;
     private $changeLogAction;
@@ -156,9 +157,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                     
         $status = '';
         try {
-            $sql = null;
+            $sql    = null;
             $record = null;
-            $event = null;
+            $event  = self::LOG_EVENT;
             $projectId = null;
             
             if ($isCronJob) {
@@ -284,7 +285,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $this->settings->addUser($username);
         $details = 'User '.$username.' added to ETL users.';
-        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details);
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
 
@@ -375,6 +376,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function copyConfiguration($fromConfigName, $toConfigName)
     {
         $this->settings->copyConfiguration($fromConfigName, $toConfigName);
+        $details = 'REDCap-ETL configuration "'.$fromConfigName.'" copied to "'.
+            $toConfigName.'" for user '.USERID.', project ID '.PROJECT_ID.'.';
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
     
     /**
@@ -384,11 +388,16 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function renameConfiguration($configName, $newConfigName)
     {
         $this->settings->renameConfiguration($configName, $newConfigName);
+        $details = 'REDCap-ETL configuration "'.$configName.'" renamed to "'.
+            $newConfigName.'" for user '.USERID.', project ID '.PROJECT_ID.'.';
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
     
     public function removeConfiguration($configName)
     {
         $this->settings->removeConfiguration($configName);
+        $details = 'REDCap-ETL configuration "'.$configName.'" deleted.';
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
    
     #-------------------------------------------------------------------
@@ -445,7 +454,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $this->settings->addServer($serverName);
         $details = 'Server configuration "'.$serverName.'" created.';
-        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details);
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
     public function copyServer($fromServerName, $toServerName)
@@ -457,7 +466,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $this->settings->renameServer($serverName, $newServerName);
         $details = 'Server configuration "'.$serverName.'" renamed to "'.$newServerName.'".';
-        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details);
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
     
     
@@ -465,7 +474,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $this->settings->removeServer($serverName);
         $details = 'Server configuration "'.$serverName.'" deleted.';
-        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details);
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
 
