@@ -20,7 +20,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const SERVER_CONFIG_PAGE = 'web/admin/server_config.php';
     const ADMIN_ETL_CONFIG_PAGE = 'web/admin/admin_etl_config.php';
 
+    const RUN_LOG_ACTION    = 'REDCap-ETL Export';
+    const CHANGE_LOG_ACTION = 'REDCap-ETL Change';
+    
     private $settings;
+    private $changeLogAction;
 
     public function __construct()
     {
@@ -36,8 +40,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function cron()
     {
-        $adminConfig = $this->getAdminConfig();
+        #\REDCap::logEvent('REDCap-ETL cron function start');
         
+        $adminConfig = $this->getAdminConfig();
+
         #---------------------------------------------------
         # If ETL cron jobs are allowed
         #---------------------------------------------------
@@ -47,11 +53,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             $hour = $now->format('G');  // 0-23 (24-hour format without leading zeroes)
             $date = $now->format('Y-m-d');
 
-            #\REDCap::logEvent('REDCap-ETL cron check on day '.$day.', hour '.$hour);
-            
             if ($adminConfig->isAllowedCronTime($day, $hour)) {
                 #\REDCap::logEvent('REDCap-ETL cron - cron allowed for day '.$day.', hour '.$hour);
                 
+
                 if ($this->isLastRunTime($date, $hour)) {
                     #\REDCap::logEvent('REDCap-ETL cron - cron already processed for day '.$day.', hour '.$hour);
                     ; // This time has already been processed, so don't do anything'
@@ -73,36 +78,32 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                         # If user has permission to run ETL for this project
                         #------------------------------------------------------
                         if (!empty($userEtlProjects) && in_array($projectId, $userEtlProjects)) {
-                            $etlConfig    = $this->getConfiguration($configName, $username, $projectId);
-                            $serverConfig = $this->getServerConfig($serverName);
+                            $etlConfig = $this->getConfiguration($configName, $username, $projectId);
+
+                            $isCronJob = true;
                             
-                            #----------------------------------------------------
-                            # If the server is active
-                            #----------------------------------------------------
-                            if ($serverConfig->getIsActive()) {
-                                \REDCap::logEvent(
-                                    'REDCap-ETL cron job config "'.$configName.'" for user "'
-                                    .$username.'" on server "'.$serverName.'" on day '.$day.', hour '.$hour
-                                );
-                
-                                if (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) == 0) {
-                                    if ($adminConfig->getAllowEmbeddedServer()) {
-                                        $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
-                                        #$logger->setPrintLogging(false);
-                                        #$properties = $etlConfig->getPropertiesArray();
-                                        #$redCapEtl  = new \IU\REDCapETL\RedCapEtl($logger, $properties);
-                                        #$redCapEtl->run();
-                                        $isCronJob = true;
-                                        $this->runEmbedded($etlConfig, $isCronJob);
-                                    }
-                                } else {
-                                    $serverConfig->run($etlConfig, true /* is cron job */);
+                            if (strcmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
+                                $serverConfig = null;
+                                if ($adminConfig->getAllowEmbeddedServer()) {
+                                    $this->run($etlConfig, $serverConfig, $isCronJob);
+                                }
+                            } else {
+                                $serverConfig = $this->getServerConfig($serverName);
+                                if ($serverConfig->getIsActive()) {
+                                    $this->run($etlConfig, $serverConfig, $isCronJob);
                                 }
                             }
                         }
                     } # END - foreach cron job
                     
                     $this->setLastRunTime($date, $hour);
+                    
+                    # Wait for any child processes
+                    if (function_exists('pcntl_fork') && function_exists('pcntl_wait')) {
+                        while (pcntl_wait($status) != -1) {
+                            ; // Wait for all child processes to finish
+                        }
+                    }
                 }
             }
         }
@@ -126,43 +127,78 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $username   = $etlConfig->getUsername();
         $configName = $etlConfig->getName();
         $projectId  = $etlConfig->getProjectId();
+        $configUrl  = $etlConfig->getProperty(Configuration::REDCAP_API_URL);
         
-        if (empty($serverName)) {
+        if (!isset($serverConfig)) {
             $serverName = ServerConfig::EMBEDDED_SERVER_NAME;
         } else {
             $serverName = $serverConfig->getName();
         }
-        
+
         $cron = 'no';
         if ($isCronJob) {
             $cron = 'yes';
         }
         
-        $status = '';
-        
-        $details =  '(pid='.$projectIdi."\n".'config='.$configName."\n";
-        $details .= 'server='.$serverName."\n";
-        $details .= "test\n";
-        if ($isCronJob) {
-            $details .= ',cron=yes';
-        } else {
-            $details .= ',cron=no';
+        $details = '';
+        if (strcasecmp($configUrl, $this->getRedCapApiUrl()) !== 0) {
+            $details .= "REDCap API URL: {$configUrl}\n";
         }
-        $details .= ').';
-        
-        $action = 'Data Export (ETL)';
+        $details .= "project ID: {$projectId}\n";
+        $details .= "user: {$username}\n";
+        $details .= "configuration: {$configName}\n";
+        $details .= "server: {$serverName}\n";
+        if ($isCronJob) {
+            $details .= "cron: yes\n";
+        } else {
+            $details .= "cron: no\n";
+        }
+                    
+        $status = '';
         try {
+            $sql = null;
+            $record = null;
+            $event = null;
+            $projectId = null;
+            
+            if ($isCronJob) {
+                $projectId = $etlConfig->getProjectId();
+            }
+            
+            #------------------------------------------------------------------------
+            # If no server configuration was specified, run on the embedded server
+            #------------------------------------------------------------------------
             if (empty($serverConfig)) {
-                $status = $this->runEmbedded($etlConfig, $isCronJob);
+                # If forking can be used (forking cannot be used by a web app, so
+                # only cron jobs, which are not run by a web app, can be forked)
+                if ($isCronJob && function_exists('pcntl_fork') && function_exists('pcntl_wait')) {
+                    $pid = pcntl_fork();
+                    
+                    if ($pid === -1) {
+                        # The fork was unsuccessful (and this is the only thread)
+                        $status = $this->runEmbedded($etlConfig, $isCronJob);
+                    } elseif ($pid === 0 || $pid === -1) {
+                        # The fork was susccessful and this is the child process,
+                        $status = $this->runEmbedded($etlConfig, $isCronJob);
+                        exit(0);
+                    } else {
+                        # the fork worked, and this is the parent process
+                        $status = ''; # This is a cron job, so returning the status isn't important
+                    }
+                } else {
+                    $status = $this->runEmbedded($etlConfig, $isCronJob);
+                }
             } else {
+                # Run on the specified server
                 $status = $serverConfig->run($etlConfig, $isCronJob);
             }
-            $details = 'Job submitted '.$details;
-            \REDCap::logEvent($action, $details);
+            $details = "REDCap-ETL job submitted \n".$details;
+            \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
         } catch (\Exception $exception) {
             $details = 'Job submission failed '.$details
                 .' - error: '.$exception->getMessage();
-            \REDCap::logEvent($action, $details);
+            \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
+            throw $exception;  # rethrow the exception
         }
         
         return $status;
@@ -247,22 +283,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function addUser($username)
     {
         $this->settings->addUser($username);
+        $details = 'User '.$username.' added to ETL users.';
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details);
     }
 
 
     #-------------------------------------------------------------------
     # UserInfo methods
     #-------------------------------------------------------------------
-    
-    private function getUserInfo($username = USERID, $projectId = PROJECT_ID)
-    {
-        return $this->settings->getUserInfo($username, $projectId);
-    }
-
-    private function setUserInfo($userInfo, $username = USERID, $projectId = PROJECT_ID)
-    {
-        $this->settings->setUserInfo($userInfo, $username, $projectId);
-    }
 
     public function getUserConfigurationNames($username = USERID, $projectId = PROJECT_ID)
     {
@@ -280,12 +308,19 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     }
     
     /**
+     * Set the projects for which the specified user is allowed to use
+     * REDCap-ETL.
+     *
+     * @param string username the username for the user whose projects
+     *     are being modified.
      * @param array $projects an array of REDCap project IDS
      *     for which the user has ETL permission.
      */
     public function setUserEtlProjects($username, $projects)
     {
         $this->settings->setUserEtlProjects($username, $projects);
+        $details = 'ETL projects modified for user '.$username;
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details);
     }
 
 
@@ -303,7 +338,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         return $this->settings->getConfiguration($name, $username, $projectId);
     }
-
+    
     /**
      * @param Configuration $configuration
      * @param string $username
@@ -311,23 +346,25 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function setConfiguration($configuration, $username = USERID, $projectId = PROJECT_ID)
     {
-        global $lang;
         $this->settings->setConfiguration($configuration, $username, $projectId);
         $details = 'REDCap-ETL configuration "'.$configuration->getName()
             .'" updated (pid='.$configuration->getProjectId().') ';
-        \REDCap::logEvent($lang['reporting_33'].' (ETL)', $details);
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details);
     }
 
     public function setConfigSchedule($configName, $server, $schedule, $username = USERID, $projectId = PROJECT_ID)
     {
         $this->settings->setConfigSchedule($configName, $server, $schedule, $username, $projectId);
+        $details = 'REDCap-ETL configuration "'.$configName
+            .'" schedule modified for user '.$username.' and project ID '.$projectId.'.';
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details);
     }
     
     public function addConfiguration($name, $username = USERID, $projectId = PROJECT_ID)
     {
-        global $lang;
         $this->settings->addConfiguration($name, $username, $projectId);
-        \REDCap::logEvent($lang['reporting_33'].' (ETL)', 'REDCap-ETL configuration "'.$name.'" created.');
+        $details = 'REDCap-ETL configuration "'.$name.'" created.';
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details);
     }
 
 
@@ -399,9 +436,16 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         return $this->settings->getServers();
     }
 
+    /**
+     * Adds a new server with the specified server name.
+     *
+     * @param string $serverName the name of the server to add.
+     */
     public function addServer($serverName)
     {
         $this->settings->addServer($serverName);
+        $details = 'Server configuration "'.$serverName.'" created.';
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details);
     }
 
     public function copyServer($fromServerName, $toServerName)
@@ -412,12 +456,16 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function renameServer($serverName, $newServerName)
     {
         $this->settings->renameServer($serverName, $newServerName);
+        $details = 'Server configuration "'.$serverName.'" renamed to "'.$newServerName.'".';
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details);
     }
     
     
     public function removeServer($serverName)
     {
         $this->settings->removeServer($serverName);
+        $details = 'Server configuration "'.$serverName.'" deleted.';
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details);
     }
 
 

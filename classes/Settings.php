@@ -158,11 +158,15 @@ class Settings
     {
         $configuraion = null;
         $key = $this->getConfigurationKey($name, $username);
-
+        
         $setting = $this->module->getProjectSetting($key, $projectId);
         $configValues = json_decode($setting, true);
         if (isset($configValues) && is_array($configValues)) {
-            $configuration = new Configuration($configValues['name']);
+            $configuration = new Configuration(
+                $configValues['name'],
+                $configValues['username'],
+                $configValues['projectId']
+            );
             $configuration->set($configValues['properties']);
         }
         return $configuration;
