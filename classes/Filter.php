@@ -17,6 +17,11 @@ class Filter
     {
         return \REDCap::escapeHtml($value);
     }
+    
+    public static function escapeForHtmlAttribute($value)
+    {
+        return htmlspecialchars($value, ENT_QUOTES);
+    }
 
     public static function escapeForJavaScriptInSingleQuotes($value)
     {

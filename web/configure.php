@@ -210,9 +210,11 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $success);
     array_unshift($values, '');
     foreach ($values as $value) {
         if (strcmp($value, $configName) === 0) {
-            echo '<option value="'.$value.'" selected>'.$value."</option>\n";
+            echo '<option value="'.Filter::escapeForHtmlAttribute($value).'" selected>'
+                .Filter::escapeForHtml($value)."</option>\n";
         } else {
-            echo '<option value="'.$value.'">'.$value."</option>\n";
+            echo '<option value="'.Filter::escapeForHtmlAttribute($value).'">'
+                .Filter::escapeForHtml($value)."</option>\n";
         }
     }
     ?>
@@ -310,9 +312,10 @@ Configuration form
                 Project API Token
                 </td>
                 <td>
+                    <?php $apiToken = $properties[Configuration::DATA_SOURCE_API_TOKEN] ?>
                     <input type="password" size="34"
-                           value="<?php echo $properties[Configuration::DATA_SOURCE_API_TOKEN];?>"
-                           name="<?php echo Configuration::DATA_SOURCE_API_TOKEN;?>" id="apiToken"/>
+                        value="<?php echo Filter::escapeForHtmlAttribute($apiToken);?>"
+                        name="<?php echo Configuration::DATA_SOURCE_API_TOKEN;?>" id="apiToken"/>
                     <input type="checkbox" id="showApiToken" style="vertical-align: middle; margin: 0;">
                     <span style="vertical-align: middle;">Show</span>
                 </td>
@@ -438,8 +441,10 @@ Configuration form
                     $rules = $properties[Configuration::TRANSFORM_RULES_TEXT];
                     $rulesName = Configuration::TRANSFORM_RULES_TEXT;
                     ?>
-                    <textarea rows="14" cols="70" style="margin-top: 4px; margin-bottom: 4px;" 
-                         name="<?php echo $rulesName;?>"><?php echo $rules;?></textarea>
+                    <textarea rows="14" cols="70" style="margin-top: 4px; margin-bottom: 4px;"
+                              name="<?php echo $rulesName;?>">
+                        <?php echo Filter::escapeForHtml($rules);?>
+                    </textarea>
                 </td>
                 <td>
                     <p><input type="submit" name="submit" value="Auto-Generate"></p>
@@ -468,26 +473,28 @@ Configuration form
             <tr>
                 <td>Database host</td>
                 <td><input type="text" name="<?php echo Configuration::DB_HOST;?>"
-                    value="<?php echo $properties[Configuration::DB_HOST]?>"/></td>
+                    value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_HOST])?>"/>
+                </td>
             </tr>
 
             <tr>
                 <td>Database name</td>
                 <td><input type="text" name="<?php echo Configuration::DB_NAME;?>"
-                    value="<?php echo $properties[Configuration::DB_NAME]?>"></td>
+                    value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_NAME])?>"></td>
             </tr>
 
             <tr>
                 <td>Database username</td>
                 <td><input type="text" name="<?php echo Configuration::DB_USERNAME;?>"
-                    value="<?php echo $properties[Configuration::DB_USERNAME]?>"/></td>
+                    value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_USERNAME])?>"/></td>
             </tr>
 
             <tr>
                 <td>Database password</td>
                 <td>
                     <input type="password" name="<?php echo Configuration::DB_PASSWORD;?>"
-                        value="<?php echo $properties[Configuration::DB_PASSWORD]?>" id="dbPassword"/>
+                        value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_PASSWORD])?>"
+                        id="dbPassword"/>
                     <input type="checkbox" id="showDbPassword" style="vertical-align: middle; margin: 0;">
                     <span style="vertical-align: middle;">Show</span>
                 </td>
@@ -501,7 +508,7 @@ Configuration form
 
             <tr>
                 <td>Batch size</td>
-                <td><input type="text" name="<?php echo Configuration::BATCH_SIZE;?>"
+                <td><input type="text" name="<?php echo Filter::escapeForHtmlAttribute(Configuration::BATCH_SIZE);?>"
                     value="<?php echo $properties[Configuration::BATCH_SIZE];?>"/></td>
             </tr>
       
@@ -530,12 +537,15 @@ Configuration form
             <tr>
                 <td>Database log table</td>
                 <td><input type="text" name="<?php echo Configuration::DB_LOG_TABLE;?>"
-                    value="<?php echo $properties[Configuration::DB_LOG_TABLE];?>"/></td>
+                    value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_LOG_TABLE]);?>"/>
+                </td>
             </tr>
             <tr>
                 <td>Database event log table</td>
+                <?php $dbEventLogTable = $properties[Configuration::DB_EVENT_LOG_TABLE]; ?>
                 <td><input type="text" name="<?php echo Configuration::DB_EVENT_LOG_TABLE;?>"
-                    value="<?php echo $properties[Configuration::DB_EVENT_LOG_TABLE];?>"/></td>
+                    value="<?php echo Filter::escapeForHtmlAttribute($dbEventLogTable);?>"/>
+                </td>
             </tr>
       
             <tr style="height: 10px;"></tr>
@@ -572,14 +582,14 @@ Configuration form
             <tr>
                 <td>E-mail subject</td>
                 <td><input type="text" name="<?php echo Configuration::EMAIL_SUBJECT;?>" size="64"
-                    value="<?php echo $properties[Configuration::EMAIL_SUBJECT];?>"
+                    value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::EMAIL_SUBJECT]);?>"
                     />
                 </td>
             </tr>
             <tr>
                 <td>E-mail to list</td>
                 <td><input type="text" name="<?php echo Configuration::EMAIL_TO_LIST;?>" size="64"
-                    value="<?php echo $properties[Configuration::EMAIL_TO_LIST];?>"
+                    value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::EMAIL_TO_LIST]);?>"
                     />
                 </td>
             </tr>

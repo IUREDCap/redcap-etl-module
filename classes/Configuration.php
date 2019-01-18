@@ -99,6 +99,9 @@ class Configuration implements \JsonSerializable
         
         $batchSize = $this->getProperty(self::BATCH_SIZE);
         self::validateBatchSize($batchSize);
+        
+        $emailToList = $this->getProperty(self::EMAIL_TO_LIST);
+        self::validateEmailToList($emailToList);
     }
     
     
@@ -162,6 +165,31 @@ class Configuration implements \JsonSerializable
         }
         return true;
     }
+    
+    public static function validateEmailToList($emailToList)
+    {
+        $emails = preg_split('/[\s]*[\s,][\s]*/', $emailToList);
+        $invalidEmails = array();
+        
+        foreach ($emails as $email) {
+            if (!Filter::isEmail($email)) {
+                array_push($invalidEmails, $email);
+            }
+        }
+        
+        if (count($invalidEmails) === 1) {
+            throw new \Exception('The following to e-mail is invalid: '.$invalidEmails[0]);
+        } elseif (count($invalidEmails) > 1) {
+            $message = 'The following to e-mails are invalid: '.$invalidEmails[0];
+            for ($i = 1; $i < count($invalidEmails); $i++) {
+                $message .= ', '.$invalidEmails[$i];
+            }
+            throw new \Exception($message);
+        }
+        
+        return true;
+    }
+    
     
     public function jsonSerialize()
     {
