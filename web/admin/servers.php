@@ -94,22 +94,13 @@ echo $buffer;
 
 
 <?php
-#-------------------------------------
-# Render page sub-navigation tabs
-#-------------------------------------
-$module->renderAdminTabs($selfUrl);
+#-------------------------------------------------
+# Render page content header (tabs and messages)
+#-------------------------------------------------
+$module->renderAdminPageContentHeader($selfUrl, $error, $success);
+
 ?>
 
-<?php
-#----------------------------
-# Display error, if any
-#----------------------------
-if (!empty($error)) { ?>
-<div class="red" style="margin:20px 0;font-weight:bold;">
-    <img src="/redcap/redcap_v8.5.11/Resources/images/exclamation.png">
-    <?php echo $error; ?>
-    </div>
-<?php } ?>
 
 
 <form action="<?php echo $selfUrl;?>" method="post" style="margin-bottom: 12px;">

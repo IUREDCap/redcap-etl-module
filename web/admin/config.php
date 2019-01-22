@@ -66,13 +66,7 @@ echo $buffer;
 
 <?php
 
-$module->renderAdminTabs($selfUrl);
-
-#----------------------------
-# Display messages, if any
-#----------------------------
-$module->renderErrorMessageDiv($error);
-$module->renderSuccessMessageDiv($success);
+$module->renderAdminPageContentHeader($selfUrl, $error, $success);
 
 ?>
 

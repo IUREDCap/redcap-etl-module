@@ -11,6 +11,9 @@ use IU\RedCapEtlModule\Filter;
 #-----------------------------------------------------------------
 $submitValue = $_POST['submitValue'];
 if (strcasecmp($submitValue, 'add') === 0) {
+    #--------------------------------------
+    # Add configuration
+    #--------------------------------------
     if (!array_key_exists('configurationName', $_POST) || empty($_POST['configurationName'])) {
         $error = 'ERROR: No configuration name was specified.';
     } else {
@@ -29,6 +32,9 @@ if (strcasecmp($submitValue, 'add') === 0) {
         }
     }
 } elseif (strcasecmp($submitValue, 'copy') === 0) {
+    #--------------------------------------------
+    # Copy configuration
+    #--------------------------------------------
     $copyFromConfigName = $_POST['copyFromConfigName'];
     $copyToConfigName   = $_POST['copyToConfigName'];
     if (!empty($copyFromConfigName) && !empty($copyToConfigName)) {
@@ -39,11 +45,17 @@ if (strcasecmp($submitValue, 'add') === 0) {
         }
     }
 } elseif (strcasecmp($submitValue, 'delete') === 0) {
+    #---------------------------------------------
+    # Delete configuration
+    #---------------------------------------------
     $deleteConfigName = $_POST['deleteConfigName'];
     if (!empty($deleteConfigName)) {
         $module->removeConfiguration($deleteConfigName);
     }
 } elseif (strcasecmp($submitValue, 'rename') === 0) {
+    #----------------------------------------------
+    # Rename configuration
+    #----------------------------------------------
     $renameConfigName    = $_POST['renameConfigName'];
     $renameNewConfigName = $_POST['renameNewConfigName'];
     if (!empty($renameConfigName) && !empty($renameNewConfigName)) {
@@ -75,8 +87,8 @@ echo $buffer;
 <img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>database_table.png">REDCap-ETL
 </div>
 
-<?php
 
+<?php
 
 $configurationNames = $module->getUserConfigurationNames();
 
@@ -146,7 +158,8 @@ if (!in_array($projectId, $userEtlProjects)) {
 #------------------------------------------------------------
 ?>
 <form action="<?=$selfUrl;?>" method="post" style="margin-bottom: 12px;">
-    REDCap-ETL configuration name: <input name="configurationName" type="text">
+    REDCap-ETL configuration name:
+    <input name="configurationName" type="text" size="40" />
     <input type="submit" name="submitValue" value="Add" />
 </form>
 
@@ -188,9 +201,9 @@ foreach ($configurationNames as $configurationName) {
         print '<tr class="odd">'."\n";
     }
     
-    $configureUrl = $configUrl.'&configName='.$configurationName;
-    $runConfigurationUrl = $runUrl.'&configName='.$configurationName;
-    $scheduleConfigUrl = $scheduleUrl.'&configName='.$configurationName;
+    $configureUrl = $configUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
+    $runConfigurationUrl = $runUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
+    $scheduleConfigUrl = $scheduleUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
     
     print "<td>".Filter::escapeForHtml($configurationName)."</td>\n";
     print '<td style="text-align:center;">'

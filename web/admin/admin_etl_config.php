@@ -59,13 +59,7 @@ echo $buffer;
 
 <?php
 
-$module->renderAdminTabs('');
-
-#----------------------------
-# Display messages, if any
-#----------------------------
-$module->renderErrorMessageDiv($error);
-$module->renderSuccessMessageDiv($success);
+$module->renderAdminPageContentHeader('', $error, $success);
 
 ?>
 

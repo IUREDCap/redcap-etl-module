@@ -19,7 +19,6 @@ $userUrl         = $module->getURL(RedCapEtlModule::USER_CONFIG_PAGE);
 
 $adminConfig = $module->getAdminConfig();
     
-
 $selectedDay = $_POST['selectedDay'];
 if (!isset($selectedDay)) {
     $selectedDay = $_GET['selectedDay'];
@@ -36,26 +35,10 @@ if (!isset($selectedTime)) {
     }
 }
 
-
 $cronJobs = $module->getCronJobs($selectedDay, $selectedTime);
 
-
-$submitValue = $_POST['submitValue'];
-if (strcasecmp($submitValue, 'Save') === 0) {
-    $times = $_POST['times'];
-    $adminConfig->setAllowedCronTimes($times);
-    
-    $allowOnDemand = $_POST['allowOnDemand'];
-    $adminConfig->setAllowOnDemand($allowOnDemand);
-    
-    $allowCron = $_POST['allowCron'];
-    $adminConfig->setAllowCron($allowCron);
-    
-    $module->setAdminConfig($adminConfig);
-    $success = "Admin configuration saved.";
-}
-
 ?>
+
 
 <?php #include APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>
 
@@ -77,13 +60,7 @@ echo $buffer;
 
 <?php
 
-$module->renderAdminTabs($selfUrl);
-
-#----------------------------
-# Display messages, if any
-#----------------------------
-$module->renderErrorMessageDiv($error);
-$module->renderSuccessMessageDiv($success);
+$module->renderAdminPageContentHeader($selfUrl, $error, $success);
 
 ?>
 
@@ -137,11 +114,11 @@ $times = $adminConfig->getTimeLabels();
         $row = 1;
         foreach ($cronJobs as $cronJob) {
             $server = $cronJob['server'];
-            $serverUrl = $serverConfigUrl.'&serverName='.$server;
+            $serverUrl = $serverConfigUrl.'&serverName='.Filter::escapeForUrlParameter($server);
             $username  = $cronJob['username'];
             $projectId = $cronJob['projectId'];
             $config    = $cronJob['config'];
-            $userConfigUrl = $userUrl.'&username='.$username;
+            $userConfigUrl = $userUrl.'&username='.Filter::escapeForUrlParameter($username);
             
             $configUrl = $module->getURL(
                 RedCapEtlModule::ADMIN_ETL_CONFIG_PAGE.'?config='.$config
@@ -154,9 +131,8 @@ $times = $adminConfig->getTimeLabels();
                 echo '<tr class="odd">'."\n";
             }
             echo "<td>".'<a href="'.$userConfigUrl.'">'.Filter::escapeForHtml($cronJob['username']).'</a>'."</td>\n";
-            echo "<td>".'<a href="'.APP_PATH_WEBROOT.'index.php?pid='.$projectId.'" target="_blank">'
+            echo "<td>".'<a href="'.APP_PATH_WEBROOT.'index.php?pid='.(int)$projectId.'" target="_blank">'
                 .$projectId.'</a>'."</td>\n";
-            #print "<td>".'<a href="#" class="copyConfig">'.$cronJob['config'].'</a>'."</td>\n";
             echo "<td>".'<a href="'.$configUrl.'">'.Filter::escapeForHtml($config).'</a>'."</td>\n";
             
             if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) == 0) {
