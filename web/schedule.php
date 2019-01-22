@@ -6,6 +6,7 @@ require_once __DIR__.'/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Configuration;
+use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
@@ -133,9 +134,11 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $success);
     array_unshift($values, '');
     foreach ($values as $value) {
         if (strcmp($value, $configName) === 0) {
-            echo '<option value="'.$value.'" selected>'.$value."</option>\n";
+            echo '<option value="'.Filter::escapeForHtmlAttribute($value).'" selected>'
+                .Filter::escapeForHtml($value)."</option>\n";
         } else {
-            echo '<option value="'.$value.'">'.$value."</option>\n";
+            echo '<option value="'.Filter::escapeForHtmlAttribute($value).'">'
+                .Filter::escapeForHtml($value)."</option>\n";
         }
     }
     ?>
@@ -190,37 +193,43 @@ $(function () {
         
 <form action="<?php echo $selfUrl;?>" method="post" style="margin-top: 14px;">
 
-<div style="margin-bottom: 12px;">
-<span style="font-weight: bold">Server:</span>
-<?php
 
-echo '<select name="server">'."\n";
-echo '<option value=""></option>'."\n";
+    <div style="margin-bottom: 12px;">
+    <span style="font-weight: bold">Server:</span>
 
-if ($adminConfig->getAllowEmbeddedServer()) {
-    $selected = '';
-    if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
-        $selected = 'selected';
-    }
+    <?php
+    #--------------------------------------------------------------
+    # Server selection
+    #--------------------------------------------------------------
+    echo '<select name="server">'."\n";
+    echo '<option value=""></option>'."\n";
 
-    echo '<option value="'.ServerConfig::EMBEDDED_SERVER_NAME.'" '.$selected.'>'
-         .ServerConfig::EMBEDDED_SERVER_NAME
-         .'</option>'."\n";
-}
-
-foreach ($servers as $serverName) {
-    $serverConfig = $module->getServerConfig($serverName);
-    if (isset($serverConfig) && $serverConfig->getIsActive() === true) {
+    if ($adminConfig->getAllowEmbeddedServer()) {
         $selected = '';
-        if ($serverName === $server) {
+        if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
             $selected = 'selected';
         }
-        echo '<option value="'.$serverName.'" '.$selected.'>'.$serverName."</option>\n";
+
+        echo '<option value="'.ServerConfig::EMBEDDED_SERVER_NAME.'" '.$selected.'>'
+             .ServerConfig::EMBEDDED_SERVER_NAME
+             .'</option>'."\n";
     }
-}
-echo "</select>\n";
-?>
-</div>
+
+    foreach ($servers as $serverName) {
+        $serverConfig = $module->getServerConfig($serverName);
+        if (isset($serverConfig) && $serverConfig->getIsActive() === true) {
+            $selected = '';
+            if ($serverName === $server) {
+                $selected = 'selected';
+            }
+            echo '<option value="'.Filter::escapeForHtmlAttribute($serverName).'" '.$selected.'>'
+                .Filter::escapeForHtml($serverName)."</option>\n";
+        }
+    }
+    echo "</select>\n";
+    ?>
+    </div>
+
 
   <!-- <fieldset style="border: 2px solid #ccc; border-radius: 7px; padding: 7px;"> -->
   <!-- <legend style="font-weight: bold;">Schedule Automated Repeating Run</legend> -->

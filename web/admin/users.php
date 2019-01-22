@@ -9,6 +9,7 @@ if (!SUPER_USER) {
 require_once __DIR__.'/../../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
+use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
 
@@ -102,7 +103,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $successMessage);
         } else {
             echo "<tr class=\"odd\">\n";
         }
-        echo '<td><a href="'.$userConfigUrl.'">'.$user.'</td>'."\n";
+        echo '<td><a href="'.$userConfigUrl.'">'.Filter::escapeForHtml($user).'</td>'."\n";
         echo '<td style="text-align: right;">'.count($etlProjects)."</td>\n";
         echo '<td style="text-align: right;">'.$configCount."</td>\n";
         echo "</tr>\n";

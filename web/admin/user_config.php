@@ -9,6 +9,7 @@ if (!SUPER_USER) {
 require_once __DIR__.'/../../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
+use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
 
@@ -74,14 +75,11 @@ echo $buffer;
 
 <?php $module->renderAdminTabs($selfUrl); ?>
 
-<?php #echo "user-search: ".$_POST['user-search']."<br/>\n"; ?>
-<?php #echo "user label: ".$_POST['userLabel']."<br/>\n"; ?>
-<?php #echo "username-result: ".$_POST['username-result']."<br/>\n"; ?>
-<?php # print "<pre>"; print_r($userProjects); print "</pre>"; ?>
 
 <form id="searchForm" action="<?php echo $selfUrl;?>" method="post">
-User: <input type="text" id="user-search" name="user-search" size="48" value="<?php echo $username; ?>">
-<!-- <input type="submit" name="submitValue" value="Add User"><br /> -->
+User:
+<input type="text" id="user-search" name="user-search" size="48" 
+     value="<?php echo Filter::escapeForHtmlAttribute($username); ?>">
 <input type="hidden" name="username-result" id="username-result">
 <input type="hidden" name="userLabel" id="userLabel">
 </form>
@@ -116,10 +114,10 @@ $(function() {
 
 <?php
 if (!empty($username)) {
-    echo "<p>Projects for user {$userLabel}</p>\n";
+    echo "<p>Projects for user ".Filter::escapeForHtml($userLabel)."</p>\n";
 ?>
 <form action="<?php echo $selfUrl;?>" method="post">
-<input type="hidden" name="username-result" value="<?php echo $username;?>">
+<input type="hidden" name="username-result" value="<?php echo Filter::escapeForHtmlAttribute($username);?>">
 <table class="user-projects">
     <thead>
         <tr> <th>ETL Access?</th> </th><th>PID</th> <th>Project</th> <th>ETL Configurations</th> </tr>
@@ -142,29 +140,32 @@ if (!empty($username)) {
             if (!empty($userEtlProjects) && in_array($projectId, $userEtlProjects)) {
                 $checked = ' checked ';
             }
-            echo '<td style="text-align: center;"><input type="checkbox" name="checkbox['.$projectId.']" '
+            echo '<td style="text-align: center;"><input type="checkbox" name="checkbox['.(int)$projectId.']" '
                 .$checked.'></td>'."\n";
-            echo '<td style="text-align: right">'.$projectId."</td>\n";
+            echo '<td style="text-align: right">'.(int)$projectId."</td>\n";
             
             # Project title
             echo "<td>\n";
-            echo '<a href="'.APP_PATH_WEBROOT.'index.php?pid='.$project['project_id'].'" target="_blank">'
-                .$project['app_title']."</a>\n";
+            echo '<a href="'.APP_PATH_WEBROOT.'index.php?pid='
+                .Filter::escapeForUrlParameter($project['project_id']).'" target="_blank">'
+                .Filter::escapeForHtml($project['app_title'])."</a>\n";
             echo "</td>\n";
             
             echo "<td>\n";
             $isFirst = true;
             foreach ($configNames as $configName) {
                 $configUrl = $module->getURL(
-                    RedCapEtlModule::ADMIN_ETL_CONFIG_PAGE.'?config='.$configName
-                    .'&username='.$username.'&pid='.$projectId
+                    RedCapEtlModule::ADMIN_ETL_CONFIG_PAGE
+                    .'?config='.Filter::escapeForUrlParameter($configName)
+                    .'&username='.Filter::escapeForUrlParameter($username)
+                    .'&pid='.Filter::escapeForUrlParameter($projectId)
                 );
                 if ($isFirst) {
                     $isFirst = false;
                 } else {
                     echo ", ";
                 }
-                echo '<a href="'.$configUrl.'">'.$configName."</a>\n";
+                echo '<a href="'.$configUrl.'">'.Filter::escapeForHtml($configName)."</a>\n";
             }
             echo "\n";
             echo "</td>\n";

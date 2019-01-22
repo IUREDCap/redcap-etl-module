@@ -13,6 +13,7 @@ use phpseclib\Net\SCP;
 use phpseclib\Net\SFTP;
 use phpseclib\Net\SSH2;
 
+use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\ServerConfig;
 use IU\RedCapEtlModule\RedCapEtlModule;
 
@@ -122,9 +123,11 @@ $module->renderSuccessMessageDiv($success);
     array_unshift($values, '');
     foreach ($values as $value) {
         if (strcmp($value, $serverName) === 0) {
-            echo '<option value="'.$value.'" selected>'.$value."</option>\n";
+            echo '<option value="'.Filter::escapeForHtmlAttribute($value)
+                .'" selected>'.Filter::escapeForHtml($value)."</option>\n";
         } else {
-            echo '<option value="'.$value.'">'.$value."</option>\n";
+            echo '<option value="'.Filter::escapeForHtmlAttribute($value).'">'
+                .Filter::escapeForHtml($value)."</option>\n";
         }
     }
     ?>
@@ -192,7 +195,8 @@ if (!empty($serverName)) {
     }
 ?>
 <form action=<?php echo $selfUrl;?> method="post">
-  <input type="hidden" name="serverName" value="<?php echo $serverConfig->getName();?>">
+  <input type="hidden" name="serverName"
+      value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getName());?>">
   <table>
     <tr>
       <td>Active:</td>
@@ -200,8 +204,9 @@ if (!empty($serverName)) {
     </tr>
     <tr>
       <td>Server address:</td>
-      <td><input type="text" name="serverAddress" value="<?php echo $serverConfig->getServerAddress();?>"
-                 size="60" style="margin: 4px;"></td>
+      <td><input type="text" name="serverAddress"
+          value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getServerAddress());?>"
+          size="60" style="margin: 4px;"></td>
     </tr>
     <tr>
       <td style="padding-top: 4px; padding-bottom: 4px; vertical-align: top;">Authentication method:</td>
@@ -226,8 +231,9 @@ if (!empty($serverName)) {
     </tr>
     <tr>
       <td>Username:</td>
-      <td><input type="text" name="username" value="<?php echo $serverConfig->getUsername();?>"
-                 size="28" style="margin: 4px;"></td>
+      <td><input type="text" name="username"
+          value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getUsername());?>"
+          size="28" style="margin: 4px;"></td>
     </tr>
     
     <?php
@@ -243,8 +249,9 @@ if (!empty($serverName)) {
     <tr id="passwordRow" <?php echo $passwordStyle; ?> >
       <td>Password:</td>
       <td>
-        <input type="password" name="password" value="<?php echo $serverConfig->getPassword();?>"
-               size="28" style="margin: 4px;" id="password" autocomplete="off">
+        <input type="password" name="password"
+            value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getPassword());?>"
+            size="28" style="margin: 4px;" id="password" autocomplete="off">
         <input type="checkbox" id="showPassword" style="vertical-align: middle; margin: 0;">
         <span style="vertical-align: middle;">Show</span>
       </td>
@@ -252,14 +259,16 @@ if (!empty($serverName)) {
 
     <tr id="sshKeyFileRow" <?php echo $sshStyle; ?> >
       <td>SSH key file:</td>
-      <td><input type="text" name="sshKeyFile" value="<?php echo $serverConfig->getSshKeyFile();?>"
-                 size="44" style="margin: 4px;" autocomplete="off"></td>
+      <td><input type="text" name="sshKeyFile"
+          value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getSshKeyFile());?>"
+          size="44" style="margin: 4px;" autocomplete="off"></td>
     </tr>
     <tr id="sshKeyPasswordRow" <?php echo $sshStyle; ?> >
       <td>SSH key password:</td>
       <td>
-        <input type="password" name="sshKeyPassword" value="<?php echo $serverConfig->getSshKeyPassword();?>"
-               size="44" style="margin: 4px;" id="sshKeyPassword" autocomplete="off">
+        <input type="password" name="sshKeyPassword"
+            value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getSshKeyPassword());?>"
+            size="44" style="margin: 4px;" id="sshKeyPassword" autocomplete="off">
         <input type="checkbox" id="showSshKeyPassword" style="vertical-align: middle; margin: 0;">
         <span style="vertical-align: middle;">Show</span>
       </td>
@@ -271,23 +280,29 @@ if (!empty($serverName)) {
     
     <tr>
       <td>Configuration directory:</td>
-      <td><input type="text" name="configDir" value="<?php echo $serverConfig->getConfigDir();?>"
-                 size="60" style="margin: 4px;"></td>
+      <td><input type="text" name="configDir"
+          value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getConfigDir());?>"
+          size="60" style="margin: 4px;"></td>
     </tr>
     <tr>
       <td>ETL command prefix:</td>
-      <td><input type="text" name="etlCommandPrefix" value="<?php echo $serverConfig->getEtlCommandPrefix();?>"
-                 size="60" style="margin: 4px;"></td>
+      <td><input type="text" name="etlCommandPrefix"
+          value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getEtlCommandPrefix());?>"
+          size="60" style="margin: 4px;"></td>
     </tr>    
     <tr>
       <td>ETL command:</td>
-      <td><input type="text" name="etlCommand" value="<?php echo $serverConfig->getEtlCommand();?>"
-                 size="60" style="margin: 4px;"></td>
+      <td>
+        <input type="text" name="etlCommand"
+            value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getEtlCommand());?>"
+            size="60" style="margin: 4px;">
+      </td>
     </tr>
     <tr>
       <td>ETL command suffix:</td>
-      <td><input type="text" name="etlCommandSuffix" value="<?php echo $serverConfig->getEtlCommandSuffix();?>"
-                 size="60" style="margin: 4px;"></td>
+      <td><input type="text" name="etlCommandSuffix"
+          value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getEtlCommandSuffix());?>"
+          size="60" style="margin: 4px;"></td>
     </tr>
             
     <tr>
@@ -297,8 +312,9 @@ if (!empty($serverName)) {
     
     <tr>
       <td>Log file:</td>
-      <td><input type="text" name="logFile" value="<?php echo $serverConfig->getLogFile();?>"
-                 size="60" style="margin: 4px;"></td>
+      <td><input type="text" name="logFile"
+          value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getLogFile());?>"
+          size="60" style="margin: 4px;"></td>
     </tr>
        
     <tr>
@@ -308,8 +324,9 @@ if (!empty($serverName)) {
         
     <tr>
       <td>E-mail from address:</td>
-      <td><input type="text" name="emailFromAddress" value="<?php echo $serverConfig->getEmailFromAddress();?>"
-                 size="40" style="margin: 4px;"></td>
+      <td><input type="text" name="emailFromAddress"
+          value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getEmailFromAddress());?>"
+          size="40" style="margin: 4px;"></td>
     </tr>
     
     <tr>
@@ -352,7 +369,10 @@ if (!empty($serverName)) {
   </div>
   <div style="margin-top: 4ex;">
     <input type="submit" name="submit" value="Test Server Connection"> <br/>
-    <textarea id="testOutput" name="testOutput" rows="4" cols="40"><?php echo $testOutput;?>&nbsp;</textarea>
+    <textarea id="testOutput" name="testOutput" rows="4" cols="40"><?php
+        echo Filter::escapeForHtml($testOutput);
+    ?>&nbsp;
+    </textarea>
   </div>
 </form>
 <?php

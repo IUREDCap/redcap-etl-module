@@ -9,6 +9,7 @@ if (!SUPER_USER) {
 require_once __DIR__.'/../../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
+use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
@@ -138,9 +139,9 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
         } else {
             echo "<tr class=\"odd\">\n";
         }
-        print "<td>{$server}</td>\n";
+        print "<td>".Filter::escapeForHtml($server)."</td>\n";
 
-        $serverConfigureUrl = $configureUrl.'&serverName='.$server;
+        $serverConfigureUrl = $configureUrl.'&serverName='.Filter::escapeForUrlParameter($server);
         
         print '<td style="text-align:center;">';
         if ($serverConfig->getIsActive()) {

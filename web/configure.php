@@ -442,8 +442,7 @@ Configuration form
                     $rulesName = Configuration::TRANSFORM_RULES_TEXT;
                     ?>
                     <textarea rows="14" cols="70" style="margin-top: 4px; margin-bottom: 4px;"
-                              name="<?php echo $rulesName;?>">
-                        <?php echo Filter::escapeForHtml($rules);?>
+                              name="<?php echo $rulesName;?>"><?php echo Filter::escapeForHtml($rules);?>
                     </textarea>
                 </td>
                 <td>

@@ -9,6 +9,7 @@ if (!SUPER_USER) {
 require_once __DIR__.'/../../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
+use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
@@ -148,23 +149,23 @@ $times = $adminConfig->getTimeLabels();
             );
 
             if ($row % 2 === 0) {
-                print '<tr class="even">'."\n";
+                echo '<tr class="even">'."\n";
             } else {
-                print '<tr class="odd">'."\n";
+                echo '<tr class="odd">'."\n";
             }
-            print "<td>".'<a href="'.$userConfigUrl.'">'.$cronJob['username'].'</a>'."</td>\n";
-            print "<td>".'<a href="'.APP_PATH_WEBROOT.'index.php?pid='.$projectId.'" target="_blank">'
+            echo "<td>".'<a href="'.$userConfigUrl.'">'.Filter::escapeForHtml($cronJob['username']).'</a>'."</td>\n";
+            echo "<td>".'<a href="'.APP_PATH_WEBROOT.'index.php?pid='.$projectId.'" target="_blank">'
                 .$projectId.'</a>'."</td>\n";
             #print "<td>".'<a href="#" class="copyConfig">'.$cronJob['config'].'</a>'."</td>\n";
-            print "<td>".'<a href="'.$configUrl.'">'.$config.'</a>'."</td>\n";
+            echo "<td>".'<a href="'.$configUrl.'">'.Filter::escapeForHtml($config).'</a>'."</td>\n";
             
             if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) == 0) {
-                print "<td>".$server."</td>\n";
+                echo "<td>".$server."</td>\n";
             } else {
-                print "<td>".'<a href="'.$serverUrl.'">'.$server.'</a>'."</td>\n";
+                echo "<td>".'<a href="'.$serverUrl.'">'.Filter::escapeForHtml($server).'</a>'."</td>\n";
             }
             
-            print "</tr>\n";
+            echo "</tr>\n";
             $row++;
         }
         ?>

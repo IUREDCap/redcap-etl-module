@@ -11,6 +11,7 @@ require_once __DIR__.'/../../dependencies/autoload.php';
 use \IU\REDCapETL\Version;
 
 use \IU\RedCapEtlModule\AdminConfig;
+use \IU\RedCapEtlModule\Filter;
 use \IU\RedCapEtlModule\RedCapEtlModule;
 
 $selfUrl = $module->getUrl(RedCapEtlModule::ADMIN_HOME_PAGE);
@@ -93,12 +94,12 @@ $module->renderSuccessMessageDiv($success);
     
     <span  style="padding-left: 4em;">Embedded server e-mail from address: </span>
     <input type="text" name="embeddedServerEmailFromAddress" size="50"
-        value="<?php echo $adminConfig->getEmbeddedServerEmailFromAddress();?>">
+        value="<?php echo Filter::escapeForHtmlAttribute($adminConfig->getEmbeddedServerEmailFromAddress());?>">
     <br />
 
     <span  style="padding-left: 4em;">Embedded server log file: </span>
     <input type="text" name="embeddedServerLogFile" size="61"
-        value="<?php echo $adminConfig->getEmbeddedServerLogFile();?>">
+        value="<?php echo Filter::escapeForHtmlAttribute($adminConfig->getEmbeddedServerLogFile());?>">
     <br />
         
     <?php

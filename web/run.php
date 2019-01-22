@@ -6,6 +6,7 @@ require_once __DIR__.'/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Configuration;
+use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
@@ -122,9 +123,11 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $success);
     array_unshift($values, '');
     foreach ($values as $value) {
         if (strcmp($value, $configName) === 0) {
-            echo '<option value="'.$value.'" selected>'.$value."</option>\n";
+            echo '<option value="'.Filter::escapeForHtmlAttribute($value).'" selected>'
+                .Filter::escapeForHtml($value)."</option>\n";
         } else {
-            echo '<option value="'.$value.'">'.$value."</option>\n";
+            echo '<option value="'.Filter::escapeForHtmlAttribute($value).'">'
+                .Filter::escapeForHtml($value)."</option>\n";
         }
     }
     ?>
@@ -142,7 +145,8 @@ $allowEmbeddedServer = $adminConfig->getAllowEmbeddedServer();
         <legend style="font-weight: bold;">Run Now</legend>
         <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
         <input type="submit" name="submit" value="Run"
-               onclick='$("#runOutput").text(""); $("body").css("cursor", "progress");'/>
+            style="color: #008000; font-weight: bold;"
+            onclick='$("#runOutput").text(""); $("body").css("cursor", "progress");'/>
         on
         <?php
 
@@ -166,12 +170,13 @@ $allowEmbeddedServer = $adminConfig->getAllowEmbeddedServer();
                 if ($serverName === $server) {
                     $selected = 'selected';
                 }
-                echo '<option value="'.$serverName.'" '.$selected.'>'.$serverName."</option>\n";
+                echo '<option value="'.Filter::escapeForHtmlAttribute($serverName).'" '.$selected.'>'
+                    .Filter::escapeForHtml($serverName)."</option>\n";
             }
         }
         echo "</select>\n";
         ?>
-  <p><pre id="runOutput"><?php echo $runOutput;?></pre></p>
+  <p><pre id="runOutput"><?php echo Filter::escapeForHtml($runOutput);?></pre></p>
   </fieldset>
 </form>
 

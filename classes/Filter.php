@@ -8,7 +8,7 @@ namespace IU\RedCapEtlModule;
 class Filter
 {
     /**
-     * Escape a text for displaying as HTML.
+     * Escape text for displaying as HTML.
      * This method only works within REDCap context.
      *
      * @param string $value the text to display.
@@ -23,6 +23,14 @@ class Filter
         return htmlspecialchars($value, ENT_QUOTES);
     }
 
+    /**
+     * Escape value for use as URL parameters.
+     */
+    public static function escapeForUrlParameter($value)
+    {
+        return urlencode($value);
+    }
+    
     public static function escapeForJavaScriptInSingleQuotes($value)
     {
         # REDCap's JavaScript escape function for single quotes
