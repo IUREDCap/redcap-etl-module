@@ -74,6 +74,9 @@ class Configuration implements \JsonSerializable
         $this->properties[self::REDCAP_API_URL] = APP_PATH_WEBROOT_FULL.'api/';
         $this->properties[self::SSL_VERIFY]     = true;
         
+        $this->properties[self::API_TOKEN_USERNAME] = '';
+        $this->properties[self::DATA_SOURCE_API_TOKEN] = '';
+        
         $this->properties[self::BATCH_SIZE] = 100;
         $this->properties[self::TRANSFORM_RULES_SOURCE] = '1';
         

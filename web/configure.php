@@ -78,7 +78,6 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
         $apiUrl    = $properties[Configuration::REDCAP_API_URL];
         $dataToken = $properties[Configuration::DATA_SOURCE_API_TOKEN];
 
-         
         try {
             if (empty($apiUrl)) {
                 $error = 'ERROR: No REDCap API URL specified.';
@@ -118,20 +117,27 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
         } else {
             $_POST[Configuration::API_TOKEN_USERNAME] = trim($_POST[Configuration::API_TOKEN_USERNAME]);
         }
-                
-        if (empty($_POST[Configuration::API_TOKEN_USERNAME])) {
-            # No API token user was specified, set the API token to blank
-            $_POST[Configuration::DATA_SOURCE_API_TOKEN] = '';
-        } else {
-            if (!array_key_exists($_POST[Configuration::API_TOKEN_USERNAME], $apiTokens)) {
-                # The API token user does not have an API token, so set it to blank
-                $_POST[Configuration::API_TOKEN_USERNAME]    = '';
+
+        $apiUrl = $module->getRedCapApiUrl();
+                        
+        # If the configuration's API URL matches the API URL of the
+        # REDCap instance that is running (which should always be
+        # the case for non-admin users)
+        if (strcasecmp(trim($properties[Configuration::REDCAP_API_URL]), trim($apiUrl)) === 0) {                
+            if (empty($_POST[Configuration::API_TOKEN_USERNAME])) {
+                # No API token user was specified, set the API token to blank
                 $_POST[Configuration::DATA_SOURCE_API_TOKEN] = '';
             } else {
-                $_POST[Configuration::DATA_SOURCE_API_TOKEN] = $apiTokens[$_POST[Configuration::API_TOKEN_USERNAME]];
+                if (!array_key_exists($_POST[Configuration::API_TOKEN_USERNAME], $apiTokens)) {
+                    # The API token user does not have an API token, so set it to blank
+                    $_POST[Configuration::API_TOKEN_USERNAME]    = '';
+                    $_POST[Configuration::DATA_SOURCE_API_TOKEN] = '';
+                } else {
+                    $_POST[Configuration::DATA_SOURCE_API_TOKEN] = $apiTokens[$_POST[Configuration::API_TOKEN_USERNAME]];
+                }
             }
         }
-        
+    
         $configuration->set($_POST);
         $configuration->validate();
         $module->setConfiguration($configuration);
@@ -207,7 +213,7 @@ if (!empty($properties)) {
                 .' removed as the API token user.';
         } else {
             $apiToken = $apiTokens[$apiTokenUser];
-        
+
             #-----------------------------------------------------------
             # There is an API token for the specified user with export
             # permission, but it has changed, so update the API token
@@ -243,6 +249,7 @@ include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 #print "Properties text: <pre>\n".$configuration->getRedCapEtlPropertiesText()."</pre>\n";
 #print "Transformation rules text: <pre>\n".$configuration->getTransformationRulesText()."</pre>\n";
 #print "<pre>_POST\n"; print_r($_POST); print "</pre>\n";
+#print "<pre>\n"; print_r($properties); print "</pre>\n";
 #print "<pre>_FILES\n"; print_r($_FILES); print "</pre>\n";
 #$tmp = $_FILES['uploadCsvFile']['tmp_name'];
 #print "tmp file: {$tmp}<br />\n";
@@ -345,7 +352,8 @@ $(function() {
 <!-- ====================================
 Configuration form
 ===================================== -->
-<form action="<?php echo $selfUrl;?>" method="post" enctype="multipart/form-data" style="margin-top: 17px;">
+<form action="<?php echo $selfUrl;?>" method="post"
+    enctype="multipart/form-data" style="margin-top: 17px;" autocomplete="off">
 
     <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
     
@@ -381,7 +389,9 @@ Configuration form
                 Project API Token
                 </td>
                 <td>
-                    <?php $apiToken = $properties[Configuration::DATA_SOURCE_API_TOKEN] ?>
+                    <?php
+                    $apiToken = $properties[Configuration::DATA_SOURCE_API_TOKEN];
+                    ?>
                     <input type="password" size="34"
                         value="<?php echo Filter::escapeForHtmlAttribute($apiToken);?>"
                         name="<?php echo Configuration::DATA_SOURCE_API_TOKEN;?>" id="apiToken"/>

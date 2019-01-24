@@ -347,7 +347,7 @@ class Settings
         #-------------------------------------------------------------
         # Remove the configuration name from the project's information
         #-------------------------------------------------------------
-        $projectInfo = $this->getUserInfo();
+        $projectInfo = $this->getProjectInfo();
         if (isset($projectInfo) && $projectInfo->hasConfigName($configName)) {
             $projectInfo->removeConfigName($configName);
             $json = $projectInfo->toJson();
