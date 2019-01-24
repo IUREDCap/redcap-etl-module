@@ -95,7 +95,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $successMessage);
         $etlProjects = $module->getUserEtlProjects($user);
         $configCount = 0;
         foreach ($etlProjects as $etlProject) {
-            $configNames = $module->getUserConfigurationNames($user, $etlProject);
+            $configNames = $module->getConfigurationNames($etlProject);
             $configCount += count($configNames);
         }
         $userConfigUrl = $userUrl.'&username='.$user;

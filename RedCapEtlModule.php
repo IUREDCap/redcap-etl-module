@@ -293,9 +293,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     # UserInfo methods
     #-------------------------------------------------------------------
 
-    public function getUserConfigurationNames($username = USERID, $projectId = PROJECT_ID)
+    public function getConfigurationNames($projectId = PROJECT_ID)
     {
-        return $this->settings->getUserConfigurationNames($username, $projectId);
+        return $this->settings->getConfigurationNames($projectId);
     }
 
 
@@ -335,9 +335,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      * @param string $name the name of the configuration to get.
      * @return Configuration the specified configuration.
      */
-    public function getConfiguration($name, $username = USERID, $projectId = PROJECT_ID)
+    public function getConfiguration($name, $projectId = PROJECT_ID)
     {
-        return $this->settings->getConfiguration($name, $username, $projectId);
+        return $this->settings->getConfiguration($name, $projectId);
     }
     
     /**

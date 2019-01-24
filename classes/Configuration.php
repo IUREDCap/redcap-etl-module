@@ -13,6 +13,8 @@ class Configuration implements \JsonSerializable
     const DATA_SOURCE_API_TOKEN = 'data_source_api_token';
     const SSL_VERIFY = 'ssl_verify';
 
+    const API_TOKEN_USERNAME = 'api_token_username';
+    
     const TRANSFORM_RULES_FILE   = 'transform_rules_file';
     const TRANSFORM_RULES_TEXT   = 'transform_rules_text';
     const TRANSFORM_RULES_SOURCE = 'transform_rules_source';
@@ -168,25 +170,30 @@ class Configuration implements \JsonSerializable
     
     public static function validateEmailToList($emailToList)
     {
-        $emails = preg_split('/[\s]*[\s,][\s]*/', $emailToList);
-        $invalidEmails = array();
+        if (isset($emailToList)) {
+            $emailToList = trim($emailToList);
+            
+            if (!empty($emailToList)) {        
+                $emails = preg_split('/[\s]*[\s,][\s]*/', $emailToList);
+                $invalidEmails = array();
         
-        foreach ($emails as $email) {
-            if (!Filter::isEmail($email)) {
-                array_push($invalidEmails, $email);
+                foreach ($emails as $email) {
+                    if (!Filter::isEmail($email)) {
+                        array_push($invalidEmails, $email);
+                    }
+                }
+        
+                if (count($invalidEmails) === 1) {
+                    throw new \Exception('The following to e-mail is invalid: '.$invalidEmails[0]);
+                } elseif (count($invalidEmails) > 1) {
+                    $message = 'The following to e-mails are invalid: '.$invalidEmails[0];
+                    for ($i = 1; $i < count($invalidEmails); $i++) {
+                        $message .= ', '.$invalidEmails[$i];
+                    }
+                    throw new \Exception($message);
+                }
             }
         }
-        
-        if (count($invalidEmails) === 1) {
-            throw new \Exception('The following to e-mail is invalid: '.$invalidEmails[0]);
-        } elseif (count($invalidEmails) > 1) {
-            $message = 'The following to e-mails are invalid: '.$invalidEmails[0];
-            for ($i = 1; $i < count($invalidEmails); $i++) {
-                $message .= ', '.$invalidEmails[$i];
-            }
-            throw new \Exception($message);
-        }
-        
         return true;
     }
     
@@ -215,25 +222,6 @@ class Configuration implements \JsonSerializable
 
     public function set($properties)
     {
-        #------------------------------------------------
-        # Validate values
-        #------------------------------------------------
-        /*
-        foreach (self::getPropertyNames() as $name) {
-            if (array_key_exists($name, $properties)) {
-                $value = $properties[$name];
-                switch ($name) {
-                    case Configuration::REDCAP_API_URL:
-                        if (!empty($value) && filter_var($value, FILTER_VALIDATE_URL) === false) {
-                            $message = 'Invalid REDCap API URL.';
-                            throw new \Exception($message);
-                        }
-                        break;
-                }
-            }
-        }
-        */
-
         #------------------------------------------------
         # Set values
         #------------------------------------------------
@@ -296,6 +284,8 @@ class Configuration implements \JsonSerializable
         unset($properties[self::DB_USERNAME]);
         unset($properties[self::DB_PASSWORD]);
         
+        unset($properties[self::API_TOKEN_USERNAME]);
+        
         unset($properties[self::CRON_SERVER]);
         unset($properties[self::CRON_SCHEDULE]);
         
@@ -327,6 +317,8 @@ class Configuration implements \JsonSerializable
         unset($properties[self::DB_NAME]);
         unset($properties[self::DB_USERNAME]);
         unset($properties[self::DB_PASSWORD]);
+
+        unset($properties[self::API_TOKEN_USERNAME]);
         
         unset($properties[self::CRON_SERVER]);
         unset($properties[self::CRON_SCHEDULE]);

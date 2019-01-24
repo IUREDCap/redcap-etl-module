@@ -132,7 +132,7 @@ if (!empty($username)) {
         foreach ($userProjects as $project) {
             $projectId = $project['project_id'];
             
-            $configNames = $module->getUserConfigurationNames($username, $projectId);
+            $configNames = $module->getConfigurationNames($projectId);
             
             if ($row % 2 == 0) {
                 echo '<tr class="even-row">'."\n";

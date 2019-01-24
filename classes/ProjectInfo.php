@@ -3,18 +3,15 @@
 namespace IU\RedCapEtlModule;
 
 /**
- * Top-level class for storing user information.
+ * Top-level class for storing project information.
  */
-class UserInfo implements \JsonSerializable
+class ProjectInfo implements \JsonSerializable
 {
-    private $username;
-
-    /** @var array where keys are configuration names for the user */
+    /** @var array where keys are configuration names for the project */
     private $configs;
 
-    public function __construct($username)
+    public function __construct()
     {
-        $this->username = $username;
         $this->configs = array();
     }
 
@@ -65,10 +62,5 @@ class UserInfo implements \JsonSerializable
     {
         $json = json_encode($this);
         return $json;
-    }
-
-    public function getUsername()
-    {
-        return $this->username;
     }
 }

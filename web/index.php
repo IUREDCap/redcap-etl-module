@@ -90,7 +90,7 @@ echo $buffer;
 
 <?php
 
-$configurationNames = $module->getUserConfigurationNames();
+$configurationNames = $module->getConfigurationNames();
 
 $adminConfig = $module->getAdminConfig();
 

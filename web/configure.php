@@ -16,6 +16,12 @@ $error = '';
 $listUrl  = $module->getUrl("web/index.php");
 $selfUrl  = $module->getUrl("web/configure.php");
 
+/** @var array configurations property map from property name to value */
+$properties = array();
+
+
+$redCapDb = new RedCapDb();
+
 
 #-------------------------------------------
 # Get the configuration name
@@ -42,6 +48,16 @@ if (!empty($configName)) {
 }
 
 
+#--------------------------------------------------------------
+# Get the API tokens for this project with export permission,
+# and the username of user whose API token should be used
+# (if any)
+#--------------------------------------------------------------
+if (!empty($configuration)) {
+    $apiTokens    = $redCapDb->getApiTokensWithExportPermission(PROJECT_ID);
+    $apiTokenUser = $configuration->getProperty(Configuration::API_TOKEN_USERNAME);
+}
+
 
 #-------------------------
 # Set the submit value
@@ -61,6 +77,8 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
     if (!empty($properties)) {
         $apiUrl    = $properties[Configuration::REDCAP_API_URL];
         $dataToken = $properties[Configuration::DATA_SOURCE_API_TOKEN];
+
+         
         try {
             if (empty($apiUrl)) {
                 $error = 'ERROR: No REDCap API URL specified.';
@@ -85,8 +103,8 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
                 $rulesGenerator = new \IU\REDCapETL\RulesGenerator();
                 $rulesText = $rulesGenerator->generate($dataProject);
                 $properties[Configuration::TRANSFORM_RULES_TEXT] = $rulesText;
-                # print "$rulesText\n";
-            }
+                #print "$rulesText\n";
+             }
         } catch (Exception $exception) {
             $error = 'ERROR: '.$exception->getMessage();
         }
@@ -94,9 +112,26 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
 } elseif (strcasecmp($submit, 'Cancel') === 0) {
     header('Location: '.$listUrl);
 } elseif (strcasecmp($submit, 'Save') === 0) {
-    #$configuration = new Configuration($configName);
-
     try {
+        if (!isset($_POST[Configuration::API_TOKEN_USERNAME])) {
+            $_POST[Configuration::API_TOKEN_USERNAME] = '';
+        } else {
+            $_POST[Configuration::API_TOKEN_USERNAME] = trim($_POST[Configuration::API_TOKEN_USERNAME]);
+        }
+                
+        if (empty($_POST[Configuration::API_TOKEN_USERNAME])) {
+            # No API token user was specified, set the API token to blank
+            $_POST[Configuration::DATA_SOURCE_API_TOKEN] = '';
+        } else {
+            if (!array_key_exists($_POST[Configuration::API_TOKEN_USERNAME], $apiTokens)) {
+                # The API token user does not have an API token, so set it to blank
+                $_POST[Configuration::API_TOKEN_USERNAME]    = '';
+                $_POST[Configuration::DATA_SOURCE_API_TOKEN] = '';
+            } else {
+                $_POST[Configuration::DATA_SOURCE_API_TOKEN] = $apiTokens[$_POST[Configuration::API_TOKEN_USERNAME]];
+            }
+        }
+        
         $configuration->set($_POST);
         $configuration->validate();
         $module->setConfiguration($configuration);
@@ -122,38 +157,70 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
     // this should be a GET request, initialize with existing database values, if any
 }
 
+
+
 ?>
 
 <?php
 
 $success = '';
-#---------------------------------------------------------------
-# If the configuration is not empty, then update the
+
+#-----------------------------------------------------------------
+# API token user and token check
+#
+# If the configuration properties are not empty, then update the
 # API token if it has changed, UNLESS the REDCap API URL
 # being used does not match the one for the currently running
 # REDCap instance (which only admins should be allowed to do)
-#----------------------------------------------------------------
-if (!empty($configuration)) {
-    $properties = $configuration->getProperties();
-  
+#-----------------------------------------------------------------
+if (!empty($properties)) {
+
     # Get API URL and currently stored token for this project, if any
     $apiUrl = $module->getRedCapApiUrl();
-    $redCapDb = new RedCapDb();
-    $apiToken = $redCapDb->getApiToken(USERID, PROJECT_ID);
-        
+                        
     # If the configuration's API URL matches the API URL of the
     # REDCap instance that is running (which should always be
     # the case for non-admin users)
     if (strcasecmp(trim($properties[Configuration::REDCAP_API_URL]), trim($apiUrl)) === 0) {
-        # If the configuration's API Token does NOT match the current one for the project,
-        # then update the one in the configuration so it matches
-        if (strcasecmp(trim($properties[Configuration::DATA_SOURCE_API_TOKEN]), trim($apiToken)) !== 0) {
-            $configuration->setProperty(Configuration::DATA_SOURCE_API_TOKEN, $apiToken);
-            $module->setConfiguration($configuration, USERID, PROJECT_ID);
+    
+        if (empty($apiTokenUser)) {
             if (!empty($properties[Configuration::DATA_SOURCE_API_TOKEN])) {
-                $success = "Your API token has changed, and has been automatically updated in your configuration.";
+                #--------------------------------------------------------------
+                # No API token user is specified, but there is an API token,
+                # so remove it
+                #--------------------------------------------------------------
+                $properties[Configuration::DATA_SOURCE_API_TOKEN] = '';
+                $configuration->set($properties);
+                $module->setConfiguration($configuration, USERID, PROJECT_ID);
+             }
+        } elseif (!array_key_exists($apiTokenUser, $apiTokens)) {
+            #---------------------------------------------------
+            # The specified API token user no longer has an API
+            # token for this project with export permission, so
+            # delete this user as the API token user and clear
+            # the API token
+            #---------------------------------------------------
+            $properties[Configuration::API_TOKEN_USERNAME] = '';
+            $properties[Configuration::DATA_SOURCE_API_TOKEN] = '';
+            $configuration->set($properties);
+            $module->setConfiguration($configuration, USERID, PROJECT_ID);
+            $success = 'User "'.$apiTokenUser.'", who was specified as the API token user, no longer'
+                .' has an API token for this project with export permissions. This user has been'
+                .' removed as the API token user.';
+        } else {
+            $apiToken = $apiTokens[$apiTokenUser];
+        
+            #-----------------------------------------------------------
+            # There is an API token for the specified user with export
+            # permission, but it has changed, so update the API token
+            #-----------------------------------------------------------
+            if (strcasecmp(trim($properties[Configuration::DATA_SOURCE_API_TOKEN]), $apiToken) !== 0) {
+                $properties[Configuration::DATA_SOURCE_API_TOKEN] = $apiToken;
+                $configuration->set($properties);
+                $module->setConfiguration($configuration, USERID, PROJECT_ID);
+                $success = 'The API token for user "'.$apiTokenUser
+                .'" has changed, and has been automatically updated in the configuration.';
             }
-            $properties = $configuration->getProperties();
         }
     }
 }
@@ -169,6 +236,7 @@ include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 ?>
 
 <?php
+#print '<br/>TRANSFORM RULES: '.$properties[Configuration::TRANSFORM_RULES_TEXT]."<br/>\n";
 #print "submitValue {$submitValue}\n";
 #print "PROJECTS:<br />\n";
 #while ($row = db_fetch_assoc($q)) {
@@ -206,7 +274,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $success);
     <span style="font-weight: bold;">Configuration:</span>
     <select name="configName" onchange="this.form.submit()">
     <?php
-    $values = $module->getUserConfigurationNames();
+    $values = $module->getConfigurationNames();
     array_unshift($values, '');
     foreach ($values as $value) {
         if (strcmp($value, $configName) === 0) {
@@ -223,6 +291,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $success);
 
 <!-- Configuration part (displayed if the configuration name is set) -->
 <?php if (!empty($configName)) { ?>
+
 <!-- Rules overwrite dialog -->
 <div id="rules-overwrite-dialog" style="display:none;" title="Overwrite transformation rules?">
   Test...
@@ -365,7 +434,28 @@ Configuration form
                 </td>
             </tr>
             <?php } ?>
-      
+
+
+                  
+            <tr>
+                <td>API token user:</td>
+                <td>
+                    <select name="<?php echo Configuration::API_TOKEN_USERNAME;?>">
+                        <?php
+
+                        echo '<option value=""></option>'."\n";
+                        foreach ($apiTokens as $username => $apiToken) {
+                            $selected = '';
+                            if (strcasecmp($username, $apiTokenUser) === 0) {
+                                $selected = 'selected';
+                            }
+                            echo '<option '.$selected.' value="'.Filter::escapeForHtmlAttribute($username).'">'
+                                .Filter::escapeForHtml($username).'</option>'."\n";
+                        }
+                        ?>
+                    </select>
+                </td>
+            </tr>
             <tr>
                 <td>
                 API Token Status
@@ -375,11 +465,14 @@ Configuration form
 
                     echo "<div style=\"border: 1px solid #AAAAAA; margin-bottom: 4px;"
                         ." padding: 4px; border-radius: 4px;\">\n";
+                    
+                    
                     $apiUrl = $module->getRedCapApiUrl();
                     # If the configurations API URL doesn't match the project's API URL -
-                    # this case should only be possible for admins
+                    # this case should only be possible for admins and indicates
+                    # admin is entering information token information for a remote system
                     if (strcasecmp(trim($properties[Configuration::REDCAP_API_URL]), trim($apiUrl)) !== 0) {
-                        print '<span style="color: navy; font-weight: bold;">?</span>&nbsp;&nbsp;';
+                        echo '<span style="color: navy; font-weight: bold;">?</span>&nbsp;&nbsp;';
                         if (empty($properties[Configuration::DATA_SOURCE_API_TOKEN])) {
                             echo "No REDCap API token specified.";
                         } elseif (empty($properties[Configuration::REDCAP_API_URL])) {
@@ -388,41 +481,27 @@ Configuration form
                             echo "Non-local REDCap API URL specified - no API token information available.";
                         }
                     } else {
-                        # API token is for currently running REDCap server
-                        list($apiToken, $isExport, $isImport)
-                            = RedCapDb::getApiTokenWithPermissions(USERID, PROJECT_ID);
-                        $apiToken = trim($apiToken);
-                        if (!empty($apiToken)) {
-                            # If the project's API token does not match the configuration's API token
-                            $configApiToken = trim($properties[Configuration::DATA_SOURCE_API_TOKEN]);
-                            if (strcasecmp($configApiToken, $apiToken) !== 0) {
-                                # This case should only be possible for admin users
-                                print '<img alt="X" style="color: red; font-weight: bold;" src='
-                                    .APP_PATH_IMAGES.'cross.png>&nbsp;&nbsp;';
-                                echo "An API token has been created, "
-                                    ."but it does not match the token specified in the configuration.";
-                            } elseif ($isExport) {
-                                # If there is an API token and it has export permission
-                                print '<img alt="OK" style="color: green; font-weight: bold;" src='
-                                    .APP_PATH_IMAGES.'tick.png>&nbsp;&nbsp;';
-                                echo "An API token with export permission has been created for this project.";
-                            } else {
-                                # If there is an API token, but it does NOT have export permission
-                                print '<img alt="X" style="color: red; font-weight: bold;" src='
-                                    .APP_PATH_IMAGES.'cross.png>&nbsp;&nbsp;';
-                                    echo "An API token has been created, but it doesn't have export permission."
-                                    ."<br /><br />"
-                                    ."You need to request an API token"
-                                    ." for this project that has export permission.";
-                            }
-                        } else {
-                            # If this project does not have an API token (for the current user)
-                            print '<img alt="X" style="color: red; font-weight: bold;" src='
+                        if (count($apiTokens) < 1) {
+                            echo '<img alt="X" style="color: red; font-weight: bold;" src='
                                 .APP_PATH_IMAGES.'cross.png>&nbsp;&nbsp;';
-                            echo "No API token has been created for this project.<br /><br />"
-                                ."You need to request an API token for this project that has export permission.";
+                            echo "There are no API tokens with export permission for this project."
+                                ."<br /><br />"
+                                ."An API token needs to be requested"
+                                ." for this project that has export permission.";                           
+                        } elseif (empty($apiTokenUser)) {
+                            echo '<img alt="X" style="color: red; font-weight: bold;" src='
+                                .APP_PATH_IMAGES.'cross.png>&nbsp;&nbsp;';
+                            echo "No user's API token has been selected for this project."
+                                ."<br /><br />"
+                                ."You need to select an API token user (whose API token will be used to access REDCap).";
+                        } else {
+                            # If there is an API token and it has export permission
+                            echo '<img alt="OK" style="color: green; font-weight: bold;" src='
+                                .APP_PATH_IMAGES.'tick.png>&nbsp;&nbsp;';
+                            echo 'The API token for user "'.$apiTokenUser.'", which has export permission, has been selected.';
                         }
                     }
+
                     echo "</div>\n";
                     ?>
                 </td>
@@ -617,5 +696,3 @@ if (isset($configuration)) {
 ?>
 
 <?php include APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
-
-

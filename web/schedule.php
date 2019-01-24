@@ -17,7 +17,7 @@ $adminConfig = $module->getAdminConfig();
 
 $servers = $module->getServers();
 
-$configurationNames = $module->getUserConfigurationNames();
+$configurationNames = $module->getConfigurationNames();
 
 $selfUrl = $module->getUrl('web/schedule.php');
 $listUrl = $module->getUrl('web/index.php');
@@ -130,7 +130,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $success);
     <span style="font-weight: bold;">Configuration:</span>
     <select name="configName" onchange="this.form.submit();">
     <?php
-    $values = $module->getUserConfigurationNames();
+    $values = $module->getConfigurationNames();
     array_unshift($values, '');
     foreach ($values as $value) {
         if (strcmp($value, $configName) === 0) {

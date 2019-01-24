@@ -6,6 +6,7 @@ class Settings
 {
     const ADMIN_CONFIG_KEY         = 'admin-config';
     const SERVER_CONFIG_KEY_PREFIX = 'server-config:';
+    const PROJECT_INFO_KEY         = 'project-info';
     const SERVERS_KEY              = 'servers';
     const USER_LIST_KEY            = 'user-list';
     const LAST_RUN_TIME_KEY        = 'last-run-time'; // for storing day and time of last run
@@ -60,50 +61,38 @@ class Settings
     }
 
     #----------------------------------------------------------
-    # UserInfo settings methods
+    # ProjectInfo settings methods
     #----------------------------------------------------------
     
-    /**
-     * Gets the key for REDCap's external module settings table
-     * for the specified username, or the current username,
-     * if no username was specified.
-     */
-    private function getUserKey($username = USERID, $projectId = PROJECT_ID)
+    public function getProjectInfo($projectId = PROJECT_ID)
     {
-        $key = 'user:'.$username;
-        return $key;
-    }
-
-
-    public function getUserInfo($username = USERID, $projectId = PROJECT_ID)
-    {
-        $key = $this->getUserKey($username);
+        $key = self::PROJECT_INFO_KEY;
         $json = $this->module->getProjectSetting($key, $projectId);
-        $userInfo = new UserInfo($username);
-        $userInfo->fromJson($json);
-        return $userInfo;
+        $projectInfo = new ProjectInfo();
+        $projectInfo->fromJson($json);
+        return $projectInfo;
     }
     
-    public function setUserInfo($userInfo, $username = USERID, $projectId = PROJECT_ID)
+    public function setProjectInfo($projectInfo, $projectId = PROJECT_ID)
     {
-        $key = $this->getUserKey($username);
-        $json = $userInfo->toJson();
+        $key = self::PROJECT_INFO_KEY;
+        $json = $projectInfo->toJson();
         $this->module->setProjectSetting($key, $json, $projectId);
     }
 
+
     /**
-     * Gets the ETL configurations for the specified user and project.
+     * Gets the ETL configurations for the specified project.
      *
-     * @param string $username the REDCap username.
      * @param int $projectId the REDCap project ID.
      *
      * @return array array of ETL configuration names for the specified
      *     username and project ID.
      */
-    public function getUserConfigurationNames($username = USERID, $projectId = PROJECT_ID)
+    public function getConfigurationNames($projectId = PROJECT_ID)
     {
-        $userInfo = $this->getUserInfo($username, $projectId);
-        $names = $userInfo->getConfigNames();
+        $projectInfo = $this->getProjectInfo($projectId);
+        $names = $projectInfo->getConfigNames();
         return $names;
     }
     
@@ -140,9 +129,9 @@ class Settings
     #-------------------------------------------------------------------
     
         
-    public function getConfigurationKey($name, $username = USERID)
+    public function getConfigurationKey($name)
     {
-        $key = 'user:'.$username.';configuration:'.$name;
+        $key = 'configuration:'.$name;
         return $key;
     }
 
@@ -154,10 +143,10 @@ class Settings
      * @return Configuration the specified configuration, or null if no
      *     configuration is found.
      */
-    public function getConfiguration($name, $username = USERID, $projectId = PROJECT_ID)
+    public function getConfiguration($name, $projectId = PROJECT_ID)
     {
         $configuraion = null;
-        $key = $this->getConfigurationKey($name, $username);
+        $key = $this->getConfigurationKey($name);
         
         $setting = $this->module->getProjectSetting($key, $projectId);
         $configValues = json_decode($setting, true);
@@ -244,17 +233,17 @@ class Settings
         }
         
         try {
-            # Add configuration entry for user
-            $userInfo = $this->getUserInfo();
-            if (!isset($userInfo)) {
-                $userInfo = new UserInfo($username);
+            # Add configuration entry for project
+            $projectInfo = $this->getProjectInfo();
+            if (!isset($projectInfo)) {
+                $projectInfo = new ProjectInfo();
             }
 
-            if (!$userInfo->hasConfigName($name)) {
-                $userInfo->addConfigName($name);
-                $json = $userInfo->toJson();
-                $userKey = $this->getUserKey();
-                $this->module->setProjectSetting($userKey, $json, $projectId);
+            if (!$projectInfo->hasConfigName($name)) {
+                $projectInfo->addConfigName($name);
+                $json = $projectInfo->toJson();
+                $projectKey = self::PROJECT_INFO_KEY;
+                $this->module->setProjectSetting($projectKey, $json, $projectId);
             }
         
             # Add the actual configuration
@@ -292,13 +281,13 @@ class Settings
         
         try {
             #--------------------------------------------------------
-            # Add the configuration name to the user's information
+            # Add the configuration name to the projects's information
             #--------------------------------------------------------
-            $userInfo = $this->getUserInfo();
-            $userInfo->addConfigName($toConfigName);
-            $json = $userInfo->toJson();
-            $userKey = $this->getUserKey();
-            $this->module->setProjectSetting($userKey, $json);
+            $projectInfo = $this->getProjectInfo();
+            $projectInfo->addConfigName($toConfigName);
+            $json = $projectInfo->toJson();
+            $projectKey = self::PROJECT_INFO_KEY;
+            $this->module->setProjectSetting($projectKey, $json);
         
             #-----------------------------------------------------
             # Copy the actual configuration
@@ -355,15 +344,15 @@ class Settings
             $this->db->startTransaction();
         }
         
-        #-----------------------------------------------------------
-        # Remove the configuration name from the user's information
-        #-----------------------------------------------------------
-        $userInfo = $this->getUserInfo();
-        if (isset($userInfo) && $userInfo->hasConfigName($configName)) {
-            $userInfo->removeConfigName($configName);
-            $json = $userInfo->toJson();
-            $userKey = $this->getUserKey();
-            $this->module->setProjectSetting($userKey, $json);
+        #-------------------------------------------------------------
+        # Remove the configuration name from the project's information
+        #-------------------------------------------------------------
+        $projectInfo = $this->getUserInfo();
+        if (isset($projectInfo) && $projectInfo->hasConfigName($configName)) {
+            $projectInfo->removeConfigName($configName);
+            $json = $projectInfo->toJson();
+            $projectKey = self::PROJECT_INFO_KEY;
+            $this->module->setProjectSetting($projectKey, $json);
         }
         
         #------------------------------------------------
@@ -405,8 +394,8 @@ class Settings
         foreach ($usernames as $username) {
             $etlProjects = $this->getUserEtlProjects($username);
             foreach ($etlProjects as $etlProject) {
-                $user = $this->getUserInfo($username, $etlProject);
-                $configNames = $user->getConfigNames();
+                $project = $this->getProjectInfo($etlProject);
+                $configNames = $project->getConfigNames();
                 foreach ($configNames as $configName) {
                     $config = $this->getConfiguration($configName, $username, $etlProject);
                     if (isset($config)) {
