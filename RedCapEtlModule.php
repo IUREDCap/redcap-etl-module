@@ -18,8 +18,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const USER_CONFIG_PAGE   = 'web/admin/user_config.php';
     const SERVERS_PAGE       = 'web/admin/servers.php';
     const SERVER_CONFIG_PAGE = 'web/admin/server_config.php';
-    const ADMIN_ETL_CONFIG_PAGE = 'web/admin/admin_etl_config.php';
-
+    
+    const USER_ETL_CONFIG_PAGE  = 'web/configure.php';
+    
     const RUN_LOG_ACTION    = 'REDCap-ETL Export';
     const CHANGE_LOG_ACTION = 'REDCap-ETL Change';
     const LOG_EVENT         = -1;
@@ -572,7 +573,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $listUrl = $this->getUrl('web/index.php');
         $listLabel = '<span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>'
-           .' My ETL Configurations';
+           .' ETL Configurations';
 
         #$addUrl = $this->getUrl('add.php');
         #$addLabel = '<span style="color: #008000;" class="glyphicon glyphicon-plus" aria-hidden="true"></span>'
@@ -595,15 +596,19 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $tabs = array();
         
         $tabs[$listUrl]     = $listLabel;
-        #$tabs[$addUrl]      = $addLabel;
-        $tabs[$configUrl]   = $configLabel;
         
-        if ($adminConfig->getAllowCron()) {
-            $tabs[$scheduleUrl] = $scheduleLabel;
-        }
+        $userEtlProjects = $this->getUserEtlProjects(USERID);
+        
+        if (SUPER_USER || in_array(PROJECT_ID, $userEtlProjects)) {
+            $tabs[$configUrl]   = $configLabel;
+        
+            if ($adminConfig->getAllowCron()) {
+                $tabs[$scheduleUrl] = $scheduleLabel;
+            }
     
-        if ($adminConfig->getAllowOnDemand()) {
-            $tabs[$runUrl] = $runLabel;
+            if ($adminConfig->getAllowOnDemand()) {
+                $tabs[$runUrl] = $runLabel;
+            }
         }
         
         $this->renderTabs($tabs, $activeUrl);

@@ -107,7 +107,7 @@ $times = $adminConfig->getTimeLabels();
 
 <table class="dataTable">
     <thead>
-        <tr> <th>User</th> <th>Project ID</th> <th>Configuration</th> <th>Server</th> </tr>
+        <tr> <th>Project ID</th> <th>Configuration</th> <th>Server</th> </tr>
     </thead>
     <tbody>
         <?php
@@ -115,14 +115,15 @@ $times = $adminConfig->getTimeLabels();
         foreach ($cronJobs as $cronJob) {
             $server = $cronJob['server'];
             $serverUrl = $serverConfigUrl.'&serverName='.Filter::escapeForUrlParameter($server);
-            $username  = $cronJob['username'];
+            #$username  = $cronJob['username'];
             $projectId = $cronJob['projectId'];
             $config    = $cronJob['config'];
             $userConfigUrl = $userUrl.'&username='.Filter::escapeForUrlParameter($username);
             
             $configUrl = $module->getURL(
-                RedCapEtlModule::ADMIN_ETL_CONFIG_PAGE.'?config='.$config
-                .'&username='.$username.'&pid='.$projectId
+                RedCapEtlModule::USER_ETL_CONFIG_PAGE
+                .'?pid='.$projectId
+                .'&configName='.$config
             );
 
             if ($row % 2 === 0) {
@@ -130,7 +131,6 @@ $times = $adminConfig->getTimeLabels();
             } else {
                 echo '<tr class="odd">'."\n";
             }
-            echo "<td>".'<a href="'.$userConfigUrl.'">'.Filter::escapeForHtml($cronJob['username']).'</a>'."</td>\n";
             echo "<td>".'<a href="'.APP_PATH_WEBROOT.'index.php?pid='.(int)$projectId.'" target="_blank">'
                 .$projectId.'</a>'."</td>\n";
             echo "<td>".'<a href="'.$configUrl.'">'.Filter::escapeForHtml($config).'</a>'."</td>\n";

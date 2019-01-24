@@ -159,10 +159,10 @@ if (!empty($username)) {
             $isFirst = true;
             foreach ($configNames as $configName) {
                 $configUrl = $module->getURL(
-                    RedCapEtlModule::ADMIN_ETL_CONFIG_PAGE
-                    .'?config='.Filter::escapeForUrlParameter($configName)
-                    .'&username='.Filter::escapeForUrlParameter($username)
-                    .'&pid='.Filter::escapeForUrlParameter($projectId)
+                    RedCapEtlModule::USER_ETL_CONFIG_PAGE
+                    .'?pid='.Filter::escapeForUrlParameter($projectId)
+                    .'&configName='.Filter::escapeForUrlParameter($configName)
+                    #.'&username='.Filter::escapeForUrlParameter($username)
                 );
                 if ($isFirst) {
                     $isFirst = false;

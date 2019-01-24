@@ -104,7 +104,7 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
                 $rulesText = $rulesGenerator->generate($dataProject);
                 $properties[Configuration::TRANSFORM_RULES_TEXT] = $rulesText;
                 #print "$rulesText\n";
-             }
+            }
         } catch (Exception $exception) {
             $error = 'ERROR: '.$exception->getMessage();
         }
@@ -174,7 +174,6 @@ $success = '';
 # REDCap instance (which only admins should be allowed to do)
 #-----------------------------------------------------------------
 if (!empty($properties)) {
-
     # Get API URL and currently stored token for this project, if any
     $apiUrl = $module->getRedCapApiUrl();
                         
@@ -182,7 +181,6 @@ if (!empty($properties)) {
     # REDCap instance that is running (which should always be
     # the case for non-admin users)
     if (strcasecmp(trim($properties[Configuration::REDCAP_API_URL]), trim($apiUrl)) === 0) {
-    
         if (empty($apiTokenUser)) {
             if (!empty($properties[Configuration::DATA_SOURCE_API_TOKEN])) {
                 #--------------------------------------------------------------
@@ -192,7 +190,7 @@ if (!empty($properties)) {
                 $properties[Configuration::DATA_SOURCE_API_TOKEN] = '';
                 $configuration->set($properties);
                 $module->setConfiguration($configuration, USERID, PROJECT_ID);
-             }
+            }
         } elseif (!array_key_exists($apiTokenUser, $apiTokens)) {
             #---------------------------------------------------
             # The specified API token user no longer has an API
@@ -290,7 +288,9 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $success);
 </form>
 
 <!-- Configuration part (displayed if the configuration name is set) -->
-<?php if (!empty($configName)) { ?>
+<?php
+if (!empty($configName)) {
+?>
 
 <!-- Rules overwrite dialog -->
 <div id="rules-overwrite-dialog" style="display:none;" title="Overwrite transformation rules?">
@@ -487,18 +487,20 @@ Configuration form
                             echo "There are no API tokens with export permission for this project."
                                 ."<br /><br />"
                                 ."An API token needs to be requested"
-                                ." for this project that has export permission.";                           
+                                ." for this project that has export permission.";
                         } elseif (empty($apiTokenUser)) {
                             echo '<img alt="X" style="color: red; font-weight: bold;" src='
                                 .APP_PATH_IMAGES.'cross.png>&nbsp;&nbsp;';
                             echo "No user's API token has been selected for this project."
                                 ."<br /><br />"
-                                ."You need to select an API token user (whose API token will be used to access REDCap).";
+                                ."You need to select an API token user"
+                                ." (whose API token will be used to access REDCap).";
                         } else {
                             # If there is an API token and it has export permission
                             echo '<img alt="OK" style="color: green; font-weight: bold;" src='
                                 .APP_PATH_IMAGES.'tick.png>&nbsp;&nbsp;';
-                            echo 'The API token for user "'.$apiTokenUser.'", which has export permission, has been selected.';
+                            echo 'The API token for user "'.$apiTokenUser.'", which has export permission,'
+                                .' has been selected.';
                         }
                     }
 

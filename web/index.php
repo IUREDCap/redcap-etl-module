@@ -118,7 +118,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $success);
 # If the user does NOT have permission to use ETL for this project,
 # display a link to send e-mail to request access
 #--------------------------------------------------------------------
-if (!in_array($projectId, $userEtlProjects)) {
+if (!SUPER_USER && !in_array($projectId, $userEtlProjects)) {
     echo '<div style="padding-top:15px; padding-bottom:15px;">'."\n";
     $label = 'Request ETL access for this project';
     $projectUrl = APP_PATH_WEBROOT_FULL.'index.php?pid='.$projectId;

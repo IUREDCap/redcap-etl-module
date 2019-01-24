@@ -173,7 +173,7 @@ class Configuration implements \JsonSerializable
         if (isset($emailToList)) {
             $emailToList = trim($emailToList);
             
-            if (!empty($emailToList)) {        
+            if (!empty($emailToList)) {
                 $emails = preg_split('/[\s]*[\s,][\s]*/', $emailToList);
                 $invalidEmails = array();
         
