@@ -133,9 +133,9 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $success);
     $row = 1;
     foreach (range(0, 23) as $time) {
         if ($row % 2 === 0) {
-            print '<tr class="even-row">'."\n";
+            echo '<tr class="even-row">'."\n";
         } else {
-            print '<tr>'."\n";
+            echo '<tr>'."\n";
         }
         $row++;
         $label = $adminConfig->getHtmlTimeLabel($time);

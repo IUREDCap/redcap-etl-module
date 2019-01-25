@@ -196,47 +196,46 @@ if (!SUPER_USER && !in_array($projectId, $userEtlProjects)) {
 $row = 1;
 foreach ($configurationNames as $configurationName) {
     if ($row % 2 === 0) {
-        print '<tr class="even">'."\n";
+        echo '<tr class="even">'."\n";
     } else {
-        print '<tr class="odd">'."\n";
+        echo '<tr class="odd">'."\n";
     }
     
     $configureUrl = $configUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
     $runConfigurationUrl = $runUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
     $scheduleConfigUrl = $scheduleUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
     
-    print "<td>".Filter::escapeForHtml($configurationName)."</td>\n";
-    print '<td style="text-align:center;">'
+    echo "<td>".Filter::escapeForHtml($configurationName)."</td>\n";
+    echo '<td style="text-align:center;">'
         .'<a href="'.$configureUrl.'"><img src='.APP_PATH_IMAGES.'gear.png></a>'
         ."</td>\n";
         
     if ($adminConfig->getAllowOnDemand()) {
-        print '<td style="text-align:center;">'
+        echo '<td style="text-align:center;">'
             .'<a href="'.$runConfigurationUrl.'"><img src='.APP_PATH_IMAGES.'application_go.png></a>'
             ."</td>\n";
     }
 
     if ($adminConfig->getAllowCron()) {
-        print '<td style="text-align:center;">'
+        echo '<td style="text-align:center;">'
             .'<a href="'.$scheduleConfigUrl.'"><img src='.APP_PATH_IMAGES.'clock_frame.png></a>'
             ."</td>\n";
     }
         
-    print '<script>var test1 = 123;</script>'."\n";
-    print '<td style="text-align:center;">'
+    echo '<td style="text-align:center;">'
         .'<img src="'.APP_PATH_IMAGES.'page_copy.png" class="copyConfig" style="cursor: pointer;"'
         .' id="copyConfig'.$row.'"/>'
         ."</td>\n";
-    print '<td style="text-align:center;">'
+    echo '<td style="text-align:center;">'
         .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" class="renameConfig" style="cursor: pointer;"'
         .' id="renameConfig'.$row.'"/>'
         ."</td>\n";
-    print '<td style="text-align:center;">'
+    echo '<td style="text-align:center;">'
         .'<img src="'.APP_PATH_IMAGES.'delete.png" class="deleteConfig" style="cursor: pointer;"'
         .' id="deleteConfig'.$row.'"/>'
         ."</td>\n";
 
-    print "</tr>\n";
+    echo "</tr>\n";
     $row++;
 }
 

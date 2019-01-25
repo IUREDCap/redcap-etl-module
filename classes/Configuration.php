@@ -434,7 +434,6 @@ class Configuration implements \JsonSerializable
         $this->properties[self::REDCAP_API_URL] = $value;
     }
 
-
     public static function getPropertyNames()
     {
         $reflection = new \ReflectionClass(self::class);
@@ -442,18 +441,3 @@ class Configuration implements \JsonSerializable
         return $properyNames;
     }
 }
-
-/*
-$names = ['', 'test', 123, '<script>&27;</script>', '&34;', 'test-1 234', 'a"test', 'test\'s 1'];
-
-foreach ($names as $name) {
-
-    try {
-        if (Configuration::validateName($name)) {
-            print 'Name "'.$name.'" is '."valid\n";
-        }
-    } catch (\Exception $exception) {
-        print "Error: ".$exception->getMessage()."\n";
-    }
-}
-*/

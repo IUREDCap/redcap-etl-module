@@ -130,38 +130,38 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
         } else {
             echo "<tr class=\"odd\">\n";
         }
-        print "<td>".Filter::escapeForHtml($server)."</td>\n";
+        echo "<td>".Filter::escapeForHtml($server)."</td>\n";
 
         $serverConfigureUrl = $configureUrl.'&serverName='.Filter::escapeForUrlParameter($server);
         
-        print '<td style="text-align:center;">';
+        echo '<td style="text-align:center;">';
         if ($serverConfig->getIsActive()) {
-            print '<img src='.APP_PATH_IMAGES.'tick.png>';
+            echo '<img src='.APP_PATH_IMAGES.'tick.png>';
         } else {
-            print '<img src='.APP_PATH_IMAGES.'cross.png>';
+            echo '<img src='.APP_PATH_IMAGES.'cross.png>';
         }
-        print "</td>\n";
+        echo "</td>\n";
 
-        print '<td style="text-align:center;">'
+        echo '<td style="text-align:center;">'
             .'<a href="'.$serverConfigureUrl.'"><img src='.APP_PATH_IMAGES.'gear.png></a>'
             ."</td>\n";
 
-        print '<td style="text-align:center;">'
+        echo '<td style="text-align:center;">'
             .'<img src="'.APP_PATH_IMAGES.'page_copy.png" id="copyServer'.$row.'"'
             .' class="copyServer" style="cursor: pointer;">'
             ."</td>\n";
 
-        print '<td style="text-align:center;">'
+        echo '<td style="text-align:center;">'
             .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" id="renameServer'.$row.'"'
             .' class="renameServer" style="cursor: pointer;">'
             ."</td>\n";
           
-        print '<td style="text-align:center;">'
+        echo '<td style="text-align:center;">'
               .'<img src="'.APP_PATH_IMAGES.'delete.png" id="deleteServer'.$row.'"'
               .' class="deleteServer" style="cursor: pointer;">'
               ."</td>\n";
       
-        print "</tr>\n";
+        echo "</tr>\n";
         $row++;
     }
     ?>
