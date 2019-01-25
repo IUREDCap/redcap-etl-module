@@ -123,7 +123,7 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
         # If the configuration's API URL matches the API URL of the
         # REDCap instance that is running (which should always be
         # the case for non-admin users)
-        if (strcasecmp(trim($properties[Configuration::REDCAP_API_URL]), trim($apiUrl)) === 0) {                
+        if (strcasecmp(trim($properties[Configuration::REDCAP_API_URL]), trim($apiUrl)) === 0) {
             if (empty($_POST[Configuration::API_TOKEN_USERNAME])) {
                 # No API token user was specified, set the API token to blank
                 $_POST[Configuration::DATA_SOURCE_API_TOKEN] = '';
@@ -133,7 +133,8 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
                     $_POST[Configuration::API_TOKEN_USERNAME]    = '';
                     $_POST[Configuration::DATA_SOURCE_API_TOKEN] = '';
                 } else {
-                    $_POST[Configuration::DATA_SOURCE_API_TOKEN] = $apiTokens[$_POST[Configuration::API_TOKEN_USERNAME]];
+                    $_POST[Configuration::DATA_SOURCE_API_TOKEN]
+                        = $apiTokens[$_POST[Configuration::API_TOKEN_USERNAME]];
                 }
             }
         }

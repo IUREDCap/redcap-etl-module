@@ -74,13 +74,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                         $serverName = $cronJob['server'];
                         $configName = $cronJob['config'];
                         
-                        $userEtlProjects = $this->getUserEtlProjects($username);
-                        
-                        #------------------------------------------------------
-                        # If user has permission to run ETL for this project
-                        #------------------------------------------------------
-                        if (!empty($userEtlProjects) && in_array($projectId, $userEtlProjects)) {
-                            $etlConfig = $this->getConfiguration($configName, $username, $projectId);
+                        #----------------------------------------------------------------------
+                        # If the project has at least one user who has permission to run ETL
+                        #----------------------------------------------------------------------
+                        if ($this->hasEtlUser($projectId)) {
+                            $etlConfig = $this->getConfiguration($configName, $projectId);
 
                             $isCronJob = true;
                             
@@ -307,6 +305,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function getUserEtlProjects($username = USERID)
     {
         return $this->settings->getUserEtlProjects($username);
+    }
+    
+    public function hasEtlUser($projectId = PROJECT_ID)
+    {
+        return $this->settings->hasEtlUser($projectId);
     }
     
     /**
