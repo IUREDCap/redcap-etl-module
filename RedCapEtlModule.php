@@ -63,8 +63,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                     #\REDCap::logEvent('REDCap-ETL cron - cron already processed for day '.$day.', hour '.$hour);
                     ; // This time has already been processed, so don't do anything'
                 } else {
-                    $cronJobs = $this->getCronJobs($day, $hour);
-        
                     #\REDCap::logEvent('REDCap-ETL cron - processing '
                     #    .count($cronJobs).' jobs for day '.$day.', hour '.$hour);
                     
@@ -604,13 +602,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         
         if (SUPER_USER || in_array(PROJECT_ID, $userEtlProjects)) {
             $tabs[$configUrl]   = $configLabel;
-        
-            if ($adminConfig->getAllowCron()) {
-                $tabs[$scheduleUrl] = $scheduleLabel;
-            }
     
             if ($adminConfig->getAllowOnDemand()) {
                 $tabs[$runUrl] = $runLabel;
+            }
+                    
+            if ($adminConfig->getAllowCron()) {
+                $tabs[$scheduleUrl] = $scheduleLabel;
             }
         }
         
