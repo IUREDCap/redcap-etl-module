@@ -38,6 +38,8 @@ class Configuration implements \JsonSerializable
     
     const BATCH_SIZE = 'batch_size';
 
+    const TABLE_PREFIX = 'table_prefix';
+    
     const PRINT_LOGGING = 'print_logging';
     const PROJECT_ID = 'project_id';
     
@@ -80,6 +82,8 @@ class Configuration implements \JsonSerializable
         $this->properties[self::BATCH_SIZE] = 100;
         $this->properties[self::TRANSFORM_RULES_SOURCE] = '1';
         
+        $this->properties[self::TABLE_PREFIX] = '';
+                
         $this->properties[self::DB_LOGGING]         = true;
         $this->properties[self::DB_LOG_TABLE]       = \IU\REDCapETL\Configuration::DEFAULT_DB_LOG_TABLE;
         $this->properties[self::DB_EVENT_LOG_TABLE] = \IU\REDCapETL\Configuration::DEFAULT_DB_EVENT_LOG_TABLE;
@@ -104,6 +108,9 @@ class Configuration implements \JsonSerializable
         
         $batchSize = $this->getProperty(self::BATCH_SIZE);
         self::validateBatchSize($batchSize);
+        
+        $tablePrefix = $this->getProperty(self::TABLE_PREFIX);
+        self::validateTablePrefix($tablePrefix);
         
         $emailToList = $this->getProperty(self::EMAIL_TO_LIST);
         self::validateEmailToList($emailToList);
@@ -170,7 +177,24 @@ class Configuration implements \JsonSerializable
         }
         return true;
     }
-    
+ 
+     
+    public static function validateTablePrefix($tablePrefix)
+    {
+        $matches = array();
+        if (empty($tablePrefix)) {
+            ; // OK, it's optional
+        } elseif (preg_match('/^[_$a-zA-Z][_$a-zA-Z0-9]*$/', $tablePrefix, $matches) === 1) {
+            ; // OK
+        } else {
+             $errorMessage = 'Invalid table name prefix "'.$tablePrefix.'". Table name prefixes need to start with'
+                 .' a letter (a-z or A-Z), underscore, or dollar sign, that is followed by zero or more'
+                 .' of the same characters and/or digits (0-9)';
+            throw new \Exception($errorMessage);
+        }
+        return true;
+    }
+       
     public static function validateEmailToList($emailToList)
     {
         if (isset($emailToList)) {

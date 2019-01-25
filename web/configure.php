@@ -387,7 +387,7 @@ Configuration form
 
             <tr>
                 <td>
-                Project API Token
+                API token
                 </td>
                 <td>
                     <?php
@@ -419,7 +419,7 @@ Configuration form
       
             <tr>
                 <td>
-                SSL Certificate Verification&nbsp;
+                SSL certificate verification&nbsp;
                 </td>
                 <td>
                     <?php
@@ -449,7 +449,7 @@ Configuration form
 
                   
             <tr>
-                <td>API token user:</td>
+                <td>API Token - use token of user&nbsp;</td>
                 <td>
                     <select name="<?php echo Configuration::API_TOKEN_USERNAME;?>">
                         <?php
@@ -469,7 +469,7 @@ Configuration form
             </tr>
             <tr>
                 <td>
-                API Token Status
+                API token status
                 </td>
                 <td>
                     <?php
@@ -527,7 +527,7 @@ Configuration form
             <tr>
 
             <tr>
-                <td>Transformation Rules&nbsp;</td>
+                <td>Transformation rules</td>
                 <td>
                     <?php
                     $rules = $properties[Configuration::TRANSFORM_RULES_TEXT];
@@ -599,10 +599,18 @@ Configuration form
 
             <tr>
                 <td>Batch size</td>
-                <td><input type="text" name="<?php echo Filter::escapeForHtmlAttribute(Configuration::BATCH_SIZE);?>"
+                <td><input type="text" name="<?php echo Configuration::BATCH_SIZE;?>"
                     value="<?php echo $properties[Configuration::BATCH_SIZE];?>"/></td>
             </tr>
-      
+
+            <tr style="height: 10px;"></tr> 
+ 
+            <tr>
+                <td>Table name prefix</td>
+                <td><input type="text" name="<?php echo Configuration::TABLE_PREFIX;?>"
+                    value="<?php echo $properties[Configuration::TABLE_PREFIX];?>"/></td>
+            </tr>
+           
             <!--
             <tr>
                 <td><hr style="color: blue; border: 1px solid black;"/></td>
