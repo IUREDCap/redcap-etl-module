@@ -143,7 +143,10 @@ $allowEmbeddedServer = $adminConfig->getAllowEmbeddedServer();
 <form action="<?php echo $selfUrl;?>" method="post">
     <fieldset style="border: 2px solid #ccc; border-radius: 7px; padding: 7px;">
         <legend style="font-weight: bold;">Run Now</legend>
-        <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
+        
+        <input type="hidden" name="configName"
+            value="<?php echo Filter::escapeForHtmlAttribute($configName); ?>" />
+        
         <input type="submit" name="submit" value="Run"
             style="color: #008000; font-weight: bold;"
             onclick='$("#runOutput").text(""); $("body").css("cursor", "progress");'/>

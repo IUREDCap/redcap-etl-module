@@ -291,5 +291,3 @@ $(function () {
 ?>
 
 <?php include APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
-
-

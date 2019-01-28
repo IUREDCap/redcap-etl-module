@@ -121,7 +121,6 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $success);
 if (!SUPER_USER && !in_array($projectId, $userEtlProjects)) {
     echo '<div style="padding-top:15px; padding-bottom:15px;">'."\n";
     $label = 'Request ETL access for this project';
-    $projectUrl = APP_PATH_WEBROOT_FULL.'index.php?pid='.$projectId;
 
     # The underscore variable names are internal REDCap variables
     // phpcs:disable
@@ -270,7 +269,9 @@ $(function() {
     # Set up click event handlers for the Copy Configuration  buttons
     $row = 1;
     foreach ($configurationNames as $configurationName) {
-        echo '$("#copyConfig'.$row.'").click({fromConfig: "'.$configurationName.'"}, copyConfig);'."\n";
+        echo '$("#copyConfig'.$row.'").click({fromConfig: "'
+            .Filter::escapeForJavaScriptInDoubleQuotes($configurationName)
+            .'"}, copyConfig);'."\n";
         $row++;
     }
     ?>
@@ -324,7 +325,9 @@ $(function() {
     # Set up click event handlers for the Rename Configuration  buttons
     $row = 1;
     foreach ($configurationNames as $configurationName) {
-        echo '$("#renameConfig'.$row.'").click({configName: "'.$configurationName.'"}, renameConfig);'."\n";
+        echo '$("#renameConfig'.$row.'").click({configName: "'
+            .Filter::escapeForJavaScriptInDoubleQuotes($configurationName)
+            .'"}, renameConfig);'."\n";
         $row++;
     }
     ?>
@@ -379,7 +382,9 @@ $(function() {
     # Set up click event handlers for the Delete Configuration  buttons
     $row = 1;
     foreach ($configurationNames as $configurationName) {
-        echo '$("#deleteConfig'.$row.'").click({configName: "'.$configurationName.'"}, deleteConfig);'."\n";
+        echo '$("#deleteConfig'.$row.'").click({configName: "'
+           .Filter::escapeForJavaScriptInDoubleQuotes($configurationName)
+           .'"}, deleteConfig);'."\n";
         $row++;
     }
     ?>

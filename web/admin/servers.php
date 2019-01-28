@@ -234,9 +234,15 @@ echo "<script>\n";
 
 $row = 1;
 foreach ($servers as $server) {
-    echo '$("#copyServer'.$row.'").click({server: "'.$server.'"}, copyServer);'."\n";
-    echo '$("#renameServer'.$row.'").click({server: "'.$server.'"}, renameServer);'."\n";
-    echo '$("#deleteServer'.$row.'").click({server: "'.$server.'"}, deleteServer);'."\n";
+    echo '$("#copyServer'.$row.'").click({server: "'
+        .Filter::escapeForJavaScriptInDoubleQuotes($server)
+        .'"}, copyServer);'."\n";
+    echo '$("#renameServer'.$row.'").click({server: "'
+        .Filter::escapeForJavaScriptInDoubleQuotes($server)
+        .'"}, renameServer);'."\n";
+    echo '$("#deleteServer'.$row.'").click({server: "'
+        .Filter::escapeForJavaScriptInDoubleQuotes($server)
+        .'"}, deleteServer);'."\n";
     $row++;
 }
 

@@ -617,23 +617,28 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
 
     /**
-     * RENDER TABS FROM ARRAY WITH 'PAGE' AS KEY AND LABEL AS VALUE
+     * Renders tabs using built-in REDCap styles.
+     *
+     * @param array $tabs map from URL to tab label.
+     * @param string $activeUrl the URL that should be marked as active.
      */
     public function renderTabs($tabs = array(), $activeUrl = '')
     {
         echo '<div id="sub-nav" style="margin:5px 0 20px;">'."\n";
         echo '<ul>'."\n";
-        foreach ($tabs as $thisUrl => $thisLabel) {
+        foreach ($tabs as $tabUrl => $tabLabel) {
             // Check for Active tab
             $isActive = false;
             $class = '';
-            if (strcasecmp($thisUrl, $activeUrl) === 0) {
+            if (strcasecmp($tabUrl, $activeUrl) === 0) {
                 $class = ' class="active"';
                 $isActive = true;
             }
             echo '<li '.$class.'>'."\n";
-            echo '<a href="'.$thisUrl.'" style="font-size:13px;color:#393733;padding:6px 9px 5px 10px;">';
-            echo $thisLabel.'</a>'."\n";
+            # Note: URLs created with the getUrl method, so they should already be escaped
+            echo '<a href="'.$tabUrl.'" style="font-size:13px;color:#393733;padding:6px 9px 5px 10px;">';
+            # Note: labels are static values in code, and not based on user input
+            echo $tabLabel.'</a>'."\n";
         }
         echo '</li>'."\n";
         echo '</ul>'."\n";

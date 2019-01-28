@@ -65,8 +65,6 @@ echo $buffer;
 
 <?php
 #print "SUBMIT = {$submit} <br/> \n";
-#$users = $module->getUsers();
-#print "Users: <pre><br />\n"; print_r($users); print "</pre> <br/> \n";
 #print "<pre><br />\n"; print_r($_POST); print "</pre> <br/> \n";
 ?>
 
@@ -187,27 +185,5 @@ if (!empty($username)) {
 <?php
 }
 ?>
-
-<!--
-<h5 style="margin-top: 2em;">REDCap-ETL Users</h5>
-<table class="dataTable">
-    <thead>
-        <tr> <th>username</th> </tr>
-    </thead>
-    <tbody>
-    <?php
-    $row = 1;
-    foreach ($users as $user) {
-        if ($row % 2 == 0) {
-            echo "<tr class=\"even\"><td>{$user}</td></tr>\n";
-        } else {
-            echo "<tr class=\"odd\"><td>{$user}</td></tr>\n";
-        }
-        $row++;
-    }
-    ?>
-    </tbody>
-</table>
--->
 
 <?php include APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>

@@ -77,11 +77,6 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $successMessage);
 
 ?>
 
-<?php #echo "user-search: ".$_POST['user-search']."<br/>\n"; ?>
-<?php #echo "user label: ".$_POST['userLabel']."<br/>\n"; ?>
-<?php #echo "username-result: ".$_POST['username-result']."<br/>\n"; ?>
-<?php # print "<pre>"; print_r($userProjects); print "</pre>"; ?>
-
 
 <h5 style="margin-top: 2em;">REDCap-ETL Users</h5>
 <table class="dataTable">
@@ -98,7 +93,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $successMessage);
             $configNames = $module->getConfigurationNames($etlProject);
             $configCount += count($configNames);
         }
-        $userConfigUrl = $userUrl.'&username='.$user;
+        $userConfigUrl = $userUrl.'&username='.Filter::escapeForUrlParameter($user);
         if ($row % 2 == 0) {
             echo "<tr class=\"even\">\n";
         } else {

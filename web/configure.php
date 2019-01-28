@@ -356,13 +356,14 @@ Configuration form
 <form action="<?php echo $selfUrl;?>" method="post"
     enctype="multipart/form-data" style="margin-top: 17px;" autocomplete="off">
 
-    <input type="hidden" name="configName" value="<?php echo $configName; ?>" />
+    <input type="hidden" name="configName"
+        value="<?php echo Filter::escapeForHtmlAttribute($configName); ?>" />
     
     <input type="hidden" name="<?php echo Configuration::CONFIG_API_TOKEN; ?>"
-           value="<?php echo $properties[Configuration::CONFIG_API_TOKEN]; ?>" />
+           value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::CONFIG_API_TOKEN]); ?>" />
            
     <input type="hidden" name="<?php echo Configuration::TRANSFORM_RULES_SOURCE; ?>"
-           value="<?php echo $properties[Configuration::TRANSFORM_RULES_SOURCE]; ?>" />
+           value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::TRANSFORM_RULES_SOURCE]); ?>" />
          
     <!--<div style="padding: 10px; border: 1px solid #ccc; background-color: #f0f0f0;"> -->
 
@@ -510,7 +511,8 @@ Configuration form
                             # If there is an API token and it has export permission
                             echo '<img alt="OK" style="color: green; font-weight: bold;" src='
                                 .APP_PATH_IMAGES.'tick.png>&nbsp;&nbsp;';
-                            echo 'The API token for user "'.$apiTokenUser.'", which has export permission,'
+                            echo 'The API token for user "'.Filter::escapeForHtml($apiTokenUser).'"'
+                                .', which has export permission,'
                                 .' has been selected.';
                         }
                     }
@@ -533,9 +535,9 @@ Configuration form
                     $rules = $properties[Configuration::TRANSFORM_RULES_TEXT];
                     $rulesName = Configuration::TRANSFORM_RULES_TEXT;
                     ?>
-                    <textarea rows="14" cols="70" style="margin-top: 4px; margin-bottom: 4px;"
-                              name="<?php echo $rulesName;?>"><?php echo Filter::escapeForHtml($rules);?>
-                    </textarea>
+                    <textarea rows="14" cols="70"
+                        style="margin-top: 4px; margin-bottom: 4px;"
+                        name="<?php echo $rulesName;?>"><?php echo Filter::escapeForHtml($rules);?></textarea>
                 </td>
                 <td>
                     <p><input type="submit" name="submit" value="Auto-Generate"></p>
