@@ -13,14 +13,15 @@ use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
 
+$deleteButtonLabel = 'Delete User from REDCap-ETL';
+
 $selfUrl       = $module->getUrl(RedCapEtlModule::USER_CONFIG_PAGE);
 $userSearchUrl = $module->getUrl('web/admin/user_search.php');
-$adminUrl      = $module->getURL(RedCapEtlModule::ADMIN_HOME_PAGE);
+$adminUrl      = $module->getUrl(RedCapEtlModule::ADMIN_HOME_PAGE);
 
 $adminConfigJson = $module->getSystemSetting(AdminConfig::KEY);
 $adminConfig = new AdminConfig();
-
-
+        
 $submitValue = $_POST['submitValue'];
 
 $username = $_POST['username-result'];
@@ -30,25 +31,36 @@ if (empty($username)) {
 
 $userLabel = $_POST['userLabel'];
 
-if (!empty($username)) {
-    #if (strcasecmp($submitValue, 'Add User') === 0) {
-    #    $module->addUser($username);
-    if (strcasecmp($submitValue, 'Save') === 0) {
-        $checkbox = $_POST['checkbox'];
-        $userEtlProjects = array();
-        foreach (array_keys($checkbox) as $projectId) {
-            array_push($userEtlProjects, $projectId);
+try {
+    if (!empty($username)) {
+        if (strcmp($submitValue, $deleteButtonLabel) === 0) {
+            $module->deleteUser($username);
+            $success = 'User "'.$username.'" deleted from REDCap-ETL.';
+            $urlValue = RedCapEtlModule::USERS_PAGE.'?success='.Filter::escapeForUrlParameter($success);
+            $usersUrl = $module->getUrl($urlValue);
+            header('Location: '.$usersUrl);
+        } else {
+            if (strcasecmp($submitValue, 'Save') === 0) {
+                $checkbox = $_POST['checkbox'];
+                $userEtlProjects = array();
+                foreach (array_keys($checkbox) as $projectId) {
+                    array_push($userEtlProjects, $projectId);
+                }
+                $module->addUser($username);
+                $module->setUserEtlProjects($username, $userEtlProjects);
+                $success = 'User '.$username.' saved.';
+                $url = $module->getUrl(RedCapEtlModule::USERS_PAGE.'?success='.Filter::escapeForUrlParameter($success));
+                header('Location: '.$url);
+            }
+            $db = new RedCapDb();
+            $userProjects = $db->getUserProjects($username);
+            $userEtlProjects = $module->getUserEtlProjects($username);
         }
-        $module->addUser($username);
-        $module->setUserEtlProjects($username, $userEtlProjects);
-        $success = 'User '.$username.' saved.';
-        $url = $module->getUrl(RedCapEtlModule::USERS_PAGE.'?success='.$success);
-        header('Location: '.$url);
     }
-    $db = new RedCapDb();
-    $userProjects = $db->getUserProjects($username);
-    $userEtlProjects = $module->getUserEtlProjects($username);
+} catch (Exception $exception) {
+    $error = $exception->getMessage();
 }
+
 
 #---------------------------------------------
 # Include REDCap's Control Center page header
@@ -64,7 +76,9 @@ echo $buffer;
 
 
 <?php
-#print "SUBMIT = {$submit} <br/> \n";
+#print "SUBMIT = {$submitValue} <br/> \n";
+#print "username = {$username} <br/> \n";
+#print "usersUrl = {$usersUrl} <br/> \n";
 #print "<pre><br />\n"; print_r($_POST); print "</pre> <br/> \n";
 ?>
 
@@ -117,6 +131,60 @@ $(function() {
 <?php
 if (!empty($username)) {
     echo "<p>Projects for user ".Filter::escapeForHtml($userLabel)."</p>\n";
+?>
+
+<?php
+#--------------------------------------
+# Delete User from REDCap-ETL dialog
+#--------------------------------------
+?>
+<div id="deleteDialog"
+    title="<?php echo $deleteButtonLabel;?>"
+    style="display: none;"
+    >
+    <form id="deleteUserForm" action="<?php echo $selfUrl;?>" method="post">
+    <p>To delete user &quot;<?php echo $username;?>&quot; from the REDCap-ETL users,
+    click on the <span style="font-weight: bold;"><?php echo $deleteButtonLabel;?></span> button.
+    </p>
+    <p>This action will NOT delete the user from REDCap and will NOT delete any
+    of the REDCap-ETL configurations this user has created or edited.
+    </p>
+    <input type="hidden" name="username-result" value="<?php echo $username;?>">
+    <input type="hidden" name="submitValue" value="<?php echo $deleteButtonLabel;?>">
+    </form>
+</div>
+
+<script>
+$(function() {
+    // Delete user from REDCap-ETL form
+    deleteUserForm = $("#deleteUserForm").dialog({
+        autoOpen: false,
+        height: 240,
+        width: 400,
+        modal: true,
+        buttons: {
+            Cancel: function() {$(this).dialog("close");},
+            "<?php echo $deleteButtonLabel;?>": function() {deleteUserForm.submit();}
+        },
+        title: "<?php echo $deleteButtonLabel;?>"
+    });
+
+    function deleteUser(event) {
+        var username = event.data.username;
+        $("#deleteUserForm").data('username', username).dialog("open");
+    }    
+
+    $("#deleteUser").click({username: "<?php echo Filter::escapeForJavaScriptInDoubleQuotes($username);?>"},
+        deleteUser);
+});
+
+</script>
+
+
+<?php
+#-----------------------------------------------
+# User configuration form
+#-----------------------------------------------
 ?>
 <form action="<?php echo $selfUrl;?>" method="post">
 <input type="hidden" name="username-result" value="<?php echo Filter::escapeForHtmlAttribute($username);?>">
@@ -178,8 +246,12 @@ if (!empty($username)) {
         ?>
     </tbody>
 </table>
+<hr />
 <p>
 <input type="submit" name="submitValue" value="Save">
+<input type="button" name="submitValue" value="<?php echo $deleteButtonLabel;?>" id="deleteUser"
+    style="float: right;">
+<div style="clear: both;"></div>
 </p>
 </form>
 <?php

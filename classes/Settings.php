@@ -59,7 +59,33 @@ class Settings
             $this->db->endTransaction($commit);
         }
     }
+    
+    public function deleteUser($username, $transaction = true)
+    {
+        $commit = true;
+        $userList = new UserList();
+        
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        # Remove the user from the list of users
+        $json = $this->module->getSystemSetting(self::USER_LIST_KEY);
+        $userList->fromJson($json);
+        $userList->deleteUser($username);
+        $json = $userList->toJson();
+        $this->module->setSystemSetting(self::USER_LIST_KEY, $json);
 
+        # Remove the user's ETL project permissions
+        $key = self::USER_PROJECTS_KEY_PREFIX . $username;
+        $this->module->removeSystemSetting($key);
+                
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+    }
+    
+    
     #----------------------------------------------------------
     # ProjectInfo settings methods
     #----------------------------------------------------------

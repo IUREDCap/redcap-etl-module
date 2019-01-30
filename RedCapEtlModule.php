@@ -285,7 +285,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
-
+    public function deleteUser($username)
+    {
+        $this->settings->deleteUser($username);
+        $details = 'User '.$username.' deleted from ETL users.';
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
+    }
+    
     #-------------------------------------------------------------------
     # UserInfo methods
     #-------------------------------------------------------------------
@@ -651,7 +657,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         if (!empty($message)) {
             echo '<div align="center" class="darkgreen" style="margin: 20px 0;">'."\n";
             echo '<img src="'.(APP_PATH_IMAGES.'accept.png').'">';
-            echo Filter::escapeForHtml($message)."\n";
+            echo '&nbsp;'.Filter::escapeForHtml($message)."\n";
             echo "</div>\n";
         }
     }
