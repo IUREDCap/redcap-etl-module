@@ -694,6 +694,24 @@ Configuration form
                     />
                 </td>
             </tr>
+      
+            <tr style="height: 10px;"></tr>
+            
+            <tr>
+                <td>Post-Processing SQL</td>
+                <td>
+                    <?php
+                    $sql = $properties[Configuration::POST_PROCESSING_SQL];
+                    $sqlName = Configuration::POST_PROCESSING_SQL;
+                    ?>
+                    <textarea rows="10" cols="70"
+                        style="margin-top: 4px; margin-bottom: 4px;"
+                        name="<?php echo $sqlName;?>"><?php echo Filter::escapeForHtml($sql);?></textarea>
+                </td>
+            </tr>
+            
+            <tr style="height: 10px;"></tr>
+            
             <tr>
                 <td style="text-align: center;"><input type="submit" name="submit" value="Save" /></td>
                 <td style="text-align: center;"><input type="submit" name="submit" value="Cancel" /></td>
