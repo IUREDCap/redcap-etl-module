@@ -15,6 +15,7 @@ $error = '';
 
 $listUrl  = $module->getUrl("web/index.php");
 $selfUrl  = $module->getUrl("web/configure.php");
+$generateRulesUrl = $module->getUrl('web/generate_rules.php');
 
 /** @var array configurations property map from property name to value */
 $properties = array();
@@ -62,55 +63,17 @@ if (!empty($configuration)) {
 #-------------------------
 # Set the submit value
 #-------------------------
-$submit = '';
-if (array_key_exists('submit', $_POST)) {
-    $submit = $_POST['submit'];
-}
-
 $submitValue = '';
 if (array_key_exists('submitValue', $_POST)) {
     $submitValue = $_POST['submitValue'];
 }
 
-if (strcasecmp($submit, 'Auto-Generate') === 0) {
-    # Check for API Token (or just let RedCapEtl class handle?)
-    if (!empty($properties)) {
-        $apiUrl    = $properties[Configuration::REDCAP_API_URL];
-        $dataToken = $properties[Configuration::DATA_SOURCE_API_TOKEN];
-
-        try {
-            if (empty($apiUrl)) {
-                $error = 'ERROR: No REDCap API URL specified.';
-            } elseif (empty($dataToken)) {
-                $error = 'ERROR: No data source API token specified.';
-            } else {
-                $existingRulesText = $properties[Configuration::TRANSFORM_RULES_TEXT];
-                $areExistingRules = false;
-                if (!empty($existingRulesText)) {
-                    # WARN that existing rules will be overwritten
-                    # ...
-                    $areExistingRules = true;
-                    #echo
-                    #"<script>\n"
-                    #.'$("#rules-overwrite-dialog").dialog("open");'."\n"
-                    #."</script>\n"
-                    #;
-                }
-                $dataProject = new \IU\REDCapETL\EtlRedCapProject($apiUrl, $dataToken);
-                // ADD ...$sslVerify = true, $caCertFile = null);
-                
-                $rulesGenerator = new \IU\REDCapETL\RulesGenerator();
-                $rulesText = $rulesGenerator->generate($dataProject);
-                $properties[Configuration::TRANSFORM_RULES_TEXT] = $rulesText;
-                #print "$rulesText\n";
-            }
-        } catch (Exception $exception) {
-            $error = 'ERROR: '.$exception->getMessage();
-        }
-    }
-} elseif (strcasecmp($submit, 'Cancel') === 0) {
+if (strcasecmp($submitValue, 'Cancel') === 0) {
     header('Location: '.$listUrl);
-} elseif (strcasecmp($submit, 'Save') === 0) {
+} elseif (strcasecmp($submitValue, 'Save') === 0
+        || strcasecmp($submitValue, 'Upload CSV file') === 0
+        || strcasecmp($submitValue, 'Download CSV file') === 0
+        || strcasecmp($submitValue, 'Auto-Generate') === 0) {
     try {
         if (!isset($_POST[Configuration::API_TOKEN_USERNAME])) {
             $_POST[Configuration::API_TOKEN_USERNAME] = '';
@@ -140,26 +103,64 @@ if (strcasecmp($submit, 'Auto-Generate') === 0) {
         }
     
         $configuration->set($_POST);
-        $configuration->validate();
-        $module->setConfiguration($configuration);
-        header('Location: '.$listUrl);
+        $properties = $configuration->getProperties();
+        
+        if (strcasecmp($submitValue, 'Save') === 0) {
+            $configuration->validate();
+            $module->setConfiguration($configuration);
+            header('Location: '.$listUrl);
+        } elseif (strcasecmp($submitValue, 'Upload CSV file') === 0) {
+            $fileContents = file_get_contents($_FILES['uploadCsvFile']['tmp_name']);
+            if ($fileContents === false) {
+                $error = 'ERROR: Unable to upload transformation rules file "'
+                    .$_FILES['uploadCsvFile']['tmp_name'].'"\n"';
+            } else {
+                $properties[Configuration::TRANSFORM_RULES_TEXT] = $fileContents;
+            }
+        } elseif (strcasecmp($submitValue, 'Download CSV file') === 0) {
+            $downloadFileName = 'rules.csv';
+            header('Content-Type: text/csv');
+            //header("Content-Transfer-Encoding: Binary");
+            header("Content-disposition: attachment; filename=\"" . $downloadFileName . "\"");
+            echo $properties[Configuration::TRANSFORM_RULES_TEXT];
+            return;
+        } elseif (strcasecmp($submitValue, 'Auto-Generate') === 0) {
+            # Check for API Token (or just let RedCapEtl class handle?)
+
+            if (!empty($properties)) {
+                $apiUrl    = $properties[Configuration::REDCAP_API_URL];
+                $dataToken = $properties[Configuration::DATA_SOURCE_API_TOKEN];
+
+                if (empty($apiUrl)) {
+                    $error = 'ERROR: No REDCap API URL specified.';
+                } elseif (empty($dataToken)) {
+                    $error = 'ERROR: No data source API token specified.';
+                } else {
+                    $existingRulesText = $properties[Configuration::TRANSFORM_RULES_TEXT];
+                    $areExistingRules = false;
+                    if (!empty($existingRulesText)) {
+                        # WARN that existing rules will be overwritten
+                        # ...
+                        $areExistingRules = true;
+                        #echo
+                        #"<script>\n"
+                        #.'$("#rules-overwrite-dialog").dialog("open");'."\n"
+                        #."</script>\n"
+                        #;
+                    }
+                    $dataProject = new \IU\REDCapETL\EtlRedCapProject($apiUrl, $dataToken);
+                    // ADD ...$sslVerify = true, $caCertFile = null);
+                
+                    $rulesGenerator = new \IU\REDCapETL\RulesGenerator();
+                    $rulesText = $rulesGenerator->generate($dataProject);
+                    $properties[Configuration::TRANSFORM_RULES_TEXT] = $rulesText;
+                    #print "$rulesText\n";
+                }
+            }
+        }
     } catch (\Exception $exception) {
         $error = 'ERROR: '.$exception->getMessage();
     }
-} elseif (strcasecmp($submitValue, 'Upload CSV file') === 0) {
-    $fileContents = file_get_contents($_FILES['uploadCsvFile']['tmp_name']);
-    if ($fileContents === false) {
-        $error = 'ERROR: Unable to upload transformation rules file "'.$_FILES['uploadCsvFile']['tmp_name'].'"\n"';
-    } else {
-        $properties[Configuration::TRANSFORM_RULES_TEXT] = $fileContents;
-    }
-} elseif (strcasecmp($submitValue, 'Download CSV file') === 0) {
-    $downloadFileName = 'rules.csv';
-    header('Content-Type: text/csv');
-    //header("Content-Transfer-Encoding: Binary");
-    header("Content-disposition: attachment; filename=\"" . $downloadFileName . "\"");
-    echo $properties[Configuration::TRANSFORM_RULES_TEXT];
-    return;
 } else {
     // this should be a GET request, initialize with existing database values, if any
 }
@@ -257,6 +258,7 @@ include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 #$fileContents = file_get_contents($_FILES['uploadCsvFile']['tmp_name']);
 #print "\nCONTENTS: <pre>{$fileContents}</pre>\n\n";
 
+ 
 ?>
 
 <div class="projhdr"> 
@@ -268,6 +270,9 @@ include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 
 $module->renderProjectPageContentHeader($selfUrl, $error, $success);
 
+   print "<pre>\n";
+    print_r($rcontents);
+    print "</pre>\n";
 ?>
 
 <?php
@@ -304,6 +309,8 @@ if (!empty($configName)) {
 <div id="rules-overwrite-dialog" style="display:none;" title="Overwrite transformation rules?">
   Test...
 </div>
+
+<!-- generate rules -->
 
 <!-- <button type="button" id="api-token-button">...</button> -->
 <script>
@@ -540,7 +547,7 @@ Configuration form
                         name="<?php echo $rulesName;?>"><?php echo Filter::escapeForHtml($rules);?></textarea>
                 </td>
                 <td>
-                    <p><input type="submit" name="submit" value="Auto-Generate"></p>
+                    <p><input type="submit" name="submitValue" value="Auto-Generate"></p>
                     <p>
                         <button type="submit" value="Upload CSV file"
                                 name="submitValue" style="vertical-align: middle;">
@@ -713,8 +720,8 @@ Configuration form
             <tr style="height: 10px;"></tr>
             
             <tr>
-                <td style="text-align: center;"><input type="submit" name="submit" value="Save" /></td>
-                <td style="text-align: center;"><input type="submit" name="submit" value="Cancel" /></td>
+                <td style="text-align: center;"><input type="submit" name="submitValue" value="Save" /></td>
+                <td style="text-align: center;"><input type="submit" name="submitValue" value="Cancel" /></td>
             </tr>
         </tbody>
   </table>
@@ -734,5 +741,6 @@ Configuration form
 #}
 
 ?>
+
 
 <?php include APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
