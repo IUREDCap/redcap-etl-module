@@ -22,6 +22,7 @@ $serversUrl   = $module->getUrl(RedCapEtlModule::SERVERS_PAGE);
 
 $submit = $_POST['submit'];
 
+
 #-------------------------------------------
 # Get the server name
 #-------------------------------------------
@@ -41,7 +42,15 @@ if (!empty($serverName)) {
 # If the server name is set, get the configuration for that server
 #-------------------------------------------------------------------
 if (!empty($serverName)) {
-    $serverConfig = $module->getServerConfig($serverName);
+    try {
+        $serverConfig = $module->getServerConfig($serverName);
+    } catch (Exception $exception) {
+        # The server could not be found, but the most likely cause is
+        # that it was deleted so don't indicate an error
+        $serverConfig = null;
+        $serverName = '';
+        $_SESSION['serverName'] = '';
+    }
 }
 
 
