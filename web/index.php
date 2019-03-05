@@ -346,7 +346,7 @@ $(function() {
     >
     <form id="renameForm" action="<?php echo $selfUrl;?>" method="post">
     To rename the configuration <span id="configToRename" style="font-weight: bold;"></span>,
-    enter the new name for the new sconfiguration below, and click on the
+    enter the new name for the new configuration below, and click on the
     <span style="font-weight: bold;">Rename configuration</span> button.
     <p>
     <span style="font-weight: bold;">New configuration name:</span>
