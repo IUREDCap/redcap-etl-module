@@ -12,6 +12,7 @@ class Settings
     const LAST_RUN_TIME_KEY        = 'last-run-time'; // for storing day and time of last run
 
     const USER_PROJECTS_KEY_PREFIX = 'user-projects:';  // appdend with username to make key
+    const HELP_KEY_PREFIX          = 'help:';  // append with help topic to make key
     
     const CONFIG_SESSION_KEY = 'redcap-etl-config';
     
@@ -824,4 +825,29 @@ class Settings
         $lastRunTime = $this->getLastRunTime();
         return $lastRunTime[0] == $date && $lastRunTime[1] == $time;
     }
+
+
+    #--------------------------------------------------------------
+    # Help settings methods, for custom, site-specific, help
+    #--------------------------------------------------------------
+
+    public function getHelp($topic)
+    {
+        $key = self::HELP_KEY_PREFIX . $topic;
+        $help = $this->module->getSystemSetting($key);
+        return $help;
+    }
+
+    public function setHelp($topic, $help)
+    {
+        $key = self::HELP_KEY_PREFIX . $topic;
+        $this->module->setSystemSetting($key, $help);
+    }
+
+    public function removeHelp($topic)
+    {
+        $key = self::HELP_KEY_PREFIX . $topic;
+        $this->module->removeSystemSetting($key);
+    }
+
 }

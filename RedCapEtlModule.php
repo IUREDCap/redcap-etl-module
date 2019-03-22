@@ -18,7 +18,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const USER_CONFIG_PAGE   = 'web/admin/user_config.php';
     const SERVERS_PAGE       = 'web/admin/servers.php';
     const SERVER_CONFIG_PAGE = 'web/admin/server_config.php';
-    
+    const ADMIN_INFO_PAGE    = 'web/admin/info.php';
+        
     const USER_ETL_CONFIG_PAGE  = 'web/configure.php';
     
     const RUN_LOG_ACTION    = 'REDCap-ETL Export';
@@ -573,13 +574,16 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
            .' User Config</span>';
            
         $serversUrl = $this->getUrl(self::SERVERS_PAGE);
-        $serversLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
+        $serversLabel = '<span class="glyphicon glyphicon-list" aria-hidden="true"></span>'
            .' ETL Servers';
 
         $serverConfigUrl = $this->getUrl(self::SERVER_CONFIG_PAGE);
         $serverConfigLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
            .' ETL Server Config';
 
+        $helpUrl = $this->getUrl(self::ADMIN_INFO_PAGE);
+        $helpLabel = '&nbsp;<span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>&nbsp;';
+           
         $tabs = array();
         
         $tabs[$adminUrl]         = $adminLabel;
@@ -589,6 +593,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
         $tabs[$serversUrl]       = $serversLabel;
         $tabs[$serverConfigUrl]  = $serverConfigLabel;
+        
+        $tabs[$helpUrl]          = $helpLabel;
         
         $this->renderTabs($tabs, $activeUrl);
     }
