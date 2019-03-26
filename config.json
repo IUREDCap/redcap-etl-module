@@ -18,12 +18,18 @@
            "cron_max_run_time": "720"
         }
     ],
-   "links": {
+    "compatibility": {
+      "php-version-min": "5.6.0",
+      "php-version-max": "",
+      "redcap-version-min": "7.0.0",
+      "redcap-version-max": ""
+    },
+    "links": {
        "control-center": [
            {
                "name": "REDCap-ETL",
                "icon": "table_gear",
-               "url": "web/admin/config.php"
+               "url": "web/admin/info.php"
            }
        ],
        "project": [
