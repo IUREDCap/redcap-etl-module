@@ -849,5 +849,4 @@ class Settings
         $key = self::HELP_KEY_PREFIX . $topic;
         $this->module->removeSystemSetting($key);
     }
-
 }

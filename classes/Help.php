@@ -14,7 +14,3 @@ class Help
         return self::$info[$topic];
     }
 }
-
-
-print Help::getHelp('test')."\n";
-
