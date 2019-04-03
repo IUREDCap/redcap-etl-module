@@ -97,7 +97,7 @@ echo $buffer;
 #-------------------------------------------------
 # Render page content header (tabs and messages)
 #-------------------------------------------------
-$module->renderAdminPageContentHeader($selfUrl, $error, $success);
+$module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
 
 ?>
 

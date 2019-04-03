@@ -13,6 +13,10 @@ use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
 
+$success = '';
+$warning = '';
+$error   = '';
+
 $deleteButtonLabel = 'Delete User from REDCap-ETL';
 
 $selfUrl       = $module->getUrl(RedCapEtlModule::USER_CONFIG_PAGE);
@@ -87,7 +91,7 @@ echo $buffer;
 
 <?php
 
-$module->renderAdminPageContentHeader($selfUrl, $error, $success);
+$module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
 
 ?>
 

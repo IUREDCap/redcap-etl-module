@@ -73,7 +73,7 @@ echo $buffer;
 $errorMessage = $_GET['error'];
 $successMessage = $_GET['success'];
 
-$module->renderAdminPageContentHeader($selfUrl, $errorMessage, $successMessage);
+$module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, $successMessage);
 
 ?>
 

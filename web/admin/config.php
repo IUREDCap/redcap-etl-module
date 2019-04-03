@@ -66,7 +66,7 @@ echo $buffer;
 
 <?php
 
-$module->renderAdminPageContentHeader($selfUrl, $error, $success);
+$module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
 
 ?>
 
