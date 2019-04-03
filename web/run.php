@@ -102,7 +102,7 @@ echo $buffer;
 </div>
 
 <?php
-$module->renderProjectPageContentHeader($selfUrl, $error, $success);
+$module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 ?>
 
 <?php

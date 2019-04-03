@@ -116,7 +116,7 @@ echo "{$link}\n";
 #------------------------------
 # Display module tabs
 #------------------------------
-$module->renderProjectPageContentHeader($selfUrl, $error, $success);
+$module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 ?>
 
 

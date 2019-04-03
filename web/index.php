@@ -106,7 +106,7 @@ $projectId = $module->getProjectId();
 
 <?php
 
-$module->renderProjectPageContentHeader($selfUrl, $error, $success);
+$module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
 ?>
 
