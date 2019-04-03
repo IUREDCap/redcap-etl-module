@@ -234,22 +234,28 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $adminConfig = $this->getAdminConfig();
         
         $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
-        
-        # Set the from e-mail address from the admin. configuration
-        $properties[Configuration::EMAIL_FROM_ADDRESS] = $adminConfig->getEmbeddedServerEmailFromAddress();
-        
-        # Set the log file, and set print logging off
-        $properties[Configuration::LOG_FILE]      = $adminConfig->getEmbeddedServerLogFile();
-        $properties[Configuration::PRINT_LOGGING] = false;
 
-        # Set process identifting properties
-        $properties[Configuration::PROJECT_ID]   = $etlConfiguration->getProjectId();
-        $properties[Configuration::CONFIG_NAME]  = $etlConfiguration->getName();
-        $properties[Configuration::CONFIG_OWNER] = $etlConfiguration->getUsername();
-        $properties[Configuration::CRON_JOB]     = $isCronJob;
+        try {
+            # Set the from e-mail address from the admin. configuration
+            $properties[Configuration::EMAIL_FROM_ADDRESS] = $adminConfig->getEmbeddedServerEmailFromAddress();
+        
+            # Set the log file, and set print logging off
+            $properties[Configuration::LOG_FILE]      = $adminConfig->getEmbeddedServerLogFile();
+            $properties[Configuration::PRINT_LOGGING] = false;
 
-        $redCapEtl = new \IU\REDCapETL\RedCapEtl($logger, $properties);
-        $redCapEtl->run();
+            # Set process identifting properties
+            $properties[Configuration::PROJECT_ID]   = $etlConfiguration->getProjectId();
+            $properties[Configuration::CONFIG_NAME]  = $etlConfiguration->getName();
+            $properties[Configuration::CONFIG_OWNER] = $etlConfiguration->getUsername();
+            $properties[Configuration::CRON_JOB]     = $isCronJob;
+
+            $redCapEtl = new \IU\REDCapETL\RedCapEtl($logger, $properties);
+            $redCapEtl->run();
+        } catch (\Exception $exception) {
+            $logger->logException($exception);
+            $logger->log('Processing failed.');
+        }
+
         
         $status = implode("\n", $logger->getLogArray());
         return $status;
@@ -586,6 +592,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
            
         $tabs = array();
         
+        $tabs[$helpUrl]          = $helpLabel;
+        
         $tabs[$adminUrl]         = $adminLabel;
         $tabs[$cronJobsUrl]      = $cronJobsLabel;
         $tabs[$usersUrl]         = $usersLabel;
@@ -593,8 +601,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
         $tabs[$serversUrl]       = $serversLabel;
         $tabs[$serverConfigUrl]  = $serverConfigLabel;
-        
-        $tabs[$helpUrl]          = $helpLabel;
+
         
         $this->renderTabs($tabs, $activeUrl);
     }
@@ -688,22 +695,32 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         }
     }
     
-        
+    public function renderWarningMessageDiv($message)
+    {
+        if (!empty($message)) {
+            echo '<div align="center" class="yellow" style="margin: 20px 0;">'."\n";
+            echo '<img src="'.(APP_PATH_IMAGES.'warning.png').'" width="16px">';
+            echo '&nbsp;'.Filter::escapeForHtml($message)."\n";
+            echo "</div>\n";
+        }
+    }
+           
     public function renderErrorMessageDiv($message)
     {
         if (!empty($message)) {
             echo '<div align="center" class="red" style="margin: 20px 0;">'."\n";
             echo '<img src="'.(APP_PATH_IMAGES.'exclamation.png').'">';
-            echo Filter::escapeForHtml($message)."\n";
+            echo '&nbsp;'.Filter::escapeForHtml($message)."\n";
             echo "</div>\n";
         }
     }
     
     
-    public function renderAdminPageContentHeader($selfUrl, $errorMessage, $successMessage)
+    public function renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, $successMessage)
     {
         $this->renderAdminTabs($selfUrl);
         $this->renderErrorMessageDiv($errorMessage);
+        $this->renderWarningMessageDiv($warningMessage);
         $this->renderSuccessMessageDiv($successMessage);
     }
     
@@ -714,10 +731,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      * @param string $errorMessage the error message to print (if any).
      * @param string $successMessage the success message to print (if any).
      */
-    public function renderProjectPageContentHeader($selfUrl, $errorMessage, $successMessage)
+    public function renderProjectPageContentHeader($selfUrl, $errorMessage, $warningMessage, $successMessage)
     {
         $this->renderUserTabs($selfUrl);
         $this->renderErrorMessageDiv($errorMessage);
+        $this->renderWarningMessageDiv($warningMessage);
         $this->renderSuccessMessageDiv($successMessage);
     }
     
