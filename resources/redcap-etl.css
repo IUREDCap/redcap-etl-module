@@ -35,9 +35,6 @@ table.cron-schedule td.day {
     text-align: center;
 }
 
-table.cron-schedule td.cron-not-allowed {
-}
-
 table.cron-schedule input[type="radio"],
 table.cron-schedule input[type="checkbox"] {
     margin: 0;
