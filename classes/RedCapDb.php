@@ -120,6 +120,7 @@ class RedCapDb
         $sql = "select username, api_token from redcap_user_rights "
             . " where project_id = ".((int) PROJECT_ID)." "
             . " and api_export = 1 "
+            . " and api_token is not null "
             ;
         $queryResult = db_query($sql);
         while ($row = db_fetch_assoc($queryResult)) {
