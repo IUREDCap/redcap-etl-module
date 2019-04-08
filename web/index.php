@@ -4,7 +4,19 @@
 
 require_once __DIR__.'/../dependencies/autoload.php';
 
+use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Filter;
+
+#--------------------------------------------------------------
+# If the user doesn't have permission to access REDCap-ETL for
+# this project, redirect them to the access request page which
+# should display a link to send e-mail to request permission.
+#--------------------------------------------------------------
+if (!Authorization::hasEtlProjectPagePermission($module, USERID)) {
+    $requestAccessUrl = $module->getUrl('web/request_access.php');
+    header('Location: '.$requestAccessUrl);
+}
+
 
 #-----------------------------------------------------------------
 # Process form submissions (configuration add/copy/delete/rename)
@@ -67,6 +79,19 @@ if (strcasecmp($submitValue, 'add') === 0) {
     }
 }
 
+#$selfUrl     = $module->getUrl('web/index.php');
+#print "<hr />{$selfUrl}<br />\n";
+#print('<pre>');
+#print_r($_POST);
+#print('</pre>');
+#print('<pre>');
+#print_r($_SESSION);
+#print('</pre>');
+
+#$rights = $module->getUserRights(USERID);
+#print "<hr/><pre>RIGHTS\n";
+#print_r($rights);
+#print "</pre>\n";
 
 
 #---------------------------------------------

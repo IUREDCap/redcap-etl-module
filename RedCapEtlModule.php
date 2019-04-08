@@ -36,6 +36,36 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         parent::__construct();
     }
     
+    // phpcs:disable
+    /**
+     * Method that determines if the REDCap-ETL link is displayed for
+     * the user on project pages.
+     */
+    public function redcap_module_link_check_display($project_id, $link)
+    {
+        if (SUPER_USER) {
+            return $link;
+        }
+
+        if (!empty($project_id) && Authorization::hasRedCapUserRightsForEtl($this, USERID)) {
+            return $link;
+        }
+
+        return null;
+    }
+    // phpcs:enable
+
+        
+    /**
+     * Returns REDCap user rights for the current project.
+     *
+     * @return array a map from username to an map of rights for the current project.
+     */
+    public function getUserRights($userId = null)
+    {
+        $rights = \REDCap::getUserRights($userId);
+        return $rights;
+    }
 
     /**
      * Cron method that is called by REDCap as configured in the
@@ -256,7 +286,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             $logger->log('Processing failed.');
         }
 
-        
         $status = implode("\n", $logger->getLogArray());
         return $status;
     }
@@ -341,6 +370,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function hasEtlUser($projectId = PROJECT_ID)
     {
         return $this->settings->hasEtlUser($projectId);
+    }
+    
+    public function isSuperUser()
+    {
+        return SUPER_USER;
     }
     
     /**

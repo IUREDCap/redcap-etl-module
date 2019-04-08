@@ -45,6 +45,8 @@ class Authorization
     {
         $hasPermission = false;
 
+        $projectId = $module->getProjectId();
+        
         if ($module->isSuperUser()) {
             $hasPermission = true;
         } elseif (!empty($projectId) && !empty($username)) {
@@ -52,27 +54,25 @@ class Authorization
                 $hasPermission = true;
             }
         }
-        return $hasPermission;        
+        return $hasPermission;
     }
     
     /**
-     * Indicates if the specified user has the REDCap user rights to access ETL
-     * for the current project.
-     *
-     * Admins can access ETL whether or not they have the specific user
-     * rights.
+     * Indicates if the specified non-admin user has the REDCap user rights
+     * to access ETL for the current project (admins always have access).
      *
      * @return boolean true if the user has permission, and
      *     false otherwise.
      */
-    public static function hasRedCapUserRightsForEtl($module, $username) {
+    public static function hasRedCapUserRightsForEtl($module, $username)
+    {
         $hasPermission = false;
 
         if (!empty($username)) {
             $rights = $module->getUserRights($username);
             if ($rights[$username]['design']) {
                 $hasPermission = true;
-            }            
+            }
         }
         return $hasPermission;
     }
