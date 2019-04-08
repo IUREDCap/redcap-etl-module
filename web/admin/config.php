@@ -76,6 +76,10 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
 
 <form action="<?php echo $selfUrl;?>" method="post">
 
+    <p>
+    Version: <?php echo Filter::escapeForHtml($module->getVersion()); ?>
+    </p>
+        
     <?php
     $checked = '';
     if ($adminConfig->getAllowEmbeddedServer()) {
