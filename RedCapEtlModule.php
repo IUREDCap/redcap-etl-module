@@ -297,20 +297,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     }
 
     /**
-     * Gets the module version number based on its directory.
-     *
-     * NOTE: version is stored in the database, we should
-     * probably have just used that value (system setting,
-     * key = 'version').
+     * Gets the external module's version number.
      */
-    public function getVersionNumber()
+    public function getVersion()
     {
-        $versionNumber = '';
-        $dirName = $this->getModuleDirectoryName();
-        if (preg_match('/.*_v(.*)/', $dirName, $matches) === 1) {
-            $versionNumber = $matches[1];
-        }
-        return $versionNumber;
+        return $this->settings->getVersion();
     }
 
     /**
