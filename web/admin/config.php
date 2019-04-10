@@ -40,6 +40,9 @@ if (strcasecmp($submitValue, 'Save') === 0) {
     $allowCron = $_POST['allowCron'];
     $adminConfig->setAllowCron($allowCron);
     
+    $sslVerify = $_POST['sslVerify'];
+    $adminConfig->setSslVerify($sslVerify);
+    
     $module->setAdminConfig($adminConfig);
     $success = "Admin configuration saved.";
 }
@@ -79,7 +82,16 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     <p>
     Version: <?php echo Filter::escapeForHtml($module->getVersion()); ?>
     </p>
-        
+    
+    <?php
+    $checked = '';
+    if ($adminConfig->getSslVerify()) {
+        $checked = 'checked';
+    }
+    ?>
+    <input type="checkbox" name="sslVerify" <?php echo $checked;?>> SSL certificate verification
+    <br />
+    
     <?php
     $checked = '';
     if ($adminConfig->getAllowEmbeddedServer()) {
@@ -118,20 +130,22 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     <input type="checkbox" name="allowCron" <?php echo $checked;?>>
     Allow ETL cron jobs? <br />
 
-  <p style="text-align: center; margin-top: 14px;">Allowed ETL cron job times
-  and number of scheduled jobs per time</p>
-  <table class="cron-schedule admin-cron-schedule">
-    <thead>
-      <tr>
-        <th>&nbsp;</th>
-        <?php
-        foreach (AdminConfig::DAY_LABELS as $dayLabel) {
-            echo '<th class="day">'.$dayLabel."</th>\n";
-        }
-        ?>
-      </tr>
-    </thead>
+    <p style="text-align: center; margin-top: 14px;">Allowed ETL cron job times
+    and number of scheduled jobs per time</p>
+    
+    <table class="cron-schedule admin-cron-schedule">
+      <thead>
+        <tr>
+          <th>&nbsp;</th>
+          <?php
+          foreach (AdminConfig::DAY_LABELS as $dayLabel) {
+              echo '<th class="day">'.$dayLabel."</th>\n";
+          }
+          ?>
+        </tr>
+      </thead>
     <tbody>
+        
     <?php
     $cronJobs = $module->getAllCronJobs();
     $row = 1;

@@ -20,6 +20,9 @@ class AdminConfig implements \JsonSerializable
     private $allowedCronTimes;
     
     private $maxJobsPerTime;
+    
+    /** @var boolean indicates if SSL verification should be done for local REDCap */
+    private $sslVerify;
 
     public function __construct()
     {
@@ -39,6 +42,8 @@ class AdminConfig implements \JsonSerializable
                 }
             }
         }
+        
+        $ssVerify = true;
     }
 
     public function jsonSerialize()
@@ -269,5 +274,15 @@ class AdminConfig implements \JsonSerializable
                 }
             }
         }
+    }
+    
+    public function getSslVerify()
+    {
+        return $this->sslVerify;
+    }
+    
+    public function setSslVerify($sslVerify)
+    {
+        $this->sslVerify = $sslVerify;
     }
 }
