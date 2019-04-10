@@ -14,6 +14,8 @@ class Settings
     const USER_PROJECTS_KEY_PREFIX = 'user-projects:';  // appdend with username to make key
     const HELP_KEY_PREFIX          = 'help:';  // append with help topic to make key
     
+    const VERSION_KEY = 'version';
+    
     const CONFIG_SESSION_KEY = 'redcap-etl-config';
     
     private $module;
@@ -26,6 +28,16 @@ class Settings
         $this->module = $module;
         $this->db     = $db;
     }
+    
+    /**
+     * Gets the REDCap-ETL external module version number.
+     */
+    public function getVersion()
+    {
+        $version = $this->module->getSystemSetting(self::VERSION_KEY);
+        return $version;
+    }
+    
     
     #----------------------------------------------------------
     # Users settings methods
