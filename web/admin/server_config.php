@@ -207,16 +207,19 @@ if (!empty($serverName)) {
   <input type="hidden" name="serverName"
       value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getName());?>">
   <table>
+      
     <tr>
       <td>Active:</td>
       <td><input type="checkbox" name="isActive" value="checked" <?php echo $activeChecked; ?> ></td>
     </tr>
+    
     <tr>
       <td>Server address:</td>
       <td><input type="text" name="serverAddress"
           value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getServerAddress());?>"
           size="60" style="margin: 4px;"></td>
     </tr>
+    
     <tr>
       <td style="padding-top: 4px; padding-bottom: 4px; vertical-align: top;">Authentication method:</td>
       <td style="padding: 4px;">
@@ -238,6 +241,7 @@ if (!empty($serverName)) {
         <span style="vertical-align: top; margin-right: 8px;">Password</span>
       </td>
     </tr>
+    
     <tr>
       <td>Username:</td>
       <td><input type="text" name="username"
