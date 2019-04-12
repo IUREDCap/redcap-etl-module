@@ -13,6 +13,10 @@ class Configuration implements \JsonSerializable
     const DATA_SOURCE_API_TOKEN = 'data_source_api_token';
     const SSL_VERIFY = 'ssl_verify';
 
+    const REMOTE_REDCAP           = 'remote_redcap';
+    const REMOTE_REDCAP_API_URL   = 'remote_redcap_api_url';
+    const REMOTE_REDCAP_API_TOKEN = 'remote_redcap_api_token';
+    
     const API_TOKEN_USERNAME = 'api_token_username';
     
     const TRANSFORM_RULES_FILE   = 'transform_rules_file';
@@ -44,6 +48,8 @@ class Configuration implements \JsonSerializable
     const PRINT_LOGGING = 'print_logging';
     const PROJECT_ID = 'project_id';
     
+
+    
     const LOG_FILE  = 'log_file';
     
     const EMAIL_ERRORS        = 'email_errors';
@@ -74,10 +80,12 @@ class Configuration implements \JsonSerializable
         }
 
         # Set non-blank defaults
+        $this->properties[self::REMOTE_REDCAP]  = false;
         $this->properties[self::REDCAP_API_URL] = APP_PATH_WEBROOT_FULL.'api/';
         $this->properties[self::SSL_VERIFY]     = true;
-        
+         
         $this->properties[self::API_TOKEN_USERNAME] = '';
+
         $this->properties[self::DATA_SOURCE_API_TOKEN] = '';
         
         $this->properties[self::BATCH_SIZE] = 100;
@@ -262,6 +270,8 @@ class Configuration implements \JsonSerializable
                 $this->properties[$name] = false;
             } elseif ($name === self::EMAIL_SUMMARY) {
                 $this->properties[$name] = false;
+            } elseif ($name === self::REMOTE_REDCAP) {
+                $this->properties[$name] = false;
             } elseif ($name === self::SSL_VERIFY) {
                 $this->properties[$name] = false;
             }
@@ -313,10 +323,18 @@ class Configuration implements \JsonSerializable
         unset($properties[self::DB_PASSWORD]);
         
         unset($properties[self::API_TOKEN_USERNAME]);
-        
+                
         unset($properties[self::CRON_SERVER]);
         unset($properties[self::CRON_SCHEDULE]);
         
+        if (is_bool($properties[self::REMOTE_REDCAP])) {
+            if ($properties[self::REMOTE_REDCAP]) {
+                $properties[self::REMOTE_REDCAP] = 'true';
+            } else {
+                $properties[self::REMOTE_REDCAP] = 'false';
+            }
+        }
+                 
         if (is_bool($properties[self::SSL_VERIFY])) {
             if ($properties[self::SSL_VERIFY]) {
                 $properties[self::SSL_VERIFY] = 'true';
@@ -347,10 +365,18 @@ class Configuration implements \JsonSerializable
         unset($properties[self::DB_PASSWORD]);
 
         unset($properties[self::API_TOKEN_USERNAME]);
-        
+
         unset($properties[self::CRON_SERVER]);
         unset($properties[self::CRON_SCHEDULE]);
         
+        if (is_bool($properties[self::REMOTE_REDCAP])) {
+            if ($properties[self::REMOTE_REDCAP]) {
+                $properties[self::REMOTE_REDCAP] = 'true';
+            } else {
+                $properties[self::REMOTE_REDCAP] = 'false';
+            }
+        }
+         
         if (is_bool($properties[self::SSL_VERIFY])) {
             if ($properties[self::SSL_VERIFY]) {
                 $properties[self::SSL_VERIFY] = 'true';
@@ -358,7 +384,7 @@ class Configuration implements \JsonSerializable
                 $properties[self::SSL_VERIFY] = 'false';
             }
         }
-        
+               
         # Convert the transformation rules from text to
         # an array of strings
         if (array_key_exists(self::TRANSFORM_RULES_TEXT, $properties)) {
@@ -445,6 +471,20 @@ class Configuration implements \JsonSerializable
     public function setApiUrl($value)
     {
         $this->properties[self::REDCAP_API_URL] = $value;
+    }
+    
+    public function isRemoteRedcap()
+    {
+        $isRemote = false;
+        if (array_key_exists(self::REMOTE_REDCAP, $this->properties)) {
+            $isRemoteValue = $this->properties[self::REMOTE_REDCAP];
+            if (is_bool($isRemoteValue) && $isRemoteValue) {
+                $isRemote = true;
+            } elseif (strcasecmp($isRemoteValue, 'true') === 0 || strcasecmp($isRemoteValue, 'on') === 0) {
+                $isRemote = true;
+            }
+        }
+        return $isRemote;
     }
 
     public static function getPropertyNames()

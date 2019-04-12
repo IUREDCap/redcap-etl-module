@@ -6,16 +6,49 @@ require_once __DIR__.'/../dependencies/autoload.php';
 
 use IU\REDCapETL\EtlRedCapProject;
 
+use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Configuration;
 use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
 
-$error = '';
+#--------------------------------------------------------------
+# If the user doesn't have permission to access REDCap-ETL for
+# this project, redirect them to the access request page which
+# should display a link to send e-mail to request permission.
+#--------------------------------------------------------------
+if (!Authorization::hasEtlProjectPagePermission($module, USERID)) {
+    $requestAccessUrl = $module->getUrl('web/request_access.php');
+    header('Location: '.$requestAccessUrl);
+}
+
+$success = '';
+$warning = '';
+$error   = '';
+
+#-------------------------------------------------------------------
+# Check for test mode (which should only be used for development)
+#-------------------------------------------------------------------
+$testMode = false;
+if (@file_exists(__DIR__.'/../test-config.ini')) {
+    $testMode = true;
+}
+
+if (array_key_exists('success', $_GET)) {
+    $success = $_GET['success'];
+}
+
+if (array_key_exists('warning', $_GET)) {
+    $warning = $_GET['warning'];
+}
 
 $listUrl  = $module->getUrl("web/index.php");
 $selfUrl  = $module->getUrl("web/configure.php");
 $generateRulesUrl = $module->getUrl('web/generate_rules.php');
+
+$adminConfig = $module->getAdminConfig();
+
+$configuration = null;
 
 /** @var array configurations property map from property name to value */
 $properties = array();
@@ -48,67 +81,108 @@ if (!empty($configName)) {
     }
 }
 
+#print "<pre>\n";
+#print_r($_POST);
+#print "</pre>\n";
 
-#--------------------------------------------------------------
-# Get the API tokens for this project with export permission,
-# and the username of user whose API token should be used
-# (if any)
-#--------------------------------------------------------------
 if (!empty($configuration)) {
-    $apiTokens    = $redCapDb->getApiTokensWithExportPermission(PROJECT_ID);
+    #--------------------------------------------------------------
+    # Get the API tokens for this project with export permission,
+    # and the username of user whose API token should be used
+    # (if any)
+    #--------------------------------------------------------------
+    $apiTokens    = $redCapDb->getApiTokensWithSameExportPermissionAsUser(USERID, PROJECT_ID);
     $apiTokenUser = $configuration->getProperty(Configuration::API_TOKEN_USERNAME);
-}
-
-
-#-------------------------
-# Set the submit value
-#-------------------------
-$submitValue = '';
-if (array_key_exists('submitValue', $_POST)) {
-    $submitValue = $_POST['submitValue'];
-}
-
-if (strcasecmp($submitValue, 'Cancel') === 0) {
-    header('Location: '.$listUrl);
-} elseif (strcasecmp($submitValue, 'Save') === 0
-        || strcasecmp($submitValue, 'Upload CSV file') === 0
-        || strcasecmp($submitValue, 'Download CSV file') === 0
-        || strcasecmp($submitValue, 'Auto-Generate') === 0) {
-    try {
+    
+    
+    #-------------------------
+    # Get the submit value
+    #-------------------------
+    $submitValue = '';
+    if (array_key_exists('submitValue', $_POST)) {
+        $submitValue = $_POST['submitValue'];
+    }
+    
+    #---------------------------------------------------------------
+    # if this is a POST other than Cancel,
+    # update the configuration properties with the POST values
+    #---------------------------------------------------------------
+    if (!empty($submitValue) && strcasecmp($submitValue, 'Cancel')) {
+        array_map('trim', $_POST);
         if (!isset($_POST[Configuration::API_TOKEN_USERNAME])) {
             $_POST[Configuration::API_TOKEN_USERNAME] = '';
-        } else {
-            $_POST[Configuration::API_TOKEN_USERNAME] = trim($_POST[Configuration::API_TOKEN_USERNAME]);
         }
+        $configuration->set($_POST);
+        
+        # If this is NOT a remote REDCap configuration, set SSL certificate verification
+        # to the global value (this can only be set in the configuration for remote
+        # REDCap configurations)
+        if (!$configuration->isRemoteRedcap()) {
+            $configuration->setProperty(Configuration::SSL_VERIFY, $adminConfig->getSslVerify());
+        }
+        $properties = $configuration->getProperties();
+    }
+    
+    #----------------------------------------------
+    # Check API token specification
+    #----------------------------------------------
+    $localApiUrl = $module->getRedCapApiUrl();
+    $apiTokenUser = '';
 
-        $apiUrl = $module->getRedCapApiUrl();
-                        
-        # If the configuration's API URL matches the API URL of the
-        # REDCap instance that is running (which should always be
-        # the case for non-admin users)
-        if (strcasecmp(trim($properties[Configuration::REDCAP_API_URL]), trim($apiUrl)) === 0) {
-            if (empty($_POST[Configuration::API_TOKEN_USERNAME])) {
-                # No API token user was specified, set the API token to blank
-                $_POST[Configuration::DATA_SOURCE_API_TOKEN] = '';
+    if ($testMode && strcmp($configuration->getRedCapApiUrl(), $module->getRedCapApiUrl()) !== 0) {
+        ; // Test mode, so remote REDCap is being used, so no checks can be done
+        # In test mode:
+        # - the REDCap API URL becomes editable for admins
+        # - if the REDCap API URL is changed so that it does not match the API URL of local REDCap, the API token user is ignored
+        # - 
+
+    } else {
+        if (empty($configuration->getProperty(Configuration::API_TOKEN_USERNAME))) {
+            # No API token user was specified, set the API token to blank
+            $configuration->setProperty(Configuration::DATA_SOURCE_API_TOKEN, '');
+        } else {
+            $apiTokenUser = $configuration->getProperty(Configuration::API_TOKEN_USERNAME);
+            # An API token user was specified
+            if (!array_key_exists($apiTokenUser, $apiTokens)) {
+                $warning = 'WARNING: user "'.$apiTokenUser.'" does not'
+                    .' have an API token for this project. API token user reset to blank.';
+                # The API token user does not have a valid API token, so set it to blank
+                $configuration->setProperty(Configuration::API_TOKEN_USERNAME, '');
+                $configuration->setProperty(Configuration::DATA_SOURCE_API_TOKEN, '');
             } else {
-                if (!array_key_exists($_POST[Configuration::API_TOKEN_USERNAME], $apiTokens)) {
-                    # The API token user does not have an API token, so set it to blank
-                    $_POST[Configuration::API_TOKEN_USERNAME]    = '';
-                    $_POST[Configuration::DATA_SOURCE_API_TOKEN] = '';
-                } else {
-                    $_POST[Configuration::DATA_SOURCE_API_TOKEN]
-                        = $apiTokens[$_POST[Configuration::API_TOKEN_USERNAME]];
-                }
+                # A valid API token user was specified, so set the API token to the
+                # value for this user
+                $configuration->setProperty(
+                    Configuration::DATA_SOURCE_API_TOKEN,
+                    $apiTokens[$apiTokenUser]
+                );
             }
         }
+    }
     
-        $configuration->set($_POST);
-        $properties = $configuration->getProperties();
-        
-        if (strcasecmp($submitValue, 'Save') === 0) {
-            $configuration->validate();
-            $module->setConfiguration($configuration);
+    
+    # Reset properties, since they may have been modified above
+    $properties = $configuration->getProperties();
+    
+    
+    #------------------------------------------------------
+    # Process Actions
+    #------------------------------------------------------
+    try {
+        if (strcasecmp($submitValue, 'Cancel') === 0) {
             header('Location: '.$listUrl);
+        } elseif (strcasecmp($submitValue, 'Save') === 0) {
+            if (empty($warning) && empty($error)) {
+                $configuration->validate();
+                $module->setConfiguration($configuration);  // Save configuration to database
+            }
+        } elseif (strcasecmp($submitValue, 'Save and Exit') === 0) {
+            if (empty($warning) && empty($error)) {
+                $configuration->validate();
+                $module->setConfiguration($configuration);  // Save configuration to database
+                $location = 'Location: '.$listUrl;
+                header($location);
+            }
         } elseif (strcasecmp($submitValue, 'Upload CSV file') === 0) {
             $fileContents = file_get_contents($_FILES['uploadCsvFile']['tmp_name']);
             if ($fileContents === false) {
@@ -125,53 +199,42 @@ if (strcasecmp($submitValue, 'Cancel') === 0) {
             echo $properties[Configuration::TRANSFORM_RULES_TEXT];
             return;
         } elseif (strcasecmp($submitValue, 'Auto-Generate') === 0) {
-            # Check for API Token (or just let RedCapEtl class handle?)
+            $apiUrl    = $configuration->getProperty(Configuration::REDCAP_API_URL);
+            $dataToken = $configuration->getProperty(Configuration::DATA_SOURCE_API_TOKEN);
 
-            if (!empty($properties)) {
-                $apiUrl    = $properties[Configuration::REDCAP_API_URL];
-                $dataToken = $properties[Configuration::DATA_SOURCE_API_TOKEN];
-
-                if (empty($apiUrl)) {
-                    $error = 'ERROR: No REDCap API URL specified.';
-                } elseif (empty($dataToken)) {
-                    $error = 'ERROR: No data source API token specified.';
-                } else {
-                    $existingRulesText = $properties[Configuration::TRANSFORM_RULES_TEXT];
-                    $areExistingRules = false;
-                    if (!empty($existingRulesText)) {
-                        # WARN that existing rules will be overwritten
-                        # ...
-                        $areExistingRules = true;
-                        #echo
-                        #"<script>\n"
-                        #.'$("#rules-overwrite-dialog").dialog("open");'."\n"
-                        #."</script>\n"
-                        #;
-                    }
-                    $dataProject = new \IU\REDCapETL\EtlRedCapProject($apiUrl, $dataToken);
-                    // ADD ...$sslVerify = true, $caCertFile = null);
-                
-                    $rulesGenerator = new \IU\REDCapETL\RulesGenerator();
-                    $rulesText = $rulesGenerator->generate($dataProject);
-                    $properties[Configuration::TRANSFORM_RULES_TEXT] = $rulesText;
-                    #print "$rulesText\n";
+            if (empty($apiUrl)) {
+                $error = 'ERROR: No REDCap API URL specified.';
+            } elseif (empty($dataToken)) {
+                $error = 'ERROR: No data source API token information specified.';
+            } else {
+                $existingRulesText = $properties[Configuration::TRANSFORM_RULES_TEXT];
+                $areExistingRules = false;
+                if (!empty($existingRulesText)) {
+                    # WARN that existing rules will be overwritten
+                    # ...
+                    $areExistingRules = true;
+                    #echo
+                    #"<script>\n"
+                    #.'$("#rules-overwrite-dialog").dialog("open");'."\n"
+                    #."</script>\n"
+                    #;
                 }
+                $dataProject = new \IU\REDCapETL\EtlRedCapProject($apiUrl, $dataToken);
+                // ADD ...$sslVerify = true, $caCertFile = null);
+                        
+                $rulesGenerator = new \IU\REDCapETL\RulesGenerator();
+                $rulesText = $rulesGenerator->generate($dataProject);
+                $properties[Configuration::TRANSFORM_RULES_TEXT] = $rulesText;
+                #print "$rulesText\n";
             }
         }
     } catch (\Exception $exception) {
         $error = 'ERROR: '.$exception->getMessage();
     }
-} else {
-    // this should be a GET request, initialize with existing database values, if any
 }
-
-
-
 ?>
 
 <?php
-
-$success = '';
 
 #-----------------------------------------------------------------
 # API token user and token check
@@ -181,10 +244,11 @@ $success = '';
 # being used does not match the one for the currently running
 # REDCap instance (which only admins should be allowed to do)
 #-----------------------------------------------------------------
+/*
 if (!empty($properties)) {
     # Get API URL and currently stored token for this project, if any
     $apiUrl = $module->getRedCapApiUrl();
-                        
+
     # If the configuration's API URL matches the API URL of the
     # REDCap instance that is running (which should always be
     # the case for non-admin users)
@@ -210,8 +274,8 @@ if (!empty($properties)) {
             $properties[Configuration::DATA_SOURCE_API_TOKEN] = '';
             $configuration->set($properties);
             $module->setConfiguration($configuration, USERID, PROJECT_ID);
-            $success = 'User "'.$apiTokenUser.'", who was specified as the API token user, no longer'
-                .' has an API token for this project with export permissions. This user has been'
+            $warning .= 'User "'.$apiTokenUser.'", who was specified as the API token user, no longer'
+                .' has an API token for this project with export permission. This user has been'
                 .' removed as the API token user.';
         } else {
             $apiToken = $apiTokens[$apiTokenUser];
@@ -224,13 +288,17 @@ if (!empty($properties)) {
                 $properties[Configuration::DATA_SOURCE_API_TOKEN] = $apiToken;
                 $configuration->set($properties);
                 $module->setConfiguration($configuration, USERID, PROJECT_ID);
-                $success = 'The API token for user "'.$apiTokenUser
-                .'" has changed, and has been automatically updated in the configuration.';
+                $success .= 'The API token for user "'.$apiTokenUser
+                    .'" has changed, and has been automatically updated in the configuration.';
             }
         }
     }
 }
+*/
 
+# Update API token user
+#$apiTokenUser = $configuration->getProperty(Configuration::API_TOKEN_USERNAME);
+    
 ?>
 
 
@@ -239,6 +307,7 @@ if (!empty($properties)) {
 # Include REDCap's project page header
 #--------------------------------------------
 include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
+
 ?>
 
 <?php
@@ -258,21 +327,28 @@ include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 #$fileContents = file_get_contents($_FILES['uploadCsvFile']['tmp_name']);
 #print "\nCONTENTS: <pre>{$fileContents}</pre>\n\n";
 
+#$rights = $module->getUserRights();
+#print "<pre>\n";
+#print_r($rights);
+#print "</pre>\n";
+
  
 ?>
 
 <div class="projhdr"> 
     <img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>database_table.png">REDCap-ETL
+    <?php
+    if ($testMode) {
+        echo '<span style="color: blue;">[TEST MODE]</span>';
+    }
+    ?>
 </div>
 
 
 <?php
 
-$module->renderProjectPageContentHeader($selfUrl, $error, $success);
+$module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
-   print "<pre>\n";
-    print_r($rcontents);
-    print "</pre>\n";
 ?>
 
 <?php
@@ -300,10 +376,14 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $success);
     </select>
 </form>
 
-<!-- Configuration part (displayed if the configuration name is set) -->
+
 <?php
-if (!empty($configName)) {
+#-----------------------------------------------------------------------------
+# If configuration not empty, display configuration form
+#-----------------------------------------------------------------------------
+if (!empty($configuration)) {
 ?>
+
 
 <!-- Rules overwrite dialog -->
 <div id="rules-overwrite-dialog" style="display:none;" title="Overwrite transformation rules?">
@@ -354,9 +434,37 @@ $(function() {
                 .insertBefore(this);
         }).remove();       
     })
-});    
+});
+
+// Show/hide local/remote REDCap rows
+$(function() {
+    $("input[name=<?php echo Configuration::REMOTE_REDCAP;?>]").change(function() {
+        if ($(this).is(':checked')) {
+            $('.remoteRow').show();
+            $('.localRow').hide();
+        } else {
+            $('.remoteRow').hide();
+            $('.localRow').show();
+        }
+    });
+});
+    
 </script>
-              
+
+
+<?php
+#--------------------------------------------------------
+# Set CSS styles to show/hide local/remote REDCap rows
+#--------------------------------------------------------
+$localRowStyle = '';
+$remoteRowStyle = '';
+if ($configuration->isRemoteRedcap()) {
+    $localRowStyle = ' style="display: none;" ';
+} else {
+    $remoteRowStyle = ' style="display: none;" ';
+}
+?>
+
 <!-- ====================================
 Configuration form
 ===================================== -->
@@ -385,6 +493,29 @@ Configuration form
 
             <?php if (SUPER_USER) { ?>
             <tr>
+                <td>
+                Remote REDCap Instance
+                </td>
+                <td>
+                    <?php
+                    $value = '';
+                    $checked = '';
+                    if ($properties[Configuration::REMOTE_REDCAP]) {
+                        $checked = ' checked ';
+                        $value = ' value="true" ';
+                    }
+                    ?>
+                    <input type="checkbox" name="<?php echo Configuration::REMOTE_REDCAP;?>"
+                    <?php echo $checked;?>
+                    <?php echo $value;?> >
+                </td>
+            </tr>
+            <?php } ?>
+            
+            <?php #if (SUPER_USER) { ?>
+
+            
+            <tr class="remoteRow" <?php echo $remoteRowStyle; ?> >
                 <td>REDCap API URL</td>
                 <td>
                     <input type="text" size="60" 
@@ -393,7 +524,27 @@ Configuration form
                 </td>
             </tr>
 
-            <tr>
+      
+            <tr class="remoteRow" <?php echo $remoteRowStyle; ?> >
+                <td>
+                SSL certificate verification&nbsp;
+                </td>
+                <td>
+                    <?php
+                    $value = '';
+                    $checked = '';
+                    if ($properties[Configuration::SSL_VERIFY]) {
+                        $checked = ' checked ';
+                        $value = ' value="true" ';
+                    }
+                    ?>
+                    <input type="checkbox" name="<?php echo Configuration::SSL_VERIFY;?>"
+                    <?php echo $checked;?>
+                    <?php echo $value;?> >
+                </td>
+            </tr>
+                
+            <tr class="remoteRow" <?php echo $remoteRowStyle; ?> >
                 <td>
                 API token
                 </td>
@@ -424,27 +575,11 @@ Configuration form
                     </script>
                 </td>
             </tr>
-      
-            <tr>
-                <td>
-                SSL certificate verification&nbsp;
-                </td>
-                <td>
-                    <?php
-                    $value = '';
-                    $checked = '';
-                    if ($properties[Configuration::SSL_VERIFY]) {
-                        $checked = ' checked ';
-                        $value = ' value="true" ';
-                    }
-                    ?>
-                    <input type="checkbox" name="<?php echo Configuration::SSL_VERIFY;?>"
-                    <?php echo $checked;?>
-                    <?php echo $value;?> >
-                </td>
-            </tr>
-            <?php } else { # end if (SUPER_USER) ?>
-            <tr>
+
+            <?php #} else { # END if (SUPER_USER) ?>
+            
+            
+            <tr class="localRow" <?php echo $localRowStyle; ?> >
                 <td>REDCap API URL</td>
                 <td>
                     <div style="border: 1px solid #AAAAAA; margin: 4px 0px; padding: 4px; border-radius: 4px;">
@@ -452,11 +587,8 @@ Configuration form
                     </div>
                 </td>
             </tr>
-            <?php } ?>
-
-
-                  
-            <tr>
+            
+            <tr class="localRow" <?php echo $localRowStyle; ?> >
                 <td>API Token - use token of user&nbsp;</td>
                 <td>
                     <select name="<?php echo Configuration::API_TOKEN_USERNAME;?>">
@@ -475,6 +607,11 @@ Configuration form
                     </select>
                 </td>
             </tr>
+            
+            <?php #} # END else ?>
+
+
+
             <tr>
                 <td>
                 API token status
@@ -609,7 +746,7 @@ Configuration form
             <tr>
                 <td>Batch size</td>
                 <td><input type="text" name="<?php echo Configuration::BATCH_SIZE;?>"
-                    value="<?php echo $properties[Configuration::BATCH_SIZE];?>"/></td>
+                    value="<?php echo Filter::escapeForHtml($properties[Configuration::BATCH_SIZE]);?>"/></td>
             </tr>
 
             <tr style="height: 10px;"></tr> 
@@ -617,7 +754,7 @@ Configuration form
             <tr>
                 <td>Table name prefix</td>
                 <td><input type="text" name="<?php echo Configuration::TABLE_PREFIX;?>"
-                    value="<?php echo $properties[Configuration::TABLE_PREFIX];?>"/></td>
+                    value="<?php echo Filter::escapeForHtml($properties[Configuration::TABLE_PREFIX]);?>"/></td>
             </tr>
            
             <!--
@@ -720,15 +857,28 @@ Configuration form
             <tr style="height: 10px;"></tr>
             
             <tr>
-                <td style="text-align: center;"><input type="submit" name="submitValue" value="Save" /></td>
-                <td style="text-align: center;"><input type="submit" name="submitValue" value="Cancel" /></td>
+                <td style="text-align: center;">&nbsp;</td>
+                <td style="text-align: center;">
+                    <input type="submit" name="submitValue" value="Save" />
+                    <input type="submit" name="submitValue" value="Save and Exit" style="margin-left: 24px;"/>
+                    <input type="submit" name="submitValue" value="Cancel" style="margin-left: 24px;" />
+                </td>
+                <td style="text-align: center;">&nbsp;</td>
             </tr>
+            
+            <tr style="height: 10px;"></tr>
         </tbody>
   </table>
   <!--</div> -->
 </form>
 
-<?php } ?>
+<?php
+#------------------------------------------------------
+# End, if configuration is not empty
+#------------------------------------------------------
+}
+?>
+
 
 <?php
 // See JSON output of properties for REDCap-ETL
