@@ -70,7 +70,7 @@ class Authorization
 
         if (!empty($username)) {
             $rights = $module->getUserRights($username);
-            if ($rights[$username]['design']) {
+            if ($rights[$username]['design']) {  // && $rights[$username]['data_export_tool'] > 0
                 $hasPermission = true;
             }
         }
