@@ -20,3 +20,6 @@ composer.phar
 
 # ignore atom tags
 *.tags*
+
+# Test mode configuration file
+test-config.ini
