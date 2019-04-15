@@ -137,11 +137,11 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
       <thead>
         <tr>
           <th>&nbsp;</th>
-          <?php
-          foreach (AdminConfig::DAY_LABELS as $dayLabel) {
-              echo '<th class="day">'.$dayLabel."</th>\n";
-          }
-          ?>
+            <?php
+            foreach (AdminConfig::DAY_LABELS as $dayLabel) {
+                echo '<th class="day">'.$dayLabel."</th>\n";
+            }
+            ?>
         </tr>
       </thead>
     <tbody>
