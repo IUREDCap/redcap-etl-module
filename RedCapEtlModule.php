@@ -469,7 +469,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $details = 'REDCap-ETL configuration "'.$configName.'" deleted.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
-   
+    
+    public function getConfigurationExportRight($configName, $projectId = PROJECT_ID)
+    {
+        $configuration = $this->settings->getConfiguration($configName, $projectId);
+        $exportRight = $configuration->getProperty(Configuration::DATA_EXPORT_RIGHT);
+        return $exportRight;
+    }
+
     #-------------------------------------------------------------------
     # Cron job methods
     #-------------------------------------------------------------------

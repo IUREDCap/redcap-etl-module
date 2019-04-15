@@ -35,6 +35,35 @@ class Authorization
     }
     
     /**
+     * Indicates if the specified user has permission to access the specified configuration.
+     */
+    public static function hasEtlConfigurationPermission($module, $configuration, $username)
+    {
+        $hasPermission = false;
+        if ($module->isSuperUser()) {
+            $hasPermission = true;
+        } else {
+            $configExportRight = $configuration->getProperty(Configuration::DATA_EXPORT_RIGHT);
+            $userExportRight   = $module->getDataExportRight($username);
+            if (!empty($configExportRight) && !empty($userExportRight)) {
+                if ($userExportRight == 1) {
+                    # User has full data set export permission
+                    $hasPermission = true;
+                } elseif ($userExportRight == 3 && $configExportRight != 1) {
+                    # User cannot see tagged identifier fields, and configuration
+                    # is NOT "full data set"
+                    $hasPermission = true;
+                } elseif ($userExportRight == 2 && ($configExportRight == 2 || $configExportRight == 0)) {
+                    # User and configuration export permissions are both "de-identified"
+                    # (the most restrive access other than "no access")
+                    $hasPermission = true;
+                }
+            }
+        }
+        return $hasPermission;
+    }
+    
+    /**
      * Indicates if the user has the right to request permission to
      * use ETL on the current project.
      *
