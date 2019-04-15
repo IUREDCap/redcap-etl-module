@@ -141,7 +141,7 @@ class RedCapDb
       * @param int $projectId
       *
       * @return array map from username to API token for the applicable API tokens
-      */   
+      */
     public function getApiTokensWithSameExportPermissionAsUser($username, $projectId)
     {
         $tokens = array();
@@ -167,8 +167,7 @@ class RedCapDb
         }
         return $tokens;
     }
-    
-    //
+
     
     // TRANSACTIONS
     //

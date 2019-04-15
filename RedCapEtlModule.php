@@ -27,12 +27,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const LOG_EVENT         = -1;
     
     private $settings;
+    private $db;
     private $changeLogAction;
 
     public function __construct()
     {
-        $db = new RedCapDb();
-        $this->settings = new Settings($this, $db);
+        $this->db = new RedCapDb();
+        $this->settings = new Settings($this, $this->db);
         parent::__construct();
     }
     
@@ -66,7 +67,15 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $rights = \REDCap::getUserRights($userId);
         return $rights;
     }
-
+    
+    public function getDataExportRight($username = USERID)
+    {
+        $dataExportRight = 0;
+        $rights = $this->getUserRights($username)[$username];
+        $dataExportRight = $rights['data_export_tool'];
+        return $dataExportRight;
+    }
+    
     /**
      * Cron method that is called by REDCap as configured in the
      * config.json file for this module.
@@ -423,7 +432,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     
     public function addConfiguration($name, $username = USERID, $projectId = PROJECT_ID)
     {
-        $this->settings->addConfiguration($name, $username, $projectId);
+        $dataExportRight = $this->getDataExportRight($username);
+        $this->settings->addConfiguration($name, $username, $projectId, $dataExportRight);
         $details = 'REDCap-ETL configuration "'.$name.'" created.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
