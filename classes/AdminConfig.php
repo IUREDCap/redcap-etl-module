@@ -7,12 +7,28 @@ class AdminConfig implements \JsonSerializable
     const KEY = 'admin-config';
     const DAY_LABELS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     
+    # Property constants
+    const SSL_VERIFY     = 'sslVerify';
+    
+    const ALLOW_EMBEDDED_SERVER              = 'allowEmbeddedServer';
+    const EMBEDDED_SERVER_EMAIL_FROM_ADDRESS = 'embeddedServerEmailFromAddress';
+    const EMBEDDED_SERVER_LOG_FILE           = 'embeddedServerLogFile';
+    
+    const ALLOW_ON_DEMAND    = 'allowOnDemand';
+    const ALLOW_CRON         = 'allowCron';
+    const ALLOWED_CRON_TIMES = 'allowedCronTimes';
+    
+    /** @var boolean indicates if SSL verification should be done for local REDCap */
+    private $sslVerify;
+    
     private $allowEmbeddedServer;  // Allow embedded REDCap-ETL server to be used
     
+    /** @var string log file (if any) on REDCap server to use for the embedded ETL server. */
     private $embeddedServerLogFile;
-    private $embeddedServerEmailFromAddress; // E-mail from address to use for embedded server
-                                             // (must be set for e-mail logging to work for embedded server)
     
+    /** @var string E-mail from address to use for embedded server
+     *     (must be set for e-mail logging to work for embedded server). */
+    private $embeddedServerEmailFromAddress;
     
     private $allowOnDemand;  // Allow the ETL process to be run on demand
     
@@ -20,9 +36,7 @@ class AdminConfig implements \JsonSerializable
     private $allowedCronTimes;
     
     private $maxJobsPerTime;
-    
-    /** @var boolean indicates if SSL verification should be done for local REDCap */
-    private $sslVerify;
+
 
     public function __construct()
     {
@@ -45,6 +59,64 @@ class AdminConfig implements \JsonSerializable
         
         $ssVerify = true;
     }
+    
+    /**
+     * Sets admin configuration properties from a map that uses the
+     * property keys for this class.
+     */
+    public function set($properties)
+    {
+        # Set allowed cron times
+        if (array_key_exists(self::ALLOWED_CRON_TIMES, $properties)) {
+            $this->allowedCronTimes = $properties[self::ALLOWED_CRON_TIMES];
+        } else {
+            $this->allowedCronTimes = array();
+        }
+        
+        # Set allow embedded server (false will return no value)
+        if (array_key_exists(self::ALLOW_EMBEDDED_SERVER, $properties)) {
+            $this->allowEmbeddedServer = true;
+        } else {
+            $this->allowEmbeddedServer = false;
+        }
+    
+        # Set the e-mail from address for the embedded server
+        if (array_key_exists(self::EMBEDDED_SERVER_EMAIL_FROM_ADDRESS, $properties)) {
+            $this->embeddedServerEmailFromAddress =
+                trim($properties[self::EMBEDDED_SERVER_EMAIL_FROM_ADDRESS]);
+        } else {
+            $this->embeddedServerEmailFromAddress = '';
+        }
+
+        # Set the log file for the embedded server
+        if (array_key_exists(self::EMBEDDED_SERVER_LOG_FILE, $properties)) {
+            $this->embeddedServerLogFile = trim($properties[self::EMBEDDED_SERVER_LOG_FILE]);
+        } else {
+            $this->embeddedServerLogFile = '';
+        }
+
+        # Set flag that indicates if users can run jobs on demand
+        if (array_key_exists(self::ALLOW_ON_DEMAND, $properties)) {
+            $this->allowOnDemand = true;
+        } else {
+            $this->allowOnDemand = false;
+        }
+    
+        # Set flag that indicates if cron (scheduled) jobs can be run by users
+        if (array_key_exists(self::ALLOW_CRON, $properties)) {
+            $this->allowCron = true;
+        } else {
+            $this->allowCron = false;
+        }
+    
+        # Set flag indicating of SSL certificate verification should be done
+        if (array_key_exists(self::SSL_VERIFY, $properties)) {
+            $this->sslVerify = true;
+        } else {
+            $this->sslVerify - false;
+        }
+    }
+
 
     public function jsonSerialize()
     {
