@@ -231,8 +231,6 @@ class Settings
     {
         $key = $this->getConfigurationKey($configuration->getName());
 
-            $configuration->setProperty(Configuration::DATA_EXPORT_RIGHT, "1");   // REMOVE!!!!!!!!!!
-            
         $json = json_encode($configuration);
         $this->module->setProjectSetting($key, $json, $projectId);
     }
