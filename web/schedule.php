@@ -29,8 +29,6 @@ $adminConfig = $module->getAdminConfig();
 
 $servers = $module->getServers();
 
-$configurationNames = $module->getConfigurationNames();
-
 $selfUrl = $module->getUrl('web/schedule.php');
 $listUrl = $module->getUrl('web/index.php');
 
