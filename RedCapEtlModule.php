@@ -347,16 +347,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $details = 'User '.$username.' deleted from ETL users.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
-    
-    #-------------------------------------------------------------------
-    # UserInfo methods
-    #-------------------------------------------------------------------
-
-    public function getConfigurationNames($projectId = PROJECT_ID)
-    {
-        return $this->settings->getConfigurationNames($projectId);
-    }
-
 
     #-------------------------------------------------------------------
     # User ETL project methods
@@ -470,13 +460,68 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
     
-    public function getConfigurationExportRight($configName, $projectId = PROJECT_ID)
+    public function getConfigurationExportRight($configuration, $projectId = PROJECT_ID)
     {
-        $configuration = $this->settings->getConfiguration($configName, $projectId);
         $exportRight = $configuration->getProperty(Configuration::DATA_EXPORT_RIGHT);
         return $exportRight;
     }
+    
+    /**
+     * Gets the label for the specified exportRight.
+     */
+    public function getExportRightLabel($exportRight)
+    {
+        $label = '';
+        switch ($exportRight) {
+            case 0:
+                $label = 'No access';
+                break;
+            case 1:
+                $label = 'Full data set';
+                break;
+            case 2:
+                $label = 'De-identified data';
+                break;
+            case 3:
+                $label = 'No tagged identifiers';
+                break;
+        }
+        return $label;
+    }
+    
+    /**
+     * Gets all the configuration names for the specified project.
+     */
+    public function getConfigurationNames($projectId = PROJECT_ID)
+    {
+        return $this->settings->getConfigurationNames($projectId);
+    }
 
+    /**
+     * Gets the configuration names for the specified project that the specified user
+     * has permission to access.
+     */
+    public function getAccessibleConfigurationNames($projectId = PROJECT_ID, $username = USERID)
+    {
+        $configNames = array();
+        $allConfigNames = $this->getConfigurationNames($projectId);
+        
+        if ($this->getDataExportRight($username) == 1) {
+            # If user has "full data set" export permissions, improve performance by
+            # avoiding individual configuration permission checks below
+            $configNames = $allConfigNames;
+        } else {
+            foreach ($allConfigNames as $configName) {
+                $config = $this->getConfiguration($configName, $projectId);
+                if (Authorization::hasEtlConfigurationPermission($this, $config, $username)) {
+                    array_push($configNames, $configName);
+                }
+            }
+        }
+        return $configNames;    
+    }
+    
+    
     #-------------------------------------------------------------------
     # Cron job methods
     #-------------------------------------------------------------------

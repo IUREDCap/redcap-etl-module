@@ -28,8 +28,6 @@ $adminConfig = $module->getAdminConfig();
 
 $servers = $module->getServers();
 
-$configurationNames = $module->getConfigurationNames();
-
 $selfUrl   = $module->getUrl('web/run.php');
 $listUrl   = $module->getUrl('web/index.php');
 
@@ -129,8 +127,9 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
       style="padding: 4px; margin-bottom: 0px; border: 1px solid #ccc; background-color: #ccc;">
     <span style="font-weight: bold;">Configuration:</span>
     <select name="configName" onchange="this.form.submit()">
+
     <?php
-    $values = $module->getConfigurationNames();
+    $values = $module->getAccessibleConfigurationNames();
     array_unshift($values, '');
     foreach ($values as $value) {
         if (strcmp($value, $configName) === 0) {

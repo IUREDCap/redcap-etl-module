@@ -32,13 +32,9 @@ if (strcasecmp($submitValue, 'add') === 0) {
         try {
             $configurationName = $_POST['configurationName'];
             $configuration = $module->getConfiguration($configurationName);
-            if (isset($configuration)) {
-                $error = 'ERROR: configuration "'.$configurationName.'" already exists.';
-            } else {
-                $indexUrl = $module->getUrl("web/index.php");
-                $module->addConfiguration($configurationName);
-                header('Location: '.$indexUrl);
-            }
+            $indexUrl = $module->getUrl("web/index.php");
+            $module->addConfiguration($configurationName);
+            header('Location: '.$indexUrl);
         } catch (\Exception $exception) {
             $error = 'ERROR: '.$exception->getMessage();
         }
@@ -193,6 +189,7 @@ if (!SUPER_USER && !in_array($projectId, $userEtlProjects)) {
 <thead>
 <tr class="hrd">
     <th>Configuration Name</th>
+    <th>Data Export</th>
     <th>Configure</th>
     <?php
     
@@ -228,37 +225,104 @@ foreach ($configurationNames as $configurationName) {
     $configureUrl = $configUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
     $runConfigurationUrl = $runUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
     $scheduleConfigUrl = $scheduleUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
+
+    $configuration = $module->getConfiguration($configurationName);
+    $exportRight = $module->getConfigurationExportRight($configuration);
+    $exportRightLabel = $module->getExportRightLabel($exportRight);
     
     echo "<td>".Filter::escapeForHtml($configurationName)."</td>\n";
-    echo '<td style="text-align:center;">'
-        .'<a href="'.$configureUrl.'"><img src='.APP_PATH_IMAGES.'gear.png></a>'
-        ."</td>\n";
-        
+    echo "<td>".Filter::escapeForHtml($exportRightLabel)."</td>\n";
+    
+    #-------------------------------------------------------------------------------------
+    # CONFIGURE BUTTON - disable if user does not have permission to access configuration
+    #-------------------------------------------------------------------------------------
+    if (Authorization::hasEtlConfigurationPermission($module, $configuration, USERID)) {
+        echo '<td style="text-align:center;">'
+            .'<a href="'.$configureUrl.'"><img src="'.APP_PATH_IMAGES.'gear.png"></a>'
+            ."</td>\n";
+    } else {
+        echo '<td style="text-align:center;">'
+            .'<img src="'.APP_PATH_IMAGES.'gear.png" class="disabled">'
+            ."</td>\n";
+    }
+    
+    #--------------------------------------------------------------------------------------
+    # RUN BUTTON - display if running on demand allowed, but disable if user does not have
+    # the needed data export permission to access the configuration
+    #--------------------------------------------------------------------------------------
     if ($adminConfig->getAllowOnDemand()) {
-        echo '<td style="text-align:center;">'
-            .'<a href="'.$runConfigurationUrl.'"><img src='.APP_PATH_IMAGES.'application_go.png></a>'
-            ."</td>\n";
+        if (Authorization::hasEtlConfigurationPermission($module, $configuration, USERID)) {
+            echo '<td style="text-align:center;">'
+                .'<a href="'.$runConfigurationUrl.'"><img src="'.APP_PATH_IMAGES.'application_go.png"></a>'
+                ."</td>\n";
+        } else {
+            echo '<td style="text-align:center;">'
+                .'<img src="'.APP_PATH_IMAGES.'application_go.png" class="disabled">'
+                ."</td>\n";            
+        }
     }
 
+    #--------------------------------------------------------------------------------------
+    # SHEDULE BUTTON - display if ETL cron jobs allowed, but disable if user does not have
+    # the needed data export permission to access the configuration
+    #--------------------------------------------------------------------------------------
     if ($adminConfig->getAllowCron()) {
-        echo '<td style="text-align:center;">'
-            .'<a href="'.$scheduleConfigUrl.'"><img src='.APP_PATH_IMAGES.'clock_frame.png></a>'
-            ."</td>\n";
+        if (Authorization::hasEtlConfigurationPermission($module, $configuration, USERID)) {
+            echo '<td style="text-align:center;">'
+                .'<a href="'.$scheduleConfigUrl.'"><img src="'.APP_PATH_IMAGES.'clock_frame.png"></a>'
+                ."</td>\n";
+        } else {
+            echo '<td style="text-align:center;">'
+                .'<img src="'.APP_PATH_IMAGES.'clock_frame.png" class="disabled">'
+                ."</td>\n";            
+        }
     }
-        
-    echo '<td style="text-align:center;">'
-        .'<img src="'.APP_PATH_IMAGES.'page_copy.png" class="copyConfig" style="cursor: pointer;"'
-        .' id="copyConfig'.$row.'"/>'
-        ."</td>\n";
-    echo '<td style="text-align:center;">'
-        .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" class="renameConfig" style="cursor: pointer;"'
-        .' id="renameConfig'.$row.'"/>'
-        ."</td>\n";
-    echo '<td style="text-align:center;">'
-        .'<img src="'.APP_PATH_IMAGES.'delete.png" class="deleteConfig" style="cursor: pointer;"'
-        .' id="deleteConfig'.$row.'"/>'
-        ."</td>\n";
 
+    #-----------------------------------------------------------
+    # COPY BUTTON - disable if user does not have the needed
+    # data export permission to access the configuration
+    #-----------------------------------------------------------
+    if (Authorization::hasEtlConfigurationPermission($module, $configuration, USERID)) {
+        echo '<td style="text-align:center;">'
+            .'<img src="'.APP_PATH_IMAGES.'page_copy.png" class="copyConfig" style="cursor: pointer;"'
+            .' id="copyConfig'.$row.'"/>'
+            ."</td>\n";
+    } else {
+        echo '<td style="text-align:center;">'
+            .'<img src="'.APP_PATH_IMAGES.'page_copy.png" class="disabled" />'
+            ."</td>\n";        
+    }
+    
+    #-----------------------------------------------------------
+    # RENAME BUTTON - disable if user does not have the needed
+    # data export permission to access the configuration
+    #-----------------------------------------------------------
+    if (Authorization::hasEtlConfigurationPermission($module, $configuration, USERID)) {
+        echo '<td style="text-align:center;">'
+            .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" class="renameConfig" style="cursor: pointer;"'
+            .' id="renameConfig'.$row.'"/>'
+            ."</td>\n";
+    } else {
+        echo '<td style="text-align:center;">'
+            .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" class="disabled" />'
+            ."</td>\n";        
+    }
+
+    #-----------------------------------------------------------
+    # DELETE BUTTON - disable if user does not have the needed
+    # data export permission to access the configuration
+    #-----------------------------------------------------------    
+    if (Authorization::hasEtlConfigurationPermission($module, $configuration, USERID)) {
+        echo '<td style="text-align:center;">'
+            .'<img src="'.APP_PATH_IMAGES.'delete.png" class="deleteConfig" style="cursor: pointer;"'
+            .' id="deleteConfig'.$row.'"/>'
+            ."</td>\n";
+    } else {
+        echo '<td style="text-align:center;">'
+            .'<img src="'.APP_PATH_IMAGES.'delete.png" class="disabled" />'
+            ."</td>\n";        
+    }
+    
     echo "</tr>\n";
     $row++;
 }

@@ -231,6 +231,8 @@ class Settings
     {
         $key = $this->getConfigurationKey($configuration->getName());
 
+            $configuration->setProperty(Configuration::DATA_EXPORT_RIGHT, "1");   // REMOVE!!!!!!!!!!
+            
         $json = json_encode($configuration);
         $this->module->setProjectSetting($key, $json, $projectId);
     }
@@ -281,8 +283,13 @@ class Settings
      *
      * @param string $name the name of the configuration.
      */
-    public function addConfiguration($name, $username = USERID, $projectId = PROJECT_ID, $transaction = true)
-    {
+    public function addConfiguration(
+        $name,
+        $username = USERID,
+        $projectId = PROJECT_ID,
+        $dataExportRight = 0,
+        $transaction = true
+    ) {
         $commit = true;
         $errorMessage = '';
         
@@ -307,11 +314,14 @@ class Settings
             # Add the actual configuration
             $key = $this->getConfigurationKey($name);
             $configuration = $this->module->getSystemSetting($key);
-            if (!isset($configuration)) {
-                $configuration = new Configuration($name);
-                $jsonConfiguration = json_encode($configuration);
-                $this->module->setProjectSetting($key, $jsonConfiguration, $projectId);
+            if (isset($configuration)) {
+                throw new \Exception('Configuration "'.$name.'" already exists.');
             }
+
+            $configuration = new Configuration($name);
+            $configuration->setProperty(Configuration::DATA_EXPORT_RIGHT, $dataExportRight);
+            $jsonConfiguration = json_encode($configuration);
+            $this->module->setProjectSetting($key, $jsonConfiguration, $projectId);
         } catch (\Exception $exception) {
             $commit = false;
             $this->db->endTransaction($commit);

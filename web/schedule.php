@@ -142,7 +142,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     <span style="font-weight: bold;">Configuration:</span>
     <select name="configName" onchange="this.form.submit();">
     <?php
-    $values = $module->getConfigurationNames();
+    $values = $module->getAccessibleConfigurationNames();
     array_unshift($values, '');
     foreach ($values as $value) {
         if (strcmp($value, $configName) === 0) {

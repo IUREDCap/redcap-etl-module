@@ -13,6 +13,8 @@ class Configuration implements \JsonSerializable
     const DATA_SOURCE_API_TOKEN = 'data_source_api_token';
     const SSL_VERIFY = 'ssl_verify';
 
+    const DATA_EXPORT_RIGHT = 'data_export_right';
+    
     const REMOTE_REDCAP           = 'remote_redcap';
     const REMOTE_REDCAP_API_URL   = 'remote_redcap_api_url';
     const REMOTE_REDCAP_API_TOKEN = 'remote_redcap_api_token';
@@ -86,6 +88,8 @@ class Configuration implements \JsonSerializable
          
         $this->properties[self::API_TOKEN_USERNAME] = '';
 
+        $this->properties[self::DATA_EXPORT_RIGHT] = 0;
+        
         $this->properties[self::DATA_SOURCE_API_TOKEN] = '';
         
         $this->properties[self::BATCH_SIZE] = 100;

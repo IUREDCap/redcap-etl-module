@@ -129,13 +129,14 @@ if (!empty($configuration)) {
     $localApiUrl = $module->getRedCapApiUrl();
     $apiTokenUser = '';
 
-    if ($testMode && strcmp($configuration->getRedCapApiUrl(), $module->getRedCapApiUrl()) !== 0) {
+    $apiUrl = $configuration->getProperty(Configuration::REDCAP_API_URL);
+    if ($testMode && strcmp($apiUrl, $module->getRedCapApiUrl()) !== 0) {
         ; // Test mode, so remote REDCap is being used, so no checks can be done
         # In test mode:
         # - the REDCap API URL becomes editable for admins
-        # - if the REDCap API URL is changed so that it does not match the API URL of local REDCap, the API token user is ignored
-        # - 
-
+        # - if the REDCap API URL is changed so that it does not match the API URL of local REDCap,
+        #   the API token user is ignored
+        # -
     } else {
         if (empty($configuration->getProperty(Configuration::API_TOKEN_USERNAME))) {
             # No API token user was specified, set the API token to blank
@@ -231,74 +232,7 @@ if (!empty($configuration)) {
     } catch (\Exception $exception) {
         $error = 'ERROR: '.$exception->getMessage();
     }
-}
-?>
-
-<?php
-
-#-----------------------------------------------------------------
-# API token user and token check
-#
-# If the configuration properties are not empty, then update the
-# API token if it has changed, UNLESS the REDCap API URL
-# being used does not match the one for the currently running
-# REDCap instance (which only admins should be allowed to do)
-#-----------------------------------------------------------------
-/*
-if (!empty($properties)) {
-    # Get API URL and currently stored token for this project, if any
-    $apiUrl = $module->getRedCapApiUrl();
-
-    # If the configuration's API URL matches the API URL of the
-    # REDCap instance that is running (which should always be
-    # the case for non-admin users)
-    if (strcasecmp(trim($properties[Configuration::REDCAP_API_URL]), trim($apiUrl)) === 0) {
-        if (empty($apiTokenUser)) {
-            if (!empty($properties[Configuration::DATA_SOURCE_API_TOKEN])) {
-                #--------------------------------------------------------------
-                # No API token user is specified, but there is an API token,
-                # so remove it
-                #--------------------------------------------------------------
-                $properties[Configuration::DATA_SOURCE_API_TOKEN] = '';
-                $configuration->set($properties);
-                $module->setConfiguration($configuration, USERID, PROJECT_ID);
-            }
-        } elseif (!array_key_exists($apiTokenUser, $apiTokens)) {
-            #---------------------------------------------------
-            # The specified API token user no longer has an API
-            # token for this project with export permission, so
-            # delete this user as the API token user and clear
-            # the API token
-            #---------------------------------------------------
-            $properties[Configuration::API_TOKEN_USERNAME] = '';
-            $properties[Configuration::DATA_SOURCE_API_TOKEN] = '';
-            $configuration->set($properties);
-            $module->setConfiguration($configuration, USERID, PROJECT_ID);
-            $warning .= 'User "'.$apiTokenUser.'", who was specified as the API token user, no longer'
-                .' has an API token for this project with export permission. This user has been'
-                .' removed as the API token user.';
-        } else {
-            $apiToken = $apiTokens[$apiTokenUser];
-
-            #-----------------------------------------------------------
-            # There is an API token for the specified user with export
-            # permission, but it has changed, so update the API token
-            #-----------------------------------------------------------
-            if (strcasecmp(trim($properties[Configuration::DATA_SOURCE_API_TOKEN]), $apiToken) !== 0) {
-                $properties[Configuration::DATA_SOURCE_API_TOKEN] = $apiToken;
-                $configuration->set($properties);
-                $module->setConfiguration($configuration, USERID, PROJECT_ID);
-                $success .= 'The API token for user "'.$apiTokenUser
-                    .'" has changed, and has been automatically updated in the configuration.';
-            }
-        }
-    }
-}
-*/
-
-# Update API token user
-#$apiTokenUser = $configuration->getProperty(Configuration::API_TOKEN_USERNAME);
-    
+}  // END - if configuration is not empty
 ?>
 
 
@@ -361,7 +295,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     <span style="font-weight: bold;">Configuration:</span>
     <select name="configName" onchange="this.form.submit()">
     <?php
-    $values = $module->getConfigurationNames();
+    $values = $module->getAccessibleConfigurationNames();
     array_unshift($values, '');
     foreach ($values as $value) {
         if (strcmp($value, $configName) === 0) {
@@ -378,10 +312,13 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
 
 <?php
-#-----------------------------------------------------------------------------
-# If configuration not empty, display configuration form
-#-----------------------------------------------------------------------------
-if (!empty($configuration)) {
+if (empty($configuration)) {
+    ; // Don't display any page content
+} elseif (!Authorization::hasEtlConfigurationPermission($module, $configuration, USERID)) {
+    echo '<div class="red" style="margin-top:12px;">'
+        .'<p style="text-align: center;">You do not have data export permission to access this configuration.</p>'
+        .'</div>';
+} else {
 ?>
 
 
@@ -452,19 +389,6 @@ $(function() {
 </script>
 
 
-<?php
-#--------------------------------------------------------
-# Set CSS styles to show/hide local/remote REDCap rows
-#--------------------------------------------------------
-$localRowStyle = '';
-$remoteRowStyle = '';
-if ($configuration->isRemoteRedcap()) {
-    $localRowStyle = ' style="display: none;" ';
-} else {
-    $remoteRowStyle = ' style="display: none;" ';
-}
-?>
-
 <!-- ====================================
 Configuration form
 ===================================== -->
@@ -491,41 +415,26 @@ Configuration form
                 </td>
             </tr>
 
-            <?php if (SUPER_USER) { ?>
+            
             <tr>
-                <td>
-                Remote REDCap Instance
-                </td>
-                <td>
-                    <?php
-                    $value = '';
-                    $checked = '';
-                    if ($properties[Configuration::REMOTE_REDCAP]) {
-                        $checked = ' checked ';
-                        $value = ' value="true" ';
-                    }
-                    ?>
-                    <input type="checkbox" name="<?php echo Configuration::REMOTE_REDCAP;?>"
-                    <?php echo $checked;?>
-                    <?php echo $value;?> >
-                </td>
-            </tr>
-            <?php } ?>
-            
-            <?php #if (SUPER_USER) { ?>
-
-            
-            <tr class="remoteRow" <?php echo $remoteRowStyle; ?> >
                 <td>REDCap API URL</td>
+                <?php if ($testMode && SUPER_USER) { # make API URL editable ?>
                 <td>
                     <input type="text" size="60" 
                            value="<?php echo $properties[Configuration::REDCAP_API_URL];?>"
                            name="<?php echo Configuration::REDCAP_API_URL?>" />
                 </td>
+                <?php } else { ?>
+                <td>
+                    <div style="border: 1px solid #AAAAAA; margin: 4px 0px; padding: 4px; border-radius: 4px;">
+                    <?php echo Filter::escapeForHtml($properties[Configuration::REDCAP_API_URL]); ?>
+                    </div>
+                </td>
+                <?php } ?>
             </tr>
 
-      
-            <tr class="remoteRow" <?php echo $remoteRowStyle; ?> >
+            <?php if ($testMode && SUPER_USER) { # make API URL editable ?>
+            <tr>
                 <td>
                 SSL certificate verification&nbsp;
                 </td>
@@ -544,7 +453,7 @@ Configuration form
                 </td>
             </tr>
                 
-            <tr class="remoteRow" <?php echo $remoteRowStyle; ?> >
+            <tr>
                 <td>
                 API token
                 </td>
@@ -575,18 +484,7 @@ Configuration form
                     </script>
                 </td>
             </tr>
-
-            <?php #} else { # END if (SUPER_USER) ?>
-            
-            
-            <tr class="localRow" <?php echo $localRowStyle; ?> >
-                <td>REDCap API URL</td>
-                <td>
-                    <div style="border: 1px solid #AAAAAA; margin: 4px 0px; padding: 4px; border-radius: 4px;">
-                    <?php echo Filter::escapeForHtml($properties[Configuration::REDCAP_API_URL]); ?>
-                    </div>
-                </td>
-            </tr>
+            <?php } # End - if test mode and super user (admin) ?>
             
             <tr class="localRow" <?php echo $localRowStyle; ?> >
                 <td>API Token - use token of user&nbsp;</td>
@@ -624,9 +522,11 @@ Configuration form
                     
                     
                     $apiUrl = $module->getRedCapApiUrl();
+                    #--------------------------------------------------------------------------------------------
                     # If the configurations API URL doesn't match the project's API URL -
-                    # this case should only be possible for admins and indicates
+                    # this case should only be possible for admins in test mode and indicates
                     # admin is entering information token information for a remote system
+                    #--------------------------------------------------------------------------------------------
                     if (strcasecmp(trim($properties[Configuration::REDCAP_API_URL]), trim($apiUrl)) !== 0) {
                         echo '<span style="color: navy; font-weight: bold;">?</span>&nbsp;&nbsp;';
                         if (empty($properties[Configuration::DATA_SOURCE_API_TOKEN])) {

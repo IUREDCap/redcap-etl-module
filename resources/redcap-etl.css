@@ -75,3 +75,7 @@ table.user-projects th, table.user-projects td {
 td.time-range {
     font-family: "Courier New", Courier, monospace;
 }
+
+img.disabled {
+    opacity: 0.33;
+}
