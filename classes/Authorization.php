@@ -33,6 +33,19 @@ class Authorization
         }
         return $hasPermission;
     }
+
+
+    /**
+     * Indicates if the specified user has permission to access the configuration
+     * with the specified configuration name for the specified project.
+     */
+    public static function hasEtlConfigNamePermission($module, $configName, $username, $projectId)
+    {
+        $configuration = $module->getConfiguration($configName, $projectId);
+        $hasPermission = self::hasEtlConfigurationPermission($module, $configuration, $username);
+        return $hasPermission;
+    }
+    
     
     /**
      * Indicates if the specified user has permission to access the specified configuration.
