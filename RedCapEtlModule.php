@@ -435,29 +435,43 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function copyConfiguration($fromConfigName, $toConfigName)
     {
-        $this->settings->copyConfiguration($fromConfigName, $toConfigName);
-        $details = 'REDCap-ETL configuration "'.$fromConfigName.'" copied to "'.
-            $toConfigName.'" for user '.USERID.', project ID '.PROJECT_ID.'.';
-        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
+        if (Authorization::hatEtlConfigNamePermission($this, $configName, USERID, PROJECT_ID)) {
+            $this->settings->copyConfiguration($fromConfigName, $toConfigName);
+            $details = 'REDCap-ETL configuration "'.$fromConfigName.'" copied to "'.
+                $toConfigName.'" for user '.USERID.', project ID '.PROJECT_ID.'.';
+            \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
+        } else {
+            throw new \Exception('You do not have permission to copy configuration "'.$configName.'".');
+        }
     }
     
     /**
-     * Rename configuration (only supports rename from/to same
-     * user and project).
+     * Renames configuration (only supports rename from/to same project).
+     *
+     * @param string $configName the name of the configuration to be renamed.
+     * @param string $newConfigName the new name for the configuration being renamed.
      */
     public function renameConfiguration($configName, $newConfigName)
     {
-        $this->settings->renameConfiguration($configName, $newConfigName);
-        $details = 'REDCap-ETL configuration "'.$configName.'" renamed to "'.
-            $newConfigName.'" for user '.USERID.', project ID '.PROJECT_ID.'.';
-        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
+        if (Authorization::hatEtlConfigNamePermission($this, $configName, USERID, PROJECT_ID)) {
+            $this->settings->renameConfiguration($configName, $newConfigName);
+            $details = 'REDCap-ETL configuration "'.$configName.'" renamed to "'.
+                $newConfigName.'" for user '.USERID.', project ID '.PROJECT_ID.'.';
+            \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
+        } else {
+            throw new \Exception('You do not have permission to remname configuration "'.$configName.'".');
+        }
     }
     
     public function removeConfiguration($configName)
     {
-        $this->settings->removeConfiguration($configName);
-        $details = 'REDCap-ETL configuration "'.$configName.'" deleted.';
-        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
+        if (Authorization::hatEtlConfigNamePermission($this, $configName, USERID, PROJECT_ID)) {
+            $this->settings->removeConfiguration($configName);
+            $details = 'REDCap-ETL configuration "'.$configName.'" deleted.';
+            \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
+        } else {
+            throw new \Exception('You do not have permission to remove configuration "'.$configName.'".');
+        }
     }
     
     public function getConfigurationExportRight($configuration, $projectId = PROJECT_ID)
@@ -518,7 +532,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 }
             }
         }
-        return $configNames;    
+        return $configNames;
     }
     
     
