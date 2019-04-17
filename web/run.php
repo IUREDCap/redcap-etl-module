@@ -7,6 +7,7 @@ require_once __DIR__.'/../dependencies/autoload.php';
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Configuration;
+use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
@@ -142,6 +143,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     }
     ?>
     </select>
+    <?php Csrf::generateFormToken(); ?>
 </form>
 
 <br />
@@ -191,6 +193,7 @@ $allowEmbeddedServer = $adminConfig->getAllowEmbeddedServer();
         ?>
   <p><pre id="runOutput"><?php echo Filter::escapeForHtml($runOutput);?></pre></p>
   </fieldset>
+    <?php Csrf::generateFormToken(); ?>
 </form>
 
 

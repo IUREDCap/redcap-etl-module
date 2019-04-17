@@ -6,6 +6,7 @@ require_once __DIR__.'/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Authorization;
+use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Configuration;
 use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapEtlModule;
@@ -153,6 +154,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     }
     ?>
     </select>
+    <?php Csrf::generateFormToken(); ?>
 </form>
 
 <br />
@@ -295,6 +297,7 @@ $(function () {
   <p>
     <input type="submit" name="submitValue" value="Save">
   </p>
+    <?php Csrf::generateFormToken(); ?>
 </form>
 <?php
 }

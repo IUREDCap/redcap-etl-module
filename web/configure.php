@@ -8,6 +8,7 @@ use IU\REDCapETL\EtlRedCapProject;
 
 use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Configuration;
+use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
@@ -308,6 +309,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     }
     ?>
     </select>
+    <?php Csrf::generateFormToken(); ?>
 </form>
 
 
@@ -770,6 +772,7 @@ Configuration form
         </tbody>
   </table>
   <!--</div> -->
+    <?php Csrf::generateFormToken(); ?>
 </form>
 
 <?php

@@ -5,6 +5,7 @@
 require_once __DIR__.'/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\Authorization;
+use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
 
 #--------------------------------------------------------------
@@ -181,6 +182,7 @@ if (!SUPER_USER && !in_array($projectId, $userEtlProjects)) {
     REDCap-ETL configuration name:
     <input name="configurationName" type="text" size="40" />
     <input type="submit" name="submitValue" value="Add" />
+    <?php Csrf::generateFormToken(); ?>
 </form>
 
 
@@ -387,6 +389,7 @@ $(function() {
     </p>
     <input type="hidden" name="copyFromConfigName" id="copyFromConfigName" value="">
     <input type="hidden" name="submitValue" value="copy">
+    <?php Csrf::generateFormToken(); ?>
     </form>
 </div>
 
@@ -443,6 +446,7 @@ $(function() {
     </p>
     <input type="hidden" name="renameConfigName" id="renameConfigName" value="">
     <input type="hidden" name="submitValue" value="rename">
+    <?php Csrf::generateFormToken(); ?>
     </form>
 </div>
 
@@ -495,6 +499,7 @@ $(function() {
     click on the <span style="font-weight: bold;">Delete configuration</span> button.
     <input type="hidden" name="deleteConfigName" id="deleteConfigName" value="">
     <input type="hidden" name="submitValue" value="delete">
+    <?php Csrf::generateFormToken(); ?>
     </form>
 </div>
 
