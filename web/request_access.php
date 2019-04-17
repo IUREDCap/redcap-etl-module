@@ -22,8 +22,10 @@ $projectId = $module->getProjectId();
 
 
 if (!Authorization::hasEtlRequestPermission($module, USERID)) {
-    echo "You do not have permission to use, or request the use of, REDCap-ETL"
-        ." for this project.";
+    echo 'You do not have permission to use, or request the use of, REDCap-ETL'
+        .' for this project. You need to have REDCap user right '
+        .' "Project Design and Setup" and REDCap data export user right of at'
+        .' least "De-Identified".';
 } elseif (!Authorization::hasEtlProjectPagePermission($module, USERID)) {
     #--------------------------------------------------------------------
     # The user does NOT have permission to use ETL for this project,

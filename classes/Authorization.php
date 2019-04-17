@@ -92,7 +92,8 @@ class Authorization
         if ($module->isSuperUser()) {
             $hasPermission = true;
         } elseif (!empty($projectId) && !empty($username)) {
-            if (self::hasRedCapUserRightsForEtl($module, $username)) {
+            $rights = $module->getUserRights($username);
+            if (self::hasRedCapUserRightsForEtl($module, $username) && $rights[$username]['data_export_tool'] > 0) {
                 $hasPermission = true;
             }
         }
@@ -112,7 +113,7 @@ class Authorization
 
         if (!empty($username)) {
             $rights = $module->getUserRights($username);
-            if ($rights[$username]['design']) {  // && $rights[$username]['data_export_tool'] > 0
+            if ($rights[$username]['design']) {
                 $hasPermission = true;
             }
         }
