@@ -5,10 +5,18 @@
     <testsuites>
         <testsuite name="unit">
             <file>tests/unit/AdminConfigTest.php</file>
+            <file>tests/unit/AuthorizationTest.php</file>
             <file>tests/unit/ConfigurationTest.php</file>
+            <file>tests/unit/CsrfTest.php</file>
             <file>tests/unit/DbHostsTest.php</file>
+            <file>tests/unit/FilterTest.php</file>
+            <file>tests/unit/HelpTest.php</file>
             <file>tests/unit/ProjectInfoTest.php</file>
+            <file>tests/unit/RedCapDbTest.php</file>
+            <file>tests/unit/SettingsTest.php</file>
             <file>tests/unit/ServerConfigTest.php</file>
+            <file>tests/unit/ServersTest.php</file>
+            <file>tests/unit/UserListTest.php</file>
         </testsuite>
     </testsuites>
 
