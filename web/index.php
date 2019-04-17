@@ -258,7 +258,7 @@ foreach ($configurationNames as $configurationName) {
         } else {
             echo '<td style="text-align:center;">'
                 .'<img src="'.APP_PATH_IMAGES.'application_go.png" class="disabled">'
-                ."</td>\n";            
+                ."</td>\n";
         }
     }
 
@@ -274,7 +274,7 @@ foreach ($configurationNames as $configurationName) {
         } else {
             echo '<td style="text-align:center;">'
                 .'<img src="'.APP_PATH_IMAGES.'clock_frame.png" class="disabled">'
-                ."</td>\n";            
+                ."</td>\n";
         }
     }
 
@@ -290,7 +290,7 @@ foreach ($configurationNames as $configurationName) {
     } else {
         echo '<td style="text-align:center;">'
             .'<img src="'.APP_PATH_IMAGES.'page_copy.png" class="disabled" />'
-            ."</td>\n";        
+            ."</td>\n";
     }
     
     #-----------------------------------------------------------
@@ -305,13 +305,13 @@ foreach ($configurationNames as $configurationName) {
     } else {
         echo '<td style="text-align:center;">'
             .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" class="disabled" />'
-            ."</td>\n";        
+            ."</td>\n";
     }
 
     #-----------------------------------------------------------
     # DELETE BUTTON - disable if user does not have the needed
     # data export permission to access the configuration
-    #-----------------------------------------------------------    
+    #-----------------------------------------------------------
     if (Authorization::hasEtlConfigurationPermission($module, $configuration, USERID)) {
         echo '<td style="text-align:center;">'
             .'<img src="'.APP_PATH_IMAGES.'delete.png" class="deleteConfig" style="cursor: pointer;"'
@@ -320,7 +320,7 @@ foreach ($configurationNames as $configurationName) {
     } else {
         echo '<td style="text-align:center;">'
             .'<img src="'.APP_PATH_IMAGES.'delete.png" class="disabled" />'
-            ."</td>\n";        
+            ."</td>\n";
     }
     
     echo "</tr>\n";
