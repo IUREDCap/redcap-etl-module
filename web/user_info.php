@@ -52,7 +52,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 ?>
 
 
-<h5 style="font-weight: bold;">Overview</h5>
+<h4 style="font-weight: bold;">Overview</h4>
 
 <p>
 The REDCap-ETL (Extract Transform Load) external module:
@@ -69,12 +69,57 @@ The REDCap-ETL (Extract Transform Load) external module:
 
 <hr />
 
-<h5 style="font-weight: bold;">REDCap-ETL Configurations</h5>
+<h4 style="font-weight: bold;">REDCap-ETL Configurations</h4>
 
+<p>
 To run REDCap-ETL, you need to create an ETL configuration.
+The configuration needs to specify at least the following things:
+</p>
+<ul>
+    <li><strong>API Token</strong> - used to access the data to be extracted</li>
+    <li><strong>Transformation Rules</strong> - that explain how the extracted data is transformed</li>
+    <li><strong>Database Information</strong> - that contains the database and user account to be used
+        for loading the extracted and transformed data</li>
+</ul>
 
 
+<h5 style="font-weight: bold;">Database Information</h5>
 
-  
+<p>
+You need to have a database for loading your extracted data. The
+database needs to be accessible by the REDCap-ETL server that
+you are using, and you need to have a user account for the database
+that has at least the following permissions:
+</p>
+<ul>
+    <li>SELECT</li>
+    <li>INSERT</li>
+    <li>CREATE</li>
+    <li>DROP</li>
+    <li>CREATE VIEW</li>
+</ul>  
+
+<p>
+REDCap-ETL configurations allows post-processing SQL statements to be specified that
+are run after the ETL process completes. The database user will also need to have
+permission to execute any post-processing statements not coevered by the
+permissions above.
+</p>
+
+<hr />
+
+<h5 style="font-weight: bold;">REDCap-ETL Logging</h5>
+
+<p>
+There are 2 options for logging the results of your ETL processes, and they can be used simulatenously:
+<ol>
+    <li><strong>Data Logging</strong> - REDCap-ETL, by default, logs to 2 tables in your
+    database where the your transformed data is loaded. The names of these tables
+    can be changed in your configuration, or you can turn of this logging.</li>
+    <li><strong>E-mail logging</strong> - you can specify in the ETL configuration that you
+    want to receive an e-mail when an error occurs and/or that you recieve an e-mail
+    summary of ETL processing when you process completes successfully.</li>
+</ol>
+</p>
 
 <?php include APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
