@@ -28,6 +28,7 @@ $success = '';
 $adminConfig = $module->getAdminConfig();
 
 $selfUrl   = $module->getUrl('web/user_info.php');
+$transformationRulesUrl = $module->getUrl('web/transformation_rules.php');
 
 $redcapEtlImage = $module->getUrl('resources/redcap-etl.png');
 
@@ -82,6 +83,11 @@ The configuration needs to specify at least the following things:
         for loading the extracted and transformed data</li>
 </ul>
 
+
+<h5 style="font-weight: bold;">Transformation Rules</h5>
+
+<?php echo $transformationRulesUrl."<hr/>"; ?>
+<a href="<?php echo $transformationRulesUrl; ?>" target="_blank">Transformation Rules</a>
 
 <h5 style="font-weight: bold;">Database Information</h5>
 
