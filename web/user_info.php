@@ -86,8 +86,21 @@ The configuration needs to specify at least the following things:
 
 <h5 style="font-weight: bold;">Transformation Rules</h5>
 
-<?php echo $transformationRulesUrl."<hr/>"; ?>
+<p>
+In your configuration, you need to specify transformation rules that
+indicate how the data extracted from REDCap should be transformed before it
+is loaded into your database.
+</p>
+
+<p>
+An auto-generate button is provide that will generate transformation rules that
+can be used as is, or modified.
+</p>
+
+<p>
+More information on the transformation rules can be found here:
 <a href="<?php echo $transformationRulesUrl; ?>" target="_blank">Transformation Rules</a>
+</p>
 
 <h5 style="font-weight: bold;">Database Information</h5>
 
