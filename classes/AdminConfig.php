@@ -59,6 +59,24 @@ class AdminConfig implements \JsonSerializable
         
         $ssVerify = true;
     }
+
+
+    public function fromJson($json)
+    {
+        if (!empty($json)) {
+            $object = json_decode($json, true);
+            foreach (get_object_vars($this) as $var => $value) {
+                $this->$var = $object[$var];
+            }
+        }
+    }
+
+    public function toJson()
+    {
+        $json = json_encode($this);
+        return $json;
+    }
+    
     
     /**
      * Sets admin configuration properties from a map that uses the
@@ -257,22 +275,6 @@ class AdminConfig implements \JsonSerializable
         return $labels;
     }
 
-    public function fromJson($json)
-    {
-        if (!empty($json)) {
-            $object = json_decode($json);
-            foreach (get_object_vars($this) as $var => $value) {
-                $this->$var = $object->$var;
-            }
-        }
-    }
-
-    public function toJson()
-    {
-        $json = json_encode($this);
-        return $json;
-    }
-
     public function getAllowEmbeddedServer()
     {
         return $this->allowEmbeddedServer;
@@ -331,7 +333,12 @@ class AdminConfig implements \JsonSerializable
         $isAllowed = $this->allowedCronTimes[$day][$time];
         return $isAllowed;
     }
-        
+     
+    public function getAllowedCronTimes()
+    {
+        return $this->allowedCronTimes;
+    }
+    
     public function setAllowedCronTimes($times)
     {
         $this->allowedCronTimes = array();
