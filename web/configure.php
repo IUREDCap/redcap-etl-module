@@ -59,32 +59,16 @@ $redCapDb = new RedCapDb();
 
 
 #-------------------------------------------
-# Get the configuration name
+# Get the configuration
 #-------------------------------------------
-$configName = $_POST['configName'];
-if (empty($configName)) {
-    $configName = $_GET['configName'];
-    if (empty($configName)) {
-        $configName = $_SESSION['configName'];
-    }
+$configName = '';
+$configuration = $module->getConfigurationFromRequest();
+if (!empty($configuration)) {
+    $configName = $configuration->getName();
+    $properties = $configuration->getProperties();
 }
 
 
-if (!empty($configName)) {
-    $_SESSION['configName'] = $configName;
-    $configuration = $module->getConfiguration($configName);
-    if (!empty($configuration)) {
-        $properties = $configuration->getProperties();
-    } else {
-        # May have changed projects, and session config name
-        # does not exist in the new project
-        $configName = null;
-    }
-}
-
-#print "<pre>\n";
-#print_r($_POST);
-#print "</pre>\n";
 
 if (!empty($configuration)) {
     #--------------------------------------------------------------
@@ -246,6 +230,13 @@ include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 ?>
 
 <?php
+
+
+#print "<pre>\n";
+#print_r($_POST);
+#print "</pre>\n";
+
+
 #print '<br/>TRANSFORM RULES: '.$properties[Configuration::TRANSFORM_RULES_TEXT]."<br/>\n";
 #print "submitValue {$submitValue}\n";
 #print "PROJECTS:<br />\n";

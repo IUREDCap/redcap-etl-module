@@ -33,26 +33,14 @@ $selfUrl   = $module->getUrl('web/run.php');
 $listUrl   = $module->getUrl('web/index.php');
 
 #-------------------------------------------
-# Get the configuration name
+# Get the configuration
 #-------------------------------------------
-$configName = $_POST['configName'];
-if (empty($configName)) {
-    $configName = $_GET['configName'];
-    if (empty($configName)) {
-        $configName = $_SESSION['configName'];
-    }
+$configName = '';
+$configuration = $module->getConfigurationFromRequest();
+if (!empty($configuration)) {
+    $configName = $configuration->getName();
 }
 
-if (!empty($configName)) {
-    $_SESSION['configName'] = $configName;
-}
-
-if (!empty($configName)) {
-    $configuration = $module->getConfiguration($configName);
-    if (empty($configuration)) {
-        $configName = null;
-    }
-}
 
 #------------------------------------------
 # Get the server

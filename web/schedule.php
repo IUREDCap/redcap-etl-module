@@ -26,6 +26,15 @@ $error   = '';
 $warning = '';
 $success = '';
 
+#-------------------------------------------
+# Get the configuration
+#-------------------------------------------
+$configName = '';
+$configuration = $module->getConfigurationFromRequest();
+if (!empty($configuration)) {
+    $configName = $configuration->getName();
+}
+
 $adminConfig = $module->getAdminConfig();
 
 $servers = $module->getServers();
@@ -33,28 +42,8 @@ $servers = $module->getServers();
 $selfUrl = $module->getUrl('web/schedule.php');
 $listUrl = $module->getUrl('web/index.php');
 
-#-------------------------------------------
-# Get the configuration name
-#-------------------------------------------
-$configName = $_POST['configName'];
-if (empty($configName)) {
-    $configName = $_GET['configName'];
-    if (empty($configName)) {
-        $configName = $_SESSION['configName'];
-    }
-}
-if (!empty($configName)) {
-    $_SESSION['configName'] = $configName;
-}
 
-if (!empty($configName)) {
-    $configuration = $module->getConfiguration($configName);
-    if (!empty($configuration)) {
-        $properties = $configuration->getProperties();
-    } else {
-        $configName = null;
-    }
-}
+
 
 #-------------------------
 # Set the submit value
