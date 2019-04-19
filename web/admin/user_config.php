@@ -2,13 +2,16 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
-if (!SUPER_USER) {
-    exit("Only super users can access this page!");
-}
+#---------------------------------------------
+# Check that the user has access permission
+#---------------------------------------------
+$module->checkAdminPagePermission();
+
 
 require_once __DIR__.'/../../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
+use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
@@ -102,6 +105,7 @@ User:
      value="<?php echo Filter::escapeForHtmlAttribute($username); ?>">
 <input type="hidden" name="username-result" id="username-result">
 <input type="hidden" name="userLabel" id="userLabel">
+<?php Csrf::generateFormToken(); ?>
 </form>
     <!--
 <div class="ui-widget">
@@ -155,6 +159,7 @@ if (!empty($username)) {
     </p>
     <input type="hidden" name="username-result" value="<?php echo $username;?>">
     <input type="hidden" name="submitValue" value="<?php echo $deleteButtonLabel;?>">
+    <?php Csrf::generateFormToken(); ?>
     </form>
 </div>
 
@@ -257,6 +262,7 @@ $(function() {
     style="float: right;">
 <div style="clear: both;"></div>
 </p>
+<?php Csrf::generateFormToken(); ?>
 </form>
 <?php
 }

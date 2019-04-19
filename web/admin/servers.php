@@ -2,13 +2,16 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
-if (!SUPER_USER) {
-    exit("Only super users can access this page!");
-}
+#---------------------------------------------
+# Check that the user has access permission
+#---------------------------------------------
+$module->checkAdminPagePermission();
+
 
 require_once __DIR__.'/../../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
+use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
@@ -106,6 +109,7 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
 <form action="<?php echo $selfUrl;?>" method="post" style="margin-bottom: 12px;">
 Server: <input type="text" id="server-name" name="server-name" size="40">
 <input type="submit" name="submit" value="Add Server"><br />
+<?php Csrf::generateFormToken(); ?>
 </form>
     <!--
 <div class="ui-widget">
@@ -185,6 +189,7 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
     <input type="text" name="copy-to-server-name" id="copy-to-server-name">
     </p>
     <input type="hidden" name="copy-from-server-name" id="copy-from-server-name" value="">
+    <?php Csrf::generateFormToken(); ?>
     </form>
 </div>
 
@@ -206,6 +211,7 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
     <input type="text" name="rename-new-server-name" id="rename-new-server-name">
     </p>
     <input type="hidden" name="rename-server-name" id="rename-server-name" value="">
+    <?php Csrf::generateFormToken(); ?>
     </form>
 </div>
 
@@ -222,6 +228,7 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
     To delete the server <span id="server-to-delete" style="font-weight: bold;"></span>,
     click on the <span style="font-weight: bold;">Delete server</span> button.
     <input type="hidden" name="delete-server-name" id="delete-server-name" value="">
+    <?php Csrf::generateFormToken(); ?>
     </form>
 </div>
 

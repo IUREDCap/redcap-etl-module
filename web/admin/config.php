@@ -2,15 +2,17 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
-if (!SUPER_USER) {
-    exit("Only super users can access this page!");
-}
+#---------------------------------------------
+# Check that the user has access permission
+#---------------------------------------------
+$module->checkAdminPagePermission();
 
 require_once __DIR__.'/../../dependencies/autoload.php';
 
 use \IU\REDCapETL\Version;
 
 use \IU\RedCapEtlModule\AdminConfig;
+use \IU\RedCapEtlModule\Csrf;
 use \IU\RedCapEtlModule\Filter;
 use \IU\RedCapEtlModule\RedCapEtlModule;
 
@@ -192,6 +194,7 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
   <p>
     <input type="submit" name="submitValue" value="Save">
   </p>
+    <?php Csrf::generateFormToken(); ?>
 </form>
 
 <?php

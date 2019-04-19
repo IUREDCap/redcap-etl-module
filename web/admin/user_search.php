@@ -1,8 +1,10 @@
 <?php
 
-if (!SUPER_USER) {
-    exit("Only super users can access this page!");
-}
+#---------------------------------------------
+# Check that the user has access permission
+#---------------------------------------------
+$module->checkAdminPagePermission();
+
 
 require_once __DIR__.'/../../dependencies/autoload.php';
 

@@ -2,9 +2,11 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
-if (!SUPER_USER) {
-    exit("Only super users can access this page!");
-}
+#---------------------------------------------
+# Check that the user has access permission
+#---------------------------------------------
+$module->checkAdminPagePermission();
+
 
 require_once __DIR__.'/../../dependencies/autoload.php';
 
@@ -13,6 +15,7 @@ use phpseclib\Net\SCP;
 use phpseclib\Net\SFTP;
 use phpseclib\Net\SSH2;
 
+use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\ServerConfig;
 use IU\RedCapEtlModule\RedCapEtlModule;
@@ -141,6 +144,7 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     }
     ?>
     </select>
+    <?php Csrf::generateFormToken(); ?>
 </form>
 
 
@@ -387,6 +391,7 @@ if (!empty($serverName)) {
     ?>&nbsp;
     </textarea>
   </div>
+    <?php Csrf::generateFormToken(); ?>
 </form>
 <?php
 }

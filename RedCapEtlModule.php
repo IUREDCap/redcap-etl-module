@@ -939,4 +939,19 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         }
         return $configuration;
     }
+    
+    /**
+     * Checks admin page access and exits if there is an issue.
+     */
+    public function checkAdminPagePermission()
+    {
+        if (!SUPER_USER) {
+            exit("Only super users can access this page!");
+        } elseif (!Csrf::isValidRequest()) {
+            exit(
+                "Access not allowed. Your session may have expired."
+                ." Please make sure you are logged in and try again."
+            );
+        }
+    }
 }
