@@ -13,14 +13,15 @@ use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
 
-#--------------------------------------------------------------
-# If the user doesn't have permission to access REDCap-ETL for
-# this project, redirect them to the access request page which
-# should display a link to send e-mail to request permission.
-#--------------------------------------------------------------
-if (!Authorization::hasEtlProjectPagePermission($module, USERID)) {
-    $requestAccessUrl = $module->getUrl('web/request_access.php');
-    header('Location: '.$requestAccessUrl);
+#-----------------------------------------------------------
+# Check that the user has permission to access this page
+# and get the configuration if one was specified
+#-----------------------------------------------------------
+$configuration = $module->checkUserPagePermission(USERID);
+$configName = '';
+if (!empty($configuration)) {
+    $configName = $configuration->getName();
+    $properties = $configuration->getProperties();
 }
 
 $success = '';
@@ -49,24 +50,12 @@ $generateRulesUrl = $module->getUrl('web/generate_rules.php');
 
 $adminConfig = $module->getAdminConfig();
 
-$configuration = null;
 
 /** @var array configurations property map from property name to value */
 $properties = array();
 
 
 $redCapDb = new RedCapDb();
-
-
-#-------------------------------------------
-# Get the configuration
-#-------------------------------------------
-$configName = '';
-$configuration = $module->getConfigurationFromRequest();
-if (!empty($configuration)) {
-    $configName = $configuration->getName();
-    $properties = $configuration->getProperties();
-}
 
 
 
@@ -231,11 +220,13 @@ include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 
 <?php
 
-
 #print "<pre>\n";
 #print_r($_POST);
 #print "</pre>\n";
 
+#print "<pre>\n";
+#print_r($_SESSION);
+#print "</pre>\n";
 
 #print '<br/>TRANSFORM RULES: '.$properties[Configuration::TRANSFORM_RULES_TEXT]."<br/>\n";
 #print "submitValue {$submitValue}\n";

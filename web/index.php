@@ -8,15 +8,10 @@ use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
 
-#--------------------------------------------------------------
-# If the user doesn't have permission to access REDCap-ETL for
-# this project, redirect them to the access request page which
-# should display a link to send e-mail to request permission.
-#--------------------------------------------------------------
-if (!Authorization::hasEtlProjectPagePermission($module, USERID)) {
-    $requestAccessUrl = $module->getUrl('web/request_access.php');
-    header('Location: '.$requestAccessUrl);
-}
+#-----------------------------------------------------------
+# Check that the user has permission to access this page
+#-----------------------------------------------------------
+$module->checkUserPagePermission(USERID);
 
 
 #-----------------------------------------------------------------

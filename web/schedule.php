@@ -12,28 +12,19 @@ use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
-#--------------------------------------------------------------
-# If the user doesn't have permission to access REDCap-ETL for
-# this project, redirect them to the access request page which
-# should display a link to send e-mail to request permission.
-#--------------------------------------------------------------
-if (!Authorization::hasEtlProjectPagePermission($module, USERID)) {
-    $requestAccessUrl = $module->getUrl('web/request_access.php');
-    header('Location: '.$requestAccessUrl);
+#-----------------------------------------------------------
+# Check that the user has permission to access this page
+# and get the configuration if one was specified
+#-----------------------------------------------------------
+$configuration = $module->checkUserPagePermission(USERID);
+$configName = '';
+if (!empty($configuration)) {
+    $configName = $configuration->getName();
 }
 
 $error   = '';
 $warning = '';
 $success = '';
-
-#-------------------------------------------
-# Get the configuration
-#-------------------------------------------
-$configName = '';
-$configuration = $module->getConfigurationFromRequest();
-if (!empty($configuration)) {
-    $configName = $configuration->getName();
-}
 
 $adminConfig = $module->getAdminConfig();
 

@@ -111,7 +111,9 @@ class Authorization
     {
         $hasPermission = false;
 
-        if (!empty($username)) {
+        if ($module->isSuperUser()) {
+            $hasPermission = true;
+        } elseif (!empty($username)) {
             $rights = $module->getUserRights($username);
             if ($rights[$username]['design']) {
                 $hasPermission = true;

@@ -4,6 +4,7 @@
 
 require_once __DIR__.'/../dependencies/autoload.php';
 
+use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Filter;
 
@@ -17,16 +18,22 @@ require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 
 <?php
 
-$userEtlProjects = $module->getUserEtlProjects();
+$accessError = (int) $_GET['accessError'];
+
 $projectId = $module->getProjectId();
 
-
-if (!Authorization::hasEtlRequestPermission($module, USERID)) {
+if ($accessError === RedCapEtlModule::CSRF_ERROR) {
+    echo 'You do not have permission to perform that operation. Your session'
+        .' may have expired. Please make sure that you are logged in and '
+        .' try again.';
+} elseif ($accessError === RedCapEtlModule::USER_RIGHTS_ERROR) {
     echo 'You do not have permission to use, or request the use of, REDCap-ETL'
         .' for this project. You need to have REDCap user right '
         .' "Project Design and Setup" and REDCap data export user right of at'
         .' least "De-Identified".';
-} elseif (!Authorization::hasEtlProjectPagePermission($module, USERID)) {
+} elseif ($accessError === RedCapEtlModule::NO_CONFIGURATION_PERMISSION) {
+    echo 'You do not have permission to access the specified configuration.';
+} elseif ($accessError === RedCapEtlModule::NO_ETL_PROJECT_PERMISSION) {
     #--------------------------------------------------------------------
     # The user does NOT have permission to use ETL for this project,
     # but does have permission to request ETL permission, so
@@ -51,7 +58,7 @@ if (!Authorization::hasEtlRequestPermission($module, USERID)) {
             .'Project title: "'.' '.strip_tags(REDCap::getProjectTitle()).'"'."\n"
             .'Project link: '.APP_PATH_WEBROOT_FULL."redcap_v{$redcapVersion}/index.php?pid={$projectId}\n\n"
             .'Dear REDCap administrator,'."\n\n"
-            .'Please add REDCap-ETL access for me to project "'.REDCap::getProjectTitle().'"'."\n\n"
+            .'Please add REDCap-ETL access for me to project "'.strip_tags(REDCap::getProjectTitle()).'"'."\n\n"
             ."Sincerely,\n"
             .$userFirstName.' '.$userLastName
         )
@@ -62,7 +69,7 @@ if (!Authorization::hasEtlRequestPermission($module, USERID)) {
     ;
     echo "</div>\n";
 } else {
-    echo "You have been granted access to this project.";
+    echo 'An unknown access error occurred.';
 }
 ?>
 

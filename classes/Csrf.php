@@ -36,7 +36,7 @@ class Csrf
     {
         $isValid = false;
         if (array_key_exists(self::TOKEN_NAME, $_POST) && array_key_exists(self::TOKEN_NAME, $_SESSION)) {
-            if (!empty($_SESSION[self::TOKEN_NAME]) && $POST[self::TOKEN_NAME] === $_SESSION[self::TOKEN_NAME]) {
+            if (!empty($_SESSION[self::TOKEN_NAME]) && $_POST[self::TOKEN_NAME] === $_SESSION[self::TOKEN_NAME]) {
                 $isValid = true;
             }
         }
@@ -48,7 +48,7 @@ class Csrf
      * then it has to have an ETL CSRF token in the request that corresponds to an
      * ETL CSRF token in the user's session.
      */
-    public static function requestIsValid()
+    public static function isValidRequest()
     {
         $isValid = true;
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

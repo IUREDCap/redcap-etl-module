@@ -26,6 +26,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const CHANGE_LOG_ACTION = 'REDCap-ETL Change';
     const LOG_EVENT         = -1;
     
+    # Access/permission errors
+    const CSRF_ERROR                  = 1;
+    const USER_RIGHTS_ERROR           = 2;
+    const NO_ETL_PROJECT_PERMISSION   = 3;
+    const NO_CONFIGURATION_PERMISSION = 4;
+    
     private $settings;
     private $db;
     private $changeLogAction;
@@ -885,5 +891,52 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         #$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
         #$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
         return $buffer;
+    }
+    
+    
+
+    /**
+     * Checks if the user has permission to a user (non-admin) page, and
+     * returns the configuration corresponding to the configuration name in
+     * the request, if any. If the user does NOT have permission, the
+     * request will be routed to an error page.
+     *
+     * @return Configuration if a configuration name was specified in the request, the
+     *     configuration for that configuration name.
+     */
+    public function checkUserPagePermission($username = USERID)
+    {
+        $configuration = null;
+        
+        if (!Csrf::isValidRequest()) {
+            # CSRF (Cross-Site Request Forgery) check failed; this should mean that either the
+            # request is a CSRF attack or the user's session expired
+            $accessUrl = $this->getUrl('web/access.php?accessError='.self::CSRF_ERROR);
+            header('Location: '.$accessUrl);
+            exit();
+        } elseif (!Authorization::hasEtlRequestPermission($this, $username)) {
+            # User does not have REDCap user rights to use ETL for this project
+            $accessUrl = $this->getUrl('web/access.php?accessError='.self::USER_RIGHTS_ERROR);
+            header('Location: '.$accessUrl);
+            exit();
+        } elseif (!Authorization::hasEtlProjectPagePermission($this, $username)) {
+            # User has REDCap ETL user rights, but does not have specific ETL permission for this project
+            $accessUrl = $this->getUrl('web/access.php?accessError='.self::NO_ETL_PROJECT_PERMISSION);
+            header('Location: '.$accessUrl);
+            exit();
+        } else {
+            # See if a configuration was specified in the request, and if so, check that the user
+            # has permission to access it
+            $configuration = $this->getConfigurationFromRequest();
+            if (isset($configuration)) {
+                if (!Authorization::hasEtlConfigurationPermission($this, $configuration, $username)) {
+                    # User does not have permission to access the specified configuration
+                    $accessUrl = $this->getUrl('web/access.php?accessError='.self::NO_CONFIGURATION_PERMISSION);
+                    header('Location: '.$accessUrl);
+                    exit();
+                }
+            }
+        }
+        return $configuration;
     }
 }
