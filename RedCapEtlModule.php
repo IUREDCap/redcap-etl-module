@@ -535,6 +535,34 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         return $configNames;
     }
     
+    /**
+     * Gets the configuration from the request (if any), and
+     * updates the user's session appropriately.
+     */
+    public function getConfigurationFromRequest()
+    {
+        $configuration = null;
+        $configName = $_POST['configName'];
+        if (empty($configName)) {
+            $configName = $_GET['configName'];
+            if (empty($configName)) {
+                $configName = $_SESSION['configName'];
+            }
+        }
+        
+        if (!empty($configName)) {
+            $configuration = $this->getConfiguration($configName, PROJECT_ID);
+            if (empty($configuration)) {
+                $configName = '';
+            }
+        } else {
+            $configName = '';
+        }
+        
+        $_SESSION['configName'] = $configName;
+
+        return $configuration;
+    }
     
     #-------------------------------------------------------------------
     # Cron job methods
@@ -732,15 +760,21 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $runLabel = '<span style="color: #008000;" class="glyphicon glyphicon-play-circle" aria-hidden="true"></span>'
            .' Run';
 
+        $userManualUrl = $this->getUrl('web/user_manual.php');
+        $userManualLabel =
+            '<span style="color: #000066;" class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>'
+            .' User Manual';
+
         $adminConfig = $this->getAdminConfig();
         
+        # Map for tabs from URL to the label for the URL
         $tabs = array();
         
         $tabs[$listUrl]     = $listLabel;
         
         $userEtlProjects = $this->getUserEtlProjects(USERID);
         
-        if (SUPER_USER || in_array(PROJECT_ID, $userEtlProjects)) {
+        if (Authorization::hasEtlProjectPagePermission($this, USERID)) {
             $tabs[$configUrl]   = $configLabel;
     
             if ($adminConfig->getAllowOnDemand()) {
@@ -750,6 +784,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             if ($adminConfig->getAllowCron()) {
                 $tabs[$scheduleUrl] = $scheduleLabel;
             }
+            
+            $tabs[$userManualUrl] = $userManualLabel;
         }
         
         $this->renderTabs($tabs, $activeUrl);

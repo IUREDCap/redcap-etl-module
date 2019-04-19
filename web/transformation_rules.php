@@ -7,6 +7,7 @@ $htmlPage = new HtmlPage();
 $htmlPage->PrintHeaderExt();
 ?>
 <div style="text-align:right;float:right;"><img src="/redcap/redcap_v8.5.11/Resources/images/redcap-logo.png"/></div>
+<?php // phpcs:disable ?>
 <h1>REDCap-ETL Transformation Rules</h1>
 <p>The transformation rules specify how the records in REDCap are transformed
 into records in your database.</p>
@@ -970,7 +971,8 @@ FIELD,  var8, st</code></pre>
 <li>
 <p>NOTE: This example does not include a situation in which a child table that uses suffixes has a parent table that also uses suffixes, but the transforming code can handle that situation.</p>
 </li>
-</ul>
+</ul><?php // phpcs:enable ?>
+
 <style type="text/css">#footer { display: block; }</style>
 <?php
 $htmlPage->PrintFooterExt();

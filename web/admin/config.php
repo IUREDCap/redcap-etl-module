@@ -61,6 +61,7 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
 
 <?php
 #print "<pre>POST:\n"; print_r($_POST); print "</pre>\n";
+#print "<pre>POST:\n"; print_r($adminConfig); print "</pre>\n";
 ?>
 
 <form action="<?php echo $selfUrl;?>" method="post">

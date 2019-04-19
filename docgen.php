@@ -17,7 +17,7 @@ $fileContents = file_get_contents($trFile);
 
 
 $parsedown = new Parsedown();
-$content .= $parsedown->text($fileContents);
+$content = $parsedown->text($fileContents);
 $content = str_replace('<table>', '<table class="dataTable">', $content);
 $content = str_replace('<h1>Transformation Rules</h1>', '<h1>REDCap-ETL Transformation Rules</h1>', $content);
 
@@ -32,7 +32,9 @@ $html = "<?php\n"
     .'<div style="text-align:right;float:right;">'
     .'<img src="/redcap/redcap_v8.5.11/Resources/images/redcap-logo.png"/>'
     .'</div>'."\n"
+    ."<?php // phpcs:disable ?>\n"
     .$content
+    ."<?php // phpcs:enable ?>\n"
     ."\n"
     .'<style type="text/css">#footer { display: block; }</style>'."\n"
     .'<?php'."\n".'$htmlPage->PrintFooterExt();'."\n";
@@ -42,12 +44,7 @@ $html = "<?php\n"
 
 #print "{$contents}\n";
 
-print "{$html}\n";
-
-
 $outputFile = __DIR__.'/web/transformation_rules.php';
 file_put_contents($outputFile, $html);
 
-
-
-
+print "\nOutput stored in {$outputFile}.\n\n";
