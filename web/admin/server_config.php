@@ -86,13 +86,13 @@ if (strcasecmp($submit, 'Save') === 0) {
 
 
 
-<?php #include APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>
+<?php #require_once APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>
 <?php
 #--------------------------------------------
 # Include REDCap's project page header
 #--------------------------------------------
 ob_start();
-include APP_PATH_DOCROOT . 'ControlCenter/header.php';
+require_once APP_PATH_DOCROOT . 'ControlCenter/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
 $link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
@@ -392,4 +392,4 @@ if (!empty($serverName)) {
 }
 ?>
 
-<?php include APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>
+<?php require_once APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>

@@ -36,7 +36,7 @@ $redcapEtlImage = $module->getUrl('resources/redcap-etl.png');
 # Include REDCap's project page header
 #--------------------------------------------
 ob_start();
-include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
+require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
 $link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
@@ -160,4 +160,4 @@ There are 2 options for logging the results of your ETL processes, and they can 
 </ol>
 </p>
 
-<?php include APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
+<?php require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>

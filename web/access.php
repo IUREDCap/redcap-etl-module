@@ -73,6 +73,6 @@ if ($accessError === RedCapEtlModule::CSRF_ERROR) {
 }
 ?>
 
-<?php include APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
+<?php require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
 
 

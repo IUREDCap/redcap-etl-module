@@ -90,7 +90,7 @@ if (strcasecmp($submitValue, 'add') === 0) {
 # Add custom files to head section of page
 #---------------------------------------------
 ob_start();
-include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
+require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
 $link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
@@ -500,6 +500,6 @@ $(function() {
 
 
 
-<?php include APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
+<?php require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
 
 

@@ -214,7 +214,7 @@ if (!empty($configuration)) {
 #--------------------------------------------
 # Include REDCap's project page header
 #--------------------------------------------
-include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
+require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 
 ?>
 
@@ -778,4 +778,4 @@ Configuration form
 ?>
 
 
-<?php include APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
+<?php require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>

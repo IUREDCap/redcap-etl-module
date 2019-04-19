@@ -40,7 +40,7 @@ $cronJobs = $module->getCronJobs($selectedDay, $selectedTime);
 ?>
 
 
-<?php #include APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>
+<?php #require_once APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>
 
 <?php
 #--------------------------------------------
@@ -189,4 +189,4 @@ $('#popup').dialog({
 #print "<pre>\n"; print_r($cronJobs); print "</pre>";
 ?>
 
-<?php include APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>
+<?php require_once APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>

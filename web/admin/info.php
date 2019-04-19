@@ -32,7 +32,7 @@ $redcapEtlImage = $module->getUrl('resources/redcap-etl.png');
 
 ?>
 
-<?php #include APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>
+<?php #require_once APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>
 
 <?php
 #---------------------------------------------
@@ -131,4 +131,4 @@ The REDCap-ETL external module has the following admin pages:
     </li>     
 </ul>    
 
-<?php include APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>
+<?php require_once APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>
