@@ -26,11 +26,11 @@ if (strcasecmp($submitValue, 'add') === 0) {
         $error = 'ERROR: No configuration name was specified.';
     } else {
         try {
-            $configurationName = $_POST['configurationName'];
-            $configuration = $module->getConfiguration($configurationName);
-            $indexUrl = $module->getUrl("web/index.php");
+            $configurationName = Filter::stripTags($_POST['configurationName']);
+            
+            # Add configuration; an exception should be thrown if the configuration
+            # already exists, or the name is an invalid configuration name
             $module->addConfiguration($configurationName);
-            header('Location: '.$indexUrl);
         } catch (\Exception $exception) {
             $error = 'ERROR: '.$exception->getMessage();
         }

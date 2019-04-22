@@ -37,11 +37,11 @@ if (@file_exists(__DIR__.'/../test-config.ini')) {
 }
 
 if (array_key_exists('success', $_GET)) {
-    $success = $_GET['success'];
+    $success = Filter::stripTags($_GET['success']);
 }
 
 if (array_key_exists('warning', $_GET)) {
-    $warning = $_GET['warning'];
+    $warning = Filter::stripTags($_GET['warning']);
 }
 
 $listUrl  = $module->getUrl("web/index.php");

@@ -311,7 +311,7 @@ class Settings
         
             # Add the actual configuration
             $key = $this->getConfigurationKey($name);
-            $configuration = $this->module->getSystemSetting($key);
+            $configuration = $this->module->getProjectSetting($key);
             if (isset($configuration)) {
                 throw new \Exception('Configuration "'.$name.'" already exists.');
             }
@@ -325,7 +325,6 @@ class Settings
             $this->db->endTransaction($commit);
             throw $exception;
         }
-
         
         if ($transaction) {
             $this->db->endTransaction($commit);

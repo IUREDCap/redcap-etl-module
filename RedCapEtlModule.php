@@ -441,7 +441,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function copyConfiguration($fromConfigName, $toConfigName)
     {
-        if (Authorization::hasEtlConfigNamePermission($this, $configName, USERID, PROJECT_ID)) {
+        if (Authorization::hasEtlConfigNamePermission($this, $fromConfigName, USERID, PROJECT_ID)) {
             $this->settings->copyConfiguration($fromConfigName, $toConfigName);
             $details = 'REDCap-ETL configuration "'.$fromConfigName.'" copied to "'.
                 $toConfigName.'" for user '.USERID.', project ID '.PROJECT_ID.'.';
