@@ -7,6 +7,14 @@ namespace IU\RedCapEtlModule;
  */
 class RedCapDb
 {
+    /**
+     * Gets information for the specified user.
+     *
+     * @param string $username the username specifying the user for which to
+     *     retieve information.
+     *
+     * @return array map from field name to field value of user information.
+     */
     public function getUserInfo($username)
     {
         $userInfo = array();
@@ -47,12 +55,20 @@ class RedCapDb
         return $users;
     }
 
+    /**
+     * Gets the projects that that the specified user has permission
+     * to access.
+     *
+     * @param string username the username whose projects are returned.
+     *
+     * @return array array of maps from field name to field value.
+     */
     public function getUserProjects($username)
     {
         $projects = array();
-        $sql = 'select u.username, p.project_id, p.app_title, '
-            .' if(u.api_token is null, 0, 1) as has_api_token, u.api_export '
-            .' from redcap_projects p, redcap_user_rights u '
+        $sql = "select u.username, p.project_id, p.app_title, "
+            ." if(u.api_token is null, 0, 1) as has_api_token, u.api_export "
+            ." from redcap_projects p, redcap_user_rights u "
             ." where u.username = '".Filter::escapeForMysql($username)."' "
             ." and p.project_id = u.project_id and p.date_deleted is null"
             ;
@@ -86,87 +102,7 @@ class RedCapDb
         }
         return $apiToken;
     }
-    
-    public function getApiTokenWithPermissions($username, $projectId)
-    {
-        $result = null;
-        $apiToken = null;
-        $isExport = false;
-        $isImport = false;
-        
-        $sql = "select api_token, api_export, api_import from redcap_user_rights "
-            . " where project_id = ".((int) PROJECT_ID)." "
-            . " and username = '".Filter::escapeForMysql(USERID)."'"
-            . " and api_export = 1 "
-            ;
-        $queryResult = db_query($sql);
-        if ($row = db_fetch_assoc($queryResult)) {
-            $apiToken = $row['api_token'];
-            $isExport = $row['api_export'];
-            $isImport = $row['api_import'];
-            $result = array($apiToken, $isExport, $isImport);
-        }
-        return $result;
-    }
-    
-        
-    public function getApiTokensWithExportPermission($projectId)
-    {
-        $tokens = array();
-        $apiToken = null;
-        $isExport = false;
-        $isImport = false;
-        
-        $sql = "select username, api_token from redcap_user_rights "
-            . " where project_id = ".((int) $projectId)." "
-            . " and api_export = 1 "
-            . " and api_token is not null "
-            ;
-        $queryResult = db_query($sql);
-        while ($row = db_fetch_assoc($queryResult)) {
-            $username = $row['username'];
-            $apiToken = $row['api_token'];
-            $tokens[$username] = $apiToken;
-        }
-        return $tokens;
-    }
 
-     
-     /**
-      * Gets all API tokens for the specified project that have the same
-      * data export permission (e.g., "De-identified", "Full Data Set")
-      * as the specified user.
-      *
-      * @param int $username
-      * @param int $projectId
-      *
-      * @return array map from username to API token for the applicable API tokens
-      */
-    public function getApiTokensWithSameExportPermissionAsUser($username, $projectId)
-    {
-        $tokens = array();
-        $apiToken = null;
-        $isExport = false;
-        $isImport = false;
-        
-        $sql = "select username, api_token from redcap_user_rights "
-            ." where project_id = ".((int) $projectId)." "
-            ." and api_export = 1 "
-            ." and api_token is not null "
-            ." and data_export_tool = "
-            ." (select data_export_tool from redcap_user_rights "
-            ." where project_id = ".((int) $projectId)
-            ." and username = '".Filter::escapeForMysql($username)."')"
-            ;
-        
-        $queryResult = db_query($sql);
-        while ($row = db_fetch_assoc($queryResult)) {
-            $username = $row['username'];
-            $apiToken = $row['api_token'];
-            $tokens[$username] = $apiToken;
-        }
-        return $tokens;
-    }
     
     /**
      * Gets the API tokens for the specified project and data export right.
@@ -201,18 +137,11 @@ class RedCapDb
         return $tokens;
     }
 
-    
-    // TRANSACTIONS
-    //
-    //    db_query("SET AUTOCOMMIT=0");
-    //    db_query("BEGIN");
-    //    queries... (if false returned, consider it an error)
-    //    // If errors, do not commit
-    //    $commit = ($errors > 0) ? "ROLLBACK" : "COMMIT";
-    //    db_query($commit);
-    //    // Set back to initial value
-    //    db_query("SET AUTOCOMMIT=1");
-    
+
+
+    /**
+     * Starts a database transaction.
+     */
     public function startTransaction()
     {
         db_query("SET AUTOCOMMIT=0");
