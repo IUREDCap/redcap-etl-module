@@ -267,7 +267,7 @@ class Configuration implements \JsonSerializable
         #------------------------------------------------
         foreach (self::getPropertyNames() as $name) {
             if (array_key_exists($name, $properties)) {
-                $this->properties[$name] = $properties[$name];
+                $this->properties[$name] = strip_tags($properties[$name]);
             } elseif ($name === self::DB_LOGGING) {
                 $this->properties[$name] = false;
             } elseif ($name === self::EMAIL_ERRORS) {
@@ -495,7 +495,12 @@ class Configuration implements \JsonSerializable
     {
         return $this->properties[self::DATA_EXPORT_RIGHT];
     }
-
+    
+    public function setDataExportRight($dataExportRight)
+    {
+        $this->properties[self::DATA_EXPORT_RIGHT] = $dataExportRight;
+    }
+    
     public static function getPropertyNames()
     {
         $reflection = new \ReflectionClass(self::class);

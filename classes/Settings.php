@@ -335,7 +335,7 @@ class Settings
      * Copy configuration (only supports copying from/to same
      * user and project).
      */
-    public function copyConfiguration($fromConfigName, $toConfigName, $transaction = true)
+    public function copyConfiguration($fromConfigName, $toConfigName, $toExportRight = null, $transaction = true)
     {
         $commit = true;
         $errorMessage = '';
@@ -359,6 +359,9 @@ class Settings
             #-----------------------------------------------------
             $toConfig = $this->getConfiguration($fromConfigName);
             $toConfig->setName($toConfigName);
+            if (isset($toExportRight)) {
+                $toConfig->setDataExportRight($toExportRight);
+            }
             $json = $toConfig->toJson();
             $key = $this->getConfigurationKey($toConfigName);
             $this->module->setProjectSetting($key, $json);
@@ -387,7 +390,7 @@ class Settings
         }
         
         try {
-            $this->copyConfiguration($configName, $newConfigName, false);
+            $this->copyConfiguration($configName, $newConfigName, null, false);
             $this->removeConfiguration($configName, false);
         } catch (\Exception $exception) {
             $commit = false;

@@ -166,18 +166,4 @@ class RedCapDb
         }
         db_query("SET AUTOCOMMIT=1");
     }
-    
-    /*
-    #-------------------------------
-    # Get API token information
-    #-------------------------------
-    $sql = "select p.project_id, p.app_title, ur.api_token "
-        . " from redcap_user_rights ur, redcap_projects p"
-        . " where ur.project_id = p.project_id "
-        . " and ur.username = '".USERID.'"'
-        . " and ur.api_export = 1 "
-        . " order by p.app_title "
-        ;
-        $q = db_query($sql);
-    */
 }
