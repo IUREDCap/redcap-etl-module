@@ -65,7 +65,8 @@ if (!empty($configuration)) {
     # and the username of user whose API token should be used
     # (if any)
     #--------------------------------------------------------------
-    $apiTokens    = $redCapDb->getApiTokensWithSameExportPermissionAsUser(USERID, PROJECT_ID);
+    $exportRight  = $configuration->getDataExportRight();
+    $apiTokens    = $redCapDb->getApiTokens(PROJECT_ID, $exportRight);
     $apiTokenUser = $configuration->getProperty(Configuration::API_TOKEN_USERNAME);
     
     
@@ -524,10 +525,11 @@ Configuration form
                         if (count($apiTokens) < 1) {
                             echo '<img alt="X" style="color: red; font-weight: bold;" src='
                                 .APP_PATH_IMAGES.'cross.png>&nbsp;&nbsp;';
-                            echo "There are no API tokens with export permission for this project."
+                            echo "There are no API tokens for this project that have"
+                                ." the same data export rights as this configuration."
                                 ."<br /><br />"
-                                ."An API token needs to be requested"
-                                ." for this project that has export permission.";
+                                ."An API token needs to be requested "
+                                ." by a user whose data export rights matches those of the configuration.";
                         } elseif (empty($apiTokenUser)) {
                             echo '<img alt="X" style="color: red; font-weight: bold;" src='
                                 .APP_PATH_IMAGES.'cross.png>&nbsp;&nbsp;';

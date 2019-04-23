@@ -167,6 +167,39 @@ class RedCapDb
         }
         return $tokens;
     }
+    
+    /**
+     * Gets the API tokens for the specified project and data export right.
+     *
+     * @param int $projectId the ID for the REDCap project for which the API tokens
+     *     are being retrieved.
+     * @param in $exportRight the data export right used for selecting the API
+     *     tokens that are returned.
+     * @return array map from username to API tokens for the specified project that have
+     *     the specified data export right (e.g., "Full Data Set").
+     */
+    public function getApiTokens($projectId, $exportRight)
+    {
+        $tokens = array();
+        $apiToken = null;
+        $isExport = false;
+        $isImport = false;
+        
+        $sql = "select username, api_token from redcap_user_rights "
+            ." where project_id = ".((int) $projectId)." "
+            ." and api_export = 1 "
+            ." and api_token is not null "
+            ." and data_export_tool = ".((int) $exportRight)
+            ;
+        
+        $queryResult = db_query($sql);
+        while ($row = db_fetch_assoc($queryResult)) {
+            $username = $row['username'];
+            $apiToken = $row['api_token'];
+            $tokens[$username] = $apiToken;
+        }
+        return $tokens;
+    }
 
     
     // TRANSACTIONS

@@ -490,6 +490,11 @@ class Configuration implements \JsonSerializable
         }
         return $isRemote;
     }
+    
+    public function getDataExportRight()
+    {
+        return $this->properties[self::DATA_EXPORT_RIGHT];
+    }
 
     public static function getPropertyNames()
     {
