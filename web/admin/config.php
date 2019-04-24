@@ -22,7 +22,7 @@ $cronInfoUrl = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);
 
 $adminConfig = $module->getAdminConfig();
 
-$submitValue = $_POST['submitValue'];
+$submitValue = Filter::sanitizeLabel($_POST['submitValue']);
 
 if (strcasecmp($submitValue, 'Save') === 0) {
     try {

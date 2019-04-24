@@ -81,7 +81,7 @@ class ServerConfig implements \JsonSerializable
                         }
                         break;
                 }
-                $this->$var = $properties[$var];
+                $this->$var = Filter::sanitizeString($properties[$var]);
             }
         }
     }

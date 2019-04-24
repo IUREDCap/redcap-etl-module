@@ -22,17 +22,17 @@ $userUrl         = $module->getURL(RedCapEtlModule::USER_CONFIG_PAGE);
 
 $adminConfig = $module->getAdminConfig();
     
-$selectedDay = $_POST['selectedDay'];
+$selectedDay = Filter::sanitizeInt($_POST['selectedDay']);
 if (!isset($selectedDay)) {
-    $selectedDay = $_GET['selectedDay'];
+    $selectedDay = Filter::sanitizeInt($_GET['selectedDay']);
     if (!isset($selectedDay)) {
         $selectedDay = 0;
     }
 }
 
-$selectedTime = $_POST['selectedTime'];
+$selectedTime = Filter::sanitizeInt($_POST['selectedTime']);
 if (!isset($selectedTime)) {
-    $selectedTime = $_GET['selectedTime'];
+    $selectedTime = Filter::sanitizeInt($_GET['selectedTime']);
     if (!isset($selectedTime)) {
         $selectedTime = 0;
     }

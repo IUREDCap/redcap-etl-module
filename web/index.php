@@ -17,7 +17,7 @@ $module->checkUserPagePermission(USERID);
 #-----------------------------------------------------------------
 # Process form submissions (configuration add/copy/delete/rename)
 #-----------------------------------------------------------------
-$submitValue = $_POST['submitValue'];
+$submitValue = Filter::stripTags($_POST['submitValue']);
 if (strcasecmp($submitValue, 'add') === 0) {
     #--------------------------------------
     # Add configuration
@@ -39,8 +39,8 @@ if (strcasecmp($submitValue, 'add') === 0) {
     #--------------------------------------------
     # Copy configuration
     #--------------------------------------------
-    $copyFromConfigName = $_POST['copyFromConfigName'];
-    $copyToConfigName   = $_POST['copyToConfigName'];
+    $copyFromConfigName = Filter::stripTags($_POST['copyFromConfigName']);
+    $copyToConfigName   = Filter::stripTags($_POST['copyToConfigName']);
     if (!empty($copyFromConfigName) && !empty($copyToConfigName)) {
         try {
             $module->copyConfiguration($copyFromConfigName, $copyToConfigName);
@@ -52,7 +52,7 @@ if (strcasecmp($submitValue, 'add') === 0) {
     #---------------------------------------------
     # Delete configuration
     #---------------------------------------------
-    $deleteConfigName = $_POST['deleteConfigName'];
+    $deleteConfigName = Filter::stripTags($_POST['deleteConfigName']);
     if (!empty($deleteConfigName)) {
         $module->removeConfiguration($deleteConfigName);
     }
@@ -60,8 +60,8 @@ if (strcasecmp($submitValue, 'add') === 0) {
     #----------------------------------------------
     # Rename configuration
     #----------------------------------------------
-    $renameConfigName    = $_POST['renameConfigName'];
-    $renameNewConfigName = $_POST['renameNewConfigName'];
+    $renameConfigName    = Filter::stripTags($_POST['renameConfigName']);
+    $renameNewConfigName = Filter::stripTags($_POST['renameNewConfigName']);
     if (!empty($renameConfigName) && !empty($renameNewConfigName)) {
         try {
             $module->renameConfiguration($renameConfigName, $renameNewConfigName);

@@ -19,9 +19,9 @@ use IU\RedCapEtlModule\ServerConfig;
 $selfUrl = $module->getUrl(RedCapEtlModule::SERVERS_PAGE);
 $configureUrl = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
 
-$submit = $_POST['submit'];
+$submit = Filter::sanitizeLabel($_POST['submit']);
 
-$serverName = $_POST['server-name'];
+$serverName = Filter::sanitizeString($_POST['server-name']);
 
 if (!empty($serverName)) {
     if (strcasecmp($submit, 'Add Server') === 0) {
@@ -36,8 +36,8 @@ if (!empty($serverName)) {
 }
 
 
-$copyFromServerName = $_POST['copy-from-server-name'];
-$copyToServerName   = $_POST['copy-to-server-name'];
+$copyFromServerName = Filter::sanitizeString($_POST['copy-from-server-name']);
+$copyToServerName   = Filter::sanitizeString($_POST['copy-to-server-name']);
 if (!empty($copyFromServerName) && !empty($copyToServerName)) {
     try {
         $module->copyServer($copyFromServerName, $copyToServerName);
@@ -56,7 +56,7 @@ if (!empty($renameServerName) && !empty($renameNewServerName)) {
     }
 }
 
-$deleteServerName = $_POST['delete-server-name'];
+$deleteServerName = Filter::sanitizeString($_POST['delete-server-name']);
 if (!empty($deleteServerName)) {
     $module->removeServer($deleteServerName);
 }

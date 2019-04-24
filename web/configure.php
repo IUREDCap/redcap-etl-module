@@ -75,7 +75,7 @@ if (!empty($configuration)) {
     #-------------------------
     $submitValue = '';
     if (array_key_exists('submitValue', $_POST)) {
-        $submitValue = $_POST['submitValue'];
+        $submitValue = Filter::stripTags($_POST['submitValue']);
     }
     
     #---------------------------------------------------------------
@@ -83,7 +83,9 @@ if (!empty($configuration)) {
     # update the configuration properties with the POST values
     #---------------------------------------------------------------
     if (!empty($submitValue) && strcasecmp($submitValue, 'Cancel')) {
-        array_map('trim', $_POST);
+        $_POST = array_map('Filter::stripTags', $_POST);
+        $_POST = array_map('trim', $_POST);
+
         if (!isset($_POST[Configuration::API_TOKEN_USERNAME])) {
             $_POST[Configuration::API_TOKEN_USERNAME] = '';
         }

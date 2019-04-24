@@ -262,27 +262,23 @@ class Configuration implements \JsonSerializable
 
     public function set($properties)
     {
+        $flags = [self::DB_LOGGING, self::EMAIL_ERRORS, self::EMAIL_SUMMARY, self::REMOTE_REDCAP, self::SSL_VERIFY];
+        
         #------------------------------------------------
         # Set values
         #------------------------------------------------
         foreach (self::getPropertyNames() as $name) {
             if (array_key_exists($name, $properties)) {
-                $this->properties[$name] = strip_tags($properties[$name]);
-            } elseif ($name === self::DB_LOGGING) {
-                $this->properties[$name] = false;
-            } elseif ($name === self::EMAIL_ERRORS) {
-                $this->properties[$name] = false;
-            } elseif ($name === self::EMAIL_SUMMARY) {
-                $this->properties[$name] = false;
-            } elseif ($name === self::REMOTE_REDCAP) {
-                $this->properties[$name] = false;
-            } elseif ($name === self::SSL_VERIFY) {
-                $this->properties[$name] = false;
+                if (in_array($name, $flags)) {
+                    $this->properties[$name] = true;
+                } else {
+                    $this->properties[$name] = $properties[$name];
+                }
+            } else {
+                if (in_array($name, $flags)) {
+                    $this->properties[$name] = false;
+                }
             }
-            
-            # else {
-            #    $this->properties[$name] = '';
-            #}
         }
         
         $dbHost = $properties[self::DB_HOST];

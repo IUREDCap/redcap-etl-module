@@ -86,7 +86,7 @@ class AdminConfig implements \JsonSerializable
     {
         # Set allowed cron times
         if (array_key_exists(self::ALLOWED_CRON_TIMES, $properties)) {
-            $this->allowedCronTimes = $properties[self::ALLOWED_CRON_TIMES];
+            $this->allowedCronTimes = strip_tags($properties[self::ALLOWED_CRON_TIMES]);
         } else {
             $this->allowedCronTimes = array();
         }
@@ -101,14 +101,14 @@ class AdminConfig implements \JsonSerializable
         # Set the e-mail from address for the embedded server
         if (array_key_exists(self::EMBEDDED_SERVER_EMAIL_FROM_ADDRESS, $properties)) {
             $this->embeddedServerEmailFromAddress =
-                trim($properties[self::EMBEDDED_SERVER_EMAIL_FROM_ADDRESS]);
+                trim(strip_tags($properties[self::EMBEDDED_SERVER_EMAIL_FROM_ADDRESS]));
         } else {
             $this->embeddedServerEmailFromAddress = '';
         }
 
         # Set the log file for the embedded server
         if (array_key_exists(self::EMBEDDED_SERVER_LOG_FILE, $properties)) {
-            $this->embeddedServerLogFile = trim($properties[self::EMBEDDED_SERVER_LOG_FILE]);
+            $this->embeddedServerLogFile = trim(strip_tags($properties[self::EMBEDDED_SERVER_LOG_FILE]));
         } else {
             $this->embeddedServerLogFile = '';
         }

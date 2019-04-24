@@ -23,17 +23,17 @@ use IU\RedCapEtlModule\RedCapEtlModule;
 $selfUrl      = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
 $serversUrl   = $module->getUrl(RedCapEtlModule::SERVERS_PAGE);
 
-$submit = $_POST['submit'];
+$submit = Filter::sanitizeLabel($_POST['submit']);
 
 
 #-------------------------------------------
 # Get the server name
 #-------------------------------------------
-$serverName = $_POST['serverName'];
+$serverName = Filter::sanitizeString($_POST['serverName']);
 if (empty($serverName)) {
-    $serverName = $_GET['serverName'];
+    $serverName = Filter::sanitizeString($_GET['serverName']);
     if (empty($serverName)) {
-        $serverName = $_SESSION['serverName'];
+        $serverName = Filter::sanitizeString($_SESSION['serverName']);
     }
 }
 

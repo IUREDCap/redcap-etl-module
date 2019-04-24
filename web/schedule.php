@@ -41,22 +41,22 @@ $listUrl = $module->getUrl('web/index.php');
 #-------------------------
 $submitValue = '';
 if (array_key_exists('submitValue', $_POST)) {
-    $submitValue = $_POST['submitValue'];
+    $submitValue = Filter::stripTags($_POST['submitValue']);
 }
 
 if (strcasecmp($submitValue, 'Save') === 0) {
-    $server = $_POST['server'];
+    $server = Filter::stripTags($_POST['server']);
     
     # Saving the schedule values
     $schedule = array();
     
-    $schedule[0] = $_POST['Sunday'];
-    $schedule[1] = $_POST['Monday'];
-    $schedule[2] = $_POST['Tuesday'];
-    $schedule[3] = $_POST['Wednesday'];
-    $schedule[4] = $_POST['Thursday'];
-    $schedule[5] = $_POST['Friday'];
-    $schedule[6] = $_POST['Saturday'];
+    $schedule[0] = Filter::sanitizeInt($_POST['Sunday']);
+    $schedule[1] = Filter::sanitizeInt($_POST['Monday']);
+    $schedule[2] = Filter::sanitizeInt($_POST['Tuesday']);
+    $schedule[3] = Filter::sanitizeInt($_POST['Wednesday']);
+    $schedule[4] = Filter::sanitizeInt($_POST['Thursday']);
+    $schedule[5] = Filter::sanitizeInt($_POST['Friday']);
+    $schedule[6] = Filter::sanitizeInt($_POST['Saturday']);
     
     if (empty($configName)) {
         $error = 'ERROR: No ETL configuration specified.';

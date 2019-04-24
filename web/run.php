@@ -35,7 +35,7 @@ $listUrl   = $module->getUrl('web/index.php');
 #------------------------------------------
 # Get the server
 #------------------------------------------
-$server = $_POST['server'];
+$server = Filter::stripTags($_POST['server']);
 if (empty($server)) {
     $server = $_SESSION['server'];
 } else {
@@ -47,7 +47,7 @@ if (empty($server)) {
 #-------------------------
 $submit = '';
 if (array_key_exists('submit', $_POST)) {
-    $submit = $_POST['submit'];
+    $submit = Filter::stripTags($_POST['submit']);
 }
 
 $runOutput = '';

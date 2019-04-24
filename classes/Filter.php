@@ -64,4 +64,28 @@ class Filter
         # Use REDCap's function
         return isUrl($value);
     }
+    
+    public function sanitizeInt($value)
+    {
+        return filter_var($value, FILTER_SANITIZE_NUMBER_INT);
+    }
+    
+    /**
+     * Removes tags and invalid characters for labels
+     * (internal string values used for submit buttons, etc.).
+     */
+    public function sanitizeLabel($value)
+    {
+        $flags = FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_BACKTICK;
+        return filter_var($value, FILTER_SANITIZE_STRING, $flags);
+    }
+    
+    /**
+     * Removes tags and invalid characters for strings.
+     */
+    public function sanitizeString($value)
+    {
+        $flags = FILTER_FLAG_STRIP_LOW;
+        return filter_var($value, FILTER_SANITIZE_STRING, $flags);
+    }
 }
