@@ -83,7 +83,7 @@ if (!empty($configuration)) {
     # update the configuration properties with the POST values
     #---------------------------------------------------------------
     if (!empty($submitValue) && strcasecmp($submitValue, 'Cancel')) {
-        $_POST = array_map('Filter::stripTags', $_POST);
+        $_POST = array_map('strip_tags', $_POST);
         $_POST = array_map('trim', $_POST);
 
         if (!isset($_POST[Configuration::API_TOKEN_USERNAME])) {
@@ -94,7 +94,8 @@ if (!empty($configuration)) {
         # If this is NOT a remote REDCap configuration, set SSL certificate verification
         # to the global value (this can only be set in the configuration for remote
         # REDCap configurations)
-        if (!$configuration->isRemoteRedcap()) {
+        $apiUrl = $configuration->getProperty(Configuration::REDCAP_API_URL);
+        if (strcmp($apiUrl, $module->getRedCapApiUrl()) === 0) {
             $configuration->setProperty(Configuration::SSL_VERIFY, $adminConfig->getSslVerify());
         }
         $properties = $configuration->getProperties();
@@ -227,10 +228,6 @@ require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 #print_r($_POST);
 #print "</pre>\n";
 
-#print "<pre>\n";
-#print_r($_SESSION);
-#print "</pre>\n";
-
 #print '<br/>TRANSFORM RULES: '.$properties[Configuration::TRANSFORM_RULES_TEXT]."<br/>\n";
 #print "submitValue {$submitValue}\n";
 #print "PROJECTS:<br />\n";
@@ -301,10 +298,6 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 <?php
 if (empty($configuration)) {
     ; // Don't display any page content
-} elseif (!Authorization::hasEtlConfigurationPermission($module, $configuration, USERID)) {
-    echo '<div class="red" style="margin-top:12px;">'
-        .'<p style="text-align: center;">You do not have data export permission to access this configuration.</p>'
-        .'</div>';
 } else {
 ?>
 
@@ -358,19 +351,6 @@ $(function() {
                 .insertBefore(this);
         }).remove();       
     })
-});
-
-// Show/hide local/remote REDCap rows
-$(function() {
-    $("input[name=<?php echo Configuration::REMOTE_REDCAP;?>]").change(function() {
-        if ($(this).is(':checked')) {
-            $('.remoteRow').show();
-            $('.localRow').hide();
-        } else {
-            $('.remoteRow').hide();
-            $('.localRow').show();
-        }
-    });
 });
     
 </script>

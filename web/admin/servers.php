@@ -46,8 +46,8 @@ if (!empty($copyFromServerName) && !empty($copyToServerName)) {
     }
 }
 
-$renameServerName    = $_POST['rename-server-name'];
-$renameNewServerName = $_POST['rename-new-server-name'];
+$renameServerName    = Filter::sanitizeString($_POST['rename-server-name']);
+$renameNewServerName = Filter::sanitizeString($_POST['rename-new-server-name']);
 if (!empty($renameServerName) && !empty($renameNewServerName)) {
     try {
         $module->renameServer($renameServerName, $renameNewServerName);

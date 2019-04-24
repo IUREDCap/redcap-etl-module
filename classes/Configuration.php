@@ -15,10 +15,6 @@ class Configuration implements \JsonSerializable
 
     const DATA_EXPORT_RIGHT = 'data_export_right';
     
-    const REMOTE_REDCAP           = 'remote_redcap';
-    const REMOTE_REDCAP_API_URL   = 'remote_redcap_api_url';
-    const REMOTE_REDCAP_API_TOKEN = 'remote_redcap_api_token';
-    
     const API_TOKEN_USERNAME = 'api_token_username';
     
     const TRANSFORM_RULES_FILE   = 'transform_rules_file';
@@ -82,7 +78,6 @@ class Configuration implements \JsonSerializable
         }
 
         # Set non-blank defaults
-        $this->properties[self::REMOTE_REDCAP]  = false;
         $this->properties[self::REDCAP_API_URL] = APP_PATH_WEBROOT_FULL.'api/';
         $this->properties[self::SSL_VERIFY]     = true;
          
@@ -262,7 +257,7 @@ class Configuration implements \JsonSerializable
 
     public function set($properties)
     {
-        $flags = [self::DB_LOGGING, self::EMAIL_ERRORS, self::EMAIL_SUMMARY, self::REMOTE_REDCAP, self::SSL_VERIFY];
+        $flags = [self::DB_LOGGING, self::EMAIL_ERRORS, self::EMAIL_SUMMARY, self::SSL_VERIFY];
         
         #------------------------------------------------
         # Set values
@@ -270,7 +265,12 @@ class Configuration implements \JsonSerializable
         foreach (self::getPropertyNames() as $name) {
             if (array_key_exists($name, $properties)) {
                 if (in_array($name, $flags)) {
-                    $this->properties[$name] = true;
+                    $value = $properties[$name];
+                    if ($value === true || $value === 'true' || $value === 'on') {
+                        $this->properties[$name] = true;
+                    } else {
+                        $this->properties[$name] = false;
+                    }
                 } else {
                     $this->properties[$name] = $properties[$name];
                 }
@@ -326,14 +326,6 @@ class Configuration implements \JsonSerializable
                 
         unset($properties[self::CRON_SERVER]);
         unset($properties[self::CRON_SCHEDULE]);
-        
-        if (is_bool($properties[self::REMOTE_REDCAP])) {
-            if ($properties[self::REMOTE_REDCAP]) {
-                $properties[self::REMOTE_REDCAP] = 'true';
-            } else {
-                $properties[self::REMOTE_REDCAP] = 'false';
-            }
-        }
                  
         if (is_bool($properties[self::SSL_VERIFY])) {
             if ($properties[self::SSL_VERIFY]) {
@@ -368,14 +360,6 @@ class Configuration implements \JsonSerializable
 
         unset($properties[self::CRON_SERVER]);
         unset($properties[self::CRON_SCHEDULE]);
-        
-        if (is_bool($properties[self::REMOTE_REDCAP])) {
-            if ($properties[self::REMOTE_REDCAP]) {
-                $properties[self::REMOTE_REDCAP] = 'true';
-            } else {
-                $properties[self::REMOTE_REDCAP] = 'false';
-            }
-        }
          
         if (is_bool($properties[self::SSL_VERIFY])) {
             if ($properties[self::SSL_VERIFY]) {
@@ -471,20 +455,6 @@ class Configuration implements \JsonSerializable
     public function setApiUrl($value)
     {
         $this->properties[self::REDCAP_API_URL] = $value;
-    }
-    
-    public function isRemoteRedcap()
-    {
-        $isRemote = false;
-        if (array_key_exists(self::REMOTE_REDCAP, $this->properties)) {
-            $isRemoteValue = $this->properties[self::REMOTE_REDCAP];
-            if (is_bool($isRemoteValue) && $isRemoteValue) {
-                $isRemote = true;
-            } elseif (strcasecmp($isRemoteValue, 'true') === 0 || strcasecmp($isRemoteValue, 'on') === 0) {
-                $isRemote = true;
-            }
-        }
-        return $isRemote;
     }
     
     public function getDataExportRight()
