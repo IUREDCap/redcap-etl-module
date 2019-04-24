@@ -80,7 +80,7 @@ The configuration needs to specify at least the following things:
     <li><strong>API Token</strong> - used to access the data to be extracted</li>
     <li><strong>Transformation Rules</strong> - that explain how the extracted data is transformed</li>
     <li><strong>Database Information</strong> - that contains the database and user account to be used
-        for loading the extracted and transformed data</li>
+        for loading the transformed data</li>
 </ul>
 
 <p>
@@ -97,7 +97,7 @@ Each ETL configuration must specify a REDCap API token. The token is used to acc
 the data can be extracted from it.
 The API token is specified by selecting the username of the owner of the API token.
 So, users are allowed to use the API token of another user for ETL processing, but they cannot see the token.
-Also, only tokens
+Also, only API tokens
 that have the same data export permission as the configuration can be used. Since users can only access
 configurations that have the same of less data export permission than they have, this means that users can
 only use API tokens that have the same or less data export permission than they have.

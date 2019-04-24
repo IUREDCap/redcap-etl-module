@@ -905,15 +905,25 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      * @return Configuration if a configuration name was specified in the request, the
      *     configuration for that configuration name.
      */
-    public function checkUserPagePermission($username = USERID)
+    public function checkUserPagePermission($username = USERID, $runCheck = false, $scheduleCheck = false)
     {
         $configuration = null;
+        
+        $adminConfig = $this->getAdminConfig();
         
         if (!Csrf::isValidRequest()) {
             # CSRF (Cross-Site Request Forgery) check failed; this should mean that either the
             # request is a CSRF attack or the user's session expired
             $accessUrl = $this->getUrl('web/access.php?accessError='.self::CSRF_ERROR);
             header('Location: '.$accessUrl);
+            exit();
+        } elseif ($runCheck && !$adminConfig->getAllowOnDemand()) {
+            $indexUrl = $this->getUrl('web/index.php');
+            header('Location: '.$indexUrl);
+            exit();
+        } elseif ($scheduleCheck && !$adminConfig->getAllowCron()) {
+            $indexUrl = $this->getUrl('web/index.php');
+            header('Location: '.$indexUrl);
             exit();
         } elseif (!Authorization::hasEtlRequestPermission($this, $username)) {
             # User does not have REDCap user rights to use ETL for this project

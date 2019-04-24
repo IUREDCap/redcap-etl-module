@@ -16,7 +16,9 @@ use IU\RedCapEtlModule\ServerConfig;
 # Check that the user has permission to access this page
 # and get the configuration if one was specified
 #-----------------------------------------------------------
-$configuration = $module->checkUserPagePermission(USERID);
+$runCheck = false;
+$scheduleCheck = true;
+$configuration = $module->checkUserPagePermission(USERID, $runCheck, $scheduleCheck);
 $configName = '';
 if (!empty($configuration)) {
     $configName = $configuration->getName();
@@ -145,10 +147,6 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 #print "SERVER: {$server} <br />\n";
 ?>
 
-
-<?php
-if ($adminConfig->getAllowCron()) {
-?>
 
 <script type="text/javascript">
 // Change radio buttons so that a checked
@@ -279,8 +277,5 @@ $(function () {
   </p>
     <?php Csrf::generateFormToken(); ?>
 </form>
-<?php
-}
-?>
 
 <?php require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
