@@ -86,7 +86,19 @@ class AdminConfig implements \JsonSerializable
     {
         # Set allowed cron times
         if (array_key_exists(self::ALLOWED_CRON_TIMES, $properties)) {
-            $this->allowedCronTimes = strip_tags($properties[self::ALLOWED_CRON_TIMES]);
+            $times = $properties[self::ALLOWED_CRON_TIMES];
+            if (is_array($times)) {
+                foreach ($times as $rownum => $row) {
+                    if (is_array($row)) {
+                        foreach ($row as $colnum => $value) {
+                            $times[$rownum][$colnum] = Filter::sanitizeLabel($value);
+                        }
+                    }
+                }
+            } else {
+                $times = array();
+            }
+            $this->allowedCronTimes = $times;
         } else {
             $this->allowedCronTimes = array();
         }

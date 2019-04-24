@@ -23,17 +23,17 @@ $userUrl         = $module->getURL(RedCapEtlModule::USER_CONFIG_PAGE);
 $adminConfig = $module->getAdminConfig();
     
 $selectedDay = Filter::sanitizeInt($_POST['selectedDay']);
-if (!isset($selectedDay)) {
+if (empty($selectedDay)) {
     $selectedDay = Filter::sanitizeInt($_GET['selectedDay']);
-    if (!isset($selectedDay)) {
+    if (empty($selectedDay)) {
         $selectedDay = 0;
     }
 }
 
 $selectedTime = Filter::sanitizeInt($_POST['selectedTime']);
-if (!isset($selectedTime)) {
+if (empty($selectedTime)) {
     $selectedTime = Filter::sanitizeInt($_GET['selectedTime']);
-    if (!isset($selectedTime)) {
+    if (empty($selectedTime)) {
         $selectedTime = 0;
     }
 }
@@ -69,6 +69,9 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
 
 <?php
 #print "<pre>POST:\n"; print_r($_POST); print "</pre>\n";
+#print "SELECTED DAY: {$selectedDay}<br/>\n";
+#print "<pre>GET:\n"; print_r($_GET); print "</pre>\n";
+#print "<pre>CRON JOBS:\n"; print_r($cronJobs); print "</pre>\n";
 ?>
 
 <?php

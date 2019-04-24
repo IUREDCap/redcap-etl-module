@@ -36,8 +36,6 @@ $selfUrl = $module->getUrl('web/schedule.php');
 $listUrl = $module->getUrl('web/index.php');
 
 
-
-
 #-------------------------
 # Set the submit value
 #-------------------------
