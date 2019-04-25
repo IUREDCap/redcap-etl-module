@@ -544,7 +544,7 @@ class Settings
                     if (isset($times) && is_array($times)) {
                         for ($cronDay = 0; $cronDay < 7; $cronDay++) {
                             $cronTime = $times[$cronDay];
-                            if (isset($cronTime) && $time == $cronTime && $day == $cronDay) {
+                            if (isset($cronTime) && $cronTime != "" && $time == $cronTime && $day == $cronDay) {
                                 $job = array(
                                     'username'  => $username,
                                     'projectId' => $etlProject,

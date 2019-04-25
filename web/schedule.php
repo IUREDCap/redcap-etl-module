@@ -142,6 +142,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
 <?php
 #print '<pre>'; print_r($_POST); print '</pre>'."\n";
+#print '<pre>'; print_r($schedule); print '</pre>'."\n";
 #print "SERVER: {$server} <br />\n";
 ?>
 
@@ -250,7 +251,7 @@ $(function () {
             $value = $time;
             
             $checked = '';
-            if (isset($schedule[$day]) && $schedule[$day] == $value) {
+            if (isset($schedule[$day]) && $schedule[$day] != '' && $schedule[$day] == $value) {
                 $checked = ' checked ';
             }
 
