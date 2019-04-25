@@ -118,7 +118,7 @@ can be used as is, or modified.
 
 <p>
 More information on the transformation rules can be found here:
-<a href="<?php echo $transformationRulesUrl; ?>" target="_blank">Transformation Rules</a>
+<a href="<?php echo $transformationRulesUrl; ?>" target="_blank"><strong>Transformation Rules</strong></a>
 </p>
 
 <h5 style="font-weight: bold;">Database Information</h5>

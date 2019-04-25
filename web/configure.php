@@ -163,12 +163,17 @@ if (!empty($configuration)) {
                 header($location);
             }
         } elseif (strcasecmp($submitValue, 'Upload CSV file') === 0) {
-            $fileContents = file_get_contents($_FILES['uploadCsvFile']['tmp_name']);
-            if ($fileContents === false) {
-                $error = 'ERROR: Unable to upload transformation rules file "'
-                    .$_FILES['uploadCsvFile']['tmp_name'].'"\n"';
+            $uploadFileName = $_FILES['uploadCsvFile']['tmp_name'];
+            if (empty($uploadFileName)) {
+                $error = 'ERROR: No upload transformation rules file specified.';
             } else {
-                $properties[Configuration::TRANSFORM_RULES_TEXT] = $fileContents;
+                $fileContents = file_get_contents($uploadFileName);
+                if ($fileContents === false) {
+                    $error = 'ERROR: Unable to upload transformation rules file "'
+                        .$_FILES['uploadCsvFile']['tmp_name'].'"';
+                } else {
+                    $properties[Configuration::TRANSFORM_RULES_TEXT] = $fileContents;
+                }
             }
         } elseif (strcasecmp($submitValue, 'Download CSV file') === 0) {
             $downloadFileName = 'rules.csv';
