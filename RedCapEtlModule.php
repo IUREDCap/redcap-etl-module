@@ -97,10 +97,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $hour = $now->format('G');  // 0-23 (24-hour format without leading zeroes)
         $date = $now->format('Y-m-d');
         
-        #if ($this->isLastRunTime($date, $hour)) {
-        #    ; # Cron jobs for this time were already processed
-        #else {
-        if (true) {
+        if ($this->isLastRunTime($date, $hour)) {
+            ; # Cron jobs for this time were already processed
+        } else {
             $cronJobs = $this->getCronJobs($day, $hour);
             
             #\REDCap::logEvent('REDCap-ETL cron - '.count($cronJobs).' cron jobs.');
