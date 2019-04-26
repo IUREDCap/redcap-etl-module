@@ -826,26 +826,29 @@ class Settings
     # Last run time methods
     #-------------------------------------------------------------------
     
+    /**
+     * Gets the last time that the REDCap-ETL cron jobs were run
+     */
     public function getLastRunTime()
     {
+        $lastRunTime = null;
         $dateAndTime = $this->module->getSystemSetting(self::LAST_RUN_TIME_KEY);
-        if (empty($dateAndTime)) {
-            $dateAndTime = array(-1, -1);
+        if (!empty($dateAndTime)) {
+            $lastRunTime = explode(',', $dateAndTime);
         }
-        $lastRunTime = explode(',', $dateAndTime);
         return $lastRunTime;
     }
 
-    public function setLastRunTime($date, $time)
+    public function setLastRunTime($date, $hour, $minutes)
     {
-        $lastRunTime = $date.','.$time;
+        $lastRunTime = $date.','.$hour.','.$minutes;
         $this->module->setSystemSetting(self::LAST_RUN_TIME_KEY, $lastRunTime);
     }
     
-    public function isLastRunTime($date, $time)
+    public function isLastRunTime($date, $hour)
     {
         $lastRunTime = $this->getLastRunTime();
-        return $lastRunTime[0] == $date && $lastRunTime[1] == $time;
+        return $lastRunTime[0] == $date && $lastRunTime[1] == $hour;
     }
 
 

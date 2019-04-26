@@ -133,6 +133,31 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     <input type="checkbox" name="<?php echo AdminConfig::ALLOW_CRON;?>" <?php echo $checked;?>>
     Allow ETL cron jobs? <br />
 
+    <?php
+    #---------------------------------------
+    # Last cron run time
+    #---------------------------------------
+    $cronTime = $module->getLastRunTime();
+    if (!isset($cronTime) || !is_array($cronTime)) {
+        $cronTime = '';
+    } else {
+        $date    = $cronTime[0];
+        $hour    = $cronTime[1];
+        $minutes = $cronTime[2];
+        if (strlen($hour) === 1) {
+            $hour = '0'.$hour;
+        }
+        $cronTime = "{$date} {$hour}:{$minutes}";
+    }
+    ?>
+    <br/>
+    Last ETL cron run time: <?php print_r($cronTime); ?><br />
+    
+    <?php
+    #----------------------------------------------------------------
+    # Allowed cron times table
+    #----------------------------------------------------------------
+    ?>
     <p style="text-align: center; margin-top: 14px;">Allowed ETL cron job times
     and number of scheduled jobs per time</p>
     

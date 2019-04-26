@@ -93,12 +93,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $adminConfig = $this->getAdminConfig();
             
         $now = new \DateTime();
-        $day  = $now->format('w');  // 0-6 (day of week; Sunday = 0)
-        $hour = $now->format('G');  // 0-23 (24-hour format without leading zeroes)
-        $date = $now->format('Y-m-d');
+        $day     = $now->format('w');  // 0-6 (day of week; Sunday = 0)
+        $hour    = $now->format('G');  // 0-23 (24-hour format without leading zeroes)
+        $minutes = $now->format('i');
+        $date    = $now->format('Y-m-d');
         
         if ($this->isLastRunTime($date, $hour)) {
             ; # Cron jobs for this time were already processed
+            #\REDCap::logEvent('REDCap-ETL cron - cron jobs already processed.');
         } else {
             $cronJobs = $this->getCronJobs($day, $hour);
             
@@ -148,7 +150,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                                         # The fork was unsuccessful (and this is the only thread)
                                         $this->run($etlConfig, $serverConfig, $isCronJob);
                                     } elseif ($pid === 0) {
-                                        # The fork was susccessful and this is the child process,
+                                        # The fork was successful and this is the child process,
                                         $this->run($etlConfig, $serverConfig, $isCronJob);
                                         return;
                                     } else {
@@ -176,7 +178,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             }  # End foreach cron job
             
             # Set the last run time processed to this time, so that it won't be processed again
-            $this->setLastRunTime($date, $hour);
+            $this->setLastRunTime($date, $hour, $minutes);
                     
             # If forking is supported, wait for child processes (if any))
             if (function_exists('pcntl_fork') && function_exists('pcntl_wait')) {
@@ -674,12 +676,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     
     public function getLastRunTime()
     {
-        $this->settings->getLastRunTime();
+        return $this->settings->getLastRunTime();
     }
 
-    public function setLastRunTime($date, $time)
+    public function setLastRunTime($date, $hour, $minutes)
     {
-        $this->settings->setLastRunTime($date, $time);
+        $this->settings->setLastRunTime($date, $hour, $minutes);
         # Don't log this because it is an internal event
     }
     
