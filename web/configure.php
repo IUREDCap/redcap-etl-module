@@ -393,8 +393,8 @@ Configuration form
                 <?php if ($testMode && SUPER_USER) { # make API URL editable ?>
                 <td>
                     <input type="text" size="60" 
-                           value="<?php echo $properties[Configuration::REDCAP_API_URL];?>"
-                           name="<?php echo Configuration::REDCAP_API_URL?>" />
+                        value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::REDCAP_API_URL]);?>"
+                        name="<?php echo Configuration::REDCAP_API_URL?>" />
                 </td>
                 <?php } else { ?>
                 <td>

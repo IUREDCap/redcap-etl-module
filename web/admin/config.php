@@ -151,7 +151,7 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     }
     ?>
     <br/>
-    Last ETL cron run time: <?php print_r($cronTime); ?><br />
+    Last ETL cron run time: <?php echo $cronTime; ?><br />
     
     <?php
     #----------------------------------------------------------------
