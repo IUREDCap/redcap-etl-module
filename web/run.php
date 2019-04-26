@@ -159,7 +159,7 @@ $allowEmbeddedServer = $adminConfig->getAllowEmbeddedServer();
         
         foreach ($servers as $serverName) {
             $serverConfig = $module->getServerConfig($serverName);
-            if (isset($serverConfig) && $serverConfig->getIsActive() === true) {
+            if (isset($serverConfig) && $serverConfig->getIsActive()) {
                 $selected = '';
                 if ($serverName === $server) {
                     $selected = 'selected';
@@ -178,6 +178,7 @@ $allowEmbeddedServer = $adminConfig->getAllowEmbeddedServer();
 
 <?php
 #print '<pre>'; print_r($servers); print '</pre>'."\n";
+#print '<pre>'; print_r($serverConfig); print '</pre>'."\n";
 ?>
 
 

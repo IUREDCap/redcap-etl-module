@@ -206,7 +206,7 @@ $(function () {
 
     foreach ($servers as $serverName) {
         $serverConfig = $module->getServerConfig($serverName);
-        if (isset($serverConfig) && $serverConfig->getIsActive() === true) {
+        if (isset($serverConfig) && $serverConfig->getIsActive()) {
             $selected = '';
             if ($serverName === $server) {
                 $selected = 'selected';
