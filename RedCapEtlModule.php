@@ -887,7 +887,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function renderProjectPageHeader()
     {
         ob_start();
-        include APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
+        require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
         $buffer = ob_get_clean();
         #$cssFile = $this->getUrl('resources/redcap-etl.css');
         #$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
