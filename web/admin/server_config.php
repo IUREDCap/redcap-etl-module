@@ -37,6 +37,12 @@ if (empty($serverName)) {
     }
 }
 
+try {
+    ServerConfig::validateName($serverName);
+} catch (Exception $exception) {
+    $serverName = '';
+}
+
 if (!empty($serverName)) {
     $_SESSION['serverName'] = $serverName;
 }

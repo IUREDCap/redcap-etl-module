@@ -317,7 +317,7 @@ class Settings
             }
 
             $configuration = new Configuration($name);
-            $configuration->setProperty(Configuration::DATA_EXPORT_RIGHT, $dataExportRight);
+            $configuration->setDataExportRight($dataExportRight);
             $jsonConfiguration = json_encode($configuration);
             $this->module->setProjectSetting($key, $jsonConfiguration, $projectId);
         } catch (\Exception $exception) {

@@ -68,17 +68,28 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      *
      * @return array a map from username to an map of rights for the current project.
      */
-    public function getUserRights($userId = null)
+    public function getUserRights()
     {
-        $rights = \REDCap::getUserRights($userId);
+        $userId = USERID;
+        $rights = \REDCap::getUserRights($userId)[$userId];
         return $rights;
     }
     
-    public function getDataExportRight($username = USERID)
+    /**
+     * Gets the data export right for the current user. If the current
+     * user is an admin 'Full data set' export permission will be
+     * returned, otherwise, the REDCap user data exports user right
+     * value for the current user will be returned.
+     */
+    public function getDataExportRight()
     {
-        $dataExportRight = 0;
-        $rights = $this->getUserRights($username)[$username];
-        $dataExportRight = $rights['data_export_tool'];
+        $dataExportRight = 0;  // No data access
+        if ($this->isSuperUser()) {
+            $dataExportRight = 1; // Full data access
+        } else {
+            $rights = $this->getUserRights();
+            $dataExportRight = $rights['data_export_tool'];
+        }
         return $dataExportRight;
     }
     
@@ -307,6 +318,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     }
     
     
+    
+    /**
+     * Gets the REDCap API URL.
+     *
+     * @return string the REDCap API URL.
+     */
     public static function getRedCapApiUrl()
     {
         return APP_PATH_WEBROOT_FULL.'api/';
@@ -358,15 +375,40 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     #-------------------------------------------------------------------
     # User ETL project methods
     #-------------------------------------------------------------------
-        
+    
+    /**
+     * Gets the ETL projects for the specified user, or for the current
+     * user if no user is specified.
+     *
+     * @param string the username for which to get the ETL projects.
+     *
+     * @return array project IDs of projects that the user has permission to use REDCap-ETL.
+     */
     public function getUserEtlProjects($username = USERID)
     {
         return $this->settings->getUserEtlProjects($username);
     }
     
+    /**
+     * Checks if the specified project has at least one user that has
+     * permission to user REDCap-ETL for the project.
+     *
+     * @return boolean true if there is at least one user who has permission to
+     *     run REDCap-ETL for the project, and false otherwise.
+     */
     public function hasEtlUser($projectId = PROJECT_ID)
     {
         return $this->settings->hasEtlUser($projectId);
+    }
+    
+    /**
+     * Gets the current username.
+     *
+     * @return string the username of the current user.
+     */
+    public function getUsername()
+    {
+        return USERID;
     }
     
     public function isSuperUser()
@@ -429,7 +471,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     
     public function addConfiguration($name, $username = USERID, $projectId = PROJECT_ID)
     {
-        $dataExportRight = $this->getDataExportRight($username);
+        $dataExportRight = $this->getDataExportRight();
         $this->settings->addConfiguration($name, $username, $projectId, $dataExportRight);
         $details = 'REDCap-ETL configuration "'.$name.'" created.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
@@ -442,8 +484,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function copyConfiguration($fromConfigName, $toConfigName, $username = USERID)
     {
-        if (Authorization::hasEtlConfigNamePermission($this, $fromConfigName, USERID, PROJECT_ID)) {
-            $toExportRight = $this->getDataExportRight($username);
+        if (Authorization::hasEtlConfigNamePermission($this, $fromConfigName, PROJECT_ID)) {
+            $toExportRight = $this->getDataExportRight();
             $this->settings->copyConfiguration($fromConfigName, $toConfigName, $toExportRight);
             $details = 'REDCap-ETL configuration "'.$fromConfigName.'" copied to "'.
                 $toConfigName.'" for user '.USERID.', project ID '.PROJECT_ID.'.';
@@ -461,7 +503,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function renameConfiguration($configName, $newConfigName)
     {
-        if (Authorization::hasEtlConfigNamePermission($this, $configName, USERID, PROJECT_ID)) {
+        if (Authorization::hasEtlConfigNamePermission($this, $configName, PROJECT_ID)) {
             $this->settings->renameConfiguration($configName, $newConfigName);
             $details = 'REDCap-ETL configuration "'.$configName.'" renamed to "'.
                 $newConfigName.'" for user '.USERID.', project ID '.PROJECT_ID.'.';
@@ -473,7 +515,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     
     public function removeConfiguration($configName)
     {
-        if (Authorization::hasEtlConfigNamePermission($this, $configName, USERID, PROJECT_ID)) {
+        if (Authorization::hasEtlConfigNamePermission($this, $configName, PROJECT_ID)) {
             $this->settings->removeConfiguration($configName);
             $details = 'REDCap-ETL configuration "'.$configName.'" deleted.';
             \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
@@ -528,14 +570,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $configNames = array();
         $allConfigNames = $this->getConfigurationNames($projectId);
         
-        if ($this->getDataExportRight($username) == 1) {
+        if ($this->getDataExportRight() == 1) {
             # If user has "full data set" export permissions, improve performance by
             # avoiding individual configuration permission checks below
             $configNames = $allConfigNames;
         } else {
             foreach ($allConfigNames as $configName) {
                 $config = $this->getConfiguration($configName, $projectId);
-                if (Authorization::hasEtlConfigurationPermission($this, $config, $username)) {
+                if (Authorization::hasEtlConfigurationPermission($this, $config)) {
                     array_push($configNames, $configName);
                 }
             }
@@ -546,6 +588,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     /**
      * Gets the configuration from the request (if any), and
      * updates the user's session appropriately.
+     *
+     * @throws \Exception if the configuration name is invalid.
      */
     public function getConfigurationFromRequest()
     {
@@ -559,6 +603,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         }
         
         if (!empty($configName)) {
+            Configuration::validateName($configName);  # throw exception if invalid
             $configuration = $this->getConfiguration($configName, PROJECT_ID);
             if (empty($configuration)) {
                 $configName = '';
@@ -571,6 +616,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
         return $configuration;
     }
+
     
     #-------------------------------------------------------------------
     # Cron job methods
@@ -782,7 +828,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         
         $userEtlProjects = $this->getUserEtlProjects(USERID);
         
-        if (Authorization::hasEtlProjectPagePermission($this, USERID)) {
+        if (Authorization::hasEtlProjectPagePermission($this)) {
             $tabs[$configUrl]   = $configLabel;
     
             if ($adminConfig->getAllowOnDemand()) {
@@ -926,12 +972,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             $indexUrl = $this->getUrl('web/index.php');
             header('Location: '.$indexUrl);
             exit();
-        } elseif (!Authorization::hasEtlRequestPermission($this, $username)) {
+        } elseif (!Authorization::hasEtlRequestPermission($this)) {
             # User does not have REDCap user rights to use ETL for this project
             $accessUrl = $this->getUrl('web/access.php?accessError='.self::USER_RIGHTS_ERROR);
             header('Location: '.$accessUrl);
             exit();
-        } elseif (!Authorization::hasEtlProjectPagePermission($this, $username)) {
+        } elseif (!Authorization::hasEtlProjectPagePermission($this)) {
             # User has REDCap ETL user rights, but does not have specific ETL permission for this project
             $accessUrl = $this->getUrl('web/access.php?accessError='.self::NO_ETL_PROJECT_PERMISSION);
             header('Location: '.$accessUrl);
@@ -941,7 +987,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             # has permission to access it
             $configuration = $this->getConfigurationFromRequest();
             if (isset($configuration)) {
-                if (!Authorization::hasEtlConfigurationPermission($this, $configuration, $username)) {
+                if (!Authorization::hasEtlConfigurationPermission($this, $configuration)) {
                     # User does not have permission to access the specified configuration
                     $accessUrl = $this->getUrl('web/access.php?accessError='.self::NO_CONFIGURATION_PERMISSION);
                     header('Location: '.$accessUrl);

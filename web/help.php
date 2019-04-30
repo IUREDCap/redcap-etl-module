@@ -12,7 +12,7 @@ use IU\RedCapEtlModule\Filter;
 # this project, redirect them to the access request page which
 # should display a link to send e-mail to request permission.
 #--------------------------------------------------------------
-if (!Authorization::hasEtlProjectPagePermission($module, USERID)) {
+if (!Authorization::hasEtlProjectPagePermission($module)) {
     $requestAccessUrl = $module->getUrl('web/request_access.php');
     header('Location: '.$requestAccessUrl);
 }

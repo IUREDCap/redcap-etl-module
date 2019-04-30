@@ -38,5 +38,38 @@ class ConfigurationTest extends TestCase
             $exceptionCaught = true;
         }
         $this->assertTrue($exceptionCaught, 'Config name script exception)');
+        
+        $exceptionCaught = false;
+        try {
+            $result = Configuration::validateName('%3CIMG');
+        } catch (\Exception $exception) {
+            $exceptionCaught = true;
+        }
+        $this->assertTrue($exceptionCaught, 'Config % exception)');
+        
+        $exceptionCaught = false;
+        try {
+            $result = Configuration::validateName('`ls -l`');
+        } catch (\Exception $exception) {
+            $exceptionCaught = true;
+        }
+        $this->assertTrue($exceptionCaught, 'Config backtick exception)');
+        
+        $exceptionCaught = false;
+        try {
+            $result = Configuration::validateName('&amp');
+        } catch (\Exception $exception) {
+            $exceptionCaught = true;
+        }
+        $this->assertTrue($exceptionCaught, 'Config & exception)');
+        
+        
+        $exceptionCaught = false;
+        try {
+            $result = Configuration::validateName('amp;');
+        } catch (\Exception $exception) {
+            $exceptionCaught = true;
+        }
+        $this->assertTrue($exceptionCaught, 'Config ; exception)');
     }
 }

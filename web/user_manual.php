@@ -12,25 +12,31 @@ use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
-#--------------------------------------------------------------
-# If the user doesn't have permission to access REDCap-ETL for
-# this project, redirect them to the access request page which
-# should display a link to send e-mail to request permission.
-#--------------------------------------------------------------
-if (!Authorization::hasEtlProjectPagePermission($module, USERID)) {
-    $requestAccessUrl = $module->getUrl('web/request_access.php');
-    header('Location: '.$requestAccessUrl);
-}
-
 $error   = '';
+$warning = '';
 $success = '';
 
-$adminConfig = $module->getAdminConfig();
+try {
+    #--------------------------------------------------------------
+    # If the user doesn't have permission to access REDCap-ETL for
+    # this project, redirect them to the access request page which
+    # should display a link to send e-mail to request permission.
+    #--------------------------------------------------------------
+    if (!Authorization::hasEtlProjectPagePermission($module)) {
+        $requestAccessUrl = $module->getUrl('web/request_access.php');
+        header('Location: '.$requestAccessUrl);
+    }
 
-$selfUrl   = $module->getUrl('web/user_manual.php');
-$transformationRulesUrl = $module->getUrl('web/transformation_rules.php');
+    $adminConfig = $module->getAdminConfig();
 
-$redcapEtlImage = $module->getUrl('resources/redcap-etl.png');
+    $selfUrl   = $module->getUrl('web/user_manual.php');
+    $transformationRulesUrl = $module->getUrl('web/transformation_rules.php');
+
+    $redcapEtlImage = $module->getUrl('resources/redcap-etl.png');
+} catch (Exception $exception) {
+    $error = 'ERROR: '.$exception->getMessage();
+}
+
 
 #--------------------------------------------
 # Include REDCap's project page header

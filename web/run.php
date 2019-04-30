@@ -12,63 +12,65 @@ use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
-#-----------------------------------------------------------
-# Check that the user has permission to access this page
-# and get the configuration if one was specified
-#-----------------------------------------------------------
-$runCheck = true;
-$configuration = $module->checkUserPagePermission(USERID, $runCheck);
-$configName = '';
-if (!empty($configuration)) {
-    $configName = $configuration->getName();
-}
-
 $error   = '';
+$warning = '';
 $success = '';
 
-$adminConfig = $module->getAdminConfig();
+try {
+    #-----------------------------------------------------------
+    # Check that the user has permission to access this page
+    # and get the configuration if one was specified
+    #-----------------------------------------------------------
+    $runCheck = true;
+    $configuration = $module->checkUserPagePermission(USERID, $runCheck);
+    $configName = '';
+    if (!empty($configuration)) {
+        $configName = $configuration->getName();
+    }
 
-$servers = $module->getServers();
 
-$selfUrl   = $module->getUrl('web/run.php');
-$listUrl   = $module->getUrl('web/index.php');
+    $adminConfig = $module->getAdminConfig();
 
-#------------------------------------------
-# Get the server
-#------------------------------------------
-$server = Filter::stripTags($_POST['server']);
-if (empty($server)) {
-    $server = $_SESSION['server'];
-} else {
-    $_SESSION['server'] = $server;
-}
+    $servers = $module->getServers();
 
-#-------------------------
-# Set the submit value
-#-------------------------
-$submit = '';
-if (array_key_exists('submit', $_POST)) {
-    $submit = Filter::stripTags($_POST['submit']);
-}
+    $selfUrl   = $module->getUrl('web/run.php');
+    $listUrl   = $module->getUrl('web/index.php');
 
-$runOutput = '';
-if (strcasecmp($submit, 'Run') === 0) {
-    if (empty($configName)) {
-        $error = 'ERROR: No ETL configuration specified.';
-    } elseif (!isset($configuration)) {
-        $error = 'ERROR: No ETL configuration found for '.$configName.'.';
+    #------------------------------------------
+    # Get the server
+    #------------------------------------------
+    $server = Filter::stripTags($_POST['server']);
+    if (empty($server)) {
+        $server = $_SESSION['server'];
     } else {
-        try {
+        $_SESSION['server'] = $server;
+    }
+
+    #-------------------------
+    # Set the submit value
+    #-------------------------
+    $submit = '';
+    if (array_key_exists('submit', $_POST)) {
+        $submit = Filter::stripTags($_POST['submit']);
+    }
+
+    $runOutput = '';
+    if (strcasecmp($submit, 'Run') === 0) {
+        if (empty($configName)) {
+            $error = 'ERROR: No ETL configuration specified.';
+        } elseif (!isset($configuration)) {
+            $error = 'ERROR: No ETL configuration found for '.$configName.'.';
+        } else {
             $serverConfig = null;
             if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) !== 0) {
                 $serverConfig = $module->getServerConfig($server);
             }
             $isCronJob = false;
             $runOutput = $module->run($configuration, $serverConfig, $isCronJob);
-        } catch (Exception $exception) {
-            $error = 'ERROR: '.$exception->getMessage();
         }
     }
+} catch (Exception $exception) {
+    $error = 'ERROR: '.$exception->getMessage();
 }
 
 ?>

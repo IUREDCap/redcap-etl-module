@@ -12,70 +12,73 @@ use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
-#-----------------------------------------------------------
-# Check that the user has permission to access this page
-# and get the configuration if one was specified
-#-----------------------------------------------------------
-$runCheck = false;
-$scheduleCheck = true;
-$configuration = $module->checkUserPagePermission(USERID, $runCheck, $scheduleCheck);
-$configName = '';
-if (!empty($configuration)) {
-    $configName = $configuration->getName();
-}
+try {
+    #-----------------------------------------------------------
+    # Check that the user has permission to access this page
+    # and get the configuration if one was specified
+    #-----------------------------------------------------------
+    $runCheck = false;
+    $scheduleCheck = true;
+    $configuration = $module->checkUserPagePermission(USERID, $runCheck, $scheduleCheck);
+    $configName = '';
+    if (!empty($configuration)) {
+        $configName = $configuration->getName();
+    }
 
-$error   = '';
-$warning = '';
-$success = '';
+    $error   = '';
+    $warning = '';
+    $success = '';
 
-$adminConfig = $module->getAdminConfig();
+    $adminConfig = $module->getAdminConfig();
 
-$servers = $module->getServers();
+    $servers = $module->getServers();
 
-$selfUrl = $module->getUrl('web/schedule.php');
-$listUrl = $module->getUrl('web/index.php');
+    $selfUrl = $module->getUrl('web/schedule.php');
+    $listUrl = $module->getUrl('web/index.php');
 
 
-#-------------------------
-# Set the submit value
-#-------------------------
-$submitValue = '';
-if (array_key_exists('submitValue', $_POST)) {
-    $submitValue = Filter::stripTags($_POST['submitValue']);
-}
+    #-------------------------
+    # Set the submit value
+    #-------------------------
+    $submitValue = '';
+    if (array_key_exists('submitValue', $_POST)) {
+        $submitValue = Filter::stripTags($_POST['submitValue']);
+    }
 
-if (strcasecmp($submitValue, 'Save') === 0) {
-    $server = Filter::stripTags($_POST['server']);
-    
-    # Saving the schedule values
-    $schedule = array();
-    
-    $schedule[0] = Filter::sanitizeInt($_POST['Sunday']);
-    $schedule[1] = Filter::sanitizeInt($_POST['Monday']);
-    $schedule[2] = Filter::sanitizeInt($_POST['Tuesday']);
-    $schedule[3] = Filter::sanitizeInt($_POST['Wednesday']);
-    $schedule[4] = Filter::sanitizeInt($_POST['Thursday']);
-    $schedule[5] = Filter::sanitizeInt($_POST['Friday']);
-    $schedule[6] = Filter::sanitizeInt($_POST['Saturday']);
-    
-    if (empty($configName)) {
-        $error = 'ERROR: No ETL configuration specified.';
-    } elseif (!isset($configuration)) {
-        $error = 'ERROR: No ETL configuration found for '.$configName.'.';
-    } elseif (empty($server)) {
-        $error = 'ERROR: No server specified.';
+    if (strcasecmp($submitValue, 'Save') === 0) {
+        $server = Filter::stripTags($_POST['server']);
+        
+        # Saving the schedule values
+        $schedule = array();
+        
+        $schedule[0] = Filter::sanitizeInt($_POST['Sunday']);
+        $schedule[1] = Filter::sanitizeInt($_POST['Monday']);
+        $schedule[2] = Filter::sanitizeInt($_POST['Tuesday']);
+        $schedule[3] = Filter::sanitizeInt($_POST['Wednesday']);
+        $schedule[4] = Filter::sanitizeInt($_POST['Thursday']);
+        $schedule[5] = Filter::sanitizeInt($_POST['Friday']);
+        $schedule[6] = Filter::sanitizeInt($_POST['Saturday']);
+        
+        if (empty($configName)) {
+            $error = 'ERROR: No ETL configuration specified.';
+        } elseif (!isset($configuration)) {
+            $error = 'ERROR: No ETL configuration found for '.$configName.'.';
+        } elseif (empty($server)) {
+            $error = 'ERROR: No server specified.';
+        } else {
+            $module->setConfigSchedule($configName, $server, $schedule);
+            $success = " Schedule saved.";
+        }
     } else {
-        $module->setConfigSchedule($configName, $server, $schedule);
-        $success = " Schedule saved.";
+        # Just displaying page
+        if (isset($configuration)) {
+            $server   = $configuration->getProperty(Configuration::CRON_SERVER);
+            $schedule = $configuration->getProperty(Configuration::CRON_SCHEDULE);
+        }
     }
-} else {
-    # Just displaying page
-    if (isset($configuration)) {
-        $server   = $configuration->getProperty(Configuration::CRON_SERVER);
-        $schedule = $configuration->getProperty(Configuration::CRON_SCHEDULE);
-    }
+} catch (Exception $exception) {
+    $error = 'ERROR: '.$exception->getMessage();
 }
-
 ?>
 
 <?php

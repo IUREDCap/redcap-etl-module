@@ -303,7 +303,7 @@ class ServerConfig implements \JsonSerializable
             throw new \Exception('No server configuration name specified.');
         } elseif (!is_string($name)) {
             throw new \Exception('Server configuration name is not a string; has type: '.gettype($name).'.');
-        } elseif (preg_match('/([&<>";@\*\n\r\t\\\\])/', $name, $matches) === 1) {
+        } elseif (preg_match('/([^a-zA-Z0-9_\- .])/', $name, $matches) === 1) {
             $errorMessage = 'Invalid character in server configuration name: '.$matches[0];
             throw new \Exception($errorMessage);
         }

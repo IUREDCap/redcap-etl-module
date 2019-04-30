@@ -5,71 +5,78 @@
 require_once __DIR__.'/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\Authorization;
+use IU\RedCapEtlModule\Configuration;
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
 
-#-----------------------------------------------------------
-# Check that the user has permission to access this page
-#-----------------------------------------------------------
-$module->checkUserPagePermission(USERID);
+try {
+    #-----------------------------------------------------------
+    # Check that the user has permission to access this page
+    #-----------------------------------------------------------
+    $module->checkUserPagePermission(USERID);
 
-
-#-----------------------------------------------------------------
-# Process form submissions (configuration add/copy/delete/rename)
-#-----------------------------------------------------------------
-$submitValue = Filter::stripTags($_POST['submitValue']);
-if (strcasecmp($submitValue, 'add') === 0) {
-    #--------------------------------------
-    # Add configuration
-    #--------------------------------------
-    if (!array_key_exists('configurationName', $_POST) || empty($_POST['configurationName'])) {
-        $error = 'ERROR: No configuration name was specified.';
-    } else {
-        try {
+    #-----------------------------------------------------------------
+    # Process form submissions (configuration add/copy/delete/rename)
+    #-----------------------------------------------------------------
+    $submitValue = Filter::stripTags($_POST['submitValue']);
+    if (strcasecmp($submitValue, 'add') === 0) {
+        #--------------------------------------
+        # Add configuration
+        #--------------------------------------
+        if (!array_key_exists('configurationName', $_POST) || empty($_POST['configurationName'])) {
+            $error = 'ERROR: No configuration name was specified.';
+        } else {
             $configurationName = Filter::stripTags($_POST['configurationName']);
             
+            # Want to make sure config name is validated before it is used
+            Configuration::validateName($configurationName);
+            
             # Add configuration; an exception should be thrown if the configuration
-            # already exists, or the name is an invalid configuration name
+            # already exists
             $module->addConfiguration($configurationName);
-        } catch (\Exception $exception) {
-            $error = 'ERROR: '.$exception->getMessage();
         }
-    }
-} elseif (strcasecmp($submitValue, 'copy') === 0) {
-    #--------------------------------------------
-    # Copy configuration
-    #--------------------------------------------
-    $copyFromConfigName = Filter::stripTags($_POST['copyFromConfigName']);
-    $copyToConfigName   = Filter::stripTags($_POST['copyToConfigName']);
-    if (!empty($copyFromConfigName) && !empty($copyToConfigName)) {
-        try {
+    } elseif (strcasecmp($submitValue, 'copy') === 0) {
+        #--------------------------------------------
+        # Copy configuration
+        #--------------------------------------------
+        $copyFromConfigName = Filter::stripTags($_POST['copyFromConfigName']);
+        $copyToConfigName   = Filter::stripTags($_POST['copyToConfigName']);
+        if (!empty($copyFromConfigName) && !empty($copyToConfigName)) {
+            # Want to make sure config names are validated before it is used
+            Configuration::validateName($copyFromConfigName);
+            Configuration::validateName($copyToConfigName);
+                        
             $module->copyConfiguration($copyFromConfigName, $copyToConfigName);
-        } catch (Exception $exception) {
-            $error = 'ERROR: ' . $exception->getMessage();
         }
-    }
-} elseif (strcasecmp($submitValue, 'delete') === 0) {
-    #---------------------------------------------
-    # Delete configuration
-    #---------------------------------------------
-    $deleteConfigName = Filter::stripTags($_POST['deleteConfigName']);
-    if (!empty($deleteConfigName)) {
-        $module->removeConfiguration($deleteConfigName);
-    }
-} elseif (strcasecmp($submitValue, 'rename') === 0) {
-    #----------------------------------------------
-    # Rename configuration
-    #----------------------------------------------
-    $renameConfigName    = Filter::stripTags($_POST['renameConfigName']);
-    $renameNewConfigName = Filter::stripTags($_POST['renameNewConfigName']);
-    if (!empty($renameConfigName) && !empty($renameNewConfigName)) {
-        try {
+    } elseif (strcasecmp($submitValue, 'delete') === 0) {
+        #---------------------------------------------
+        # Delete configuration
+        #---------------------------------------------
+        $deleteConfigName = Filter::stripTags($_POST['deleteConfigName']);
+        if (!empty($deleteConfigName)) {
+            # Want to make sure config name is validated before it is used
+            Configuration::validateName($deleteConfigName);
+            
+            $module->removeConfiguration($deleteConfigName);
+        }
+    } elseif (strcasecmp($submitValue, 'rename') === 0) {
+        #----------------------------------------------
+        # Rename configuration
+        #----------------------------------------------
+        $renameConfigName    = Filter::stripTags($_POST['renameConfigName']);
+        $renameNewConfigName = Filter::stripTags($_POST['renameNewConfigName']);
+        if (!empty($renameConfigName) && !empty($renameNewConfigName)) {
+            # Want to make sure config names are validated before it is used
+            Configuration::validateName($renameConfigName);
+            Configuration::validateName($renameNewConfigName);
+            
             $module->renameConfiguration($renameConfigName, $renameNewConfigName);
-        } catch (Exception $exception) {
-            $error = 'ERROR: ' . $exception->getMessage();
         }
     }
+} catch (\Exception $exception) {
+    $error = 'ERROR: '.$exception->getMessage();
 }
+
 
 #$selfUrl     = $module->getUrl('web/index.php');
 #print "<hr />{$selfUrl}<br />\n";
@@ -80,7 +87,7 @@ if (strcasecmp($submitValue, 'add') === 0) {
 #print_r($_SESSION);
 #print('</pre>');
 
-#$rights = $module->getUserRights(USERID);
+#$rights = $module->getUserRights();
 #print "<hr/><pre>RIGHTS\n";
 #print_r($rights);
 #print "</pre>\n";
@@ -233,7 +240,7 @@ foreach ($configurationNames as $configurationName) {
     #-------------------------------------------------------------------------------------
     # CONFIGURE BUTTON - disable if user does not have permission to access configuration
     #-------------------------------------------------------------------------------------
-    if (Authorization::hasEtlConfigurationPermission($module, $configuration, USERID)) {
+    if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
             .'<a href="'.$configureUrl.'"><img src="'.APP_PATH_IMAGES.'gear.png"></a>'
             ."</td>\n";
@@ -248,7 +255,7 @@ foreach ($configurationNames as $configurationName) {
     # the needed data export permission to access the configuration
     #--------------------------------------------------------------------------------------
     if ($adminConfig->getAllowOnDemand()) {
-        if (Authorization::hasEtlConfigurationPermission($module, $configuration, USERID)) {
+        if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
             echo '<td style="text-align:center;">'
                 .'<a href="'.$runConfigurationUrl.'"><img src="'.APP_PATH_IMAGES.'application_go.png"></a>'
                 ."</td>\n";
@@ -264,7 +271,7 @@ foreach ($configurationNames as $configurationName) {
     # the needed data export permission to access the configuration
     #--------------------------------------------------------------------------------------
     if ($adminConfig->getAllowCron()) {
-        if (Authorization::hasEtlConfigurationPermission($module, $configuration, USERID)) {
+        if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
             echo '<td style="text-align:center;">'
                 .'<a href="'.$scheduleConfigUrl.'"><img src="'.APP_PATH_IMAGES.'clock_frame.png"></a>'
                 ."</td>\n";
@@ -279,7 +286,7 @@ foreach ($configurationNames as $configurationName) {
     # COPY BUTTON - disable if user does not have the needed
     # data export permission to access the configuration
     #-----------------------------------------------------------
-    if (Authorization::hasEtlConfigurationPermission($module, $configuration, USERID)) {
+    if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
             .'<img src="'.APP_PATH_IMAGES.'page_copy.png" class="copyConfig" style="cursor: pointer;"'
             .' id="copyConfig'.$row.'"/>'
@@ -294,7 +301,7 @@ foreach ($configurationNames as $configurationName) {
     # RENAME BUTTON - disable if user does not have the needed
     # data export permission to access the configuration
     #-----------------------------------------------------------
-    if (Authorization::hasEtlConfigurationPermission($module, $configuration, USERID)) {
+    if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
             .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" class="renameConfig" style="cursor: pointer;"'
             .' id="renameConfig'.$row.'"/>'
@@ -309,7 +316,7 @@ foreach ($configurationNames as $configurationName) {
     # DELETE BUTTON - disable if user does not have the needed
     # data export permission to access the configuration
     #-----------------------------------------------------------
-    if (Authorization::hasEtlConfigurationPermission($module, $configuration, USERID)) {
+    if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
             .'<img src="'.APP_PATH_IMAGES.'delete.png" class="deleteConfig" style="cursor: pointer;"'
             .' id="deleteConfig'.$row.'"/>'

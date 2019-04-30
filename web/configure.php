@@ -13,209 +13,212 @@ use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
 
-#-----------------------------------------------------------
-# Check that the user has permission to access this page
-# and get the configuration if one was specified
-#-----------------------------------------------------------
-$configuration = $module->checkUserPagePermission(USERID);
-$configName = '';
-if (!empty($configuration)) {
-    $configName = $configuration->getName();
-    $properties = $configuration->getProperties();
-}
-
 $success = '';
 $warning = '';
 $error   = '';
 
-#-------------------------------------------------------------------
-# Check for test mode (which should only be used for development)
-#-------------------------------------------------------------------
-$testMode = false;
-if (@file_exists(__DIR__.'/../test-config.ini')) {
-    $testMode = true;
-}
-
-if (array_key_exists('success', $_GET)) {
-    $success = Filter::stripTags($_GET['success']);
-}
-
-if (array_key_exists('warning', $_GET)) {
-    $warning = Filter::stripTags($_GET['warning']);
-}
-
-$listUrl  = $module->getUrl("web/index.php");
-$selfUrl  = $module->getUrl("web/configure.php");
-$generateRulesUrl = $module->getUrl('web/generate_rules.php');
-
-$adminConfig = $module->getAdminConfig();
-
-
-/** @var array configurations property map from property name to value */
-$properties = array();
-
-
-$redCapDb = new RedCapDb();
-
-
-
-if (!empty($configuration)) {
-    #--------------------------------------------------------------
-    # Get the API tokens for this project with export permission,
-    # and the username of user whose API token should be used
-    # (if any)
-    #--------------------------------------------------------------
-    $exportRight  = $configuration->getDataExportRight();
-    $apiTokens    = $redCapDb->getApiTokens(PROJECT_ID, $exportRight);
-    $apiTokenUser = $configuration->getProperty(Configuration::API_TOKEN_USERNAME);
-    
-    
-    #-------------------------
-    # Get the submit value
-    #-------------------------
-    $submitValue = '';
-    if (array_key_exists('submitValue', $_POST)) {
-        $submitValue = Filter::stripTags($_POST['submitValue']);
-    }
-    
-    #---------------------------------------------------------------
-    # if this is a POST other than Cancel,
-    # update the configuration properties with the POST values
-    #---------------------------------------------------------------
-    if (!empty($submitValue) && strcasecmp($submitValue, 'Cancel')) {
-        $_POST = array_map('strip_tags', $_POST);
-        $_POST = array_map('trim', $_POST);
-
-        if (!isset($_POST[Configuration::API_TOKEN_USERNAME])) {
-            $_POST[Configuration::API_TOKEN_USERNAME] = '';
-        }
-        $configuration->set($_POST);
-        
-        # If this is NOT a remote REDCap configuration, set SSL certificate verification
-        # to the global value (this can only be set in the configuration for remote
-        # REDCap configurations)
-        $apiUrl = $configuration->getProperty(Configuration::REDCAP_API_URL);
-        if (strcmp($apiUrl, $module->getRedCapApiUrl()) === 0) {
-            $configuration->setProperty(Configuration::SSL_VERIFY, $adminConfig->getSslVerify());
-        }
+try {
+    #-----------------------------------------------------------
+    # Check that the user has permission to access this page
+    # and get the configuration if one was specified
+    #-----------------------------------------------------------
+    $configuration = $module->checkUserPagePermission(USERID);
+    $configName = '';
+    if (!empty($configuration)) {
+        $configName = $configuration->getName();
         $properties = $configuration->getProperties();
     }
-    
-    #----------------------------------------------
-    # Check API token specification
-    #----------------------------------------------
-    $localApiUrl = $module->getRedCapApiUrl();
-    $apiTokenUser = '';
 
-    $apiUrl = $configuration->getProperty(Configuration::REDCAP_API_URL);
-    if ($testMode && strcmp($apiUrl, $module->getRedCapApiUrl()) !== 0) {
-        ; // Test mode, so remote REDCap is being used, so no checks can be done
-        # In test mode:
-        # - the REDCap API URL becomes editable for admins
-        # - if the REDCap API URL is changed so that it does not match the API URL of local REDCap,
-        #   the API token user is ignored
-        # -
-    } else {
-        if (empty($configuration->getProperty(Configuration::API_TOKEN_USERNAME))) {
-            # No API token user was specified, set the API token to blank
-            $configuration->setProperty(Configuration::DATA_SOURCE_API_TOKEN, '');
+    #-------------------------------------------------------------------
+    # Check for test mode (which should only be used for development)
+    #-------------------------------------------------------------------
+    $testMode = false;
+    if (@file_exists(__DIR__.'/../test-config.ini')) {
+        $testMode = true;
+    }
+
+    if (array_key_exists('success', $_GET)) {
+        $success = Filter::stripTags($_GET['success']);
+    }
+
+    if (array_key_exists('warning', $_GET)) {
+        $warning = Filter::stripTags($_GET['warning']);
+    }
+
+    $listUrl  = $module->getUrl("web/index.php");
+    $selfUrl  = $module->getUrl("web/configure.php");
+    $generateRulesUrl = $module->getUrl('web/generate_rules.php');
+
+    $adminConfig = $module->getAdminConfig();
+
+
+    /** @var array configurations property map from property name to value */
+    $properties = array();
+
+    $redCapDb = new RedCapDb();
+
+
+
+    if (!empty($configuration)) {
+        #--------------------------------------------------------------
+        # Get the API tokens for this project with export permission,
+        # and the username of user whose API token should be used
+        # (if any)
+        #--------------------------------------------------------------
+        $exportRight  = $configuration->getDataExportRight();
+        $apiTokens    = $redCapDb->getApiTokens(PROJECT_ID, $exportRight);
+        $apiTokenUser = $configuration->getProperty(Configuration::API_TOKEN_USERNAME);
+        
+        
+        #-------------------------
+        # Get the submit value
+        #-------------------------
+        $submitValue = '';
+        if (array_key_exists('submitValue', $_POST)) {
+            $submitValue = Filter::stripTags($_POST['submitValue']);
+        }
+        
+        #---------------------------------------------------------------
+        # if this is a POST other than Cancel,
+        # update the configuration properties with the POST values
+        #---------------------------------------------------------------
+        if (!empty($submitValue) && strcasecmp($submitValue, 'Cancel')) {
+            $_POST = array_map('strip_tags', $_POST);
+            $_POST = array_map('trim', $_POST);
+
+            if (!isset($_POST[Configuration::API_TOKEN_USERNAME])) {
+                $_POST[Configuration::API_TOKEN_USERNAME] = '';
+            }
+            $configuration->set($_POST);
+            
+            # If this is NOT a remote REDCap configuration, set SSL certificate verification
+            # to the global value (this can only be set in the configuration for remote
+            # REDCap configurations)
+            $apiUrl = $configuration->getProperty(Configuration::REDCAP_API_URL);
+            if (strcmp($apiUrl, $module->getRedCapApiUrl()) === 0) {
+                $configuration->setProperty(Configuration::SSL_VERIFY, $adminConfig->getSslVerify());
+            }
+            $properties = $configuration->getProperties();
+        }
+        
+        #----------------------------------------------
+        # Check API token specification
+        #----------------------------------------------
+        $localApiUrl = $module->getRedCapApiUrl();
+        $apiTokenUser = '';
+
+        $apiUrl = $configuration->getProperty(Configuration::REDCAP_API_URL);
+        if ($testMode && strcmp($apiUrl, $module->getRedCapApiUrl()) !== 0) {
+            ; // Test mode, so remote REDCap is being used, so no checks can be done
+            # In test mode:
+            # - the REDCap API URL becomes editable for admins
+            # - if the REDCap API URL is changed so that it does not match the API URL of local REDCap,
+            #   the API token user is ignored
+            # -
         } else {
-            $apiTokenUser = $configuration->getProperty(Configuration::API_TOKEN_USERNAME);
-            # An API token user was specified
-            if (!array_key_exists($apiTokenUser, $apiTokens)) {
-                $warning = 'WARNING: user "'.$apiTokenUser.'" does not'
-                    .' have an API token for this project. API token user reset to blank.';
-                # The API token user does not have a valid API token, so set it to blank
-                $configuration->setProperty(Configuration::API_TOKEN_USERNAME, '');
+            if (empty($configuration->getProperty(Configuration::API_TOKEN_USERNAME))) {
+                # No API token user was specified, set the API token to blank
                 $configuration->setProperty(Configuration::DATA_SOURCE_API_TOKEN, '');
             } else {
-                # A valid API token user was specified, so set the API token to the
-                # value for this user
-                $configuration->setProperty(
-                    Configuration::DATA_SOURCE_API_TOKEN,
-                    $apiTokens[$apiTokenUser]
-                );
-            }
-        }
-    }
-    
-    
-    # Reset properties, since they may have been modified above
-    $properties = $configuration->getProperties();
-    
-    
-    #------------------------------------------------------
-    # Process Actions
-    #------------------------------------------------------
-    try {
-        if (strcasecmp($submitValue, 'Cancel') === 0) {
-            header('Location: '.$listUrl);
-        } elseif (strcasecmp($submitValue, 'Save') === 0) {
-            if (empty($warning) && empty($error)) {
-                $configuration->validate();
-                $module->setConfiguration($configuration);  // Save configuration to database
-            }
-        } elseif (strcasecmp($submitValue, 'Save and Exit') === 0) {
-            if (empty($warning) && empty($error)) {
-                $configuration->validate();
-                $module->setConfiguration($configuration);  // Save configuration to database
-                $location = 'Location: '.$listUrl;
-                header($location);
-            }
-        } elseif (strcasecmp($submitValue, 'Upload CSV file') === 0) {
-            $uploadFileName = $_FILES['uploadCsvFile']['tmp_name'];
-            if (empty($uploadFileName)) {
-                $error = 'ERROR: No upload transformation rules file specified.';
-            } else {
-                $fileContents = file_get_contents($uploadFileName);
-                if ($fileContents === false) {
-                    $error = 'ERROR: Unable to upload transformation rules file "'
-                        .$_FILES['uploadCsvFile']['tmp_name'].'"';
+                $apiTokenUser = $configuration->getProperty(Configuration::API_TOKEN_USERNAME);
+                # An API token user was specified
+                if (!array_key_exists($apiTokenUser, $apiTokens)) {
+                    $warning = 'WARNING: user "'.$apiTokenUser.'" does not'
+                        .' have an API token for this project. API token user reset to blank.';
+                    # The API token user does not have a valid API token, so set it to blank
+                    $configuration->setProperty(Configuration::API_TOKEN_USERNAME, '');
+                    $configuration->setProperty(Configuration::DATA_SOURCE_API_TOKEN, '');
                 } else {
-                    $properties[Configuration::TRANSFORM_RULES_TEXT] = $fileContents;
+                    # A valid API token user was specified, so set the API token to the
+                    # value for this user
+                    $configuration->setProperty(
+                        Configuration::DATA_SOURCE_API_TOKEN,
+                        $apiTokens[$apiTokenUser]
+                    );
                 }
-            }
-        } elseif (strcasecmp($submitValue, 'Download CSV file') === 0) {
-            $downloadFileName = 'rules.csv';
-            header('Content-Type: text/csv');
-            //header("Content-Transfer-Encoding: Binary");
-            header("Content-disposition: attachment; filename=\"" . $downloadFileName . "\"");
-            echo $properties[Configuration::TRANSFORM_RULES_TEXT];
-            return;
-        } elseif (strcasecmp($submitValue, 'Auto-Generate') === 0) {
-            $apiUrl    = $configuration->getProperty(Configuration::REDCAP_API_URL);
-            $dataToken = $configuration->getProperty(Configuration::DATA_SOURCE_API_TOKEN);
-
-            if (empty($apiUrl)) {
-                $error = 'ERROR: No REDCap API URL specified.';
-            } elseif (empty($dataToken)) {
-                $error = 'ERROR: No data source API token information specified.';
-            } else {
-                $existingRulesText = $properties[Configuration::TRANSFORM_RULES_TEXT];
-                $areExistingRules = false;
-                if (!empty($existingRulesText)) {
-                    # WARN that existing rules will be overwritten
-                    # ...
-                    $areExistingRules = true;
-                    #echo
-                    #"<script>\n"
-                    #.'$("#rules-overwrite-dialog").dialog("open");'."\n"
-                    #."</script>\n"
-                    #;
-                }
-                $dataProject = new \IU\REDCapETL\EtlRedCapProject($apiUrl, $dataToken);
-                // ADD ...$sslVerify = true, $caCertFile = null);
-                        
-                $rulesGenerator = new \IU\REDCapETL\RulesGenerator();
-                $rulesText = $rulesGenerator->generate($dataProject);
-                $properties[Configuration::TRANSFORM_RULES_TEXT] = $rulesText;
-                #print "$rulesText\n";
             }
         }
-    } catch (\Exception $exception) {
-        $error = 'ERROR: '.$exception->getMessage();
-    }
-}  // END - if configuration is not empty
+        
+        
+        # Reset properties, since they may have been modified above
+        $properties = $configuration->getProperties();
+        
+        
+        #------------------------------------------------------
+        # Process Actions
+        #------------------------------------------------------
+        try {
+            if (strcasecmp($submitValue, 'Cancel') === 0) {
+                header('Location: '.$listUrl);
+            } elseif (strcasecmp($submitValue, 'Save') === 0) {
+                if (empty($warning) && empty($error)) {
+                    $configuration->validate();
+                    $module->setConfiguration($configuration);  // Save configuration to database
+                }
+            } elseif (strcasecmp($submitValue, 'Save and Exit') === 0) {
+                if (empty($warning) && empty($error)) {
+                    $configuration->validate();
+                    $module->setConfiguration($configuration);  // Save configuration to database
+                    $location = 'Location: '.$listUrl;
+                    header($location);
+                }
+            } elseif (strcasecmp($submitValue, 'Upload CSV file') === 0) {
+                $uploadFileName = $_FILES['uploadCsvFile']['tmp_name'];
+                if (empty($uploadFileName)) {
+                    $error = 'ERROR: No upload transformation rules file specified.';
+                } else {
+                    $fileContents = file_get_contents($uploadFileName);
+                    if ($fileContents === false) {
+                        $error = 'ERROR: Unable to upload transformation rules file "'
+                            .$_FILES['uploadCsvFile']['tmp_name'].'"';
+                    } else {
+                        $properties[Configuration::TRANSFORM_RULES_TEXT] = $fileContents;
+                    }
+                }
+            } elseif (strcasecmp($submitValue, 'Download CSV file') === 0) {
+                $downloadFileName = 'rules.csv';
+                header('Content-Type: text/csv');
+                //header("Content-Transfer-Encoding: Binary");
+                header("Content-disposition: attachment; filename=\"" . $downloadFileName . "\"");
+                echo $properties[Configuration::TRANSFORM_RULES_TEXT];
+                return;
+            } elseif (strcasecmp($submitValue, 'Auto-Generate') === 0) {
+                $apiUrl    = $configuration->getProperty(Configuration::REDCAP_API_URL);
+                $dataToken = $configuration->getProperty(Configuration::DATA_SOURCE_API_TOKEN);
+
+                if (empty($apiUrl)) {
+                    $error = 'ERROR: No REDCap API URL specified.';
+                } elseif (empty($dataToken)) {
+                    $error = 'ERROR: No data source API token information specified.';
+                } else {
+                    $existingRulesText = $properties[Configuration::TRANSFORM_RULES_TEXT];
+                    $areExistingRules = false;
+                    if (!empty($existingRulesText)) {
+                        # WARN that existing rules will be overwritten
+                        # ...
+                        $areExistingRules = true;
+                        #echo
+                        #"<script>\n"
+                        #.'$("#rules-overwrite-dialog").dialog("open");'."\n"
+                        #."</script>\n"
+                        #;
+                    }
+                    $dataProject = new \IU\REDCapETL\EtlRedCapProject($apiUrl, $dataToken);
+                    // ADD ...$sslVerify = true, $caCertFile = null);
+                            
+                    $rulesGenerator = new \IU\REDCapETL\RulesGenerator();
+                    $rulesText = $rulesGenerator->generate($dataProject);
+                    $properties[Configuration::TRANSFORM_RULES_TEXT] = $rulesText;
+                    #print "$rulesText\n";
+                }
+            }
+        } catch (\Exception $exception) {
+            $error = 'ERROR: '.$exception->getMessage();
+        }
+    }  // END - if configuration is not empty
+} catch (\Exception $exception) {
+    $error = 'ERROR: '.$exception->getMessage();
+}
 ?>
 
 
@@ -229,9 +232,6 @@ require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 
 <?php
 
-#print "<pre>\n";
-#print_r($_POST);
-#print "</pre>\n";
 
 #print '<br/>TRANSFORM RULES: '.$properties[Configuration::TRANSFORM_RULES_TEXT]."<br/>\n";
 #print "submitValue {$submitValue}\n";
@@ -248,11 +248,6 @@ require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 #print "tmp file: {$tmp}<br />\n";
 #$fileContents = file_get_contents($_FILES['uploadCsvFile']['tmp_name']);
 #print "\nCONTENTS: <pre>{$fileContents}</pre>\n\n";
-
-#$rights = $module->getUserRights();
-#print "<pre>\n";
-#print_r($rights);
-#print "</pre>\n";
 
  
 ?>

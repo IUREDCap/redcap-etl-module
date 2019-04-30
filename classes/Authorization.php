@@ -9,13 +9,15 @@ namespace IU\RedCapEtlModule;
 class Authorization
 {
     /**
-     * Indicates if the user has permission to access
+     * Indicates if the current user has permission to access
      * REDCap-ETL project pages for the current project.
+     *
+     * @param RedCapEtlModule $module REDCap-ETL external module.
      *
      * @return boolean true if the user has permission, and
      *     false otherwise.
      */
-    public static function hasEtlProjectPagePermission($module, $username)
+    public static function hasEtlProjectPagePermission($module)
     {
         $hasPermission = false;
 
@@ -23,9 +25,9 @@ class Authorization
         
         if ($module->isSuperUser()) {
             $hasPermission = true;
-        } elseif (!empty($projectId) && !empty($username)) {
-            if (self::hasRedCapUserRightsForEtl($module, $username)) {
-                $userEtlProjects = $module->getUserEtlProjects($username);
+        } elseif (!empty($projectId)) {
+            if (self::hasRedCapUserRightsForEtl($module)) {
+                $userEtlProjects = $module->getUserEtlProjects();
                 if (in_array($projectId, $userEtlProjects)) {
                     $hasPermission = true;
                 }
@@ -36,28 +38,35 @@ class Authorization
 
 
     /**
-     * Indicates if the specified user has permission to access the configuration
+     * Indicates if the current user has permission to access the configuration
      * with the specified configuration name for the specified project.
+     *
+     * @param RedCapEtlModule $module the REDCap-ETL external module.
+     * @param string $configName the name of the configuration for the permission check.
+     * @param int $projectId the project ID for the permission check.
+     *
+     * @return boolean true if the current user has access to the specified configuration,
+     *     and false otherwise.
      */
-    public static function hasEtlConfigNamePermission($module, $configName, $username, $projectId)
+    public static function hasEtlConfigNamePermission($module, $configName, $projectId)
     {
         $configuration = $module->getConfiguration($configName, $projectId);
-        $hasPermission = self::hasEtlConfigurationPermission($module, $configuration, $username);
+        $hasPermission = self::hasEtlConfigurationPermission($module, $configuration);
         return $hasPermission;
     }
     
     
     /**
-     * Indicates if the specified user has permission to access the specified configuration.
+     * Indicates if the current user has permission to access the specified configuration.
      */
-    public static function hasEtlConfigurationPermission($module, $configuration, $username)
+    public static function hasEtlConfigurationPermission($module, $configuration)
     {
         $hasPermission = false;
         if ($module->isSuperUser()) {
             $hasPermission = true;
         } else {
             $configExportRight = $configuration->getProperty(Configuration::DATA_EXPORT_RIGHT);
-            $userExportRight   = $module->getDataExportRight($username);
+            $userExportRight   = $module->getDataExportRight();
             if (!empty($configExportRight) && !empty($userExportRight)) {
                 if ($userExportRight == 1) {
                     # User has full data set export permission
@@ -77,13 +86,13 @@ class Authorization
     }
     
     /**
-     * Indicates if the user has the right to request permission to
+     * Indicates if the current user has the right to request permission to
      * use ETL on the current project.
      *
      * @return boolean true if the user has permission, and
      *     false otherwise.
      */
-    public static function hasEtlRequestPermission($module, $username)
+    public static function hasEtlRequestPermission($module)
     {
         $hasPermission = false;
 
@@ -91,9 +100,9 @@ class Authorization
         
         if ($module->isSuperUser()) {
             $hasPermission = true;
-        } elseif (!empty($projectId) && !empty($username)) {
-            $rights = $module->getUserRights($username);
-            if (self::hasRedCapUserRightsForEtl($module, $username) && $rights[$username]['data_export_tool'] > 0) {
+        } elseif (!empty($projectId)) {
+            $rights = $module->getUserRights();
+            if (self::hasRedCapUserRightsForEtl($module) && $rights['data_export_tool'] > 0) {
                 $hasPermission = true;
             }
         }
@@ -101,21 +110,21 @@ class Authorization
     }
     
     /**
-     * Indicates if the specified non-admin user has the REDCap user rights
+     * Indicates if the current user has the REDCap user rights
      * to access ETL for the current project (admins always have access).
      *
-     * @return boolean true if the user has permission, and
+     * @return boolean true if the user has permission (or is an admin), and
      *     false otherwise.
      */
-    public static function hasRedCapUserRightsForEtl($module, $username)
+    public static function hasRedCapUserRightsForEtl($module)
     {
         $hasPermission = false;
 
         if ($module->isSuperUser()) {
             $hasPermission = true;
-        } elseif (!empty($username)) {
-            $rights = $module->getUserRights($username);
-            if ($rights[$username]['design']) {
+        } else {
+            $rights = $module->getUserRights();
+            if ($rights['design']) {
                 $hasPermission = true;
             }
         }
