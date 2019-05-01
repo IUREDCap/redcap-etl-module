@@ -81,6 +81,15 @@ class Filter
     }
     
     /**
+     * Removes invalid characters for internal button labels.
+     */
+    public function sanitizeButtonLabel($value)
+    {
+        $value = preg_replace('/([^a-zA-Z0-9_\- .])/', '', $value);
+        return $value;
+    }
+    
+    /**
      * Removes tags and invalid characters for strings.
      */
     public function sanitizeString($value)

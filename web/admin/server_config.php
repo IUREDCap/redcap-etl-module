@@ -23,7 +23,7 @@ use IU\RedCapEtlModule\RedCapEtlModule;
 $selfUrl      = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
 $serversUrl   = $module->getUrl(RedCapEtlModule::SERVERS_PAGE);
 
-$submit = Filter::sanitizeLabel($_POST['submit']);
+$submit = Filter::sanitizeButtonLabel($_POST['submit']);
 
 
 #-------------------------------------------

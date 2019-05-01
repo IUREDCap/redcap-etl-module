@@ -42,7 +42,7 @@ try {
     #-------------------------
     $submitValue = '';
     if (array_key_exists('submitValue', $_POST)) {
-        $submitValue = Filter::stripTags($_POST['submitValue']);
+        $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
     }
 
     if (strcasecmp($submitValue, 'Save') === 0) {

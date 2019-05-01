@@ -51,7 +51,7 @@ try {
     #-------------------------
     $submit = '';
     if (array_key_exists('submit', $_POST)) {
-        $submit = Filter::stripTags($_POST['submit']);
+        $submit = Filter::sanitizeButtonLabel($_POST['submit']);
     }
 
     $runOutput = '';

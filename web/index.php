@@ -18,7 +18,7 @@ try {
     #-----------------------------------------------------------------
     # Process form submissions (configuration add/copy/delete/rename)
     #-----------------------------------------------------------------
-    $submitValue = Filter::stripTags($_POST['submitValue']);
+    $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
     if (strcasecmp($submitValue, 'add') === 0) {
         #--------------------------------------
         # Add configuration

@@ -16,25 +16,24 @@ use \IU\RedCapEtlModule\Csrf;
 use \IU\RedCapEtlModule\Filter;
 use \IU\RedCapEtlModule\RedCapEtlModule;
 
-$selfUrl = $module->getUrl(RedCapEtlModule::ADMIN_HOME_PAGE);
+try {
+    $selfUrl     = $module->getUrl(RedCapEtlModule::ADMIN_HOME_PAGE);
+    $cronInfoUrl = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);
 
-$cronInfoUrl = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);
+    $adminConfig = $module->getAdminConfig();
 
-$adminConfig = $module->getAdminConfig();
+    $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
-$submitValue = Filter::sanitizeLabel($_POST['submitValue']);
-
-if (strcasecmp($submitValue, 'Save') === 0) {
-    try {
+    if (strcasecmp($submitValue, 'Save') === 0) {
         $adminConfig->set($_POST);
         
         $module->setAdminConfig($adminConfig);
         $success = "Admin configuration saved.";
-    } catch (Exception $exception) {
-        $error = 'ERROR: '.$exception->getMessage();
     }
+} catch (Exception $exception) {
+    $error = 'ERROR: '.$exception->getMessage();
 }
-
+    
 ?>
 
 <?php #require_once APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>
