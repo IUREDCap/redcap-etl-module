@@ -146,7 +146,7 @@ that has at least the following permissions:
 <p>
 REDCap-ETL configurations allows post-processing SQL statements to be specified that
 are run after the ETL process completes. The database user will also need to have
-permission to execute any post-processing statements not coevered by the
+permission to execute any post-processing statements not covered by the
 permissions above.
 </p>
 
@@ -155,14 +155,14 @@ permissions above.
 <h5 style="font-weight: bold;">REDCap-ETL Logging</h5>
 
 <p>
-There are 2 options for logging the results of your ETL processes, and they can be used simulatenously:
+There are 2 options for logging the results of your ETL processes, and they can be used simultaneously:
 <ol>
-    <li><strong>Data Logging</strong> - REDCap-ETL, by default, logs to 2 tables in your
-    database where the your transformed data is loaded. The names of these tables
+    <li><strong>Data Logging</strong> - REDCap-ETL, by default, logs to 2 tables in the
+    database where your transformed data is loaded. The names of these tables
     can be changed in your configuration, or you can turn of this logging.</li>
     <li><strong>E-mail logging</strong> - you can specify in the ETL configuration that you
-    want to receive an e-mail when an error occurs and/or that you recieve an e-mail
-    summary of ETL processing when you process completes successfully.</li>
+    want to receive an e-mail when an error occurs and/or that you receive an e-mail
+    summary of ETL processing when your process completes successfully.</li>
 </ol>
 </p>
 
