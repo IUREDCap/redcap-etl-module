@@ -243,9 +243,15 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         }
         
         $details = '';
+        # If being run on remote REDCap
         if (strcasecmp($configUrl, $this->getRedCapApiUrl()) !== 0) {
             $details .= "REDCap API URL: {$configUrl}\n";
+        } else {
+            # If local REDCap is being used, set SSL verify to the global value
+            $sslVerify = $adminConfig->getSslVerify();
+            $etlConfig->setProperty(Configuration::SSL_VERIFY, $sslVerify);
         }
+        
         $details .= "project ID: {$projectId}\n";
         if (!$isCronJob) {
             $details .= "user: {$username}\n";

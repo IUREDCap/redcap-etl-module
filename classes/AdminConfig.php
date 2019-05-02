@@ -57,7 +57,7 @@ class AdminConfig implements \JsonSerializable
             }
         }
         
-        $ssVerify = true;
+        $this->sslVerify = true;
     }
 
 
@@ -143,7 +143,7 @@ class AdminConfig implements \JsonSerializable
         if (array_key_exists(self::SSL_VERIFY, $properties)) {
             $this->sslVerify = true;
         } else {
-            $this->sslVerify - false;
+            $this->sslVerify = false;
         }
     }
 

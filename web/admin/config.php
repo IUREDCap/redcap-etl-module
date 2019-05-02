@@ -83,7 +83,7 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     <input type="checkbox" name="<?php echo AdminConfig::SSL_VERIFY;?>" <?php echo $checked;?> >
     SSL certificate verification
     <br />
-    
+
     <?php
     #----------------------------------------------------
     # Allow Embedded Server
