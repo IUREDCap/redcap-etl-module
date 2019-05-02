@@ -99,7 +99,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function cron()
     {
-        #\REDCap::logEvent('REDCap-ETL cron function start');
+        #$this->log('REDCap-ETL cron() start');
         
         $adminConfig = $this->getAdminConfig();
             
@@ -109,12 +109,18 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $minutes = $now->format('i');
         $date    = $now->format('Y-m-d');
         
+        #$this->log('REDCap-ETL cron - date: '.$date.', hour: '.$hour);
+        
         if ($this->isLastRunTime($date, $hour)) {
             ; # Cron jobs for this time were already processed
             #\REDCap::logEvent('REDCap-ETL cron - cron jobs already processed.');
         } else {
+            # Set the last run time processed to this time, so that it won't be processed again
+            $this->setLastRunTime($date, $hour, $minutes);
+            
             $cronJobs = $this->getCronJobs($day, $hour);
             
+            #$this->log('REDCap-ETL cron - number of cron jobs: '.count($cronJobs));
             #\REDCap::logEvent('REDCap-ETL cron - '.count($cronJobs).' cron jobs.');
         
             foreach ($cronJobs as $cronJob) {
@@ -145,6 +151,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                     } else {
                         $etlConfig = $this->getConfiguration($configName, $projectId);
                         $isCronJob = true;
+                        
                         if (strcmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
                             #----------------------------------------------------
                             # Embedded server
@@ -154,8 +161,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                                 \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
                             } else {
                                 $serverConfig = null;
-                                    
+                                
+                                /*
                                 if ($isCronJob && function_exists('pcntl_fork') && function_exists('pcntl_wait')) {
+                                    $this->log("REDCap-ETL cron - trying to fork process");
                                     $pid = pcntl_fork();
                                     if ($pid === -1) {
                                         # The fork was unsuccessful (and this is the only thread)
@@ -168,9 +177,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                                         ; # the fork worked, and this is the parent process
                                     }
                                 } else {
+                                */
                                     # Forking not supported; run serially
                                     $this->run($etlConfig, $serverConfig, $isCronJob);
+                                /*
                                 }
+                                */
                             }
                         } else {
                             #--------------------------------------------------------------
@@ -187,16 +199,15 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                     \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
                 }
             }  # End foreach cron job
-            
-            # Set the last run time processed to this time, so that it won't be processed again
-            $this->setLastRunTime($date, $hour, $minutes);
                     
             # If forking is supported, wait for child processes (if any))
+            /*
             if (function_exists('pcntl_fork') && function_exists('pcntl_wait')) {
                 while (pcntl_wait($status) != -1) {
                     ; // Wait for all child processes to finish
                 }
             }
+            */
         }
     }
 
@@ -731,9 +742,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         # Don't log this because it is an internal event
     }
     
-    public function isLastRunTime($date, $time)
+    public function isLastRunTime($date, $hour)
     {
-        return $this->settings->isLastRunTime($date, $time);
+        return $this->settings->isLastRunTime($date, $hour);
     }
 
 
