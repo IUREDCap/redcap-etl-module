@@ -99,9 +99,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function cron()
     {
-        #$this->log('REDCap-ETL cron() start');
-        
-        $adminConfig = $this->getAdminConfig();
+        #\REDCap::logEvent('REDCap-ETL cron() start');
             
         $now = new \DateTime();
         $day     = $now->format('w');  // 0-6 (day of week; Sunday = 0)
@@ -145,22 +143,22 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
                     if (strcmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
                         # Running on the embedded server
-                        if (function_exists('pcntl_fork') && function_exists('pcntl_wait')) {
-                            $pid = pcntl_fork();
-                            if ($pid === -1) {
-                                # The fork was unsuccessful (and this is the only thread)
-                                $this->run($configName, $serverName, $isCronJob, $projectId);
-                            } elseif ($pid === 0) {
-                                # The fork was successful and this is the child process,
-                                $this->run($configName, $serverName, $isCronJob, $projectId);
-                                exit(0);
-                            } else {
-                                ; # the fork worked, and this is the parent process
-                            }
-                        } else {
+                        #if (function_exists('pcntl_fork') && function_exists('pcntl_wait')) {
+                        #    $pid = pcntl_fork();
+                        #    if ($pid === -1) {
+                        #        # The fork was unsuccessful (and this is the only thread)
+                        #        $this->run($configName, $serverName, $isCronJob, $projectId);
+                        #    } elseif ($pid === 0) {
+                        #        # The fork was successful and this is the child process,
+                        #        $this->run($configName, $serverName, $isCronJob, $projectId);
+                        #        exit(0);
+                        #    } else {
+                        #        ; # the fork worked, and this is the parent process
+                        #    }
+                        #} else {
                             # Forking not supported; run serially
                             $this->run($configName, $serverName, $isCronJob, $projectId);
-                        }
+                        #}
                     } else {
                         $this->run($configName, $serverName, $isCronJob, $projectId);
                     }
