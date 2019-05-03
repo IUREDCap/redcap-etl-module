@@ -61,12 +61,8 @@ try {
         } elseif (!isset($configuration)) {
             $error = 'ERROR: No ETL configuration found for '.$configName.'.';
         } else {
-            $serverConfig = null;
-            if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) !== 0) {
-                $serverConfig = $module->getServerConfig($server);
-            }
             $isCronJob = false;
-            $runOutput = $module->run($configuration, $serverConfig, $isCronJob);
+            $runOutput = $module->run($configName, $server, $isCronJob);
         }
     }
 } catch (Exception $exception) {
