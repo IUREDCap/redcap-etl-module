@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "18b57756a381045b03894d60e4644331",
-    "content-hash": "a29632699b8776dc6b8f1b49770e038c",
+    "hash": "7ddab65a95f4e029101878d26aac2af2",
+    "content-hash": "90342a0fe90844bdc832066a2144aa37",
     "packages": [
         {
             "name": "iu-redcap/redcap-etl",
-            "version": "0.6.6",
+            "version": "0.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/redcap-etl.git",
-                "reference": "0eee1fd33459c1853428b196acc9cc7e853db470"
+                "reference": "9dfcf920f0d2f47b6379d048934529c1cec7a89f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/0eee1fd33459c1853428b196acc9cc7e853db470",
-                "reference": "0eee1fd33459c1853428b196acc9cc7e853db470",
+                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/9dfcf920f0d2f47b6379d048934529c1cec7a89f",
+                "reference": "9dfcf920f0d2f47b6379d048934529c1cec7a89f",
                 "shasum": ""
             },
             "require": {
@@ -49,7 +49,7 @@
                 "etl",
                 "redcap"
             ],
-            "time": "2019-04-17 15:24:48"
+            "time": "2019-05-07 17:37:34"
         },
         {
             "name": "phpcap/phpcap",
@@ -490,16 +490,16 @@
         },
         {
             "name": "phpdocumentor/reflection-docblock",
-            "version": "4.3.0",
+            "version": "4.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/ReflectionDocBlock.git",
-                "reference": "94fd0001232e47129dd3504189fa1c7225010d08"
+                "reference": "bdd9f737ebc2a01c06ea7ff4308ec6697db9b53c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/94fd0001232e47129dd3504189fa1c7225010d08",
-                "reference": "94fd0001232e47129dd3504189fa1c7225010d08",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/bdd9f737ebc2a01c06ea7ff4308ec6697db9b53c",
+                "reference": "bdd9f737ebc2a01c06ea7ff4308ec6697db9b53c",
                 "shasum": ""
             },
             "require": {
@@ -537,7 +537,7 @@
                 }
             ],
             "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
-            "time": "2017-11-30 07:14:17"
+            "time": "2019-04-30 17:48:53"
         },
         {
             "name": "phpdocumentor/type-resolver",
