@@ -38,6 +38,10 @@ class Configuration implements \JsonSerializable
 
     const DB_CONNECTION = 'db_connection';
     
+    const DB_SSL        = 'db_ssl';
+    const DB_SSL_VERIFY = 'db_ssl_verify';
+    const CA_CERT_FILE  = 'ca_cert_file';
+    
     const BATCH_SIZE = 'batch_size';
 
     const TABLE_PREFIX = 'table_prefix';

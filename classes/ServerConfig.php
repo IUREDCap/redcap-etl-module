@@ -38,6 +38,10 @@ class ServerConfig implements \JsonSerializable
     private $emailFromAddress;
     private $enableErrorEmail;
     private $enableSummaryEmail;
+    
+    private $dbSsl;
+    private $dbSslVerify;
+    private $caCertFile;
 
 
     public function __construct($name)
@@ -60,6 +64,20 @@ class ServerConfig implements \JsonSerializable
         $this->emailFromAddres = '';
         $this->enableErrorEmail   = false;
         $this->enableSummaryEmail = false;
+        
+        if ($this->isEmbeddedServer()) {
+            $this->enableErrorEmail   = true;
+            $this->enableSummaryEmail = true;
+        
+            // phpcs:disable
+            $homepageContactEmail = $homepage_contact_email;
+            // phpcs:enable
+            $this->emailFromAddress = $homepageContactEmail;
+        }
+        
+        $this->dbSsl = true;
+        $this->dbSslVerify = false;
+        $this->caCertFile = '';
     }
 
     /**
@@ -124,6 +142,8 @@ class ServerConfig implements \JsonSerializable
      */
     private function updateEtlConfig(& $etlConfig, $isCronJob)
     {
+        $etlConfig->setProperty(Configuration::CRON_JOB, $isCronJob);
+        
         $etlConfig->setProperty(Configuration::LOG_FILE, $this->logFile);
         
         $projectId   = $etlConfig->getProjectId();
@@ -146,6 +166,10 @@ class ServerConfig implements \JsonSerializable
         if (!$this->getEnableSummaryEmail()) {
             $etlConfig->setProperty(Configuration::EMAIL_SUMMARY, false);
         }
+        
+        $etlConfig->setProperty(Configuration::DB_SSL, $this->getDbSsl());
+        $etlConfig->setProperty(Configuration::DB_SSL_VERIFY, $this->getDbSslVerify());
+        $etlConfig->setProperty(Configuration::CA_CERT_FILE, $this->getCaCertFile());
     }
     
     /**
@@ -167,72 +191,96 @@ class ServerConfig implements \JsonSerializable
             $message = 'Server "'.$this->name.'" have been inactivated.';
             throw new \Exception($message);
         }
-        
-        if (empty($this->serverAddress)) {
-            $message = $this->createServerErrorMessageForUser('no server address specified');
-            throw new \Exception($message);
-        }
-        
-        if ($this->authMethod == self::AUTH_METHOD_PASSWORD) {
-            $ssh = new SSH2($this->serverAddress);
-            $ssh->login($username, $this->password);
-        } elseif ($this->authMethod == self::AUTH_METHOD_SSH_KEY) {
-            $keyFile = $this->getSshKeyFile();
+
+        if ($this->isEmbeddedServer()) {
+            #-------------------------------------------------
+            # Embedded server
+            #-------------------------------------------------
+            $properties = $etlConfig->getPropertiesArray();
+            $properties[Configuration::PRINT_LOGGING] = false;
             
-            if (empty($keyFile)) {
-                $message = $this->createServerErrorMessageForUser('no SSH key file was specified');
-                throw new \Exception($message);
+            $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
+
+            try {
+                $redCapEtl = new \IU\REDCapETL\RedCapEtl($logger, $properties);
+                $redCapEtl->run();
+            } catch (\Exception $exception) {
+                $logger->logException($exception);
+                $logger->log('Processing failed.');
             }
-            
-            #\REDCap::logEvent('REDCap-ETL run current user: '.get_current_user());
-                        
-            $key = new RSA();
-            $key->setPassword($this->sshKeyPassword);
-            
-            $keyFileContents = file_get_contents($keyFile);
-            
-            if ($keyFileContents === false) {
-                $message = $this->createServerErrorMessageForUser('SSH key file could not be accessed');
-                throw new \Exception($message);
-            }
-            $key->loadKey($keyFileContents);
-            $ssh = new SSH2($this->serverAddress);
-            $ssh->login($this->username, $key);
+
+            $output = implode("\n", $logger->getLogArray());
         } else {
-            $message = $this->createServerErrorMessageForUser('unrecognized authentication menthod');
-            throw new \Exception($message);
-        }
+            #-------------------------------------------------
+            # Remote server
+            #-------------------------------------------------
+
+            if (empty($this->serverAddress)) {
+                $message = $this->createServerErrorMessageForUser('no server address specified');
+                throw new \Exception($message);
+            }
+            
+            if ($this->authMethod == self::AUTH_METHOD_PASSWORD) {
+                $ssh = new SSH2($this->serverAddress);
+                $ssh->login($username, $this->password);
+            } elseif ($this->authMethod == self::AUTH_METHOD_SSH_KEY) {
+                $keyFile = $this->getSshKeyFile();
                 
-        #------------------------------------------------
-        # Copy configuration file and transformation
-        # rules file (if any) to the server.
-        #------------------------------------------------
-        $fileNameSuffix = uniqid('', true);
-        $scp = new SCP($ssh);
-        
-        $propertiesJson = $etlConfig->getRedCapEtlJsonProperties();
-        $configFileName = 'etl_config_'.$fileNameSuffix.'.json';
-        $configFilePath = $this->configDir.'/'.$configFileName;
-
-        $scpResult = $scp->put($configFilePath, $propertiesJson);
-        if (!$scpResult) {
-            $message = 'Copy of ETL configuration to server failed.'
-                . ' Please contact your system administrator for assistance.';
-            throw new \Exception($message);
-        }
-        
-        #$ssh->setTimeout(1);
-
-        $command = $this->etlCommandPrefix.' '.$this->etlCommand . ' ' . $configFilePath.' '.$this->etlCommandSuffix;
-
-        #\REDCap::logEvent('REDCap-ETL run command: '.$command);
-
-        $ssh->setTimeout(1.0);  # to prevent blocking
+                if (empty($keyFile)) {
+                    $message = $this->createServerErrorMessageForUser('no SSH key file was specified');
+                    throw new \Exception($message);
+                }
                 
-        $execOutput = $ssh->exec($command);
-        
-        $output = 'Your job has been submitted to server "'.$this->getName().'".'."\n";
-        #\REDCap::logEvent('REDCap-ETL run output: '.$output);
+                #\REDCap::logEvent('REDCap-ETL run current user: '.get_current_user());
+                            
+                $key = new RSA();
+                $key->setPassword($this->sshKeyPassword);
+                
+                $keyFileContents = file_get_contents($keyFile);
+                
+                if ($keyFileContents === false) {
+                    $message = $this->createServerErrorMessageForUser('SSH key file could not be accessed');
+                    throw new \Exception($message);
+                }
+                $key->loadKey($keyFileContents);
+                $ssh = new SSH2($this->serverAddress);
+                $ssh->login($this->username, $key);
+            } else {
+                $message = $this->createServerErrorMessageForUser('unrecognized authentication menthod');
+                throw new \Exception($message);
+            }
+                    
+            #------------------------------------------------
+            # Copy configuration file and transformation
+            # rules file (if any) to the server.
+            #------------------------------------------------
+            $fileNameSuffix = uniqid('', true);
+            $scp = new SCP($ssh);
+            
+            $propertiesJson = $etlConfig->getRedCapEtlJsonProperties();
+            $configFileName = 'etl_config_'.$fileNameSuffix.'.json';
+            $configFilePath = $this->configDir.'/'.$configFileName;
+
+            $scpResult = $scp->put($configFilePath, $propertiesJson);
+            if (!$scpResult) {
+                $message = 'Copy of ETL configuration to server failed.'
+                    . ' Please contact your system administrator for assistance.';
+                throw new \Exception($message);
+            }
+            
+            #$ssh->setTimeout(1);
+
+            $command = $this->etlCommandPrefix.' '.$this->etlCommand .' '.$configFilePath.' '.$this->etlCommandSuffix;
+
+            #\REDCap::logEvent('REDCap-ETL run command: '.$command);
+
+            $ssh->setTimeout(1.0);  # to prevent blocking
+                    
+            $execOutput = $ssh->exec($command);
+            
+            $output = 'Your job has been submitted to server "'.$this->getName().'".'."\n";
+            #\REDCap::logEvent('REDCap-ETL run output: '.$output);
+        }  // End else not embedded server
         
         return $output;
     }
@@ -304,12 +352,29 @@ class ServerConfig implements \JsonSerializable
         } elseif (!is_string($name)) {
             throw new \Exception('Server configuration name is not a string; has type: '.gettype($name).'.');
         } elseif (preg_match('/([^a-zA-Z0-9_\- .])/', $name, $matches) === 1) {
-            $errorMessage = 'Invalid character in server configuration name: '.$matches[0];
-            throw new \Exception($errorMessage);
+            if (strcasecmp($name, self::EMBEDDED_SERVER_NAME) !== 0) {
+                $errorMessage = 'Invalid character in server configuration name: '.$matches[0];
+                throw new \Exception($errorMessage);
+            }
         }
         return true;
     }
-        
+
+    /**
+     * Indicates if the server is an embedded server.
+     *
+     * @return boolean true if the server is an embedded server, and false if the server
+     *     is a remote server.
+     */
+    public function isEmbeddedServer()
+    {
+        $isEmbedded = false;
+        if (strcasecmp($this->name, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
+            $isEmbedded = true;
+        }
+        return $isEmbedded;
+    }
+    
     public function getName()
     {
         return $this->name;
@@ -399,5 +464,20 @@ class ServerConfig implements \JsonSerializable
     public function getEnableSummaryEmail()
     {
         return $this->enableSummaryEmail;
+    }
+    
+    public function getDbSsl()
+    {
+        return $this->dbSsl;
+    }
+    
+    public function getDbSslVerify()
+    {
+        return $this->dbSslVerify;
+    }
+    
+    public function getCaCertFile()
+    {
+        return $this->caCertFile;
     }
 }

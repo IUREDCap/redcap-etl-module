@@ -183,8 +183,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      * Runs an ETL job. Top-level method for running an ETL job that all code should call,
      * so that there is one place to do REDCap authorization checks and logging.
      *
-     * @param Configuration $etlConfig REDCap-ETL configuration to run
-     * @param ServerConfig $serverConfig server to run on; if empty, use embedded server
+     * @param string $configName the name of the REDCap-ETL configuration to run
+     * @param string $serverName name of server to run on
      * @param boolean $isCronJon indicates whether this is being called from a cron job or not.
      *
      * @return string the status of the run.
@@ -211,13 +211,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             #---------------------------------------------
             if (empty($serverName)) {
                 throw new \Exception('No server specified.');
-            } elseif (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
-                # Embedded server
-                if (!$adminConfig->getAllowEmbeddedServer()) {
-                    throw new \Exception('The embedded server has been disabled, and cannot be used.');
-                }
             } else {
-                $server = $this->getServerConfig($serverName); # Method throws exception if server not found
+                $serverConfig = $this->getServerConfig($serverName); # Method throws exception if server not found
+                if (!$serverConfig->getIsActive()) {
+                    throw new \Exception('Server "'.$serverName.'" has been deactivated and cannot be used.');
+                }
             }
             
             $configUrl  = $etlConfig->getProperty(Configuration::REDCAP_API_URL);
@@ -292,12 +290,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             #------------------------------------------------------------------------
             # If no server configuration was specified, run on the embedded server
             #------------------------------------------------------------------------
-            if (empty($serverConfig)) {
-                $status = $this->runEmbedded($etlConfig, $isCronJob);
-            } else {
-                # Run on the specified server
-                $status = $serverConfig->run($etlConfig, $isCronJob);
-            }
+            #if (empty($serverConfig)) {
+            #    $status = $this->runEmbedded($etlConfig, $isCronJob);
+            #} else {
+            #    # Run on the specified server
+            #    $status = $serverConfig->run($etlConfig, $isCronJob);
+            #}
+            $status = $serverConfig->run($etlConfig, $isCronJob);
         } catch (\Exception $exception) {
             $details = "ETL job failed\n".$details
                 .'error: '.$exception->getMessage();
@@ -312,38 +311,38 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     /**
      * Runs an ETL configuration on the embedded server.
      */
-    private function runEmbedded($etlConfiguration, $isCronJob = false)
-    {
-        $properties = $etlConfiguration->getPropertiesArray();
- 
-        $adminConfig = $this->getAdminConfig();
-        
-        $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
-
-        try {
-            # Set the from e-mail address from the admin. configuration
-            $properties[Configuration::EMAIL_FROM_ADDRESS] = $adminConfig->getEmbeddedServerEmailFromAddress();
-        
-            # Set the log file, and set print logging off
-            $properties[Configuration::LOG_FILE]      = $adminConfig->getEmbeddedServerLogFile();
-            $properties[Configuration::PRINT_LOGGING] = false;
-
-            # Set process identifting properties
-            $properties[Configuration::PROJECT_ID]   = $etlConfiguration->getProjectId();
-            $properties[Configuration::CONFIG_NAME]  = $etlConfiguration->getName();
-            $properties[Configuration::CONFIG_OWNER] = $etlConfiguration->getUsername();
-            $properties[Configuration::CRON_JOB]     = $isCronJob;
-
-            $redCapEtl = new \IU\REDCapETL\RedCapEtl($logger, $properties);
-            $redCapEtl->run();
-        } catch (\Exception $exception) {
-            $logger->logException($exception);
-            $logger->log('Processing failed.');
-        }
-
-        $status = implode("\n", $logger->getLogArray());
-        return $status;
-    }
+    #private function runEmbedded($etlConfiguration, $isCronJob = false)
+    #{
+    #    $properties = $etlConfiguration->getPropertiesArray();
+    #
+    #    $adminConfig = $this->getAdminConfig();
+    #
+    #    $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
+    #
+    #    try {
+    #        # Set the from e-mail address from the admin. configuration
+    #        $properties[Configuration::EMAIL_FROM_ADDRESS] = $adminConfig->getEmbeddedServerEmailFromAddress();
+    #
+    #        # Set the log file, and set print logging off
+    #        $properties[Configuration::LOG_FILE]      = $adminConfig->getEmbeddedServerLogFile();
+    #        $properties[Configuration::PRINT_LOGGING] = false;
+    #
+    #        # Set process identifting properties
+    #        $properties[Configuration::PROJECT_ID]   = $etlConfiguration->getProjectId();
+    #        $properties[Configuration::CONFIG_NAME]  = $etlConfiguration->getName();
+    #        $properties[Configuration::CONFIG_OWNER] = $etlConfiguration->getUsername();
+    #        $properties[Configuration::CRON_JOB]     = $isCronJob;
+    #
+    #        $redCapEtl = new \IU\REDCapETL\RedCapEtl($logger, $properties);
+    #        $redCapEtl->run();
+    #    } catch (\Exception $exception) {
+    #        $logger->logException($exception);
+    #        $logger->log('Processing failed.');
+    #    }
+    #
+    #    $status = implode("\n", $logger->getLogArray());
+    #    return $status;
+    #}
     
     
     
@@ -731,6 +730,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     #==================================================================================
     # Server Config methods
     #==================================================================================
+    
+    public function serverConfigExists($serverName)
+    {
+        return $this->settings->serverConfigExists($serverName);
+    }
     
     public function getServerConfig($serverName)
     {

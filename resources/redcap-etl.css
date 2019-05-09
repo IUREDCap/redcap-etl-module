@@ -79,3 +79,18 @@ td.time-range {
 img.disabled {
     opacity: 0.33;
 }
+
+fieldset.server-config {
+    padding: 7px;
+    margin-bottom: 14px;
+    border: 1px solid black;
+    background-color: #FCFEF5; /* #FCFFF9; #FBFDFF; */
+}
+
+fieldset.server-config td {
+    padding-right: 1em;
+}
+
+fieldset.server-config legend {
+    font-weight: bold;
+}

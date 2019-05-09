@@ -94,6 +94,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
 <?php
 #print '<pre>'; print_r($props); print '</pre>'."\n";
+#print '<pre>'; print_r($servers); print '</pre>'."\n";
 ?>
 
 <?php
@@ -127,7 +128,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
 <!-- Run form -->
 <?php
-$allowEmbeddedServer = $adminConfig->getAllowEmbeddedServer();
+#$allowEmbeddedServer = $adminConfig->getAllowEmbeddedServer();
 ?>
 <form action="<?php echo $selfUrl;?>" method="post">
     <fieldset style="border: 2px solid #ccc; border-radius: 7px; padding: 7px;">
@@ -141,22 +142,23 @@ $allowEmbeddedServer = $adminConfig->getAllowEmbeddedServer();
             onclick='$("#runOutput").text(""); $("body").css("cursor", "progress");'/>
         on
         <?php
-
+        
         echo '<select name="server">'."\n";
             
-        if ($adminConfig->getAllowEmbeddedServer()) {
-            $selected = '';
-            if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
-                $selected = 'selected';
-            }
-      
-            echo '<option value="'.ServerConfig::EMBEDDED_SERVER_NAME.'" '.$selected.'>'
-                .ServerConfig::EMBEDDED_SERVER_NAME
-                .'</option>'."\n";
-        }
+        #if ($adminConfig->getAllowEmbeddedServer()) {
+        #    $selected = '';
+        #    if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
+        #        $selected = 'selected';
+        #    }
+        #
+        #    echo '<option value="'.ServerConfig::EMBEDDED_SERVER_NAME.'" '.$selected.'>'
+        #        .ServerConfig::EMBEDDED_SERVER_NAME
+        #        .'</option>'."\n";
+        #}
         
         foreach ($servers as $serverName) {
             $serverConfig = $module->getServerConfig($serverName);
+            
             if (isset($serverConfig) && $serverConfig->getIsActive()) {
                 $selected = '';
                 if ($serverName === $server) {

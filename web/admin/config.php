@@ -81,10 +81,11 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     }
     ?>
     <input type="checkbox" name="<?php echo AdminConfig::SSL_VERIFY;?>" <?php echo $checked;?> >
-    SSL certificate verification
+    REDCap SSL certificate verification
     <br />
 
     <?php
+    /*
     #----------------------------------------------------
     # Allow Embedded Server
     #----------------------------------------------------
@@ -97,7 +98,7 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     Allow embedded REDCap-ETL server
     (<?php echo Version::RELEASE_NUMBER;?>)
     <br />
-    
+
     <span  style="padding-left: 4em;">Embedded server e-mail from address: </span>
     <input type="text" name="<?php echo AdminConfig::EMBEDDED_SERVER_EMAIL_FROM_ADDRESS;?>" size="50"
         value="<?php echo Filter::escapeForHtmlAttribute($adminConfig->getEmbeddedServerEmailFromAddress());?>">
@@ -107,6 +108,8 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     <input type="text" name="<?php echo AdminConfig::EMBEDDED_SERVER_LOG_FILE;?>" size="61"
         value="<?php echo Filter::escapeForHtmlAttribute($adminConfig->getEmbeddedServerLogFile());?>">
     <br />
+    */
+    ?>
         
     <?php
     #--------------------------------------------------

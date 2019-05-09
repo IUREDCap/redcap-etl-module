@@ -10,9 +10,9 @@ class AdminConfig implements \JsonSerializable
     # Property constants
     const SSL_VERIFY     = 'sslVerify';
     
-    const ALLOW_EMBEDDED_SERVER              = 'allowEmbeddedServer';
-    const EMBEDDED_SERVER_EMAIL_FROM_ADDRESS = 'embeddedServerEmailFromAddress';
-    const EMBEDDED_SERVER_LOG_FILE           = 'embeddedServerLogFile';
+    #const ALLOW_EMBEDDED_SERVER              = 'allowEmbeddedServer';
+    #const EMBEDDED_SERVER_EMAIL_FROM_ADDRESS = 'embeddedServerEmailFromAddress';
+    #const EMBEDDED_SERVER_LOG_FILE           = 'embeddedServerLogFile';
     
     const ALLOW_ON_DEMAND    = 'allowOnDemand';
     const ALLOW_CRON         = 'allowCron';
@@ -21,14 +21,14 @@ class AdminConfig implements \JsonSerializable
     /** @var boolean indicates if SSL verification should be done for local REDCap */
     private $sslVerify;
     
-    private $allowEmbeddedServer;  // Allow embedded REDCap-ETL server to be used
+    # private $allowEmbeddedServer;  // Allow embedded REDCap-ETL server to be used
     
     /** @var string log file (if any) on REDCap server to use for the embedded ETL server. */
-    private $embeddedServerLogFile;
+    # private $embeddedServerLogFile;
     
     /** @var string E-mail from address to use for embedded server
      *     (must be set for e-mail logging to work for embedded server). */
-    private $embeddedServerEmailFromAddress;
+    #private $embeddedServerEmailFromAddress;
     
     private $allowOnDemand;  // Allow the ETL process to be run on demand
     
@@ -104,26 +104,26 @@ class AdminConfig implements \JsonSerializable
         }
         
         # Set allow embedded server (false will return no value)
-        if (array_key_exists(self::ALLOW_EMBEDDED_SERVER, $properties)) {
-            $this->allowEmbeddedServer = true;
-        } else {
-            $this->allowEmbeddedServer = false;
-        }
+        #if (array_key_exists(self::ALLOW_EMBEDDED_SERVER, $properties)) {
+        #    $this->allowEmbeddedServer = true;
+        #} else {
+        #    $this->allowEmbeddedServer = false;
+        #}
     
         # Set the e-mail from address for the embedded server
-        if (array_key_exists(self::EMBEDDED_SERVER_EMAIL_FROM_ADDRESS, $properties)) {
-            $this->embeddedServerEmailFromAddress =
-                trim(strip_tags($properties[self::EMBEDDED_SERVER_EMAIL_FROM_ADDRESS]));
-        } else {
-            $this->embeddedServerEmailFromAddress = '';
-        }
+        #if (array_key_exists(self::EMBEDDED_SERVER_EMAIL_FROM_ADDRESS, $properties)) {
+        #    $this->embeddedServerEmailFromAddress =
+        #        trim(strip_tags($properties[self::EMBEDDED_SERVER_EMAIL_FROM_ADDRESS]));
+        #} else {
+        #    $this->embeddedServerEmailFromAddress = '';
+        #}
 
         # Set the log file for the embedded server
-        if (array_key_exists(self::EMBEDDED_SERVER_LOG_FILE, $properties)) {
-            $this->embeddedServerLogFile = trim(strip_tags($properties[self::EMBEDDED_SERVER_LOG_FILE]));
-        } else {
-            $this->embeddedServerLogFile = '';
-        }
+        #if (array_key_exists(self::EMBEDDED_SERVER_LOG_FILE, $properties)) {
+        #    $this->embeddedServerLogFile = trim(strip_tags($properties[self::EMBEDDED_SERVER_LOG_FILE]));
+        #} else {
+        #    $this->embeddedServerLogFile = '';
+        #}
 
         # Set flag that indicates if users can run jobs on demand
         if (array_key_exists(self::ALLOW_ON_DEMAND, $properties)) {
@@ -287,37 +287,37 @@ class AdminConfig implements \JsonSerializable
         return $labels;
     }
 
-    public function getAllowEmbeddedServer()
-    {
-        return $this->allowEmbeddedServer;
-    }
+    #public function getAllowEmbeddedServer()
+    #{
+    #    return $this->allowEmbeddedServer;
+    #}
     
-    public function setAllowEmbeddedServer($allowEmbeddedServer)
-    {
-        $this->allowEmbeddedServer = $allowEmbeddedServer;
-    }
+    #public function setAllowEmbeddedServer($allowEmbeddedServer)
+    #{
+    #    $this->allowEmbeddedServer = $allowEmbeddedServer;
+    #}
  
 
-    public function getEmbeddedServerLogFile()
-    {
-        return $this->embeddedServerLogFile;
-    }
+    #public function getEmbeddedServerLogFile()
+    #{
+    #    return $this->embeddedServerLogFile;
+    #}
     
-    public function setEmbeddedServerLogFile($logFile)
-    {
-        $this->embeddedServerLogFile = $logFile;
-    }
+    #public function setEmbeddedServerLogFile($logFile)
+    #{
+    #    $this->embeddedServerLogFile = $logFile;
+    #}
  
 
-    public function getEmbeddedServerEmailFromAddress()
-    {
-        return $this->embeddedServerEmailFromAddress;
-    }
+    #public function getEmbeddedServerEmailFromAddress()
+    #{
+    #    return $this->embeddedServerEmailFromAddress;
+    #}
     
-    public function setEmbeddedServerEmailFromAddress($fromEmail)
-    {
-        $this->embeddedServerEmailFromAddress = $fromEmail;
-    }
+    #public function setEmbeddedServerEmailFromAddress($fromEmail)
+    #{
+    #    $this->embeddedServerEmailFromAddress = $fromEmail;
+    #}
  
 
     public function getAllowOnDemand()

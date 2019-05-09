@@ -150,21 +150,26 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
             .'<a href="'.$serverConfigureUrl.'"><img src='.APP_PATH_IMAGES.'gear.png></a>'
             ."</td>\n";
 
-        echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'page_copy.png" id="copyServer'.$row.'"'
-            .' class="copyServer" style="cursor: pointer;">'
-            ."</td>\n";
+        
+        if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
+            echo "<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>\n";
+        } else {
+            echo '<td style="text-align:center;">'
+                .'<img src="'.APP_PATH_IMAGES.'page_copy.png" id="copyServer'.$row.'"'
+                .' class="copyServer" style="cursor: pointer;">'
+                ."</td>\n";
 
-        echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" id="renameServer'.$row.'"'
-            .' class="renameServer" style="cursor: pointer;">'
-            ."</td>\n";
+            echo '<td style="text-align:center;">'
+                .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" id="renameServer'.$row.'"'
+                .' class="renameServer" style="cursor: pointer;">'
+                ."</td>\n";
           
-        echo '<td style="text-align:center;">'
-              .'<img src="'.APP_PATH_IMAGES.'delete.png" id="deleteServer'.$row.'"'
-              .' class="deleteServer" style="cursor: pointer;">'
-              ."</td>\n";
-      
+            echo '<td style="text-align:center;">'
+                  .'<img src="'.APP_PATH_IMAGES.'delete.png" id="deleteServer'.$row.'"'
+                  .' class="deleteServer" style="cursor: pointer;">'
+                  ."</td>\n";
+        }
+              
         echo "</tr>\n";
         $row++;
     }

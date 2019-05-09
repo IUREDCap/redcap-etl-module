@@ -216,135 +216,154 @@ if (!empty($serverName)) {
 <form action=<?php echo $selfUrl;?> method="post">
   <input type="hidden" name="serverName"
       value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getName());?>">
-  <table>
-      
+ 
+  <!-- ACTIVE SETTING -->
+  <table style="margin-bottom: 12px;">
     <tr>
-      <td>Active:</td>
+      <td style="font-weight: bold; padding-right: 6px;">Active:</td>
       <td><input type="checkbox" name="isActive" value="checked" <?php echo $activeChecked; ?> ></td>
     </tr>
-    
-    <tr>
-      <td>Server address:</td>
-      <td><input type="text" name="serverAddress"
-          value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getServerAddress());?>"
-          size="60" style="margin: 4px;"></td>
-    </tr>
-    
-    <tr>
-      <td style="padding-top: 4px; padding-bottom: 4px; vertical-align: top;">Authentication method:</td>
-      <td style="padding: 4px;">
-        <input type="radio" name="authMethod" value="<?php echo ServerConfig::AUTH_METHOD_SSH_KEY;?>"
-            <?php
-            if ($authMethod == ServerConfig::AUTH_METHOD_SSH_KEY) {
-                echo ' checked ';
-            }
-            ?>
-            style="vertical-align: middle; margin: 0;">
-        <span style="vertical-align: top; margin-right: 8px;">SSH Key</span>
-        <input type="radio" name="authMethod" value="<?php echo ServerConfig::AUTH_METHOD_PASSWORD;?>"
-            <?php
-            if ($authMethod == ServerConfig::AUTH_METHOD_PASSWORD) {
-                echo ' checked ';
-            }
-            ?>
-            style="vertical-align: middle; margin: 0;">
-        <span style="vertical-align: top; margin-right: 8px;">Password</span>
-      </td>
-    </tr>
-    
-    <tr>
-      <td>Username:</td>
-      <td><input type="text" name="username"
-          value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getUsername());?>"
-          size="28" style="margin: 4px;"></td>
-    </tr>
-    
+  </table>
+  
+  
+    <!-- SERVER CONNECTION SETTINGS -->
     <?php
-    $passwordStyle = '';
-    $sshStyle = '';
-    if ($authMethod == ServerConfig::AUTH_METHOD_PASSWORD) {
-        $sshStyle = ' style="display: none;" ';
-    } else {
-        $passwordStyle = ' style="display: none;" ';
-    }
+    if (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) !== 0) {
     ?>
+        <fieldset class="server-config">
+            <legend>Server Connection Settings</legend>
+            <table>  
+                <tr>
+                    <td>Server address:</td>
+                    <td><input type="text" name="serverAddress"
+                        value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getServerAddress());?>"
+                        size="60" style="margin: 4px;"></td>
+                </tr>
     
-    <tr id="passwordRow" <?php echo $passwordStyle; ?> >
-      <td>Password:</td>
-      <td>
-        <input type="password" name="password"
-            value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getPassword());?>"
-            size="28" style="margin: 4px;" id="password" autocomplete="off">
-        <input type="checkbox" id="showPassword" style="vertical-align: middle; margin: 0;">
-        <span style="vertical-align: middle;">Show</span>
-      </td>
-    </tr>
+                <tr>
+                    <td style="padding-top: 4px; padding-bottom: 4px; vertical-align: top;">Authentication method:</td>
+                    <td style="padding: 4px;">
+                        <input type="radio" name="authMethod" value="<?php echo ServerConfig::AUTH_METHOD_SSH_KEY;?>"
+                        <?php
+                        if ($authMethod == ServerConfig::AUTH_METHOD_SSH_KEY) {
+                            echo ' checked ';
+                        }
+                        ?>
+                        style="vertical-align: middle; margin: 0;">
+                        <span style="vertical-align: top; margin-right: 8px;">SSH Key</span>
+                        <input type="radio" name="authMethod" value="<?php echo ServerConfig::AUTH_METHOD_PASSWORD;?>"
+                        <?php
+                        if ($authMethod == ServerConfig::AUTH_METHOD_PASSWORD) {
+                            echo ' checked ';
+                        }
+                        ?>
+                        style="vertical-align: middle; margin: 0;">
+                        <span style="vertical-align: top; margin-right: 8px;">Password</span>
+                    </td>
+                </tr>
+    
+                <tr>
+                    <td>Username:</td>
+                    <td><input type="text" name="username"
+                        value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getUsername());?>"
+                        size="28" style="margin: 4px;"></td>
+                </tr>
+    
+                    <?php
+                    $passwordStyle = '';
+                    $sshStyle = '';
+                    if ($authMethod == ServerConfig::AUTH_METHOD_PASSWORD) {
+                        $sshStyle = ' style="display: none;" ';
+                    } else {
+                        $passwordStyle = ' style="display: none;" ';
+                    }
+                    ?>
+    
+                <tr id="passwordRow" <?php echo $passwordStyle; ?> >
+                    <td>Password:</td>
+                    <td>
+                        <input type="password" name="password"
+                            value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getPassword());?>"
+                            size="28" style="margin: 4px;" id="password" autocomplete="off">
+                        <input type="checkbox" id="showPassword" style="vertical-align: middle; margin: 0;">
+                        <span style="vertical-align: middle;">Show</span>
+                    </td>
+                </tr>
 
-    <tr id="sshKeyFileRow" <?php echo $sshStyle; ?> >
-      <td>SSH key file:</td>
-      <td><input type="text" name="sshKeyFile"
-          value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getSshKeyFile());?>"
-          size="44" style="margin: 4px;" autocomplete="off"></td>
-    </tr>
-    <tr id="sshKeyPasswordRow" <?php echo $sshStyle; ?> >
-      <td>SSH key password:</td>
-      <td>
-        <input type="password" name="sshKeyPassword"
-            value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getSshKeyPassword());?>"
-            size="44" style="margin: 4px;" id="sshKeyPassword" autocomplete="off">
-        <input type="checkbox" id="showSshKeyPassword" style="vertical-align: middle; margin: 0;">
-        <span style="vertical-align: middle;">Show</span>
-      </td>
-    </tr>
+      <tr id="sshKeyFileRow" <?php echo $sshStyle; ?> >
+        <td>SSH key file:</td>
+        <td><input type="text" name="sshKeyFile"
+            value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getSshKeyFile());?>"
+            size="44" style="margin: 4px;" autocomplete="off"></td>
+      </tr>
+      <tr id="sshKeyPasswordRow" <?php echo $sshStyle; ?> >
+        <td>SSH key password:</td>
+        <td>
+          <input type="password" name="sshKeyPassword"
+              value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getSshKeyPassword());?>"
+              size="44" style="margin: 4px;" id="sshKeyPassword" autocomplete="off">
+          <input type="checkbox" id="showSshKeyPassword" style="vertical-align: middle; margin: 0;">
+          <span style="vertical-align: middle;">Show</span>
+        </td>
+      </tr>
         
-    <tr>
-      <td>&nbsp;</td><td>&nbsp</td>
-    </tr>
-    
-    <tr>
-      <td>Configuration directory:</td>
-      <td><input type="text" name="configDir"
-          value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getConfigDir());?>"
-          size="60" style="margin: 4px;"></td>
-    </tr>
-    <tr>
-      <td>ETL command prefix:</td>
-      <td><input type="text" name="etlCommandPrefix"
-          value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getEtlCommandPrefix());?>"
-          size="60" style="margin: 4px;"></td>
-    </tr>    
-    <tr>
-      <td>ETL command:</td>
-      <td>
-        <input type="text" name="etlCommand"
-            value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getEtlCommand());?>"
-            size="60" style="margin: 4px;">
-      </td>
-    </tr>
-    <tr>
-      <td>ETL command suffix:</td>
-      <td><input type="text" name="etlCommandSuffix"
-          value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getEtlCommandSuffix());?>"
-          size="60" style="margin: 4px;"></td>
-    </tr>
-            
-    <tr>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-    </tr>
-    
+    </table>
+    </fieldset>
+  
+    <!-- SERVER COMMAND SETTINGS -->
+    <fieldset class="server-config">
+    <legend>Server Command Settings</legend>
+    <table>    
+      <tr>
+        <td>Configuration directory:</td>
+        <td><input type="text" name="configDir"
+            value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getConfigDir());?>"
+            size="60" style="margin: 4px;"></td>
+      </tr>
+      <tr>
+        <td>ETL command prefix:</td>
+        <td><input type="text" name="etlCommandPrefix"
+            value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getEtlCommandPrefix());?>"
+            size="60" style="margin: 4px;"></td>
+      </tr>    
+      <tr>
+        <td>ETL command:</td>
+        <td>
+          <input type="text" name="etlCommand"
+              value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getEtlCommand());?>"
+              size="60" style="margin: 4px;">
+        </td>
+      </tr>
+      <tr>
+        <td>ETL command suffix:</td>
+        <td><input type="text" name="etlCommandSuffix"
+            value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getEtlCommandSuffix());?>"
+            size="60" style="margin: 4px;"></td>
+      </tr>
+    </table>
+    </fieldset>
+    <?php
+    } // end if not embedded server
+    ?>
+  
+  <!-- SERVER LOGGING SETTINGS -->
+  <fieldset class="server-config">
+  <legend>Server Logging Settings</legend>
+  <table>
     <tr>
       <td>Log file:</td>
       <td><input type="text" name="logFile"
-          value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getLogFile());?>"
-          size="60" style="margin: 4px;"></td>
+          value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getLogFile());?>" size="60">
+      </td>
     </tr>
-       
-    <tr>
-      <td>&nbsp;</td>
-      <td>&nbsp;</td>
-    </tr>
-        
+  </table>
+  </fieldset>
+  
+  
+  <!-- SERVER E-MAIL SETTINGS -->
+  <fieldset class="server-config">
+  <legend>Server E-mail Settings</legend>
+  <table>        
     <tr>
       <td>E-mail from address:</td>
       <td><input type="text" name="emailFromAddress"
@@ -377,8 +396,50 @@ if (!empty($serverName)) {
         <input type="checkbox" name="enableSummaryEmail" value="true" <?php echo $checked; ?> >
       </td>
     </tr>   
-    
+       
   </table>
+  </fieldset>
+
+  
+  <fieldset class="server-config">
+  <legend>Database Connection SSL Settings</legend>
+  <table>
+    <tr>
+      <td>Database SSL:</td>
+      <td>
+        <?php
+        $checked = '';
+        if ($serverConfig->getDbSsl()) {
+            $checked = ' checked ';
+        }
+        ?>
+        <input type="checkbox" name="dbSsl" value="true" <?php echo $checked; ?> >
+      </td>
+    </tr>
+    
+    <tr>
+      <td style="margin-right: 1em;">Database SSL verification:&nbsp;</td>
+      <td>
+        <?php
+        $checked = '';
+        if ($serverConfig->getDbSslVerify()) {
+            $checked = ' checked ';
+        }
+        ?>
+        <input type="checkbox" name="dbSslVerify" value="true" <?php echo $checked; ?> >
+      </td>
+    </tr>
+    
+    <tr>
+      <td style="margin-right: 1em;">CA certificate file:</td>
+      <td><input type="text" name="caCertFile"
+          value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getCaCertFile());?>" size="60">
+      </td>
+    </tr>
+        
+  </table>
+  </fieldset>
+  
   
   <div style="margin-top: 20px;">
     <div style="width: 50%; float: left;">
