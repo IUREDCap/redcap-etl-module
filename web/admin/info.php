@@ -126,10 +126,10 @@ The REDCap-ETL external module has the following admin pages:
     - User search and user ETL permission configuration.
     </li>
     <li><a href="<?php echo $etlServersUrl;?>" style="font-weight: bold;">ETL Servers</a>
-    - See list of existing external ETL servers and add new ones.
+    - See list of existing ETL servers and add new ones.
     </li>
     <li><a href="<?php echo $etlServerConfigUrl;?>" style="font-weight: bold;">ETL Server Config</a>
-    - External ETL server configuration.
+    - ETL server configuration.
     </li>     
 </ul>    
 

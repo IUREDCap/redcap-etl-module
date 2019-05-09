@@ -86,20 +86,28 @@ class ServerConfig implements \JsonSerializable
     public function set($properties)
     {
         foreach (get_object_vars($this) as $var => $value) {
-            if (array_key_exists($var, $properties)) {
-                switch ($var) {
-                    # convert true/false property values to boolean
-                    case 'enableErrorEmail':
-                    case 'enableSummaryEmail':
-                    case 'isActive':
+            switch ($var) {
+                # convert true/false property values to boolean
+                case 'enableErrorEmail':
+                case 'enableSummaryEmail':
+                case 'isActive':
+                case 'dbSsl':
+                case 'dbSslVerify':
+                    if (!array_key_exists($var, $properties)) {
+                        $this->$var = false;
+                    } else {
                         if ($properties[$var]) {
-                            $properties[$var] = true;
+                            $this->$var = true;
                         } else {
-                            $properties[$var] = false;
+                            $this->$var = false;
                         }
-                        break;
-                }
-                $this->$var = Filter::sanitizeString($properties[$var]);
+                    }
+                    break;
+                default:
+                    if (array_key_exists($var, $properties)) {
+                        $this->$var = Filter::sanitizeString($properties[$var]);
+                    }
+                    break;
             }
         }
     }
@@ -187,7 +195,7 @@ class ServerConfig implements \JsonSerializable
         
         $this->updateEtlConfig($etlConfig, $isCronJob);
         
-        if (!$this->isActive) {
+        if (!$this->getIsActive()) {
             $message = 'Server "'.$this->name.'" have been inactivated.';
             throw new \Exception($message);
         }
@@ -287,51 +295,53 @@ class ServerConfig implements \JsonSerializable
     
     public function test()
     {
-        \REDCap::logEvent('REDCap-ETL server config test.');
-        
         $testOutput = '';
         try {
-            $serverAddress = $this->getServerAddress();
-            if (empty($serverAddress)) {
-                throw new \Exception('No server address found.');
-            }
-                    
-            $username = $this->getUsername();
-            if ($this->getAuthMethod() == ServerConfig::AUTH_METHOD_SSH_KEY) {
-                $keyFile = $this->getSshKeyFile();
-                if (empty($keyFile)) {
-                    throw new \Exception('SSH key file cound not be found.');
+            if ($this->isEmbeddedServer()) {
+                $testOutput = 'REDCap-ETL '.\IU\REDCapETL\Version::RELEASE_NUMBER.' found.';
+            } else {
+                $serverAddress = $this->getServerAddress();
+                if (empty($serverAddress)) {
+                    throw new \Exception('No server address found.');
                 }
-                            
-                $keyPassword = $this->getSshKeyPassword();
+                        
+                $username = $this->getUsername();
+                if ($this->getAuthMethod() == ServerConfig::AUTH_METHOD_SSH_KEY) {
+                    $keyFile = $this->getSshKeyFile();
+                    if (empty($keyFile)) {
+                        throw new \Exception('SSH key file cound not be found.');
+                    }
                                 
-                $key = new RSA();
+                    $keyPassword = $this->getSshKeyPassword();
+                                    
+                    $key = new RSA();
+                    
+                    #if (!empty($keyPassword)) {
+                        $key->setPassword($keyPassword);
+                    #}
                 
-                #if (!empty($keyPassword)) {
-                    $key->setPassword($keyPassword);
-                #}
-            
-                $keyFileContents = file_get_contents($keyFile);
-                if ($keyFileContents === false) {
-                    throw new \Exception('SSH key file could not be accessed.');
+                    $keyFileContents = file_get_contents($keyFile);
+                    if ($keyFileContents === false) {
+                        throw new \Exception('SSH key file could not be accessed.');
+                    }
+                    $key->loadKey($keyFileContents);
+
+                    $ssh = new SSH2($serverAddress);
+                    $ssh->login($username, $key);
+                } else {
+                    $password = $this->getPassword();
+                    
+                    $ssh = new SSH2($serverAddress);
+                    $ssh->login($username, $password);
                 }
-                $key->loadKey($keyFileContents);
 
-                $ssh = new SSH2($serverAddress);
-                $ssh->login($username, $key);
-            } else {
-                $password = $this->getPassword();
-                
-                $ssh = new SSH2($serverAddress);
-                $ssh->login($username, $password);
-            }
-
-            $output = $ssh->exec('hostname');
-            if (!$output) {
-                $testOutput = "ERROR: ssh command failed.";
-            } else {
-                $testOutput = "SUCCESS:\noutput of hostname command:\n"
-                    .$output."\n";
+                $output = $ssh->exec('hostname');
+                if (!$output) {
+                    $testOutput = "ERROR: ssh command failed.";
+                } else {
+                    $testOutput = "SUCCESS:\noutput of hostname command:\n"
+                        .$output."\n";
+                }
             }
         } catch (\Exception $exception) {
             $testOutput = 'ERROR: '.$exception->getMessage();

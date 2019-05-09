@@ -72,8 +72,8 @@ if (strcasecmp($submit, 'Save') === 0) {
     if (empty($serverName)) {
         $error = 'ERROR: no server name specified.';
     } else {
-         $serverConfig = new ServerConfig($serverName);
         try {
+            $serverConfig = new ServerConfig($serverName);
             $serverConfig->set($_POST);
             $serverConfig->validate();
             $module->setServerConfig($serverConfig);

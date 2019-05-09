@@ -28,7 +28,6 @@ try {
         $configName = $configuration->getName();
     }
 
-
     $adminConfig = $module->getAdminConfig();
 
     $servers = $module->getServers();

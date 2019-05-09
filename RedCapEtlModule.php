@@ -706,6 +706,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function copyServer($fromServerName, $toServerName)
     {
+        if (strcasecmp($fromServerName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
+            throw new \Exception('The embedded server "'.ServerConfig::EMBEDDED_SERVER_NAME.'" cannot be copied.');
+        }
         $this->settings->copyServer($fromServerName, $toServerName);
         $details = 'Server "'.$fromServerName.'" copied to "'.$toServerName.'".';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
@@ -713,6 +716,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     
     public function renameServer($serverName, $newServerName)
     {
+        if (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
+            throw new \Exception('The embedded server "'.ServerConfig::EMBEDDED_SERVER_NAME.'" cannot be renamed.');
+        }
         $this->settings->renameServer($serverName, $newServerName);
         $details = 'Server "'.$serverName.'" renamed to "'.$newServerName.'".';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
@@ -721,6 +727,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     
     public function removeServer($serverName)
     {
+        if (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
+            throw new \Exception('The embedded server "'.ServerConfig::EMBEDDED_SERVER_NAME.'" cannot be deleted.');
+        }
         $this->settings->removeServer($serverName);
         $details = 'Server "'.$serverName.'" deleted.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
