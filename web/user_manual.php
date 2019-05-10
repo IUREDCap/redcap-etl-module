@@ -66,7 +66,7 @@ The REDCap-ETL (Extract Transform Load) external module:
 <ol>
     <li>Extracts data from REDCap</li>
     <li>Transforms the extracted data based on user-specified transformation rules</li>
-    <li>Loads transformed data into a database</li>
+    <li>Loads the transformed data into a database</li>
 </ol>
 </p>
 
@@ -130,7 +130,7 @@ More information on the transformation rules can be found here:
 <h5 style="font-weight: bold;">Database Information</h5>
 
 <p>
-You need to have a database for loading your extracted data. The
+You need to have a database for loading your transformed data. The
 database needs to be accessible by the REDCap-ETL server that
 you are using, and you need to have a user account for the database
 that has at least the following permissions:
@@ -144,7 +144,7 @@ that has at least the following permissions:
 </ul>  
 
 <p>
-REDCap-ETL configurations allows post-processing SQL statements to be specified that
+REDCap-ETL configurations allow post-processing SQL statements to be specified that
 are run after the ETL process completes. The database user will also need to have
 permission to execute any post-processing statements not covered by the
 permissions above.
@@ -159,11 +159,26 @@ There are 2 options for logging the results of your ETL processes, and they can 
 <ol>
     <li><strong>Data Logging</strong> - REDCap-ETL, by default, logs to 2 tables in the
     database where your transformed data is loaded. The names of these tables
-    can be changed in your configuration, or you can turn of this logging.</li>
-    <li><strong>E-mail logging</strong> - you can specify in the ETL configuration that you
+    can be changed in your configuration, or you can turn off this logging.</li>
+    <li><strong>E-mail logging</strong> - you can specify that you
     want to receive an e-mail when an error occurs and/or that you receive an e-mail
     summary of ETL processing when your process completes successfully.</li>
 </ol>
 </p>
+
+<h4 style="font-weight: bold;">Running REDCap-ETL</h4>
+
+There are 2 basic ways to run REDCap-ETL:
+<ol>
+    <li><strong>On Demand</strong> - You can run an ETL process on demand
+    by going to the <strong>Run</strong>
+    tab, selecting an ETL server and an ETL configuration, and clicking on the <strong>Run</strong>
+    button.
+    </li>
+    <li><strong>Scheduled</strong> - You can use the <strong>Schedule</strong> tab to schedule an ETL
+    job to run at specified times each week. For a given configuration, you can specify one hour per
+    day of the week for the job to run.
+    </li>
+</ol>
 
 <?php require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
