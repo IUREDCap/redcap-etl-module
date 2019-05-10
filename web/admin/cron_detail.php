@@ -142,11 +142,7 @@ $times = $adminConfig->getTimeLabels();
                 .$projectId.'</a>'."</td>\n";
             echo "<td>".'<a href="'.$configUrl.'">'.Filter::escapeForHtml($config).'</a>'."</td>\n";
             
-            if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) == 0) {
-                echo "<td>".$server."</td>\n";
-            } else {
-                echo "<td>".'<a href="'.$serverUrl.'">'.Filter::escapeForHtml($server).'</a>'."</td>\n";
-            }
+            echo "<td>".'<a href="'.$serverUrl.'">'.Filter::escapeForHtml($server).'</a>'."</td>\n";
             
             echo "</tr>\n";
             $row++;
