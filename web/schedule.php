@@ -17,9 +17,10 @@ try {
     # Check that the user has permission to access this page
     # and get the configuration if one was specified
     #-----------------------------------------------------------
+    $configCheck = false;
     $runCheck = false;
     $scheduleCheck = true;
-    $configuration = $module->checkUserPagePermission(USERID, $runCheck, $scheduleCheck);
+    $configuration = $module->checkUserPagePermission(USERID, $configCheck, $runCheck, $scheduleCheck);
     $configName = '';
     if (!empty($configuration)) {
         $configName = $configuration->getName();

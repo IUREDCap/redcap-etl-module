@@ -993,8 +993,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      * @return Configuration if a configuration name was specified in the request, the
      *     configuration for that configuration name.
      */
-    public function checkUserPagePermission($username = USERID, $runCheck = false, $scheduleCheck = false)
-    {
+    public function checkUserPagePermission(
+        $username = USERID,
+        $configCheck = false,
+        $runCheck = false,
+        $scheduleCheck = false
+    ) {
         $configuration = null;
         
         $adminConfig = $this->getAdminConfig();
@@ -1029,10 +1033,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             $configuration = $this->getConfigurationFromRequest();
             if (isset($configuration)) {
                 if (!Authorization::hasEtlConfigurationPermission($this, $configuration)) {
-                    # User does not have permission to access the specified configuration
-                    $accessUrl = $this->getUrl('web/access.php?accessError='.self::NO_CONFIGURATION_PERMISSION);
-                    header('Location: '.$accessUrl);
-                    exit();
+                    if ($configCheck) {
+                        # User does not have permission to access the specified configuration
+                        $accessUrl = $this->getUrl('web/access.php?accessError='.self::NO_CONFIGURATION_PERMISSION);
+                        header('Location: '.$accessUrl);
+                        exit();
+                    } else {
+                        $configuration = null;
+                    }
                 }
             }
         }

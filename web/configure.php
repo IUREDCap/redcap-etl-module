@@ -22,7 +22,8 @@ try {
     # Check that the user has permission to access this page
     # and get the configuration if one was specified
     #-----------------------------------------------------------
-    $configuration = $module->checkUserPagePermission(USERID);
+    $configCheck = true;
+    $configuration = $module->checkUserPagePermission(USERID, $configCheck);
     $configName = '';
     if (!empty($configuration)) {
         $configName = $configuration->getName();
