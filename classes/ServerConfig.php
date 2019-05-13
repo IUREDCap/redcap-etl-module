@@ -106,6 +106,7 @@ class ServerConfig implements \JsonSerializable
                 default:
                     if (array_key_exists($var, $properties)) {
                         $this->$var = Filter::sanitizeString($properties[$var]);
+                        $this->$var = trim($this->$var);
                     }
                     break;
             }
@@ -272,7 +273,6 @@ class ServerConfig implements \JsonSerializable
             $scpResult = $scp->put($configFilePath, $propertiesJson);
             if (!$scpResult) {
                 $message = 'Copy of ETL configuration to server failed.'
-                    . " {$configFilePath} "
                     . ' Please contact your system administrator for assistance.';
                 throw new \Exception($message);
             }
