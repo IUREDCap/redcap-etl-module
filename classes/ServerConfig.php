@@ -61,7 +61,7 @@ class ServerConfig implements \JsonSerializable
 
         $this->logFile = '';
             
-        $this->emailFromAddres = '';
+        $this->emailFromAddress = '';
         $this->enableErrorEmail   = false;
         $this->enableSummaryEmail = false;
         
@@ -272,6 +272,7 @@ class ServerConfig implements \JsonSerializable
             $scpResult = $scp->put($configFilePath, $propertiesJson);
             if (!$scpResult) {
                 $message = 'Copy of ETL configuration to server failed.'
+                    . " {$configFilePath} "
                     . ' Please contact your system administrator for assistance.';
                 throw new \Exception($message);
             }
