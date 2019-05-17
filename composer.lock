@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "87a2d37ebccfa9602a8e01de145bc1c1",
-    "content-hash": "de3f363472d3e7ecf455dacff9a5d8c1",
+    "hash": "a32d7ca8ee2b0a41f3936f6cb5b88520",
+    "content-hash": "4bf966afe059ef6af549fb9e7d54bc50",
     "packages": [
         {
             "name": "iu-redcap/redcap-etl",
-            "version": "0.7.1",
+            "version": "0.7.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/redcap-etl.git",
-                "reference": "f6c7662c7fd40aaa0ccacf37756eabfdb0c7f80e"
+                "reference": "df533273106a389757f0f3fa0d706b534aa40041"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/f6c7662c7fd40aaa0ccacf37756eabfdb0c7f80e",
-                "reference": "f6c7662c7fd40aaa0ccacf37756eabfdb0c7f80e",
+                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/df533273106a389757f0f3fa0d706b534aa40041",
+                "reference": "df533273106a389757f0f3fa0d706b534aa40041",
                 "shasum": ""
             },
             "require": {
@@ -49,7 +49,7 @@
                 "etl",
                 "redcap"
             ],
-            "time": "2019-05-08 13:25:15"
+            "time": "2019-05-14 21:33:58"
         },
         {
             "name": "phpcap/phpcap",
@@ -1039,6 +1039,7 @@
                 "mock",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2018-08-09 05:50:03"
         },
         {
@@ -1696,7 +1697,7 @@
                 },
                 {
                     "name": "Gert de Pagter",
-                    "email": "backendtea@gmail.com"
+                    "email": "BackEndTea@gmail.com"
                 }
             ],
             "description": "Symfony polyfill for ctype functions",
