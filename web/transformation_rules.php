@@ -786,7 +786,7 @@ to the parent table <strong>registration</strong></li>
 </tr>
 </tbody>
 </table>
-<p><strong>Tranformation Rules</strong></p>
+<p><strong>Transformation Rules</strong></p>
 <pre><code>TABLE,  Main, Main_id, ROOT
 FIELD,  record, int
 FIELD,  var1, string
