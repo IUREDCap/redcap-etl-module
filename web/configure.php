@@ -10,12 +10,15 @@ use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Configuration;
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
+use IU\RedCapEtlModule\Help;
 use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
 
 $success = '';
 $warning = '';
 $error   = '';
+
+$parseResult = '';
 
 try {
     #-----------------------------------------------------------
@@ -204,14 +207,47 @@ try {
                         #."</script>\n"
                         #;
                     }
-                    $dataProject = new \IU\REDCapETL\EtlRedCapProject($apiUrl, $dataToken);
-                    // ADD ...$sslVerify = true, $caCertFile = null);
+                    
+
+                    $sslVerify  = $adminConfig->getSslVerify();
+                    $caCertFile = null;
+                    #$caCertFile = $adminConfig->getCaCertFile();
+                    
+                    if ($testMode) {
+                        # If module is in test mode, override the system-wide SSL verify flag
+                        # and certificate authority certificate file with the configuration
+                        # specific ones
+                        $sslVerify  = $configuration->getProperty(Configuration::SSL_VERIFY);
+                        #$caCertFile = $configuration->getProperty(Configuration::CA_CERT_FILE);
+                    }
+
+                    $dataProject = new \IU\REDCapETL\EtlRedCapProject($apiUrl, $dataToken, $sslVerify, $caCertFile);
                             
                     $rulesGenerator = new \IU\REDCapETL\RulesGenerator();
                     $rulesText = $rulesGenerator->generate($dataProject);
                     $properties[Configuration::TRANSFORM_RULES_TEXT] = $rulesText;
                     #print "$rulesText\n";
                 }
+            } elseif (strcasecmp($submitValue, 'Check Rules') === 0) {
+                // Code to check current transformation rules; to be completed...
+                $apiUrl    = $configuration->getProperty(Configuration::REDCAP_API_URL);
+                $dataToken = $configuration->getProperty(Configuration::DATA_SOURCE_API_TOKEN);
+                $sslVerify  = $adminConfig->getSslVerify();
+                $caCertFile = null;
+                $dataProject = new \IU\REDCapETL\EtlRedCapProject($apiUrl, $dataToken, $sslVerify, $caCertFile);
+                
+                $logger = new \IU\REDCapETL\Logger('rules-check');
+                $logger->setOn(false);
+                
+                $properties = $configuration->getPropertiesArray();
+                if ($sslVerify) {
+                    $properties[Configuration::SSL_VERIFY] = 'true';
+                }
+                
+                $configuration = new \IU\REDCapETL\Configuration($logger, $properties);
+                $schemaGenerator = new \IU\REDCapETL\SchemaGenerator($dataProject, $configuration, $logger);
+                $rulesText = $configuration->getProperty(Configuration::TRANSFORM_RULES_TEXT);
+                list($schema, $parseResult) = $schemaGenerator->generateSchema($rulesText);
             }
         } catch (\Exception $exception) {
             $error = 'ERROR: '.$exception->getMessage();
@@ -227,9 +263,82 @@ try {
 #--------------------------------------------
 # Include REDCap's project page header
 #--------------------------------------------
+ob_start();
 require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
-
+$buffer = ob_get_clean();
+$cssFile = $module->getUrl('resources/redcap-etl.css');
+$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+echo $buffer;
 ?>
+
+<script>
+    // Help dialog events
+    $(document).ready(function() {
+        $( function() {
+            $('#batch-size-help-link').click(function () {
+                $('#batch-size-help').dialog({dialogClass: 'redcap-etl-help'})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });
+            $('#database-event-log-table-help-link').click(function () {
+                $('#database-event-log-table-help').dialog({dialogClass: 'redcap-etl-help'})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });             
+            $('#database-log-table-help-link').click(function () {
+                $('#database-log-table-help').dialog({dialogClass: 'redcap-etl-help'})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });            
+            $('#database-logging-help-link').click(function () {
+                $('#database-logging-help').dialog({dialogClass: 'redcap-etl-help'})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });
+            $('#email-errors-help-link').click(function () {
+                $('#email-errors-help').dialog({dialogClass: 'redcap-etl-help'})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });
+            $('#email-subject-help-link').click(function () {
+                $('#email-subject-help').dialog({dialogClass: 'redcap-etl-help'})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });
+            $('#email-summary-help-link').click(function () {
+                $('#email-summary-help').dialog({dialogClass: 'redcap-etl-help'})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });
+            $('#email-to-list-help-link').click(function () {
+                $('#email-to-list-help').dialog({dialogClass: 'redcap-etl-help'})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });            
+            $('#post-processing-sql-help-link').click(function () {
+                $('#post-processing-sql-help').dialog({dialogClass: 'redcap-etl-help'})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });            
+            $('#table-name-prefix-help-link').click(function () {
+                $('#table-name-prefix-help').dialog({dialogClass: 'redcap-etl-help'})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });
+        });
+    });
+</script>
 
 <?php
 
@@ -250,7 +359,6 @@ require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 #$fileContents = file_get_contents($_FILES['uploadCsvFile']['tmp_name']);
 #print "\nCONTENTS: <pre>{$fileContents}</pre>\n\n";
 
- 
 ?>
 
 <div class="projhdr"> 
@@ -268,6 +376,8 @@ require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
 ?>
+
+
 
 <?php
 #-------------------------------------
@@ -541,6 +651,7 @@ Configuration form
                 <td>
             <tr>
 
+            <!-- TRANSFORMATION RULES -->
             <tr>
                 <td>Transformation rules</td>
                 <td>
@@ -567,6 +678,21 @@ Configuration form
                             <span  style="vertical-align: middle;"> Download CSV file</span>
                         </button>
                     </p>
+                    <p>
+                        <button type="submit" id="check-rules-button" value="Check Rules" name="submitValue">
+                            <!-- <img src="<?php echo APP_PATH_IMAGES.'tick_circle.png';?>" style="vertical-align: middle;"> -->
+                            <span class="glyphicon glyphicon-ok-circle etl-rules-check-icon" 
+                                aria-hidden="true" style="vertical-align: middle;">
+                            </span>                             
+                            <span  style="vertical-align: middle;">Check Rules</span>
+                        </button>
+                    </p>                    
+                    <p>
+                        <a href="<?php echo $module->getUrl('web/transformation_rules.php');?>" target="_blank">
+                            <img alt="" src="<?php echo APP_PATH_IMAGES.'information_frame.png'?>"/>
+                            Transformation Rules Guide
+                        </a>
+                    </p>
                 </td>
             </tr>
 
@@ -576,6 +702,7 @@ Configuration form
                 <td>
             <tr>
 
+            <!-- DATABASE HOST -->
             <tr>
                 <td>Database host</td>
                 <td><input type="text" name="<?php echo Configuration::DB_HOST;?>"
@@ -583,18 +710,21 @@ Configuration form
                 </td>
             </tr>
 
+            <!-- DATABASE NAME -->
             <tr>
                 <td>Database name</td>
                 <td><input type="text" name="<?php echo Configuration::DB_NAME;?>"
                     value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_NAME])?>"></td>
             </tr>
 
+            <!-- DATABASE USERNAME -->
             <tr>
                 <td>Database username</td>
                 <td><input type="text" name="<?php echo Configuration::DB_USERNAME;?>"
                     value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_USERNAME])?>"/></td>
             </tr>
 
+            <!-- DATABASE PASSWORD -->
             <tr>
                 <td>Database password</td>
                 <td>
@@ -612,18 +742,34 @@ Configuration form
                 <td>
             </tr>
 
+            <!-- BATCH SIZE -->
             <tr>
                 <td>Batch size</td>
                 <td><input type="text" name="<?php echo Configuration::BATCH_SIZE;?>"
-                    value="<?php echo Filter::escapeForHtml($properties[Configuration::BATCH_SIZE]);?>"/></td>
+                    value="<?php echo Filter::escapeForHtml($properties[Configuration::BATCH_SIZE]);?>"/>
+                    <span id="batch-size-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
+                        aria-hidden="true">
+                    </span>
+                    <div id="batch-size-help" title="Batch Size" style="display: none;">
+                        <?php echo Help::getHelp('batch-size'); ?>
+                    </div>
+                </td>
             </tr>
 
             <tr style="height: 10px;"></tr> 
  
+            <!-- TABLE NAME PREFIX -->
             <tr>
                 <td>Table name prefix</td>
                 <td><input type="text" name="<?php echo Configuration::TABLE_PREFIX;?>"
-                    value="<?php echo Filter::escapeForHtml($properties[Configuration::TABLE_PREFIX]);?>"/></td>
+                    value="<?php echo Filter::escapeForHtml($properties[Configuration::TABLE_PREFIX]);?>"/>
+                    <span id="table-name-prefix-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
+                        aria-hidden="true">
+                    </span>
+                    <div id="table-name-prefix-help" title="Table Name Prefix" style="display: none;">
+                        <?php echo Help::getHelp('table-name-prefix'); ?>
+                    </div>
+                </td>
             </tr>
            
             <!--
@@ -634,6 +780,7 @@ Configuration form
       
             <tr style="height: 10px;"></tr>
       
+            <!-- DATABASE LOGGING -->
             <tr>
                 <td>Database logging</td>
                 <td>
@@ -645,25 +792,48 @@ Configuration form
                     ?>
                     <input type="checkbox" name="<?php echo Configuration::DB_LOGGING;?>" value="true"
                         <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
+                    <span id="database-logging-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
+                        aria-hidden="true">
+                    </span>                    
+                    <div id="database-logging-help" title="Database Logging" style="display: none;">
+                        <?php echo Help::getHelp('database-logging'); ?>
+                    </div>                        
                 </td>
             </tr>
       
+            <!-- DATABASE LOG TABLE -->
             <tr>
                 <td>Database log table</td>
                 <td><input type="text" name="<?php echo Configuration::DB_LOG_TABLE;?>"
                     value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_LOG_TABLE]);?>"/>
+                    <span id="database-log-table-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
+                        aria-hidden="true">
+                    </span>                    
+                    <div id="database-log-table-help" title="Database Log Table" style="display: none;">
+                        <?php echo Help::getHelp('database-log-table'); ?>                    
+                    </div>
                 </td>
             </tr>
+            
+            <!-- DATABASE EVENT LOG TABLE -->
             <tr>
                 <td>Database event log table</td>
                 <?php $dbEventLogTable = $properties[Configuration::DB_EVENT_LOG_TABLE]; ?>
                 <td><input type="text" name="<?php echo Configuration::DB_EVENT_LOG_TABLE;?>"
                     value="<?php echo Filter::escapeForHtmlAttribute($dbEventLogTable);?>"/>
+                    <span id="database-event-log-table-help-link"
+                        class="glyphicon glyphicon-question-sign etl-help-icon"
+                        aria-hidden="true">
+                    </span>                       
+                    <div id="database-event-log-table-help" title="Database Event Log Table" style="display: none;">
+                        <?php echo Help::getHelp('database-event-log-table'); ?>
+                    </div>
                 </td>
             </tr>
       
             <tr style="height: 10px;"></tr>
-                  
+            
+            <!-- E-MAIL ERRORS -->      
             <tr>
                 <td>E-mail errors</td>
                 <td>
@@ -675,10 +845,16 @@ Configuration form
                     ?>
                     <input type="checkbox" name="<?php echo Configuration::EMAIL_ERRORS;?>" value="true"
                         <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
-                    <!-- <img title="test2" src="<?php echo APP_PATH_IMAGES ?>help.png"> -->
+                    <span id="email-errors-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
+                        aria-hidden="true">
+                    </span>                      
+                    <div id="email-errors-help" title="E-Mail Errors" style="display: none;">
+                        <?php echo Help::getHelp('email-errors'); ?>
+                    </div>
                 </td>
             </tr>
 
+            <!-- E-MAIL SUMMARY -->
             <tr>
                 <td>E-mail summary</td>
                 <td>
@@ -690,26 +866,48 @@ Configuration form
                     ?>
                     <input type="checkbox" name="<?php echo Configuration::EMAIL_SUMMARY;?>" value="true"
                         <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
+                    <span id="email-summary-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
+                        aria-hidden="true">
+                    </span>                      
+                    <div id="email-summary-help" title="E-Mail Summary" style="display: none;">
+                        <?php echo Help::getHelp('email-summary'); ?>   
+                    </div>
                 </td>
             </tr>
             
+            <!-- E-MAIL SUBJECT -->
             <tr>
                 <td>E-mail subject</td>
                 <td><input type="text" name="<?php echo Configuration::EMAIL_SUBJECT;?>" size="64"
                     value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::EMAIL_SUBJECT]);?>"
                     />
+                    <span id="email-subject-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
+                        aria-hidden="true">
+                    </span>                      
+                    <div id="email-subject-help" title="E-Mail Subject" style="display: none;">
+                        <?php echo Help::getHelp('email-subject'); ?>
+                    </div>
                 </td>
             </tr>
+            
+            <!-- E-MAIL TO LIST -->
             <tr>
                 <td>E-mail to list</td>
                 <td><input type="text" name="<?php echo Configuration::EMAIL_TO_LIST;?>" size="64"
                     value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::EMAIL_TO_LIST]);?>"
                     />
+                    <span id="email-to-list-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
+                        aria-hidden="true">
+                    </span>                      
+                    <div id="email-to-list-help" title="E-Mail To List" style="display: none;">
+                        <?php echo Help::getHelp('email-to-list'); ?>
+                    </div>                    
                 </td>
             </tr>
       
             <tr style="height: 10px;"></tr>
             
+            <!-- POST-PROCESSING SQL -->
             <tr>
                 <td>Post-Processing SQL</td>
                 <td>
@@ -720,6 +918,14 @@ Configuration form
                     <textarea rows="10" cols="70"
                         style="margin-top: 4px; margin-bottom: 4px;"
                         name="<?php echo $sqlName;?>"><?php echo Filter::escapeForHtml($sql);?></textarea>
+                </td>
+                <td>
+                    <span id="post-processing-sql-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
+                        aria-hidden="true">
+                    </span>                      
+                    <div id="post-processing-sql-help" title="Post-Processing SQL" style="display: none;">
+                        <?php echo Help::getHelp('post-processing-sql'); ?>
+                    </div>                         
                 </td>
             </tr>
             
@@ -742,12 +948,55 @@ Configuration form
     <?php Csrf::generateFormToken(); ?>
 </form>
 
+
+<?php
+#----------------------------------------------
+# Parse Result (for rules check)
+#----------------------------------------------
+
+$status = $parseResult[0];
+$parseMessages = nl2br($parseResult[1]);
+
+$class = '';
+if (strcasecmp($status, 'valid') === 0) {
+    $class = ' class="darkgreen" ';
+} else if (strcasecmp($status, 'warn') === 0) {
+    $class = ' class="yellow" ';
+    $status = 'warning';
+} else if (strcasecmp($status, 'error') === 0) {
+    $class = ' class="red" ';
+}
+
+
+echo '<div id ="parse-result" style="display: none;" title="Transformation Rules Check">'."\n";
+echo '<div '.$class.'>'."\n";
+echo 'Status: '.$status."\n";
+echo '</div><br/>'."\n";
+echo $parseMessages."\n";
+echo '</div>'."\n";
+
+if (!empty($parseResult)) {
+?>
+
+<script>
+    $('#parse-result').dialog({dialogClass: 'etl-rules-check', width: '500px'})
+        dialog('widget').position({my: 'right', at: 'right', of: '#check-rules-button'})
+    ;
+</script>
+
+<?php
+}  // End if parse result not empty
+?>
+
+
 <?php
 #------------------------------------------------------
 # End, if configuration is not empty
 #------------------------------------------------------
 }
 ?>
+
+
 
 
 <?php

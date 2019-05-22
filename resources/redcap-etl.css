@@ -94,3 +94,34 @@ fieldset.server-config td {
 fieldset.server-config legend {
     font-weight: bold;
 }
+
+.ui-dialog.redcap-etl-help {
+    border: 2px solid #286090;
+}
+
+.ui-dialog.redcap-etl-help .ui-dialog-titlebar {
+    border: 1px solid #286090;
+    color: #286090;
+}
+
+.etl-help-icon {
+    color: #286090;
+    margin-left: 4px;
+}
+
+.ui-dialog.etl-rules-check {
+    border: 2px solid #222222;
+}
+
+.ui-dialog.etl-rules-check .ui-dialog-titlebar {
+    border: 1px solid #222222;
+    color: #222222;
+}
+
+.etl-rules-check-icon {
+    color: #007700;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 2px;
+}
