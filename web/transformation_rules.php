@@ -6,7 +6,7 @@ require_once APP_PATH_DOCROOT . 'Config/init_global.php';
 $htmlPage = new HtmlPage();
 $htmlPage->PrintHeaderExt();
 ?>
-<div style="text-align:right;float:right;"><img src="/redcap/redcap_v8.5.11/Resources/images/redcap-logo.png"/></div>
+<div style="text-align:right;float:right;"><img src="<?php echo APP_PATH_IMAGES."redcap-logo.png"; ?>" alt="REDCap"/></div>
 <?php // phpcs:disable ?>
 <h1>REDCap-ETL Transformation Rules</h1>
 <p>The transformation rules specify how the records in REDCap are transformed

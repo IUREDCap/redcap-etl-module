@@ -30,7 +30,7 @@ $html = "<?php\n"
     .'$htmlPage->PrintHeaderExt();'."\n"
     ."?>\n"
     .'<div style="text-align:right;float:right;">'
-    .'<img src="/redcap/redcap_v8.5.11/Resources/images/redcap-logo.png"/>'
+    .'<img src="<?php echo APP_PATH_IMAGES."redcap-logo.png"; ?>" alt="REDCap"/>'
     .'</div>'."\n"
     ."<?php // phpcs:disable ?>\n"
     .$content
