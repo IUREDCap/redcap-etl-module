@@ -9,6 +9,7 @@ class AdminConfig implements \JsonSerializable
     
     # Property constants
     const SSL_VERIFY     = 'sslVerify';
+    const CA_CERT_FILE   = 'caCertFile';
     
     #const ALLOW_EMBEDDED_SERVER              = 'allowEmbeddedServer';
     #const EMBEDDED_SERVER_EMAIL_FROM_ADDRESS = 'embeddedServerEmailFromAddress';
@@ -20,6 +21,9 @@ class AdminConfig implements \JsonSerializable
     
     /** @var boolean indicates if SSL verification should be done for local REDCap */
     private $sslVerify;
+    
+    /** @var string certificate authority certificate file used for SSL verification of REDCap. */
+    private $caCertFile;
     
     # private $allowEmbeddedServer;  // Allow embedded REDCap-ETL server to be used
     
@@ -144,6 +148,13 @@ class AdminConfig implements \JsonSerializable
             $this->sslVerify = true;
         } else {
             $this->sslVerify = false;
+        }
+        
+        # Set certificate authority certificate file
+        if (array_key_exists(self::CA_CERT_FILE, $properties)) {
+            $this->caCertFile = $properties[self::CA_CERT_FILE];
+        } else {
+            $this->caCertFile = '';
         }
     }
 
@@ -375,5 +386,10 @@ class AdminConfig implements \JsonSerializable
     public function setSslVerify($sslVerify)
     {
         $this->sslVerify = $sslVerify;
+    }
+    
+    public function getCaCertFile()
+    {
+        return $this->caCertFile;
     }
 }

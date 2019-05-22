@@ -39,6 +39,7 @@ class ServerConfig implements \JsonSerializable
     private $enableErrorEmail;
     private $enableSummaryEmail;
     
+    # Database SSL verification
     private $dbSsl;
     private $dbSslVerify;
     private $caCertFile;
