@@ -239,12 +239,12 @@ try {
                 $logger = new \IU\REDCapETL\Logger('rules-check');
                 $logger->setOn(false);
                 
-                $properties = $configuration->getPropertiesArray();
+                $checkProperties = $configuration->getPropertiesArray();
                 if ($sslVerify) {
-                    $properties[Configuration::SSL_VERIFY] = 'true';
+                    $checkProperties[Configuration::SSL_VERIFY] = 'true';
                 }
                 
-                $configuration = new \IU\REDCapETL\Configuration($logger, $properties);
+                $configuration = new \IU\REDCapETL\Configuration($logger, $checkProperties);
                 $schemaGenerator = new \IU\REDCapETL\SchemaGenerator($dataProject, $configuration, $logger);
                 $rulesText = $configuration->getProperty(Configuration::TRANSFORM_RULES_TEXT);
                 list($schema, $parseResult) = $schemaGenerator->generateSchema($rulesText);
