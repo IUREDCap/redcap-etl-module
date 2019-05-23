@@ -29,8 +29,8 @@ $html = "<?php\n"
     .'$htmlPage = new HtmlPage();'."\n"
     .'$htmlPage->PrintHeaderExt();'."\n"
     ."?>\n"
-    .'<div style="text-align:right;float:right;">'
-    .'<img src="<?php echo APP_PATH_IMAGES."redcap-logo.png"; ?>" alt="REDCap"/>'
+    .'<div style="text-align:right;float:right;">'."\n"
+    .'    <img src="<?php echo APP_PATH_IMAGES."redcap-logo.png"; ?>" alt="REDCap"/>'."\n"
     .'</div>'."\n"
     ."<?php // phpcs:disable ?>\n"
     .$content

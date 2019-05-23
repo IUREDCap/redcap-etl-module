@@ -680,7 +680,6 @@ Configuration form
                     </p>
                     <p>
                         <button type="submit" id="check-rules-button" value="Check Rules" name="submitValue">
-                            <!-- <img src="<?php echo APP_PATH_IMAGES.'tick_circle.png';?>" style="vertical-align: middle;"> -->
                             <span class="glyphicon glyphicon-ok-circle etl-rules-check-icon" 
                                 aria-hidden="true" style="vertical-align: middle;">
                             </span>                             
@@ -960,10 +959,10 @@ $parseMessages = nl2br($parseResult[1]);
 $class = '';
 if (strcasecmp($status, 'valid') === 0) {
     $class = ' class="darkgreen" ';
-} else if (strcasecmp($status, 'warn') === 0) {
+} elseif (strcasecmp($status, 'warn') === 0) {
     $class = ' class="yellow" ';
     $status = 'warning';
-} else if (strcasecmp($status, 'error') === 0) {
+} elseif (strcasecmp($status, 'error') === 0) {
     $class = ' class="red" ';
 }
 
