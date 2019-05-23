@@ -6,7 +6,9 @@ require_once APP_PATH_DOCROOT . 'Config/init_global.php';
 $htmlPage = new HtmlPage();
 $htmlPage->PrintHeaderExt();
 ?>
-<div style="text-align:right;float:right;"><img src="<?php echo APP_PATH_IMAGES."redcap-logo.png"; ?>" alt="REDCap"/></div>
+<div style="text-align:right;float:right;">
+    <img src="<?php echo APP_PATH_IMAGES."redcap-logo.png"; ?>" alt="REDCap"/>
+</div>
 <?php // phpcs:disable ?>
 <h1>REDCap-ETL Transformation Rules</h1>
 <p>The transformation rules specify how the records in REDCap are transformed
@@ -99,9 +101,9 @@ a one-to-one mapping to record IDs, i.e., each study participant has
 one first name, one last name, and one birthdate.</li>
 <li>The database field <strong>registration_id</strong> (specified in the TABLE command)
 is created automatically as an auto-incremented synthetic key</li>
-<li>The database field __record_id__ represents the REDCap record ID, and is
+<li>The database field <strong>record_id</strong> represents the REDCap record ID, and is
 created automatically in the database for all tables by REDCap-ETL</li>
-<li>The database fields <strong>record_id<strong>, </strong>first_name</strong> and __last_name__
+<li>The database fields <strong>record_id</strong>, <strong>first_name</strong> and <strong>last_name</strong>
 match the REDCap fields.</li>
 <li>The REDCap field <strong>dob</strong> with type <strong>date</strong>, was renamed to <strong>birthdate</strong> in the database</li>
 <li>The <strong>birthdate</strong> database field has Y-M-D format, which is what REDCap
@@ -254,14 +256,14 @@ only created for tables that have a rows type of <code>&lt;suffixes&gt;</code> o
 <h4>FIELD Statements</h4>
 <p>Field statements specify the fields that are generated in the tables in your database.</p>
 <pre><code>FIELD, &lt;field_name&gt;, &lt;field_type&gt;[, &lt;database_field_name&gt;]</code></pre>
-<p>__<code>&lt;field_name&gt;</code>__ is the name of the field in REDCap.</p>
+<p><strong><code>&lt;field_name&gt;</code></strong> is the name of the field in REDCap.</p>
 <ul>
-<li>If <strong><code>&lt;database_field_name&gt;</code></strong> is not set, __<code>&lt;field_name&gt;</code>__ will also be the name
+<li>If <strong><code>&lt;database_field_name&gt;</code></strong> is not set, <strong><code>&lt;field_name&gt;</code></strong> will also be the name
 of the field in the database where the extracted data are loaded</li>
 <li>If <strong><code>&lt;database_field_name&gt;</code></strong> is set, then it will be used as
 the name of the field in the database where the extracted data are loaded</li>
 </ul>
-<p>__<code>&lt;field_type&gt;</code>__ can be one of the REDCap-ETL types in the table below that shows
+<p><strong><code>&lt;field_type&gt;</code></strong> can be one of the REDCap-ETL types in the table below that shows
 the database types used to store the different REDCap-ETL types.</p>
 <table class="dataTable">
 <thead>
