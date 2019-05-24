@@ -969,7 +969,7 @@ if (strcasecmp($status, 'valid') === 0) {
 
 echo '<div id ="parse-result" style="display: none;" title="Transformation Rules Check">'."\n";
 echo '<div '.$class.'>'."\n";
-echo 'Status: '.$status."\n";
+echo '<strong>Status: '.$status."</strong>\n";
 echo '</div><br/>'."\n";
 echo $parseMessages."\n";
 echo '</div>'."\n";
