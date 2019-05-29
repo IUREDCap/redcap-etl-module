@@ -107,16 +107,18 @@ class Filter
     {
         $allowedTags = ['a', 'b', 'hr', 'i', 'p'];
 
-        foreach ($allowedTags as $tag) {
-            if ($tag !== 'a') {
-                $text = self::removeTagAttributes($text, $tag);
-            }
-        }
-
+        # Remove leadin and trailing spacing from tags
         $text = preg_replace('/<\s*([^>]+)\s*>/', '<${1}>', $text);
 
-        # nested tag
+        # Close nested tag, for example, change <a <a> => <a> <a>
         $text = preg_replace('/<\s*([a-zA-Z]+)([^<>]*<)/', '<${1}>${2}', $text);
+
+        # Remove all attributes of allowed tags, except for the "a" tag
+        foreach ($allowedTags as $tag) {
+            if ($tag !== 'a') {
+                $text = preg_replace('/<\s*'.$tag.'[^(>|\/>)]*/', '<'.$tag, $text);
+            }
+        }
 
         # Remove a tag attributes that are not href with the form href="http..."
         $text = preg_replace('/<\s*a\s+(href="(http[^"]*)"|([^>]*))\s*>/i', '<a href="$2">', $text);
