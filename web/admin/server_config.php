@@ -122,8 +122,8 @@ echo $buffer;
 
 <?php
 
-$module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
-
+$module->renderAdminPageContentHeader($serversUrl, $error, $warning, $success);
+$module->renderAdminEtlServerSubTabs($selfUrl);
 ?>
 
 

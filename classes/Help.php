@@ -78,4 +78,9 @@ class Help
         $info = strip_tags(self::$info[$topic]);
         return $info;
     }
+
+    public static function getTopics()
+    {
+        return array_keys(self::$info);
+    }
 }

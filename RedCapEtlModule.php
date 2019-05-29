@@ -785,6 +785,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function renderAdminTabs($activeUrl = '')
     {
+
+        $infoUrl = $this->getUrl(self::ADMIN_INFO_PAGE);
+        $infoLabel = '&nbsp;<span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>&nbsp;Info';
+        
         $adminUrl = $this->getUrl(self::ADMIN_HOME_PAGE);
         $adminLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
            .' Config';
@@ -804,32 +808,72 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
            .' User Config</span>';
            
         $serversUrl = $this->getUrl(self::SERVERS_PAGE);
-        $serversLabel = '<span class="glyphicon glyphicon-list" aria-hidden="true"></span>'
+        $serversLabel = '<span class="glyphicon glyphicon-hdd" aria-hidden="true"></span>'
            .' ETL Servers';
 
         $serverConfigUrl = $this->getUrl(self::SERVER_CONFIG_PAGE);
         $serverConfigLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
            .' ETL Server Config';
 
-        $helpUrl = $this->getUrl(self::ADMIN_INFO_PAGE);
-        $helpLabel = '&nbsp;<span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>&nbsp;';
            
         $tabs = array();
         
-        $tabs[$helpUrl]          = $helpLabel;
+        $tabs[$infoUrl]          = $infoLabel;
         
         $tabs[$adminUrl]         = $adminLabel;
         $tabs[$cronJobsUrl]      = $cronJobsLabel;
         $tabs[$usersUrl]         = $usersLabel;
-        $tabs[$configureUserUrl] = $configureUserLabel;
+        #$tabs[$configureUserUrl] = $configureUserLabel;
 
         $tabs[$serversUrl]       = $serversLabel;
-        $tabs[$serverConfigUrl]  = $serverConfigLabel;
+        #$tabs[$serverConfigUrl]  = $serverConfigLabel;
 
         
         $this->renderTabs($tabs, $activeUrl);
     }
 
+    /**
+     * Render sub-tabs for the admin ETL server pages.
+     */
+    public function renderAdminEtlServerSubTabs($activeUrl = '')
+    {
+        $serversUrl = $this->getUrl(self::SERVERS_PAGE);
+        $serversLabel = '<span class="glyphicon glyphicon-list" aria-hidden="true"></span>'
+           .' List';
+
+        $serverConfigUrl = $this->getUrl(self::SERVER_CONFIG_PAGE);
+        $serverConfigLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
+           .' Configuration';
+
+        $tabs = array();
+
+        $tabs[$serversUrl]       = $serversLabel;
+        $tabs[$serverConfigUrl]  = $serverConfigLabel;
+
+        $this->renderSubTabs($tabs, $activeUrl);
+    }
+
+    /**
+     * Render sub-tabs for the admin user pages.
+     */
+    public function renderAdminUsersSubTabs($activeUrl = '')
+    {
+        $usersUrl = $this->getUrl(self::USERS_PAGE);
+        $usersLabel = '<span class="glyphicon glyphicon-list" aria-hidden="true"></span>'
+           .' List</span>';
+
+        $configureUserUrl = $this->getUrl(self::USER_CONFIG_PAGE);
+        $configureUserLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
+           .' Configuration</span>';
+
+        $tabs = array();
+
+        $tabs[$usersUrl]         = $usersLabel;
+        $tabs[$configureUserUrl] = $configureUserLabel;
+
+        $this->renderSubTabs($tabs, $activeUrl);
+    }
+        
     /**
      * Renders the top-level tabs for the user interface.
      */
@@ -916,6 +960,35 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         echo '</div>'."\n";
         echo '<div class="clear"></div>'."\n";
     }
+    
+    /**
+     * Renders sub-tabs (second-level tabs) on the page.
+     *
+     * @param array $tabs map from URL to tab label.
+     * @param string $activeUrl the URL that should be marked as active.
+     */
+    public function renderSubTabs($tabs = array(), $activeUrl = '')
+    {
+        echo '<div style="text-align:right; margin-bottom: 17px; margin-top: 0px;">';
+        $isFirst = true;
+        foreach ($tabs as $url => $label) {
+            $style = '';
+            if (strcasecmp($url, $activeUrl) === 0) {
+                $style = ' style="padding: 1px; text-decoration: none; border-bottom: 2px solid black;" ';
+            } else {
+                $style = ' style="padding: 1px; text-decoration: none;" ';
+            }
+            
+            if ($isFirst) {
+                $isFirst = false;
+            } else {
+                echo "&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;";
+            }
+            echo '<a href="'.$url.'" '.$style.'>'."{$label}</a>";
+        }
+        echo "</div>\n";
+    }
+
     
     public function renderSuccessMessageDiv($message)
     {

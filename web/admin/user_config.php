@@ -29,14 +29,14 @@ $adminUrl      = $module->getUrl(RedCapEtlModule::ADMIN_HOME_PAGE);
 $adminConfigJson = $module->getSystemSetting(AdminConfig::KEY);
 $adminConfig = new AdminConfig();
         
-$submitValue = $_POST['submitValue'];
+$submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
-$username = $_POST['username-result'];
+$username = Filter::stripTags($_POST['username-result']);
 if (empty($username)) {
-    $username = $_GET['username'];
+    $username = Filter::stripTags($_GET['username']);
 }
 
-$userLabel = $_POST['userLabel'];
+$userLabel = Filter::stripTags($_POST['userLabel']);
 
 try {
     if (!empty($username)) {
@@ -48,7 +48,7 @@ try {
             header('Location: '.$usersUrl);
         } else {
             if (strcasecmp($submitValue, 'Save') === 0) {
-                $checkbox = $_POST['checkbox'];
+                $checkbox = Filter::sanitizeLabel($_POST['checkbox']);
                 $userEtlProjects = array();
                 foreach (array_keys($checkbox) as $projectId) {
                     array_push($userEtlProjects, $projectId);
@@ -95,12 +95,13 @@ echo $buffer;
 <?php
 
 $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
+$module->renderAdminUsersSubTabs($selfUrl);
 
 ?>
 
 
 <form id="searchForm" action="<?php echo $selfUrl;?>" method="post">
-User:
+User:&nbsp;
 <input type="text" id="user-search" name="user-search" size="48" 
      value="<?php echo Filter::escapeForHtmlAttribute($username); ?>">
 <input type="hidden" name="username-result" id="username-result">

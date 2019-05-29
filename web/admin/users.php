@@ -23,16 +23,15 @@ $adminConfigJson = $module->getSystemSetting(AdminConfig::KEY);
 $adminConfig = new AdminConfig();
 
 
-$submitValue = $_POST['submitValue'];
-$username = $_POST['username-result'];
-$userLabel = $_POST['userLabel'];
+$submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
+$username    = Filter::stripTags($_POST['username-result']);
 
 $users = $module->getUsers();
 
 
 if (!empty($username)) {
     if (strcasecmp($submitValue, 'Save') === 0) {
-        $checkbox = $_POST['checkbox'];
+        $checkbox = Filter::sanitizeLabel($_POST['checkbox']);
         $userEtlProjects = array();
         foreach (array_keys($checkbox) as $projectId) {
             array_push($userEtlProjects, $projectId);
@@ -72,10 +71,11 @@ echo $buffer;
 
 <?php
 
-$errorMessage = $_GET['error'];
-$successMessage = $_GET['success'];
+$errorMessage   = Filter::stripTags($_GET['error']);
+$successMessage = Filter::stripTags($_GET['success']);
 
 $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, $successMessage);
+$module->renderAdminUsersSubTabs($selfUrl);
 
 ?>
 
