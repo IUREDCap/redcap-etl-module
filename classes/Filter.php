@@ -97,4 +97,37 @@ class Filter
         $flags = FILTER_FLAG_STRIP_LOW;
         return filter_var($value, FILTER_SANITIZE_STRING, $flags);
     }
+    
+    /**
+     * Removes all tags except allowed tags, and removes all tag
+     * attributes except for the "href" attribute that have the
+     * form href="http..." for the "a" tag.
+     */
+    public static function sanitizeHelp($text)
+    {
+        $allowedTags = ['a', 'b', 'hr', 'i', 'p'];
+
+        foreach ($allowedTags as $tag) {
+            if ($tag !== 'a') {
+                $text = self::removeTagAttributes($text, $tag);
+            }
+        }
+
+        $text = preg_replace('/<\s*([^>]+)\s*>/', '<${1}>', $text);
+
+        # nested tag
+        $text = preg_replace('/<\s*([a-zA-Z]+)([^<>]*<)/', '<${1}>${2}', $text);
+
+        # Remove a tag attributes that are not href with the form href="http..."
+        $text = preg_replace('/<\s*a\s+(href="(http[^"]*)"|([^>]*))\s*>/i', '<a href="$2">', $text);
+
+        # terminate non-terminated a tags, e.g.: <a this is a test
+        $text = preg_replace('/<\s*a\s+([^>]*$)/i', '<a>$1', $text);
+
+        # Remove non-allowed tags
+        $allowedTagsString = '<'.implode('><', $allowedTags).'>';
+        $text = strip_tags($text, $allowedTagsString);
+
+        return $text;
+    }
 }
