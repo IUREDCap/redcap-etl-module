@@ -19,7 +19,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const SERVERS_PAGE       = 'web/admin/servers.php';
     const SERVER_CONFIG_PAGE = 'web/admin/server_config.php';
     const ADMIN_INFO_PAGE    = 'web/admin/info.php';
-        
+    const HELP_EDIT_PAGE     = 'web/admin/help_edit.php';
+            
     const USER_ETL_CONFIG_PAGE  = 'web/configure.php';
     
     const RUN_LOG_ACTION    = 'REDCap-ETL Export';
@@ -800,7 +801,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $usersUrl = $this->getUrl(self::USERS_PAGE);
         #$manageUsersLabel = '<span>Manage Users</span>';
         #$manageUsersLabel = '<span><img aria-hidden="true" src="/redcap/redcap_v8.5.11/Resources/images/users3.png">'
-        $usersLabel = '<span class="glyphicon glyphicon-list" aria-hidden="true"></span>'
+        $usersLabel = '<span class="glyphicon glyphicon-user" aria-hidden="true"></span>'
            .' Users</span>';
 
         $configureUserUrl = $this->getUrl(self::USER_CONFIG_PAGE);
@@ -815,7 +816,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $serverConfigLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
            .' ETL Server Config';
 
-           
+        $helpEditUrl = $this->getUrl(self::HELP_EDIT_PAGE);
+        $helpEditLabel = '<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>'
+           .' Help Edit';
+                      
         $tabs = array();
         
         $tabs[$infoUrl]          = $infoLabel;
@@ -828,7 +832,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $tabs[$serversUrl]       = $serversLabel;
         #$tabs[$serverConfigUrl]  = $serverConfigLabel;
 
-        
+        $tabs[$helpEditUrl]      = $helpEditLabel;
+                
         $this->renderTabs($tabs, $activeUrl);
     }
 

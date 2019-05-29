@@ -222,42 +222,6 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     </tbody>
   </table>
 
-  <fieldset class="server-config" style="margin-top: 12px;">
-    <legend>Help</legend>
-      Topic:
-      <select id="help-select">
-        <?php
-        foreach (Help::getTopics() as $topic) {
-            echo '    <option value="'.$topic.'">'.$topic.'</option>'."\n";
-        }
-        ?>
-    </select>
-
-    <select>
-      <option value="default">Use default text</option>
-      <option value="custom">Use custom text</option>
-      <option value="replace">Prepend custom text to default</option>
-      <option value="replace">Append custom text to default</option>
-    </select>
-
-    <table style="margin-top: 12px; width: 100%;">
-      <tr>
-        <th style="width: 40%";>Default</th> <th style="width: 40%";>Custom</th>
-      </tr>
-      <tr style="vertical-align: top;">
-        <td>
-          <div id="help-text" style="padding: 4px; border: 1px solid black; background-color: #FFFFFF;">
-            &nbsp;
-          </div>
-        </td>
-        <td>
-          <textarea rows="10" style="width: 100%;">
-          </textarea>
-        </td>
-      </tr>
-    </table>
-  </fieldset>
-
   <script type="text/javascript">
       $('#help-select').change(function(event) {
           $.get("<?php echo $helpInfoUrl;?>", { topic: $('#help-select').val() },

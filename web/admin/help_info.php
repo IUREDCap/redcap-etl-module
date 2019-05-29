@@ -12,7 +12,7 @@ use IU\RedCapEtlModule\Filter;
 
 $topic = '';
 if (array_key_exists('topic', $_GET)) {
-    $topic = trim(Filter::sanitizeButtonLabel($_GET['topic']);
+    $topic = trim(Filter::sanitizeButtonLabel($_GET['topic']));
 }
 
 $data = Help::getHelp($topic);
