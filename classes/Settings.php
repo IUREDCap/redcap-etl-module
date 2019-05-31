@@ -868,6 +868,9 @@ class Settings
     {
         $key = Help::HELP_SETTING_PREFIX . $topic;
         $helpSetting = $this->module->getSystemSetting($key);
+        if (empty($helpSetting)) {
+            $helpSetting = Help::DEFAULT_TEXT;
+        }
         return $helpSetting;
     }
     

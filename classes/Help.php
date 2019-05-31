@@ -104,6 +104,22 @@ class Help
             ."</p>"
     ];
 
+    public static function getTitle($topic)
+    {
+        # Change dashes to blanks and capitalize the first letter of each word
+        $title = str_replace('-', ' ', $topic);
+        $title = ucwords($title);
+
+        # Make adjustments
+        $title = str_replace('Post Processing', 'Post-Processing', $title);
+        $title = str_replace('Api', 'API', $title);
+        $title = str_replace('Email', 'E-mail', $title);
+        $title = str_replace('Sql', 'SQL', $title);
+                
+        return $title;
+    }
+    
+    
     public static function getDefaultHelp($topic)
     {
         $help = Filter::sanitizeHelp(self::$help[$topic]);
@@ -142,6 +158,11 @@ class Help
         return $help;
     }
     
+    public static function helpPreview()
+    {
+        // todo ...
+    }
+    
     /**
      * Gets a string that will display the help as HTML.
      */
@@ -154,5 +175,25 @@ class Help
     public static function getTopics()
     {
         return array_keys(self::$help);
+    }
+    
+    public static function getSettingText($setting)
+    {
+        $settingText = '';
+        switch ($setting) {
+            case self::CUSTOM_TEXT:
+                $settingText = 'custom help';
+                break;
+            case self::PREPEND_CUSTOM_TEXT:
+                $settingText = 'prepend custom help to default';
+                break;
+            case self::APPEND_CUSTOM_TEXT:
+                $settingText = 'append custom help to default';
+                break;
+            default:
+                $settingText = 'default help';
+                break;
+        }
+        return $settingText;
     }
 }

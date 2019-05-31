@@ -19,6 +19,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const SERVERS_PAGE       = 'web/admin/servers.php';
     const SERVER_CONFIG_PAGE = 'web/admin/server_config.php';
     const ADMIN_INFO_PAGE    = 'web/admin/info.php';
+    
+    const HELP_LIST_PAGE     = 'web/admin/help_list.php';
     const HELP_EDIT_PAGE     = 'web/admin/help_edit.php';
             
     const USER_ETL_CONFIG_PAGE  = 'web/configure.php';
@@ -843,7 +845,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $serverConfigLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
            .' ETL Server Config';
 
-        $helpEditUrl = $this->getUrl(self::HELP_EDIT_PAGE);
+        $helpEditUrl = $this->getUrl(self::HELP_LIST_PAGE);
         $helpEditLabel = '<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>'
            .' Help Edit';
                       
@@ -905,7 +907,29 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
         $this->renderSubTabs($tabs, $activeUrl);
     }
-        
+    
+     /**
+     * Render sub-tabs for the admin help edit pages.
+     */
+    public function renderAdminHelpEditSubTabs($activeUrl = '')
+    {
+        $usersUrl = $this->getUrl(self::HELP_LIST_PAGE);
+        $usersLabel = '<span class="glyphicon glyphicon-list" aria-hidden="true"></span>'
+           .' List</span>';
+
+        $configureUserUrl = $this->getUrl(self::HELP_EDIT_PAGE);
+        $configureUserLabel = '<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>'
+           .' Edit</span>';
+
+        $tabs = array();
+
+        $tabs[$usersUrl]         = $usersLabel;
+        $tabs[$configureUserUrl] = $configureUserLabel;
+
+        $this->renderSubTabs($tabs, $activeUrl);
+    }
+
+
     /**
      * Renders the top-level tabs for the user interface.
      */

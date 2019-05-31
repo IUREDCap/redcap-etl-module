@@ -16,11 +16,25 @@ use \IU\RedCapEtlModule\Filter;
 use \IU\RedCapEtlModule\Help;
 use \IU\RedCapEtlModule\RedCapEtlModule;
 
+$topic = Filter::sanitizeButtonLabel($_GET['topic']);
+if (empty($topic)) {
+    $topic = Filter::sanitizeButtonLabel($_POST['topic']);
+}
+
+$helpSetting = $module->getHelpSetting($topic);
+$defaultHelp = Help::getDefaultHelp($topic);
+$customHelp  = Help::getCustomHelp($topic, $module);
+
 try {
     $selfUrl     = $module->getUrl(RedCapEtlModule::HELP_EDIT_PAGE);
     
-    $helpInfoUrl = $module->getUrl('web/admin/help_info.php');
+    $helpListUrl = $module->getUrl(RedCapEtlModule::HELP_LIST_PAGE);
 
+    
+
+    $helpInfoUrl = $module->getUrl('web/admin/help_info.php');
+    $helpDialogUrl = $module->getUrl('web/help_dialog.php');
+    
     $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
     if (strcasecmp($submitValue, 'Save') === 0) {
@@ -52,35 +66,49 @@ echo $buffer;
 
 <?php
 
-$module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
+$module->renderAdminPageContentHeader($helpListUrl, $error, $warning, $success);
+$module->renderAdminHelpEditSubTabs($selfUrl);
 
 ?>
 
 <?php
 #print "<pre>POST:\n"; print_r($_POST); print "</pre>\n";
+#print "<pre>TOPIC: ".$topic."</pre>"
 ?>
 
+<!-- TOPIC SELECTION -->
 <form action="<?php echo $selfUrl;?>" method="post">
     
-
   <fieldset class="server-config" style="margin-top: 12px;">
     <legend>Help</legend>
       Topic:
-      <select id="help-select">
+      <select name="topic" onchange="this.form.submit()">
         <?php
         $topics = Help::getTopics();
-        foreach ($topics as $topic) {
-            echo '    <option value="'.$topic.'">'.$topic.'</option>'."\n";
+        array_unshift($topics, '');  # Add blank selection at beginning
+        foreach ($topics as $selectTopic) {
+            $selected = '';
+            if (strcasecmp($selectTopic, $topic) === 0) {
+                $selected = "selected";
+            }
+            echo '    <option value="'.Filter::escapeForHtml($selectTopic).'" '.$selected.'>'
+                .Filter::escapeForHtml($selectTopic).'</option>'."\n";
         }
         ?>
     </select>
+  </fieldset>
+    <?php Csrf::generateFormToken(); ?>
+</form>
 
-    <!-- Help text selection -->
+<form action="<?php echo $selfUrl;?>" method="post">
+
+  <fieldset class="server-config" style="margin-top: 12px;">
+    <!-- Help setting selection -->
     <select>
-      <option value="default">Use default text</option>
-      <option value="custom">Use custom text</option>
-      <option value="replace">Prepend custom text to default</option>
-      <option value="replace">Append custom text to default</option>
+      <option value="<?php echo Help::DEFAULT_TEXT; ?>">Use default text</option>
+      <option value="<?php echo Help::CUSTOM_TEXT; ?>">Use custom text</option>
+      <option value="<?php echo Help::PREPEND_CUSTOM_TEXT; ?>">Prepend custom text to default</option>
+      <option value="<?php echo Help::APPEND_CUSTOM_TEXT; ?>">Append custom text to default</option>
     </select>
     
     <button id="previewButton" style="float: right;">Preview</button>
@@ -94,20 +122,19 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
       <tr style="vertical-align: top;">
         <td>
           <div id="help-text" style="padding: 4px; border: 1px solid black; background-color: #FFFFFF;">
-            <?php echo Help::getHelpHtml($topics[0], $module); ?>
+            <?php echo Help::getHelpHtml($topic, $module); ?>
           </div>
         </td>
         <td>
-          <textarea rows="10" style="width: 100%;">
-          </textarea>
+          <textarea rows="10" style="width: 100%;"></textarea>
         </td>
       </tr>
     </table>
   </fieldset>
 
   <script type="text/javascript">
-      $('#help-select').change(function(event) {
-          $.get("<?php echo $helpInfoUrl;?>", { topic: $('#help-select').val() },
+      $('#topicSelect').change(function(event) {
+          $.get("<?php echo $helpInfoUrl;?>", { topic: $('#topicSelect').val() },
               function(data) {
                   $('#help-text').html(data);
               }
@@ -121,8 +148,59 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     <?php Csrf::generateFormToken(); ?>
 </form>
 
+
+<div id="previewDialog" title="<?php echo 'Preiview: '.$topic; ?>" style="display: none;">
+    <?php echo Help::getHelp($topic, $module); ?>
+</div>
+
+                    
+<script>
+    // Help dialog events
+    /**
+    $(document).ready(function() {
+        $( function() {
+            $('#previewButton').click(function () {
+                var $topic = $('#topicSelect').val();
+                var $url = '<?php echo $helpDialogUrl; ?>' + '&topic=' + $topic;
+                var $dialog;
+                $dialog = $('<div></div>').load($url).dialog();
+                
+                //alert($url);
+                
+                $dialog.dialog({title: $topic, dialogClass: 'redcap-etl-help'})
+                    .dialog('open')
+                    //.position({my: 'left top', at: 'right+20 top', of: $(this)})
+                ;
+                                
+                //$('#previewDialog').dialog({dialogClass: 'redcap-etl-help'})
+                //    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                //    .data("topic", $('#topicSelect').val())
+                //;
+                return false;
+            });
+        });
+    });
+    **/
+</script>
 <?php
 #print "<pre>\n"; print_r($cronJobs); print "</pre>\n";
 ?>
 
+<div id="helpPreview" title="<?php echo Help::getTitle($topic); ?>" style="display: none;">
+    <?php echo Help::getHelp($topic, $module); ?>
+</div>
+                    
+<script>
+    // Help dialog events
+    $(document).ready(function() {
+        $( function() {
+            $('#previewButton').click(function () {
+                $('#helpPreview').dialog({dialogClass: 'redcap-etl-help'})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });
+        });
+    });
+</script>                    
 <?php require_once APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>
