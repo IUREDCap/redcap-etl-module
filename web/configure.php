@@ -750,7 +750,7 @@ Configuration form
                         aria-hidden="true">
                     </span>
                     <div id="batch-size-help" title="Batch Size" style="display: none;">
-                        <?php echo Help::getHelp('batch-size'); ?>
+                        <?php echo Help::getHelpHtml('batch-size', $module); ?>
                     </div>
                 </td>
             </tr>
@@ -766,7 +766,7 @@ Configuration form
                         aria-hidden="true">
                     </span>
                     <div id="table-name-prefix-help" title="Table Name Prefix" style="display: none;">
-                        <?php echo Help::getHelp('table-name-prefix'); ?>
+                        <?php echo Help::getHelpHtml('table-name-prefix', $module); ?>
                     </div>
                 </td>
             </tr>
@@ -795,7 +795,7 @@ Configuration form
                         aria-hidden="true">
                     </span>                    
                     <div id="database-logging-help" title="Database Logging" style="display: none;">
-                        <?php echo Help::getHelp('database-logging'); ?>
+                        <?php echo Help::getHelpHtml('database-logging', $module); ?>
                     </div>                        
                 </td>
             </tr>
@@ -809,7 +809,7 @@ Configuration form
                         aria-hidden="true">
                     </span>                    
                     <div id="database-log-table-help" title="Database Log Table" style="display: none;">
-                        <?php echo Help::getHelp('database-log-table'); ?>                    
+                        <?php echo Help::getHelpHtml('database-log-table', $module); ?>                    
                     </div>
                 </td>
             </tr>
@@ -825,7 +825,7 @@ Configuration form
                         aria-hidden="true">
                     </span>                       
                     <div id="database-event-log-table-help" title="Database Event Log Table" style="display: none;">
-                        <?php echo Help::getHelp('database-event-log-table'); ?>
+                        <?php echo Help::getHelpHtml('database-event-log-table', $module); ?>
                     </div>
                 </td>
             </tr>
@@ -848,7 +848,7 @@ Configuration form
                         aria-hidden="true">
                     </span>                      
                     <div id="email-errors-help" title="E-Mail Errors" style="display: none;">
-                        <?php echo Help::getHelp('email-errors'); ?>
+                        <?php echo Help::getHelpHtml('email-errors', $module); ?>
                     </div>
                 </td>
             </tr>
@@ -869,7 +869,7 @@ Configuration form
                         aria-hidden="true">
                     </span>                      
                     <div id="email-summary-help" title="E-Mail Summary" style="display: none;">
-                        <?php echo Help::getHelp('email-summary'); ?>   
+                        <?php echo Help::getHelpHtml('email-summary', $module); ?>   
                     </div>
                 </td>
             </tr>
@@ -884,7 +884,7 @@ Configuration form
                         aria-hidden="true">
                     </span>                      
                     <div id="email-subject-help" title="E-Mail Subject" style="display: none;">
-                        <?php echo Help::getHelp('email-subject'); ?>
+                        <?php echo Help::getHelpHtml('email-subject', $module); ?>
                     </div>
                 </td>
             </tr>
@@ -899,7 +899,7 @@ Configuration form
                         aria-hidden="true">
                     </span>                      
                     <div id="email-to-list-help" title="E-Mail To List" style="display: none;">
-                        <?php echo Help::getHelp('email-to-list'); ?>
+                        <?php echo Help::getHelpHtml('email-to-list', $module); ?>
                     </div>                    
                 </td>
             </tr>
@@ -923,7 +923,7 @@ Configuration form
                         aria-hidden="true">
                     </span>                      
                     <div id="post-processing-sql-help" title="Post-Processing SQL" style="display: none;">
-                        <?php echo Help::getHelp('post-processing-sql'); ?>
+                        <?php echo Help::getHelpHtml('post-processing-sql', $module); ?>
                     </div>                         
                 </td>
             </tr>

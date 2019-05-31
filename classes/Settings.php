@@ -12,7 +12,6 @@ class Settings
     const LAST_RUN_TIME_KEY        = 'last-run-time'; // for storing day and time of last run
 
     const USER_PROJECTS_KEY_PREFIX = 'user-projects:';  // appdend with username to make key
-    const HELP_KEY_PREFIX          = 'help:';  // append with help topic to make key
     
     const VERSION_KEY = 'version';
     
@@ -865,22 +864,35 @@ class Settings
     # Help settings methods, for custom, site-specific, help
     #--------------------------------------------------------------
 
-    public function getHelp($topic)
+    public function getHelpSetting($topic)
     {
-        $key = self::HELP_KEY_PREFIX . $topic;
-        $help = $this->module->getSystemSetting($key);
-        return $help;
+        $key = Help::HELP_SETTING_PREFIX . $topic;
+        $helpSetting = $this->module->getSystemSetting($key);
+        return $helpSetting;
+    }
+    
+    public function setHelpSetting($topic, $setting)
+    {
+        $key = Help::HELP_SETTING_PREFIX . $topic;
+        $this->module->setSystemSetting($key, $setting);
     }
 
-    public function setHelp($topic, $help)
+    public function getCustomHelp($topic)
     {
-        $key = self::HELP_KEY_PREFIX . $topic;
+        $key = Help::HELP_TEXT_PREFIX . $topic;
+        $customHelp = $this->module->getSystemSetting($key);
+        return $customHelp;
+    }
+    
+    public function setCustomHelp($topic, $help)
+    {
+        $key = Help::HELP_TEXT_PREFIX . $topic;
         $this->module->setSystemSetting($key, $help);
     }
 
-    public function removeHelp($topic)
+    public function removeCustomHelp($topic)
     {
-        $key = self::HELP_KEY_PREFIX . $topic;
+        $key = Help::HELP_TEXT_PREFIX . $topic;
         $this->module->removeSystemSetting($key);
     }
 }

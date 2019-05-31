@@ -16,48 +16,66 @@ class Help
     /** @var array map from help topic to help content */
     private static $help = [
         'api-token-user' =>
-            "REDCap-ETL uses the REDCap API (Application Programming Interface) to access REDCap,"
+            "<p>"
+            ."REDCap-ETL uses the REDCap API (Application Programming Interface) to access REDCap,"
             ." and the REDCap API requires an API token."
-            ."This selection specifies which user's token will be used for REDCap-ETL."
+            ." This selection specifies which user's token will be used for REDCap-ETL."
+            ."</p>"
         ,
         'batch-size' =>
-            "The batch size indicates how many REDCap record IDs will be processed at a time."
+            "<p>The batch size indicates how many REDCap record IDs will be processed at a time."
             ." In general, the larger the batch size, the"
             ." faster your ETL process will run, and the more memory it will use."
             ." For very large projects, using a large batch size may cause"
-            ." system memory limits to be exceeded and the ETL process to fail."
+            ." system memory limits to be exceeded and the ETL process to fail.</p>"
         ,
         'database-event-log-table' =>
-            "If database logging is enabled,"
+            "<p>"
+            ."If database logging is enabled,"
             ." this table will contain an entry for each logged event for ETL processes that have been run."
             ." All events with the same log_id belong to the same ETL process."
+            ."</p>"
         ,
         'database-host' =>
-            "The database host is the hostname of the database server for the database where the"
+            "<p>"
+            ."The database host is the hostname of the database server for the database where the"
             ." extracted and transformed data from REDCap will be stored."
+            ."</p>"
         ,
         'database-log-table' =>
-            "The main database log table. If database logging is enabled,"
+            "<p>"
+            ."The main database log table. If database logging is enabled,"
             ." it will contain one entry for each ETL process that is run."
+            ."</p>"
         ,
         'database-logging' =>
-            "Indicates if database logging is enabled. If it is enabled, logging information on"
+            "<p>"
+            ."Indicates if database logging is enabled. If it is enabled, logging information on"
             ." each ETL process that is run will be stored in the load database."
+            ."</p>"
         ,
         'email-errors' =>
-            "Indicates if an e-mail should be sent if the ETL process encounters an error."
+            "<p>"
+            ."Indicates if an e-mail should be sent if the ETL process encounters an error."
+            ."</p>"
         ,
         'email-subject' =>
-            "The subject to use for e-mails sent to you from REDCap-ETL servers."
+            "<p>"
+            ."The subject to use for e-mails sent to you from REDCap-ETL servers."
             ." Note: if you are using a custom REDCap-ETL server, this property might not be supported."
+            ."</p>"
         ,
         'email-summary' =>
-            "Indicates if a summary e-mail should be sent if the ETL process completes successfully."
+            "<p>"
+            ."Indicates if a summary e-mail should be sent if the ETL process completes successfully."
             ." The information contained in this e-mail will also be in the database log tables if"
             ." database logging is enabled."
+            ."</p>"
         ,
         'email-to-list' =>
-            "A comma-separated list of e-mail addresses that REDCap-ETL sends error and summary e-mails to."
+            "<p>"
+            ."A comma-separated list of e-mail addresses that REDCap-ETL sends error and summary e-mails to."
+            ."</p>"
         ,
         'post-processing-sql' =>
             "<p>The post-processing SQL field is used to specify SQL commands that you want"
@@ -71,20 +89,65 @@ class Help
             ." post-processing SQL commands.</p>"
         ,
         'table-name-prefix' =>
-            "A prefix that will be added to the names of all ETL generated tables in the"
+            "<p>"
+            ."A prefix that will be added to the names of all ETL generated tables in the"
             ." load database, except for the log tables."
             ." This can be useful if you have multiple processes loading data to "
             ." the same database and want to be able to easily distinguish the tables"
             ." of the different processes."
+            ."</p>"
         ,
         'transformation-rules' =>
-            "The transformation rules describe how REDCap-ETL should transform the data"
+            "<p>"
+            ."The transformation rules describe how REDCap-ETL should transform the data"
             ." from REDCap before loading it into the database."
+            ."</p>"
     ];
 
-    public static function getHelp($topic)
+    public static function getDefaultHelp($topic)
     {
         $help = Filter::sanitizeHelp(self::$help[$topic]);
+        return $help;
+    }
+    
+    public static function getCustomHelp($topic, $module)
+    {
+        $help = $module->getCustomHelp($topic, $module);
+        $help = Filter::sanitizeHelp($help);
+        return $help;
+    }
+    
+    public static function getHelp($topic, $module)
+    {
+        $help = '';
+        
+        # Get the specified topic's help setting
+        $setting = $module->getHelpSetting($topic);
+        
+        switch ($setting) {
+            case self::CUSTOM_TEXT:
+                $help = self::getCustomHelp($topic, $module);
+                break;
+            case self::PREPEND_CUSTOM_TEXT:
+                $help = self::getCustomHelp($topic, $module) . self::getDefaultHelp($topic);
+                break;
+            case self::APPEND_CUSTOM_TEXT:
+                $help = self::getDefaultHelp($topic) . self::getCustomHelp($topic, $module);
+                break;
+            default:
+                $help = self::getDefaultHelp($topic);
+                break;
+        }
+        
+        return $help;
+    }
+    
+    /**
+     * Gets a string that will display the help as HTML.
+     */
+    public static function getHelpHtml($topic, $module)
+    {
+        $help = htmlspecialchars(self::getHelp($topic, $module));
         return $help;
     }
 

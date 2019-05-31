@@ -107,16 +107,19 @@ class Filter
     {
         $allowedTags = ['a', 'b', 'hr', 'i', 'p'];
 
-        # Remove leadin and trailing spacing from tags
-        $text = preg_replace('/<\s*([^>]+)\s*>/', '<${1}>', $text);
+        # Remove leading spacing from tags
+        $text = preg_replace('/<\s+/', '<', $text);
 
+        # Remove trailing space from tags
+        $text = preg_replace('/\s+>/', '>', $text);
+                
         # Close nested tag, for example, change <a <a> => <a> <a>
         $text = preg_replace('/<\s*([a-zA-Z]+)([^<>]*<)/', '<${1}>${2}', $text);
 
         # Remove all attributes of allowed tags, except for the "a" tag
         foreach ($allowedTags as $tag) {
             if ($tag !== 'a') {
-                $text = preg_replace('/<\s*'.$tag.'[^(>|\/>)]*/', '<'.$tag, $text);
+                #$text = preg_replace('/<\s*'.$tag.'[^(>|\/>)]*/', '<'.$tag, $text);
             }
         }
 

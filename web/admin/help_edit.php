@@ -18,8 +18,7 @@ use \IU\RedCapEtlModule\RedCapEtlModule;
 
 try {
     $selfUrl     = $module->getUrl(RedCapEtlModule::HELP_EDIT_PAGE);
-    $cronInfoUrl = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);
-
+    
     $helpInfoUrl = $module->getUrl('web/admin/help_info.php');
 
     $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
@@ -69,7 +68,8 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
       Topic:
       <select id="help-select">
         <?php
-        foreach (Help::getTopics() as $topic) {
+        $topics = Help::getTopics();
+        foreach ($topics as $topic) {
             echo '    <option value="'.$topic.'">'.$topic.'</option>'."\n";
         }
         ?>
@@ -83,18 +83,18 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
       <option value="replace">Append custom text to default</option>
     </select>
     
-    <button style="float: right;">Preview</button>
+    <button id="previewButton" style="float: right;">Preview</button>
     
     <hr style="clear: both;"/>
 
     <table style="margin-top: 12px; width: 100%;">
       <tr>
-        <th style="width: 40%";>Default</th> <th style="width: 40%";>Custom</th>
+        <th style="width: 40%;">Default</th> <th style="width: 40%;">Custom</th>
       </tr>
       <tr style="vertical-align: top;">
         <td>
           <div id="help-text" style="padding: 4px; border: 1px solid black; background-color: #FFFFFF;">
-            &nbsp;
+            <?php echo Help::getHelpHtml($topics[0], $module); ?>
           </div>
         </td>
         <td>

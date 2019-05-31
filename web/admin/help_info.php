@@ -15,6 +15,6 @@ if (array_key_exists('topic', $_GET)) {
     $topic = trim(Filter::sanitizeButtonLabel($_GET['topic']));
 }
 
-$data = Help::getHelp($topic);
+$data = Help::getHelpHtml($topic, $module);
 
 echo $data;

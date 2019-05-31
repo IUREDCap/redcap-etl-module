@@ -778,7 +778,34 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         return $this->settings->isLastRunTime($date, $hour);
     }
 
-
+    #=============================================================
+    # Help methods
+    #=============================================================
+    
+    public function getHelpSetting($topic)
+    {
+        return $this->settings->getHelpSetting($topic);
+    }
+    
+    public function setHelpSetting($topic, $setting)
+    {
+        $this->settings->setHelpSetting($topic, $setting);
+    }
+    
+    public function getCustomHelp($topic)
+    {
+        return $this->settings->getCustomHelp($topic);
+    }
+    
+    public function setCustomHelp($topic, $help)
+    {
+        $this->settings->setCustomHelp($topic, $help);
+    }
+    
+    public function removeCustomHelp($topic)
+    {
+        $this->settings->removeCustomHelp($topic);
+    }
 
 
     /**
@@ -868,8 +895,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
            .' List</span>';
 
         $configureUserUrl = $this->getUrl(self::USER_CONFIG_PAGE);
-        $configureUserLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
-           .' Configuration</span>';
+        $configureUserLabel = '<span class="glyphicon glyphicon-search" aria-hidden="true"></span>'
+           .' Search</span>';
 
         $tabs = array();
 
