@@ -177,6 +177,39 @@ class Help
         return array_keys(self::$help);
     }
     
+    /**
+     * Indicates if the specified topic is a valid help topic.
+     *
+     * @return boolean true if the specified topic is a valid help topic, and false otherwise.
+     */
+    public static function isValidTopic($topic)
+    {
+        $isValid = false;
+        $topics = array_keys(self::$help);
+        if (in_array($topic, $topics)) {
+            $isValid = true;
+        }
+        return $isValid;
+    }
+    
+    /**
+     * Indicates if the specified help setting is valid.
+     */
+    public static function isValidSetting($setting)
+    {
+        $isValid = false;
+        $settingText = '';
+        switch ($setting) {
+            case self::DEFAULT_TEXT:
+            case self::CUSTOM_TEXT:
+            case self::PREPEND_CUSTOM_TEXT:
+            case self::APPEND_CUSTOM_TEXT:
+                $isValid = true;
+                break;
+        }
+        return $isValid;
+    }
+    
     public static function getSettingText($setting)
     {
         $settingText = '';

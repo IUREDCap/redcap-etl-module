@@ -16,29 +16,49 @@ use \IU\RedCapEtlModule\Filter;
 use \IU\RedCapEtlModule\Help;
 use \IU\RedCapEtlModule\RedCapEtlModule;
 
-$topic = Filter::sanitizeButtonLabel($_GET['topic']);
-if (empty($topic)) {
-    $topic = Filter::sanitizeButtonLabel($_POST['topic']);
-}
-
-$helpSetting = $module->getHelpSetting($topic);
-$defaultHelp = Help::getDefaultHelp($topic);
-$customHelp  = Help::getCustomHelp($topic, $module);
-
 try {
     $selfUrl     = $module->getUrl(RedCapEtlModule::HELP_EDIT_PAGE);
-    
     $helpListUrl = $module->getUrl(RedCapEtlModule::HELP_LIST_PAGE);
-
-    
 
     $helpInfoUrl = $module->getUrl('web/admin/help_info.php');
     $helpDialogUrl = $module->getUrl('web/help_dialog.php');
     
+    #------------------------------------------------------
+    # Get and process the help topic
+    #------------------------------------------------------
+    $topic = Filter::sanitizeButtonLabel($_GET['topic']);
+    if (empty($topic)) {
+        $topic = Filter::sanitizeButtonLabel($_POST['topic']);
+    }
+
+    if (!Help::isValidTopic($topic)) {
+        $topic = '';
+    }
+    
     $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
     if (strcasecmp($submitValue, 'Save') === 0) {
-        $success = "Help saved.";
+        if (empty($topic)) {
+            $error = 'No help topic specified.';
+            throw new Exception($error);
+        } else {
+            $helpSetting = (int) $_POST['helpSetting'];
+            $defaultHelp = Help::getDefaultHelp($topic);
+            $customHelp = Filter::sanitizeHelp($_POST['customHelp']);
+            
+            if (Help::isValidSetting($helpSetting)) {
+                $module->setHelpSetting($topic, $helpSetting);
+                $module->setCustomHelp($topic, $customHelp);
+                $success = "Help saved.";
+            } else {
+                $error = 'Invalid help setting specified.';
+                throw new Exception($error);
+            }
+        }
+    } elseif (!empty($topic)) {
+        $helpSetting = $module->getHelpSetting($topic);
+        $defaultHelp = Help::getDefaultHelp($topic);
+        $customHelp  = Help::getCustomHelp($topic, $module);
     }
 } catch (Exception $exception) {
     $error = 'ERROR: '.$exception->getMessage();
@@ -74,6 +94,8 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
 <?php
 #print "<pre>POST:\n"; print_r($_POST); print "</pre>\n";
 #print "<pre>TOPIC: ".$topic."</pre>"
+#print "<hr/>Topic: {$topic}<hr/>\n";
+#print "<hr/>Help Setting: {$helpSetting}<hr/>\n";
 ?>
 
 <!-- TOPIC SELECTION -->
@@ -92,7 +114,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
                 $selected = "selected";
             }
             echo '    <option value="'.Filter::escapeForHtml($selectTopic).'" '.$selected.'>'
-                .Filter::escapeForHtml($selectTopic).'</option>'."\n";
+                .Filter::escapeForHtml(Help::getTitle($selectTopic)).'</option>'."\n";
         }
         ?>
     </select>
@@ -103,12 +125,44 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
 <form action="<?php echo $selfUrl;?>" method="post">
 
   <fieldset class="server-config" style="margin-top: 12px;">
+    
+    <input type="hidden" name="topic" value="<?php echo $topic; ?>">
+    
     <!-- Help setting selection -->
-    <select>
-      <option value="<?php echo Help::DEFAULT_TEXT; ?>">Use default text</option>
-      <option value="<?php echo Help::CUSTOM_TEXT; ?>">Use custom text</option>
-      <option value="<?php echo Help::PREPEND_CUSTOM_TEXT; ?>">Prepend custom text to default</option>
-      <option value="<?php echo Help::APPEND_CUSTOM_TEXT; ?>">Append custom text to default</option>
+    <select name="helpSetting">
+        <?php
+        $selected = '';
+        if (empty($helpSetting) || $helpSetting === Help::DEFAULT_TEXT) {
+            $selected = ' selected ';
+        }
+        ?>
+        <option value="<?php echo Help::DEFAULT_TEXT; ?>" <?php echo $selected; ?>>Use default text</option>
+      
+        <?php
+        $selected = '';
+        if ($helpSetting === Help::CUSTOM_TEXT) {
+            $selected = ' selected ';
+        }
+        ?>      
+        <option value="<?php echo Help::CUSTOM_TEXT; ?>" <?php echo $selected; ?>>Use custom text</option>
+      
+        <?php
+        $selected = '';
+        if ($helpSetting === Help::PREPEND_CUSTOM_TEXT) {
+            $selected = ' selected ';
+        }
+        ?>
+        <option value="<?php echo Help::PREPEND_CUSTOM_TEXT; ?>"
+            <?php echo $selected; ?>>Prepend custom text to default</option>
+      
+        <?php
+        $selected = '';
+        if ($helpSetting === Help::APPEND_CUSTOM_TEXT) {
+            $selected = ' selected ';
+        }
+        ?>   
+        <option value="<?php echo Help::APPEND_CUSTOM_TEXT; ?>"
+            <?php echo $selected; ?>>Append custom text to default</option>
     </select>
     
     <button id="previewButton" style="float: right;">Preview</button>
@@ -122,11 +176,11 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
       <tr style="vertical-align: top;">
         <td>
           <div id="help-text" style="padding: 4px; border: 1px solid black; background-color: #FFFFFF;">
-            <?php echo Help::getHelpHtml($topic, $module); ?>
+            <?php echo htmlspecialchars($defaultHelp); ?>
           </div>
         </td>
         <td>
-          <textarea rows="10" style="width: 100%;"></textarea>
+          <textarea name="customHelp" rows="10" style="width: 100%;"><?php echo $customHelp; ?></textarea>
         </td>
       </tr>
     </table>
