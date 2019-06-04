@@ -10,13 +10,12 @@ require_once __DIR__.'/../dependencies/autoload.php';
 use IU\RedCapEtlModule\Help;
 use IU\RedCapEtlModule\Filter;
 
-$topic = '';
-if (array_key_exists('topic', $_GET)) {
-    $topic = trim(Filter::sanitizeButtonLabel($_GET['topic']));
-}
+$setting = (int) $_POST['setting'];
+$defaultHelp = Filter::sanitizeHelp($_POST['defaultHelp']);
+$customHelp  = Filter::sanitizeHelp($_POST['customHelp']);
 
-$help = Help::getHelp($topic, $module);
+$help = Help::getHelpFromText($setting, $defaultHelp, $customHelp);
 
 #echo '<div title="'.$topic.'>'."\n";
-echo "{$help}\n";
+echo $help;
 #echo "</div>\n";

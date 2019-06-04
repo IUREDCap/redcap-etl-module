@@ -55,6 +55,10 @@ try {
                 throw new Exception($error);
             }
         }
+    } if (strcasecmp($submitValue, 'Preivew') === 0) {
+        $helpSetting = (int) $_POST['helpSetting'];
+        $defaultHelp = Help::getDefaultHelp($topic);
+        $customHelp = Filter::sanitizeHelp($_POST['customHelp']);
     } elseif (!empty($topic)) {
         $helpSetting = $module->getHelpSetting($topic);
         $defaultHelp = Help::getDefaultHelp($topic);
@@ -129,7 +133,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
     <input type="hidden" name="topic" value="<?php echo $topic; ?>">
     
     <!-- Help setting selection -->
-    <select name="helpSetting">
+    <select id="helpSetting" name="helpSetting">
         <?php
         $selected = '';
         if (empty($helpSetting) || $helpSetting === Help::DEFAULT_TEXT) {
@@ -175,12 +179,13 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
       </tr>
       <tr style="vertical-align: top;">
         <td>
-          <div id="help-text" style="padding: 4px; border: 1px solid black; background-color: #FFFFFF;">
+          <div id="defaultHelp" style="padding: 4px; border: 1px solid black; background-color: #FFFFFF;">
             <?php echo htmlspecialchars($defaultHelp); ?>
           </div>
         </td>
         <td>
-          <textarea name="customHelp" rows="10" style="width: 100%;"><?php echo $customHelp; ?></textarea>
+          <textarea id="customHelp" name="customHelp" rows="10"
+              style="width: 100%;"><?php echo $customHelp; ?></textarea>
         </td>
       </tr>
     </table>
@@ -210,14 +215,19 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
                     
 <script>
     // Help dialog events
-    /**
     $(document).ready(function() {
         $( function() {
             $('#previewButton').click(function () {
-                var $topic = $('#topicSelect').val();
-                var $url = '<?php echo $helpDialogUrl; ?>' + '&topic=' + $topic;
+                var $topic = "<?php echo Help::getTitle($topic); ?>";
+                var $url = '<?php echo $helpDialogUrl; ?>';
                 var $dialog;
-                $dialog = $('<div></div>').load($url).dialog();
+                $dialog = $('<div></div>')
+                    .load($url, {
+                        setting: $('#helpSetting').val(),
+                        defaultHelp: "<?php echo $defaultHelp; ?>",
+                        customHelp: $('#customHelp').val(),
+                        <?php echo Csrf::TOKEN_NAME; ?>: "<?php echo Csrf::getToken(); ?>"
+                    }).dialog();
                 
                 //alert($url);
                 
@@ -234,7 +244,6 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
             });
         });
     });
-    **/
 </script>
 <?php
 #print "<pre>\n"; print_r($cronJobs); print "</pre>\n";
@@ -245,6 +254,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
 </div>
                     
 <script>
+    /*
     // Help dialog events
     $(document).ready(function() {
         $( function() {
@@ -256,5 +266,6 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
             });
         });
     });
+    */
 </script>                    
 <?php require_once APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>

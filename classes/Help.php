@@ -158,6 +158,29 @@ class Help
         return $help;
     }
     
+    public function getHelpFromText($setting, $defaultHelp, $customHelp)
+    {
+        $help = '';
+        
+        switch ($setting) {
+            case self::CUSTOM_TEXT:
+                $help = Filter::sanitizeHelp($customHelp);
+                break;
+            case self::PREPEND_CUSTOM_TEXT:
+                $help = Filter::sanitizeHelp($customHelp . $defaultHelp);
+                break;
+            case self::APPEND_CUSTOM_TEXT:
+                $help = Filter::sanitizeHelp($defaultHelp . $customHelp);
+                break;
+            default:
+                $help = Filter::sanitizeHelp($defaultHelp);
+                break;
+        }
+        
+        return $help;
+    }
+    
+    
     public static function helpPreview()
     {
         // todo ...
