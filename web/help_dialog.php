@@ -17,5 +17,6 @@ $customHelp  = Filter::sanitizeHelp($_POST['customHelp']);
 $help = Help::getHelpFromText($setting, $defaultHelp, $customHelp);
 
 #echo '<div title="'.$topic.'>'."\n";
+#echo '<div style="max-height: 300px; overflow-y: auto; padding-right: 7px;">';
 echo $help;
 #echo "</div>\n";

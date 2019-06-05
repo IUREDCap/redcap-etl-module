@@ -105,7 +105,11 @@ class Filter
      */
     public static function sanitizeHelp($text)
     {
-        $allowedTags = ['a', 'b', 'hr', 'i', 'p'];
+        $allowedTags = [
+            'a', 'b', 'blockquote', 'em',
+            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+            'hr', 'i', 'li', 'ol', 'p', 'pre', 'strong', 'ul'
+        ];
 
         # Remove leading spacing from tags
         $text = preg_replace('/<\s+/', '<', $text);

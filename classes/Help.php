@@ -77,6 +77,25 @@ class Help
             ."A comma-separated list of e-mail addresses that REDCap-ETL sends error and summary e-mails to."
             ."</p>"
         ,
+        'load-settings' =>
+            "<p>"
+            ."The load settings specify the database where the extracted and transformed"
+            ." data from REDCap will be loaded."
+            ." Only MySQL database are currently supported."
+            ."</p>"
+            ."<p>"
+            ."The host name and database name for the database need to be specified, as well as a"
+            ." username and password for a valid user account for the database. The user account"
+            ." has to have at least the following database permissions for REDCap-ETL to work:"
+            ."<ul>"
+            ."<li>SELECT</li>"
+            ."<li>INSERT</li>"
+            ."<li>CREATE</li>"
+            ."<li>DROP</li>"
+            ."<li>CREATE VIEW</li>"
+            ."</ul>"
+            ."</p>"
+        ,
         'post-processing-sql' =>
             "<p>The post-processing SQL field is used to specify SQL commands that you want"
             ." REDCap-ETL to run on the load database"
@@ -155,6 +174,18 @@ class Help
                 break;
         }
         
+        return $help;
+    }
+    
+    public static function getHelpWithPageLink($topic, $module)
+    {
+        $help = self::getHelp($topic, $module);
+        $help = '<a href="'.$module->getUrl('web/help.php?topic='.$topic).'"'
+            .' target="_blank" style="float: right;"'
+            .'>'
+            .'View text on separate page</a>'
+            .'<div style="clear: both;"></div>'
+            .Filter::sanitizeHelp($help);
         return $help;
     }
     

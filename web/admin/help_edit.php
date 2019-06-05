@@ -175,7 +175,8 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
 
     <table style="margin-top: 12px; width: 100%;">
       <tr>
-        <th style="width: 40%;">Default</th> <th style="width: 40%;">Custom</th>
+        <th style="width: 40%;"><strong>Default Help</strong></th>
+        <th style="width: 40%;"><strong>Custom Help</strong></th>
       </tr>
       <tr style="vertical-align: top;">
         <td>
@@ -231,7 +232,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
                 
                 //alert($url);
                 
-                $dialog.dialog({title: $topic, dialogClass: 'redcap-etl-help'})
+                $dialog.dialog({title: $topic, dialogClass: 'redcap-etl-help', width: '500px'})
                     .dialog('open')
                     //.position({my: 'left top', at: 'right+20 top', of: $(this)})
                 ;

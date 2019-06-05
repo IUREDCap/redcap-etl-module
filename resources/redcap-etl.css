@@ -80,6 +80,8 @@ img.disabled {
     opacity: 0.33;
 }
 
+
+/* Server configuration fieldset */
 fieldset.server-config {
     padding: 7px;
     margin-bottom: 14px;
@@ -95,6 +97,35 @@ fieldset.server-config legend {
     font-weight: bold;
 }
 
+fieldset.server-config textarea {
+    background-color: #FFFFFF;
+}
+
+/* Configuration fieldset */
+fieldset.config {
+    padding: 7px;
+    margin-bottom: 14px;
+    background-color: #F0F5FF; /* #f0f0f0; */
+    border: 1px solid #777;
+}
+ 
+fieldset.config legend {
+    font-weight: bold;
+}
+
+/* Configuration nested fieldset */
+fieldset.config-nested {
+    padding: 7px;
+    margin: 10px 0px;
+    background-color: #F8FAFF; /* #f0f0f0; */
+    border: 1px solid #777;
+}
+ 
+fieldset.config legend {
+    font-weight: bold;
+}
+
+/* REDCap-ETL Help Dialog */
 .ui-dialog.redcap-etl-help {
     border: 2px solid #286090;
 }
@@ -103,6 +134,12 @@ fieldset.server-config legend {
     border: 1px solid #286090;
     color: #286090;
 }
+
+/*
+.ui-dialog.redcap-etl-help .ui-dialog-content {
+}
+*/
+
 
 .etl-help-icon {
     color: #286090;
