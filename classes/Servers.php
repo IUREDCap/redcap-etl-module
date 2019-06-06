@@ -19,9 +19,6 @@ class Servers implements \JsonSerializable
 
     public function getServers()
     {
-        if (!array_key_exists(ServerConfig::EMBEDDED_SERVER_NAME)) {
-            $this->servers[ServerConfig::EMBEDDED_SERVER_NAME] = 1;
-        }
         $servers = array_keys($this->servers);
         sort($servers);
         return $servers;

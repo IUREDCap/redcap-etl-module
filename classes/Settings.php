@@ -755,7 +755,12 @@ class Settings
             if (strcmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
                 $serverConfig = new ServerConfig($serverName);
                 $serverConfig->setIsActive(true);
-                $this->setServerConfig($serverConfig);
+                if (SUPER_USER) {
+                    # If admin, then add embedded server to system settings
+                    # (non-admin users do not have permission to set system
+                    # settings, and attempting to do so causes a permission error)
+                    $this->setServerConfig($serverConfig);
+                }
             } else {
                 $message = 'Server "'.$serverName.'" not found.';
                 throw new \Exception($message);
