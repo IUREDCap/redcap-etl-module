@@ -31,7 +31,7 @@ $adminConfig = new AdminConfig();
         
 $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
-$username = Filter::stripTags($_POST['username-result']);
+$username = Filter::stripTags($_POST['username']);
 if (empty($username)) {
     $username = Filter::stripTags($_GET['username']);
 }
@@ -48,10 +48,12 @@ try {
             header('Location: '.$usersUrl);
         } else {
             if (strcasecmp($submitValue, 'Save') === 0) {
-                $checkbox = Filter::sanitizeLabel($_POST['checkbox']);
+                $checkbox = $_POST['checkbox'];
                 $userEtlProjects = array();
-                foreach (array_keys($checkbox) as $projectId) {
-                    array_push($userEtlProjects, $projectId);
+                if (is_array($checkbox) && !empty($checkbox)) {
+                    foreach (array_keys($checkbox) as $projectId) {
+                        array_push($userEtlProjects, (int) $projectId);
+                    }
                 }
                 $module->addUser($username);
                 $module->setUserEtlProjects($username, $userEtlProjects);
@@ -104,7 +106,7 @@ $module->renderAdminUsersSubTabs($selfUrl);
 User:&nbsp;
 <input type="text" id="user-search" name="user-search" size="48" 
      value="<?php echo Filter::escapeForHtmlAttribute($username); ?>">
-<input type="hidden" name="username-result" id="username-result">
+<input type="hidden" name="username" id="username-result">
 <input type="hidden" name="userLabel" id="userLabel">
 <?php Csrf::generateFormToken(); ?>
 </form>
@@ -197,7 +199,7 @@ $(function() {
 #-----------------------------------------------
 ?>
 <form action="<?php echo $selfUrl;?>" method="post">
-<input type="hidden" name="username-result" value="<?php echo Filter::escapeForHtmlAttribute($username);?>">
+<input type="hidden" name="username" value="<?php echo Filter::escapeForHtmlAttribute($username);?>">
 <table class="user-projects">
     <thead>
         <tr> <th>ETL Access?</th> </th><th>PID</th> <th>Project</th> <th>ETL Configurations</th> </tr>
