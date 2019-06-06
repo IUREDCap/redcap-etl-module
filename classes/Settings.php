@@ -747,6 +747,7 @@ class Settings
     {
         $key = self::SERVER_CONFIG_KEY_PREFIX . $serverName;
         $setting = $this->module->getSystemSetting($key);
+        
         if (empty($setting)) {
             # If the server configuration is NOT found then
             # create it if it is the embedded server
@@ -759,9 +760,11 @@ class Settings
                 $message = 'Server "'.$serverName.'" not found.';
                 throw new \Exception($message);
             }
+        } else {
+            $serverConfig = new ServerConfig($serverName);
+            $serverConfig->fromJson($setting);
         }
-        $serverConfig = new ServerConfig($serverName);
-        $serverConfig->fromJson($setting);
+        
         return $serverConfig;
     }
     
