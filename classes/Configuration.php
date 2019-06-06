@@ -46,6 +46,8 @@ class Configuration implements \JsonSerializable
 
     const TABLE_PREFIX = 'table_prefix';
     
+    const LABEL_VIEW_SUFFIX = 'label_view_suffix';
+    
     const POST_PROCESSING_SQL = 'post_processing_sql';
     const PRINT_LOGGING = 'print_logging';
     const PROJECT_ID = 'project_id';
@@ -95,6 +97,8 @@ class Configuration implements \JsonSerializable
         $this->properties[self::TRANSFORM_RULES_SOURCE] = '1';
         
         $this->properties[self::TABLE_PREFIX] = '';
+        
+        $this->properties[self::LABEL_VIEW_SUFFIX] = \IU\REDCapETL\Configuration::DEFAULT_LABEL_VIEW_SUFFIX;
                 
         $this->properties[self::DB_LOGGING]         = true;
         $this->properties[self::DB_LOG_TABLE]       = \IU\REDCapETL\Configuration::DEFAULT_DB_LOG_TABLE;
@@ -124,6 +128,9 @@ class Configuration implements \JsonSerializable
         $tablePrefix = $this->getProperty(self::TABLE_PREFIX);
         self::validateTablePrefix($tablePrefix);
         
+        $labelViewSuffix = $this->getProperty(self::LABEL_VIEW_SUFFIX);
+        self::validateLabelViewSuffix($labelViewSuffix);
+                
         $emailToList = $this->getProperty(self::EMAIL_TO_LIST);
         self::validateEmailToList($emailToList);
     }
@@ -207,7 +214,23 @@ class Configuration implements \JsonSerializable
         }
         return true;
     }
-       
+
+     
+    public static function validateLabelViewSuffix($suffix)
+    {
+        $matches = array();
+        if (empty($suffix)) {
+            ; // OK, it's optional; will default to '_label_view'
+        } elseif (preg_match('/^[_$a-zA-Z][_a-zA-Z0-9]*$/', $suffix, $matches) === 1) {
+            ; // OK
+        } else {
+             $errorMessage = 'Invalid label view suffix "'.$suffix.'". Label view suffixes need to contain'
+                 .' only letters (a-z or A-Z), underscores, or digits (0-9)';
+            throw new \Exception($errorMessage);
+        }
+        return true;
+    }
+           
     public static function validateEmailToList($emailToList)
     {
         if (isset($emailToList)) {

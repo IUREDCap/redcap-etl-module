@@ -323,9 +323,21 @@ echo $buffer;
                     .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
                     ;
                 return false;
-            });      
+            });
+            $('#extract-settings-help-link').click(function () {
+                $('#extract-settings-help').dialog({dialogClass: 'redcap-etl-help', width: 500, maxHeight: 440})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });
+            $('#label-view-suffix-help-link').click(function () {
+                $('#label-view-suffix-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });
             $('#load-settings-help-link').click(function () {
-                $('#load-settings-help').dialog({dialogClass: 'redcap-etl-help', width: 500})
+                $('#load-settings-help').dialog({dialogClass: 'redcap-etl-help', width: 500, maxHeight: 440})
                     .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
                     ;
                 return false;
@@ -492,6 +504,12 @@ Configuration form
 
     <fieldset class="config">
         <legend>Extract Settings</legend>
+        <span id="extract-settings-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
+              style="float: right; margin-right: 10px;" aria-hidden="true">
+        </span>
+        <div id="extract-settings-help" title="Extract Settings" style="display: none; clear: both;">
+            <?php echo Help::getHelpWithPageLink('extract-settings', $module); ?>
+        </div> 
         <table>
             <tbody style="padding: 20px;">
 
@@ -499,8 +517,9 @@ Configuration form
                 <tr>
                     <td>REDCap API URL</td>
                     <?php
-                    if ($testMode && SUPER_USER) { # make API URL editable ?>
+                    if ($testMode && SUPER_USER) { # make API URL editable
                         $displayApiUrl = Filter::escapeForHtmlAttribute($properties[Configuration::REDCAP_API_URL]);
+                    ?>
                     <td>
                         <input type="text" size="60" 
                             value="<?php echo $displayApiUrl;?>"
@@ -783,8 +802,21 @@ Configuration form
                         </div>
                     </td>
                 </tr>
-               
      
+                <!-- LABEL VIEW SUFFIX -->
+                <tr>
+                    <td style="padding-right: 1em;">Label view suffix</td>
+                    <td><input type="text" name="<?php echo Configuration::LABEL_VIEW_SUFFIX;?>"
+                        value="<?php echo Filter::escapeForHtml($properties[Configuration::LABEL_VIEW_SUFFIX]);?>"/>
+                        <span id="label-view-suffix-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
+                            aria-hidden="true">
+                        </span>
+                        <div id="label-view-suffix-help" title="Label View Suffix" style="display: none;">
+                            <?php echo Help::getHelp('label-view-suffix', $module); ?>
+                        </div>
+                    </td>
+                </tr>
+
             </tbody>
         </table>
         

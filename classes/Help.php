@@ -77,6 +77,27 @@ class Help
             ."A comma-separated list of e-mail addresses that REDCap-ETL sends error and summary e-mails to."
             ."</p>"
         ,
+        'extract-settings' =>
+            "<p>"
+            ."REDCap-ETL uses the REDCap API (Application Programming Interface) to extract data from REDCap."
+            ." You need to have an API token for your project that REDCap-ETL can use."
+            ."</p>"
+            ."<p>"
+            ."If an API token with the correct data export permission already exists for the project,"
+            ." there should be at least one username in the API token drop-down. If there are none,"
+            ." then a user who has the same data export permission as the configuration will"
+            ." need to request one."
+            ."</p>"
+        ,
+        'label-view-suffix' =>
+            "<p>"
+            ."REDCap-ETL generates tables that have choice <em>values</em> for multiple choice fields in REDCap."
+            ." However, it also creates views of these tables that contain the choice <em>labels</em>"
+            ." instead of the choice values."
+            ." The name of a view is the name of the table it corresponds to"
+            ." with the \"label view suffix\" appended to it."
+            ."</p>"
+        ,
         'load-settings' =>
             "<p>"
             ."The load settings specify the database where the extracted and transformed"

@@ -30,9 +30,10 @@ To use REDCap-ETL on a project, you need the following:
     "De-identified" for the project.
 * **REDCap API Token**. REDCap-ETL uses the REDCap API (Application
     Programming Interface) to extract data from REDCap, so you need to have
-    A REDCap API token for the project with export permission. You can either use your
+    a REDCap API token for the project with export permission. You can either use your
     own API token, or select the API token of another of the project's users who
-    has the same "Data Exports" user right as you.
+    has the same "Data Exports" user right as you. To be able to request an API token with export
+    permission, you need to have the REDCap user right "API Export".
 * **MySQL Database Account.** An account for a MySQL database where the data can be loaded. The account has to
     have at least the following permissions:
     * SELECT
