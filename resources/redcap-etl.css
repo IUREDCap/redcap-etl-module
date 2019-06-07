@@ -140,6 +140,13 @@ fieldset.config legend {
 }
 */
 
+a.etl-help {
+    background-color: #FFFFFF;
+    border: 1px solid #286090;
+    color: #286090;
+    font-weight: bold;
+    padding: 0px 4px;
+}
 
 .etl-help-icon {
     color: #286090;

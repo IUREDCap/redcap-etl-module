@@ -936,7 +936,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function renderUserTabs($activeUrl = '')
     {
         $listUrl = $this->getUrl('web/index.php');
-        $listLabel = '<span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>'
+        $listLabel = '<span class="fas fa-list glyphicon glyphicon-list-alt" aria-hidden="true"></span>'
            .' ETL Configurations';
 
         #$addUrl = $this->getUrl('add.php');
@@ -944,20 +944,23 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         #   .' New Configuration';
 
         $configUrl = $this->getUrl('web/configure.php');
-        $configLabel = '<span style="color: #808080;" class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
+        $configLabel = '<span style="color: #808080;" class="fas fa-cog"</span>'
            .' Configure';
 
         $scheduleUrl = $this->getUrl('web/schedule.php');
-        $scheduleLabel = '<span class="glyphicon glyphicon-time" aria-hidden="true"></span>'
+        $scheduleLabel =
+           #'<span class="glyphicon glyphicon-time" aria-hidden="true"></span>'
+           '<span class="fas fa-clock"></span>'
            .' Schedule';
 
         $runUrl = $this->getUrl('web/run.php');
-        $runLabel = '<span style="color: #008000;" class="glyphicon glyphicon-play-circle" aria-hidden="true"></span>'
+        $runLabel = '<span style="color: #008000;" class="fas fa-play-circle"></span>'
            .' Run';
 
         $userManualUrl = $this->getUrl('web/user_manual.php');
         $userManualLabel =
-            '<span style="color: #000066;" class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>'
+            #'<span style="color: #000066;" class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>'
+            '<i class="fas fa-book"></i>'
             .' User Manual';
 
         $adminConfig = $this->getAdminConfig();

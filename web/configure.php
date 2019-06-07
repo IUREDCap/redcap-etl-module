@@ -504,12 +504,7 @@ Configuration form
 
     <fieldset class="config">
         <legend>Extract Settings</legend>
-        <span id="extract-settings-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
-              style="float: right; margin-right: 10px;" aria-hidden="true">
-        </span>
-        <div id="extract-settings-help" title="Extract Settings" style="display: none; clear: both;">
-            <?php echo Help::getHelpWithPageLink('extract-settings', $module); ?>
-        </div> 
+
         <table>
             <tbody style="padding: 20px;">
 
@@ -605,6 +600,12 @@ Configuration form
                             }
                             ?>
                         </select>
+                    </td>
+                    <td>
+                        <a href="#" id="extract-settings-help-link" class="etl-help" style="margin-left: 10px;">?</a>
+                        <div id="extract-settings-help" title="Extract Settings" style="display: none; clear: both;">
+                            <?php echo Help::getHelpWithPageLink('extract-settings', $module); ?>
+                        </div> 
                     </td>
                 </tr>
                 
@@ -705,15 +706,16 @@ Configuration form
                         </p>
                         <p>
                             <button type="submit" id="check-rules-button" value="Check Rules" name="submitValue">
-                                <span class="glyphicon glyphicon-ok-circle etl-rules-check-icon" 
-                                    aria-hidden="true" style="vertical-align: middle;">
-                                </span>                             
-                                <span  style="vertical-align: middle;">Check Rules</span>
+                                <div>
+                                <span class="fas fa-check-circle etl-rules-check-icon" 
+                                    aria-hidden="true" style="vertical-align: middle;"></span>
+                                <span>Check Rules</span>
+                                </div>
                             </button>
                         </p>                    
                         <p>
                             <a href="<?php echo $module->getUrl('web/transformation_rules.php');?>" target="_blank">
-                                <img alt="" src="<?php echo APP_PATH_IMAGES.'information_frame.png'?>"/>
+                                <i class="fas fa-info-circle"></i>
                                 Transformation Rules Guide
                             </a>
                         </p>
@@ -725,12 +727,7 @@ Configuration form
     
     <fieldset class="config">
         <legend>Load Settings</legend>
-        <span id="load-settings-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
-              style="float: right; margin-right: 10px;" aria-hidden="true">
-        </span>
-        <div id="load-settings-help" title="Load Settings" style="display: none; clear: both;">
-            <?php echo Help::getHelpWithPageLink('load-settings', $module); ?>
-        </div>        
+       
         <table>
             <tbody style="padding: 20px;">
                 <!-- DATABASE HOST -->
@@ -738,6 +735,12 @@ Configuration form
                     <td>Database host</td>
                     <td><input type="text" name="<?php echo Configuration::DB_HOST;?>"
                         value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_HOST])?>"/>
+                    </td>
+                    <td>
+                        <a href="#" id="load-settings-help-link" class="etl-help" title="help">?</a>
+                        <div id="load-settings-help" title="Load Settings" style="display: none; clear: both;">
+                            <?php echo Help::getHelpWithPageLink('load-settings', $module); ?>
+                        </div> 
                     </td>
                 </tr>
 
@@ -780,9 +783,7 @@ Configuration form
                     <td>Batch size</td>
                     <td><input type="text" name="<?php echo Configuration::BATCH_SIZE;?>"
                         value="<?php echo Filter::escapeForHtml($properties[Configuration::BATCH_SIZE]);?>"/>
-                        <span id="batch-size-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
-                            aria-hidden="true">
-                        </span>
+                        <a href="#" id="batch-size-help-link" class="etl-help">?</a>
                         <div id="batch-size-help" title="Batch Size" style="display: none;">
                             <?php echo Help::getHelp('batch-size', $module); ?>
                         </div>
@@ -794,9 +795,7 @@ Configuration form
                     <td style="padding-right: 1em;">Table name prefix</td>
                     <td><input type="text" name="<?php echo Configuration::TABLE_PREFIX;?>"
                         value="<?php echo Filter::escapeForHtml($properties[Configuration::TABLE_PREFIX]);?>"/>
-                        <span id="table-name-prefix-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
-                            aria-hidden="true">
-                        </span>
+                        <a href="#" id="table-name-prefix-help-link" class="etl-help">?</a>
                         <div id="table-name-prefix-help" title="Table Name Prefix" style="display: none;">
                             <?php echo Help::getHelp('table-name-prefix', $module); ?>
                         </div>
@@ -808,9 +807,7 @@ Configuration form
                     <td style="padding-right: 1em;">Label view suffix</td>
                     <td><input type="text" name="<?php echo Configuration::LABEL_VIEW_SUFFIX;?>"
                         value="<?php echo Filter::escapeForHtml($properties[Configuration::LABEL_VIEW_SUFFIX]);?>"/>
-                        <span id="label-view-suffix-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
-                            aria-hidden="true">
-                        </span>
+                        <a href="#" id="label-view-suffix-help-link" class="etl-help">?</a>
                         <div id="label-view-suffix-help" title="Label View Suffix" style="display: none;">
                             <?php echo Help::getHelp('label-view-suffix', $module); ?>
                         </div>
@@ -837,9 +834,7 @@ Configuration form
                         ?>
                         <input type="checkbox" name="<?php echo Configuration::DB_LOGGING;?>" value="true"
                             <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
-                        <span id="database-logging-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
-                            aria-hidden="true">
-                        </span>                    
+                        <a href="#" id="database-logging-help-link" class="etl-help">?</a>                    
                         <div id="database-logging-help" title="Database Logging" style="display: none;">
                             <?php echo Help::getHelp('database-logging', $module); ?>
                         </div>                        
@@ -851,9 +846,7 @@ Configuration form
                     <td>Database log table</td>
                     <td><input type="text" name="<?php echo Configuration::DB_LOG_TABLE;?>"
                         value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_LOG_TABLE]);?>"/>
-                        <span id="database-log-table-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
-                            aria-hidden="true">
-                        </span>                    
+                        <a href="#" id="database-log-table-help-link" class="etl-help">?</a>                    
                         <div id="database-log-table-help" title="Database Log Table" style="display: none;">
                             <?php echo Help::getHelp('database-log-table', $module); ?>                    
                         </div>
@@ -866,10 +859,7 @@ Configuration form
                     <?php $dbEventLogTable = $properties[Configuration::DB_EVENT_LOG_TABLE]; ?>
                     <td><input type="text" name="<?php echo Configuration::DB_EVENT_LOG_TABLE;?>"
                         value="<?php echo Filter::escapeForHtmlAttribute($dbEventLogTable);?>"/>
-                        <span id="database-event-log-table-help-link"
-                            class="glyphicon glyphicon-question-sign etl-help-icon"
-                            aria-hidden="true">
-                        </span>                       
+                        <a href="#" id="database-event-log-table-help-link" class="etl-help">?</a>
                         <div id="database-event-log-table-help" title="Database Event Log Table" style="display: none;">
                             <?php echo Help::getHelp('database-event-log-table', $module); ?>
                         </div>
@@ -897,9 +887,7 @@ Configuration form
                         ?>
                         <input type="checkbox" name="<?php echo Configuration::EMAIL_ERRORS;?>" value="true"
                             <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
-                        <span id="email-errors-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
-                            aria-hidden="true">
-                        </span>                      
+                        <a href="#" id="email-errors-help-link" class="etl-help">?</a>                      
                         <div id="email-errors-help" title="E-Mail Errors" style="display: none;">
                             <?php echo Help::getHelp('email-errors', $module); ?>
                         </div>
@@ -918,9 +906,7 @@ Configuration form
                         ?>
                         <input type="checkbox" name="<?php echo Configuration::EMAIL_SUMMARY;?>" value="true"
                             <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
-                        <span id="email-summary-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
-                            aria-hidden="true">
-                        </span>                      
+                        <a href="#" id="email-summary-help-link" class="etl-help">?</a>                      
                         <div id="email-summary-help" title="E-Mail Summary" style="display: none;">
                             <?php echo Help::getHelp('email-summary', $module); ?>   
                         </div>
@@ -933,9 +919,7 @@ Configuration form
                     <td><input type="text" name="<?php echo Configuration::EMAIL_SUBJECT;?>" size="64"
                         value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::EMAIL_SUBJECT]);?>"
                         />
-                        <span id="email-subject-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
-                            aria-hidden="true">
-                        </span>                      
+                        <a href="#" id="email-subject-help-link" class="etl-help">?</a>                      
                         <div id="email-subject-help" title="E-Mail Subject" style="display: none;">
                             <?php echo Help::getHelp('email-subject', $module); ?>
                         </div>
@@ -948,9 +932,7 @@ Configuration form
                     <td><input type="text" name="<?php echo Configuration::EMAIL_TO_LIST;?>" size="64"
                         value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::EMAIL_TO_LIST]);?>"
                         />
-                        <span id="email-to-list-help-link" class="glyphicon glyphicon-question-sign etl-help-icon" 
-                            aria-hidden="true">
-                        </span>                      
+                        <a href="#" id="email-to-list-help-link" class="etl-help">?</a>                      
                         <div id="email-to-list-help" title="E-Mail To List" style="display: none;">
                             <?php echo Help::getHelp('email-to-list', $module); ?>
                         </div>                    
@@ -978,10 +960,7 @@ Configuration form
                             name="<?php echo $sqlName;?>"><?php echo Filter::escapeForHtml($sql);?></textarea>
                     </td>
                     <td>
-                        <span id="post-processing-sql-help-link"
-                            class="glyphicon glyphicon-question-sign etl-help-icon" 
-                            aria-hidden="true">
-                        </span>                      
+                        <a href="#" id="post-processing-sql-help-link" class="etl-help">?</a>                      
                         <div id="post-processing-sql-help" title="Post-Processing SQL" style="display: none;">
                             <?php echo Help::getHelp('post-processing-sql', $module); ?>
                         </div>                         
