@@ -817,36 +817,36 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
 
         $infoUrl = $this->getUrl(self::ADMIN_INFO_PAGE);
-        $infoLabel = '&nbsp;<span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>&nbsp;Info';
+        $infoLabel = '&nbsp;<span class="fa fa-info-circle"></span>&nbsp;Info';
         
         $adminUrl = $this->getUrl(self::ADMIN_HOME_PAGE);
-        $adminLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
+        $adminLabel = '<span class="fas fa-cog"></span>'
            .' Config';
 
         $cronJobsUrl = $this->getUrl(self::CRON_DETAIL_PAGE);
-        $cronJobsLabel = '<span class="glyphicon glyphicon-time" aria-hidden="true"></span>'
+        $cronJobsLabel = '<span class="fas fa-clock"></span>'
            .' Cron Detail';
 
         $usersUrl = $this->getUrl(self::USERS_PAGE);
         #$manageUsersLabel = '<span>Manage Users</span>';
         #$manageUsersLabel = '<span><img aria-hidden="true" src="/redcap/redcap_v8.5.11/Resources/images/users3.png">'
-        $usersLabel = '<span class="glyphicon glyphicon-user" aria-hidden="true"></span>'
+        $usersLabel = '<span class="fas fa-user"></span>'
            .' Users</span>';
 
-        $configureUserUrl = $this->getUrl(self::USER_CONFIG_PAGE);
-        $configureUserLabel = '<span class="glyphicon glyphicon-user" aria-hidden="true"></span>'
-           .' User Config</span>';
+        #$configureUserUrl = $this->getUrl(self::USER_CONFIG_PAGE);
+        #$configureUserLabel = '<span class="fas fa-user"></span>'
+        #   .' User Config</span>';
            
         $serversUrl = $this->getUrl(self::SERVERS_PAGE);
-        $serversLabel = '<span class="glyphicon glyphicon-hdd" aria-hidden="true"></span>'
+        $serversLabel = '<span class="fas fa-server"></span>'
            .' ETL Servers';
 
-        $serverConfigUrl = $this->getUrl(self::SERVER_CONFIG_PAGE);
-        $serverConfigLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
-           .' ETL Server Config';
+        #$serverConfigUrl = $this->getUrl(self::SERVER_CONFIG_PAGE);
+        #$serverConfigLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
+        #   .' ETL Server Config';
 
         $helpEditUrl = $this->getUrl(self::HELP_LIST_PAGE);
-        $helpEditLabel = '<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>'
+        $helpEditLabel = '<span class="fas fa-edit"></span>'
            .' Help Edit';
                       
         $tabs = array();
@@ -872,11 +872,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function renderAdminEtlServerSubTabs($activeUrl = '')
     {
         $serversUrl = $this->getUrl(self::SERVERS_PAGE);
-        $serversLabel = '<span class="glyphicon glyphicon-list" aria-hidden="true"></span>'
+        $serversLabel = '<span class="fas fa-list"></span>'
            .' List';
 
         $serverConfigUrl = $this->getUrl(self::SERVER_CONFIG_PAGE);
-        $serverConfigLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
+        $serverConfigLabel = '<span class="fas fa-cog"></span>'
            .' Configuration';
 
         $tabs = array();
@@ -893,11 +893,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function renderAdminUsersSubTabs($activeUrl = '')
     {
         $usersUrl = $this->getUrl(self::USERS_PAGE);
-        $usersLabel = '<span class="glyphicon glyphicon-list" aria-hidden="true"></span>'
+        $usersLabel = '<span class="fas fa-list"></span>'
            .' List</span>';
 
         $configureUserUrl = $this->getUrl(self::USER_CONFIG_PAGE);
-        $configureUserLabel = '<span class="glyphicon glyphicon-search" aria-hidden="true"></span>'
+        $configureUserLabel = '<span class="fas fa-search"></span>'
            .' Search</span>';
 
         $tabs = array();
@@ -914,11 +914,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function renderAdminHelpEditSubTabs($activeUrl = '')
     {
         $usersUrl = $this->getUrl(self::HELP_LIST_PAGE);
-        $usersLabel = '<span class="glyphicon glyphicon-list" aria-hidden="true"></span>'
+        $usersLabel = '<span class="fas fa-list"></span>'
            .' List</span>';
 
         $configureUserUrl = $this->getUrl(self::HELP_EDIT_PAGE);
-        $configureUserLabel = '<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>'
+        $configureUserLabel = '<span class="fas fa-edit"></span>'
            .' Edit</span>';
 
         $tabs = array();

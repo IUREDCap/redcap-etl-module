@@ -679,7 +679,7 @@ Configuration form
             <tbody style="padding: 20px;">
                 <!-- TRANSFORMATION RULES -->
                 <tr>
-                    <td>Transformation rules</td>
+                    <td style="padding-right: 1em;">Transformation rules</td>
                     <td>
                         <?php
                         $rules = $properties[Configuration::TRANSFORM_RULES_TEXT];
@@ -694,14 +694,16 @@ Configuration form
                         <p>
                             <button type="submit" value="Upload CSV file"
                                     name="submitValue" style="vertical-align: middle;">
-                                <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>"> Upload CSV file
+                                <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>" alt=""> Upload CSV file
                             </button>
                             <input type="file" name="uploadCsvFile" id="uploadCsvFile" style="display: inline;">
                         </p>
                         <p>
                             <button type="submit" value="Download CSV file" name="submitValue">
-                                <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>" style="vertical-align: middle;">
+                                <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>"
+                                    alt="" style="vertical-align: middle;">
                                 <span  style="vertical-align: middle;"> Download CSV file</span>
+
                             </button>
                         </p>
                         <p>
@@ -715,7 +717,7 @@ Configuration form
                         </p>                    
                         <p>
                             <a href="<?php echo $module->getUrl('web/transformation_rules.php');?>" target="_blank">
-                                <i class="fas fa-info-circle"></i>
+                                <i class="fas fa-book"></i>
                                 Transformation Rules Guide
                             </a>
                         </p>
