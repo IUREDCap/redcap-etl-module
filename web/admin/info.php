@@ -49,7 +49,7 @@ $buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
 echo $buffer;
 ?>
 
-<h4><img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>table_gear.png">REDCap-ETL Admin</h4>
+<h4><img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>table_gear.png" alt="">REDCap-ETL Admin</h4>
 
 
 <?php
@@ -75,7 +75,7 @@ The REDCap-ETL (Extract Transform Load) external module:
 </p>
 
 <p>
-<img src="<?php echo $redcapEtlImage; ?>">
+<img src="<?php echo $redcapEtlImage; ?>" alt="">
 </p>
 
 <hr />

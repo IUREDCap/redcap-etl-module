@@ -828,22 +828,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
            .' Cron Detail';
 
         $usersUrl = $this->getUrl(self::USERS_PAGE);
-        #$manageUsersLabel = '<span>Manage Users</span>';
-        #$manageUsersLabel = '<span><img aria-hidden="true" src="/redcap/redcap_v8.5.11/Resources/images/users3.png">'
         $usersLabel = '<span class="fas fa-user"></span>'
            .' Users</span>';
 
-        #$configureUserUrl = $this->getUrl(self::USER_CONFIG_PAGE);
-        #$configureUserLabel = '<span class="fas fa-user"></span>'
-        #   .' User Config</span>';
-           
         $serversUrl = $this->getUrl(self::SERVERS_PAGE);
         $serversLabel = '<span class="fas fa-server"></span>'
            .' ETL Servers';
-
-        #$serverConfigUrl = $this->getUrl(self::SERVER_CONFIG_PAGE);
-        #$serverConfigLabel = '<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>'
-        #   .' ETL Server Config';
 
         $helpEditUrl = $this->getUrl(self::HELP_LIST_PAGE);
         $helpEditLabel = '<span class="fas fa-edit"></span>'
@@ -936,20 +926,15 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function renderUserTabs($activeUrl = '')
     {
         $listUrl = $this->getUrl('web/index.php');
-        $listLabel = '<span class="fas fa-list glyphicon glyphicon-list-alt" aria-hidden="true"></span>'
+        $listLabel = '<span class="fas fa-list"></span>'
            .' ETL Configurations';
 
-        #$addUrl = $this->getUrl('add.php');
-        #$addLabel = '<span style="color: #008000;" class="glyphicon glyphicon-plus" aria-hidden="true"></span>'
-        #   .' New Configuration';
-
         $configUrl = $this->getUrl('web/configure.php');
-        $configLabel = '<span style="color: #808080;" class="fas fa-cog"</span>'
+        $configLabel = '<span style="color: #808080;" class="fas fa-cog"></span>'
            .' Configure';
 
         $scheduleUrl = $this->getUrl('web/schedule.php');
         $scheduleLabel =
-           #'<span class="glyphicon glyphicon-time" aria-hidden="true"></span>'
            '<span class="fas fa-clock"></span>'
            .' Schedule';
 
@@ -959,7 +944,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
         $userManualUrl = $this->getUrl('web/user_manual.php');
         $userManualLabel =
-            #'<span style="color: #000066;" class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>'
             '<i class="fas fa-book"></i>'
             .' User Manual';
 
@@ -1053,7 +1037,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         if (!empty($message)) {
             echo '<div align="center" class="darkgreen" style="margin: 20px 0;">'."\n";
-            echo '<img src="'.(APP_PATH_IMAGES.'accept.png').'">';
+            echo '<img src="'.(APP_PATH_IMAGES.'accept.png').'" alt="">';
             echo '&nbsp;'.Filter::escapeForHtml($message)."\n";
             echo "</div>\n";
         }
@@ -1063,7 +1047,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         if (!empty($message)) {
             echo '<div align="center" class="yellow" style="margin: 20px 0;">'."\n";
-            echo '<img src="'.(APP_PATH_IMAGES.'warning.png').'" width="16px">';
+            echo '<img src="'.(APP_PATH_IMAGES.'warning.png').'"  alt="" width="16px">';
             echo '&nbsp;'.Filter::escapeForHtml($message)."\n";
             echo "</div>\n";
         }
@@ -1073,7 +1057,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         if (!empty($message)) {
             echo '<div align="center" class="red" style="margin: 20px 0;">'."\n";
-            echo '<img src="'.(APP_PATH_IMAGES.'exclamation.png').'">';
+            echo '<img src="'.(APP_PATH_IMAGES.'exclamation.png').'" alt="">';
             echo '&nbsp;'.Filter::escapeForHtml($message)."\n";
             echo "</div>\n";
         }

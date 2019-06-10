@@ -380,7 +380,7 @@ echo $buffer;
 ?>
 
 <div class="projhdr"> 
-    <img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>database_table.png">REDCap-ETL
+    <img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>database_table.png" alt="">REDCap-ETL
     <?php
     if ($testMode) {
         echo '<span style="color: blue;">[TEST MODE]</span>';
@@ -700,8 +700,8 @@ Configuration form
                         </p>
                         <p>
                             <button type="submit" value="Download CSV file" name="submitValue">
-                                <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>"
-                                    alt="" style="vertical-align: middle;">
+                                <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>" alt=""
+                                    style="vertical-align: middle;">
                                 <span  style="vertical-align: middle;"> Download CSV file</span>
 
                             </button>

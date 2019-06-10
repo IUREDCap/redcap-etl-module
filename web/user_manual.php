@@ -51,7 +51,7 @@ echo $buffer;
 ?>
 
 <div class="projhdr"> <!--h4 style="color:#800000;margin:0 0 10px;"> -->
-<img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>database_table.png">REDCap-ETL
+<img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>database_table.png" alt="">REDCap-ETL
 </div>
 
 <?php
@@ -71,7 +71,7 @@ The REDCap-ETL (Extract Transform Load) external module:
 </p>
 
 <p>
-<img src="<?php echo $redcapEtlImage; ?>">
+<img src="<?php echo $redcapEtlImage; ?>" alt="">
 </p>
 
 <hr />

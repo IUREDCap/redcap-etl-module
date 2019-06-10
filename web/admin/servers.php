@@ -93,7 +93,7 @@ echo $buffer;
 ?>
 
 
-<h4><img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>table_gear.png">REDCap-ETL Admin</h4>
+<h4><img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>table_gear.png" alt="">REDCap-ETL Admin</h4>
 
 
 <?php
@@ -140,14 +140,15 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
         
         echo '<td style="text-align:center;">';
         if ($serverConfig->getIsActive()) {
-            echo '<img src='.APP_PATH_IMAGES.'tick.png>';
+            echo '<img src="'.APP_PATH_IMAGES.'tick.png" alt="Yes">';
         } else {
-            echo '<img src='.APP_PATH_IMAGES.'cross.png>';
+            echo '<img src="'.APP_PATH_IMAGES.'cross.png" alt="No">';
         }
         echo "</td>\n";
 
         echo '<td style="text-align:center;">'
-            .'<a href="'.$serverConfigureUrl.'"><img src='.APP_PATH_IMAGES.'gear.png></a>'
+            .'<a href="'.$serverConfigureUrl.'">'
+            .'<img src="'.APP_PATH_IMAGES.'gear.png" alt="CONFIG"></a>'
             ."</td>\n";
 
         
@@ -155,17 +156,17 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
             echo "<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>\n";
         } else {
             echo '<td style="text-align:center;">'
-                .'<img src="'.APP_PATH_IMAGES.'page_copy.png" id="copyServer'.$row.'"'
+                .'<img src="'.APP_PATH_IMAGES.'page_copy.png" alt="COPY" id="copyServer'.$row.'"'
                 .' class="copyServer" style="cursor: pointer;">'
                 ."</td>\n";
 
             echo '<td style="text-align:center;">'
-                .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" id="renameServer'.$row.'"'
+                .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME" id="renameServer'.$row.'"'
                 .' class="renameServer" style="cursor: pointer;">'
                 ."</td>\n";
           
             echo '<td style="text-align:center;">'
-                  .'<img src="'.APP_PATH_IMAGES.'delete.png" id="deleteServer'.$row.'"'
+                  .'<img src="'.APP_PATH_IMAGES.'delete.png" alt="DELETE" id="deleteServer'.$row.'"'
                   .' class="deleteServer" style="cursor: pointer;">'
                   ."</td>\n";
         }

@@ -48,7 +48,7 @@ $buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
 echo $buffer;
 ?>
 
-<h4><img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>table_gear.png">REDCap-ETL Admin</h4>
+<h4><img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>table_gear.png" alt="">REDCap-ETL Admin</h4>
 
 
 <?php
@@ -83,7 +83,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
             echo "<td>".Help::getTitle($topic)."</td>";
             echo "<td>".Help::getSettingText($module->getHelpSetting($topic))."</td>";
             echo '<td style="text-align:center;">'
-                .'<a href="'.$editUrl.'"><img src='.APP_PATH_IMAGES.'page_white_edit.png></a>'
+                .'<a href="'.$editUrl.'"><img src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="EDIT"></a>'
                 ."</td>\n";
             echo "</tr>\n";
             $row++;

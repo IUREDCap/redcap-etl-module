@@ -108,7 +108,7 @@ echo $buffer;
 ?>
 
 <div class="projhdr">
-<img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>database_table.png">REDCap-ETL
+<img style="margin-right: 7px;" alt="" src="<?php echo APP_PATH_IMAGES ?>database_table.png">REDCap-ETL
 </div>
 
 
@@ -132,47 +132,6 @@ $projectId = $module->getProjectId();
 
 $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
-?>
-
-
-
-<?php
-
-#--------------------------------------------------------------------
-# If the user does NOT have permission to use ETL for this project,
-# display a link to send e-mail to request access
-#--------------------------------------------------------------------
-if (!SUPER_USER && !in_array($projectId, $userEtlProjects)) {
-    echo '<div style="padding-top:15px; padding-bottom:15px;">'."\n";
-    $label = 'Request ETL access for this project';
-
-    # The underscore variable names are internal REDCap variables
-    // phpcs:disable
-    $homepageContactEmail = $homepage_contact_email;
-    $redcapVervaion = $redcap_version;
-    $userFirstName = $user_firstname;
-    $userLastName  = $user_lastname;
-    // phpcs:enable
-    
-    echo '<a href="mailto:'.$homepageContactEmail
-        .'?subject='.rawurlencode('REDCap-ETL Access Request')
-        .'&body='
-        .rawurlencode(
-            'Username: '.USERID."\n"
-            .'Project title: "'.' '.strip_tags(REDCap::getProjectTitle()).'"'."\n"
-            .'Project link: '.APP_PATH_WEBROOT_FULL."redcap_v{$redcapVersion}/index.php?pid={$projectId}\n\n"
-            .'Dear REDCap administrator,'."\n\n"
-            .'Please add REDCap-ETL access for me to project "'.REDCap::getProjectTitle().'"'."\n\n"
-            ."Sincerely,\n"
-            .$userFirstName.' '.$userLastName
-        )
-        .'" '
-        .' class="btn-contact-admin btn btn-primary btn-xs" style="color:#fff;">'
-        .'<span class="glyphicon glyphicon-envelope"></span> '.$label
-        .'</a>'."\n";
-    ;
-    echo "</div>\n";
-} else {
 ?>
 
 <?php
@@ -242,11 +201,11 @@ foreach ($configurationNames as $configurationName) {
     #-------------------------------------------------------------------------------------
     if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
-            .'<a href="'.$configureUrl.'"><img src="'.APP_PATH_IMAGES.'gear.png"></a>'
+            .'<a href="'.$configureUrl.'"><img alt="CONFIG" src="'.APP_PATH_IMAGES.'gear.png"></a>'
             ."</td>\n";
     } else {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'gear.png" class="disabled">'
+            .'<img src="'.APP_PATH_IMAGES.'gear.png" alt="CONFIG" class="disabled">'
             ."</td>\n";
     }
     
@@ -257,11 +216,11 @@ foreach ($configurationNames as $configurationName) {
     if ($adminConfig->getAllowOnDemand()) {
         if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
             echo '<td style="text-align:center;">'
-                .'<a href="'.$runConfigurationUrl.'"><img src="'.APP_PATH_IMAGES.'application_go.png"></a>'
+                .'<a href="'.$runConfigurationUrl.'"><img src="'.APP_PATH_IMAGES.'application_go.png" alt="RUN"></a>'
                 ."</td>\n";
         } else {
             echo '<td style="text-align:center;">'
-                .'<img src="'.APP_PATH_IMAGES.'application_go.png" class="disabled">'
+                .'<img src="'.APP_PATH_IMAGES.'application_go.png"  alt="RUN" class="disabled">'
                 ."</td>\n";
         }
     }
@@ -273,11 +232,11 @@ foreach ($configurationNames as $configurationName) {
     if ($adminConfig->getAllowCron()) {
         if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
             echo '<td style="text-align:center;">'
-                .'<a href="'.$scheduleConfigUrl.'"><img src="'.APP_PATH_IMAGES.'clock_frame.png"></a>'
+                .'<a href="'.$scheduleConfigUrl.'"><img src="'.APP_PATH_IMAGES.'clock_frame.png" alt="SCHEDULE"></a>'
                 ."</td>\n";
         } else {
             echo '<td style="text-align:center;">'
-                .'<img src="'.APP_PATH_IMAGES.'clock_frame.png" class="disabled">'
+                .'<img src="'.APP_PATH_IMAGES.'clock_frame.png" alt="SCHEDULE" class="disabled">'
                 ."</td>\n";
         }
     }
@@ -288,12 +247,12 @@ foreach ($configurationNames as $configurationName) {
     #-----------------------------------------------------------
     if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'page_copy.png" class="copyConfig" style="cursor: pointer;"'
+            .'<img src="'.APP_PATH_IMAGES.'page_copy.png" alt="COPY" class="copyConfig" style="cursor: pointer;"'
             .' id="copyConfig'.$row.'"/>'
             ."</td>\n";
     } else {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'page_copy.png" class="disabled" />'
+            .'<img src="'.APP_PATH_IMAGES.'page_copy.png" alt="COPY" class="disabled" />'
             ."</td>\n";
     }
     
@@ -303,12 +262,13 @@ foreach ($configurationNames as $configurationName) {
     #-----------------------------------------------------------
     if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" class="renameConfig" style="cursor: pointer;"'
+            .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME"'
+            .' class="renameConfig" style="cursor: pointer;"'
             .' id="renameConfig'.$row.'"/>'
             ."</td>\n";
     } else {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" class="disabled" />'
+            .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME" class="disabled" />'
             ."</td>\n";
     }
 
@@ -318,12 +278,12 @@ foreach ($configurationNames as $configurationName) {
     #-----------------------------------------------------------
     if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'delete.png" class="deleteConfig" style="cursor: pointer;"'
+            .'<img src="'.APP_PATH_IMAGES.'delete.png" alt="DELETE" class="deleteConfig" style="cursor: pointer;"'
             .' id="deleteConfig'.$row.'"/>'
             ."</td>\n";
     } else {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'delete.png" class="disabled" />'
+            .'<img src="'.APP_PATH_IMAGES.'delete.png" alt="DELETE" class="disabled" />'
             ."</td>\n";
     }
     
@@ -334,10 +294,6 @@ foreach ($configurationNames as $configurationName) {
 ?>
 </tbody>
 </table>
-
-<?php
-}
-?>
 
 <?php
 #--------------------------------------

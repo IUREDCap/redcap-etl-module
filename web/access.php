@@ -12,7 +12,7 @@ require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 ?>
 
 <div class="projhdr">
-<img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>database_table.png">REDCap-ETL
+<img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>database_table.png" alt="">REDCap-ETL
 </div>
 
 
@@ -64,7 +64,7 @@ if ($accessError === RedCapEtlModule::CSRF_ERROR) {
         )
         .'" '
         .' class="btn-contact-admin btn btn-primary btn-xs" style="color:#fff;">'
-        .'<span class="glyphicon glyphicon-envelope"></span> '.$label
+        .'<span class="fas fa-envelope"></span> '.$label
         .'</a>'."\n";
     ;
     echo "</div>\n";
