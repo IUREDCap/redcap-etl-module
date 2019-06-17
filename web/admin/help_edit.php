@@ -232,7 +232,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
                 
                 //alert($url);
                 
-                $dialog.dialog({title: $topic, dialogClass: 'redcap-etl-help', width: '500px'})
+                $dialog.dialog({title: $topic, dialogClass: 'redcap-etl-help', width: 700, maxHeight: 400})
                     .dialog('open')
                     //.position({my: 'left top', at: 'right+20 top', of: $(this)})
                 ;
