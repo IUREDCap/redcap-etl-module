@@ -108,7 +108,9 @@ class Filter
         $allowedTags = [
             'a', 'b', 'blockquote', 'em',
             'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-            'hr', 'i', 'li', 'ol', 'p', 'pre', 'strong', 'ul'
+            'hr', 'i', 'li', 'ol', 'p', 'pre', 'strong',
+            'table', 'tbody', 'td', 'th', 'thead', 'tr',
+            'ul'
         ];
 
         # Remove leading spacing from tags

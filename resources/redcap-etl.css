@@ -105,7 +105,7 @@ fieldset.server-config textarea {
 fieldset.config {
     padding: 7px;
     margin-bottom: 14px;
-    background-color: #F0F5FF; /* #f0f0f0; */
+    background-color: #E9F1F8; /* #D9E8F4; #F0F5FF; #f0f0f0; */
     border: 1px solid #777;
 }
  
@@ -117,7 +117,7 @@ fieldset.config legend {
 fieldset.config-nested {
     padding: 7px;
     margin: 10px 0px;
-    background-color: #F8FAFF; /* #f0f0f0; */
+    background-color: #F4F8Fb; /* #F8FAFF; #f0f0f0; */
     border: 1px solid #777;
 }
  
@@ -133,6 +133,25 @@ fieldset.config legend {
 .ui-dialog.redcap-etl-help .ui-dialog-titlebar {
     border: 1px solid #286090;
     color: #286090;
+}
+
+.ui-dialog.redcap-etl-help table {
+    border-top: 1px solid #000000;
+    border-right: 1px solid #000000;
+}
+
+.ui-dialog.redcap-etl-help th {
+    border-bottom: 1px solid #000000;
+    border-left: 1px solid #000000;
+    font-weight: bold;
+    padding: 1px 4px;
+    background-color: #F8F8F8;
+}
+
+.ui-dialog.redcap-etl-help td {
+    border-bottom: 1px solid #000000;
+    border-left: 1px solid #000000;
+    padding: 1px 4px;
 }
 
 /*

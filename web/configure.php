@@ -326,7 +326,7 @@ echo $buffer;
             });
             $('#extract-settings-help-link').click(function () {
                 $('#extract-settings-help').dialog({dialogClass: 'redcap-etl-help', width: 500, maxHeight: 440})
-                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    .dialog('widget').position({my: 'left top', at: 'right top+60', of: $(this)})
                     ;
                 return false;
             });

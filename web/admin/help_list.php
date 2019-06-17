@@ -20,7 +20,6 @@ try {
     $selfUrl     = $module->getUrl(RedCapEtlModule::HELP_LIST_PAGE);
     
     $helpInfoUrl = $module->getUrl('web/admin/help_info.php');
-    $helpDialogUrl = $module->getUrl('web/help_dialog.php');
     
     $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
 

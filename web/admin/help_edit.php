@@ -21,7 +21,7 @@ try {
     $helpListUrl = $module->getUrl(RedCapEtlModule::HELP_LIST_PAGE);
 
     $helpInfoUrl = $module->getUrl('web/admin/help_info.php');
-    $helpDialogUrl = $module->getUrl('web/help_dialog.php');
+    $helpPreviewUrl = $module->getUrl('web/admin/help_preview.php');
     
     #------------------------------------------------------
     # Get and process the help topic
@@ -220,7 +220,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
         $( function() {
             $('#previewButton').click(function () {
                 var $topic = "<?php echo Help::getTitle($topic); ?>";
-                var $url = '<?php echo $helpDialogUrl; ?>';
+                var $url = '<?php echo $helpPreviewUrl; ?>';
                 var $dialog;
                 $dialog = $('<div></div>')
                     .load($url, {
