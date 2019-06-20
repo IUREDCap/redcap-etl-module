@@ -5,6 +5,7 @@ namespace IU\REDCapETL;
 use IU\PHPCap\RedCap;
 use IU\PHPCap\PhpCapException;
 
+use IU\REDCapETL\Database\DbConnection;
 use IU\REDCapETL\Database\DbConnectionFactory;
 
 use IU\REDCapETL\Schema\FieldTypeSpecifier;
@@ -241,12 +242,18 @@ class Configuration
         
         $this->dbLogTable = self::DEFAULT_DB_LOG_TABLE;
         if (array_key_exists(ConfigProperties::DB_LOG_TABLE, $this->properties)) {
-            $this->dbLogTable = $this->properties[ConfigProperties::DB_LOG_TABLE];
+            $dbLogTable = trim($this->properties[ConfigProperties::DB_LOG_TABLE]);
+            if (!empty($dbLogTable)) {
+                $this->dbLogTable = $dbLogTable;
+            }
         }
 
         $this->dbEventLogTable = self::DEFAULT_DB_EVENT_LOG_TABLE;
         if (array_key_exists(ConfigProperties::DB_EVENT_LOG_TABLE, $this->properties)) {
-            $this->dbEventLogTable = $this->properties[ConfigProperties::DB_EVENT_LOG_TABLE];
+            $dbEventLogTable = trim($this->properties[ConfigProperties::DB_EVENT_LOG_TABLE]);
+            if (!empty($dbEventLogTable)) {
+                $this->dbEventLogTable = $dbEventLogTable;
+            }
         }
 
         #-----------------------------------------------------------
@@ -971,7 +978,7 @@ class Configuration
         list($dbType, $dbInfo) = explode(':', $this->dbConnection, 2);
 
         if (strcasecmp($dbType, 'MySQL') === 0) {
-            $connectionInfo = explode(':', $dbInfo);
+            $connectionInfo = DbConnection::parseConnectionString($dbInfo);
         }
 
         return $connectionInfo;
@@ -1000,6 +1007,11 @@ class Configuration
             }
         }
         return $isAbsolute;
+    }
+
+    public function getPropertiesFile()
+    {
+        return $this->propertiesFile;
     }
 
     private function setPropertiesFile($file)

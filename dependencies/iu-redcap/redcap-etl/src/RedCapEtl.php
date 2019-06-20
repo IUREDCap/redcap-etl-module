@@ -32,10 +32,18 @@ class RedCapEtl
     const TRIGGER_ETL_NO  = '0';
     const TRIGGER_ETL_YES = '1';
 
+    # Text logged when the ETL process completes successfully.
+    # This can be used to programmatically check the log for
+    # when the process completes.
+    const PROCESSING_COMPLETE = 'Processing complete.';
+
     protected $detHandler;  // For calls related to Data Entry Triggers
 
     protected $configProject;
+    
+    /** @var EtlRedCapProject the project that has the data to extract */
     protected $dataProject;
+    
     protected $logProject;
 
     protected $logger;
@@ -668,6 +676,7 @@ class RedCapEtl
     public function run()
     {
         $this->log('REDCap-ETL version '.Version::RELEASE_NUMBER);
+        $this->logJobInfo();
         $this->log("Starting processing.");
 
         #-------------------------------------------------------------------------
@@ -703,7 +712,7 @@ class RedCapEtl
                 throw new EtlException($message, EtlException::INPUT_ERROR);
             }
 
-            $this->log("Processing complete.");
+            $this->log(self::PROCESSING_COMPLETE);
             $this->logger->logEmailSummary();
         }
 
@@ -771,14 +780,52 @@ class RedCapEtl
             // Provide a timestamp for the results
             $result = date('g:i:s a d-M-Y T') . "\n" . $result;
 
+            $this->log(self::PROCESSING_COMPLETE);
+
             #-----------------------------------------------------------
             # Upload the results, and set ETL trigger back to default
             #-----------------------------------------------------------
             $this->uploadResultAndReset($result, $recordId);
+
             $this->logger->logEmailSummary();
         }
 
         return $numberOfRecordIds;
+    }
+
+
+    /**
+     * Logs job info from configuration, if any
+     */
+    public function logJobInfo()
+    {
+        if (!empty($this->configuration)) {
+            $redcapApiUrl = $this->configuration->getRedCapApiUrl();
+            $this->log("REDCap API URL: ".$redcapApiUrl);
+            
+            $projectInfo = $this->dataProject->exportProjectInfo();
+            if (!empty($projectInfo)) {
+                $this->log("Project ID: ".$projectInfo['project_id']);
+                $this->log("Project title: ".$projectInfo['project_title']);
+            }
+            
+            $configName  = $this->configuration->getConfigName();
+            $configFile  = $this->configuration->getPropertiesFile();
+            if (!empty($configName)) {
+                $this->log("Configuration: ".$configName);
+            } elseif (!empty($configFile)) {
+                $this->log("Configuration: ".$configFile);
+            }
+                        
+            $cronJob = $this->configuration->getCronJob();
+            if (!empty($cronJob)) {
+                if (strcasecmp($cronJob, 'true') === 0) {
+                    $this->log('Job type: scheduled');
+                } else {
+                    $this->log('Job type: on demand');
+                }
+            }
+        }
     }
 
 
