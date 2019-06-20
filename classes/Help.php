@@ -29,30 +29,18 @@ class Help
             ." For very large projects, using a large batch size may cause"
             ." system memory limits to be exceeded and the ETL process to fail.</p>"
         ,
-        'database-event-log-table' =>
-            "<p>"
-            ."If database logging is enabled,"
-            ." this table will contain an entry for each logged event for ETL processes that have been run."
-            ." All events with the same log_id belong to the same ETL process."
-            ."</p>"
-        ,
-        'database-host' =>
-            "<p>"
-            ."The database host is the hostname of the database server for the database where the"
-            ." extracted and transformed data from REDCap will be stored."
-            ."</p>"
-        ,
-        'database-log-table' =>
-            "<p>"
-            ."The main database log table. If database logging is enabled,"
-            ." it will contain one entry for each ETL process that is run."
-            ."</p>"
-        ,
         'database-logging' =>
             "<p>"
-            ."Indicates if database logging is enabled. If it is enabled, logging information on"
-            ." each ETL process that is run will be stored in the load database."
+            ."Enabling database logging will log ETL job information to you load database."
+            ." Information is logged to 2 tables:"
             ."</p>"
+            ."<ul>"
+            ."<li><b>database log table</b> - the main database log table, which contains"
+            ." one entry for ETL process that is run.</li>"
+            ."<li><b>database event log table</b> - contains one entry for each logged event"
+            ." for the ETL processes that have run. All events with the same log_id belong to"
+            ." the same ETL process.</li>"
+            ."</ul>"
         ,
         'email-errors' =>
             "<p>"

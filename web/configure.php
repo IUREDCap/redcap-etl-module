@@ -787,7 +787,7 @@ Configuration form
                         value="<?php echo Filter::escapeForHtml($properties[Configuration::BATCH_SIZE]);?>"/>
                         <a href="#" id="batch-size-help-link" class="etl-help">?</a>
                         <div id="batch-size-help" title="Batch Size" style="display: none;">
-                            <?php echo Help::getHelp('batch-size', $module); ?>
+                            <?php echo Help::getHelpWithPageLink('batch-size', $module); ?>
                         </div>
                     </td>
                 </tr>
@@ -799,7 +799,7 @@ Configuration form
                         value="<?php echo Filter::escapeForHtml($properties[Configuration::TABLE_PREFIX]);?>"/>
                         <a href="#" id="table-name-prefix-help-link" class="etl-help">?</a>
                         <div id="table-name-prefix-help" title="Table Name Prefix" style="display: none;">
-                            <?php echo Help::getHelp('table-name-prefix', $module); ?>
+                            <?php echo Help::getHelpWithPageLink('table-name-prefix', $module); ?>
                         </div>
                     </td>
                 </tr>
@@ -811,7 +811,7 @@ Configuration form
                         value="<?php echo Filter::escapeForHtml($properties[Configuration::LABEL_VIEW_SUFFIX]);?>"/>
                         <a href="#" id="label-view-suffix-help-link" class="etl-help">?</a>
                         <div id="label-view-suffix-help" title="Label View Suffix" style="display: none;">
-                            <?php echo Help::getHelp('label-view-suffix', $module); ?>
+                            <?php echo Help::getHelpWithPageLink('label-view-suffix', $module); ?>
                         </div>
                     </td>
                 </tr>
@@ -835,11 +835,13 @@ Configuration form
                         }
                         ?>
                         <input type="checkbox" name="<?php echo Configuration::DB_LOGGING;?>" value="true"
-                            <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
-                        <a href="#" id="database-logging-help-link" class="etl-help">?</a>                    
+                            <?php echo $checked;?> style="vertical-align: middle; margin: 0;">                    
+                    </td>
+                    <td>
+                        <a href="#" id="database-logging-help-link" class="etl-help" style="margin-left: 2em">?</a> 
                         <div id="database-logging-help" title="Database Logging" style="display: none;">
                             <?php echo Help::getHelp('database-logging', $module); ?>
-                        </div>                        
+                        </div>  
                     </td>
                 </tr>
           
@@ -848,10 +850,6 @@ Configuration form
                     <td>Database log table</td>
                     <td><input type="text" name="<?php echo Configuration::DB_LOG_TABLE;?>"
                         value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_LOG_TABLE]);?>"/>
-                        <a href="#" id="database-log-table-help-link" class="etl-help">?</a>                    
-                        <div id="database-log-table-help" title="Database Log Table" style="display: none;">
-                            <?php echo Help::getHelp('database-log-table', $module); ?>                    
-                        </div>
                     </td>
                 </tr>
                 
@@ -861,10 +859,6 @@ Configuration form
                     <?php $dbEventLogTable = $properties[Configuration::DB_EVENT_LOG_TABLE]; ?>
                     <td><input type="text" name="<?php echo Configuration::DB_EVENT_LOG_TABLE;?>"
                         value="<?php echo Filter::escapeForHtmlAttribute($dbEventLogTable);?>"/>
-                        <a href="#" id="database-event-log-table-help-link" class="etl-help">?</a>
-                        <div id="database-event-log-table-help" title="Database Event Log Table" style="display: none;">
-                            <?php echo Help::getHelp('database-event-log-table', $module); ?>
-                        </div>
                     </td>
                 </tr>
             </tbody>
