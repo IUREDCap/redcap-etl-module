@@ -120,6 +120,7 @@ $adminConfig = $module->getAdminConfig();
 
 $selfUrl     = $module->getUrl('web/index.php');
 $configUrl   = $module->getUrl("web/configure.php");
+$testUrl     = $module->getUrl("web/test.php");
 $scheduleUrl = $module->getUrl("web/schedule.php");
 $runUrl      = $module->getUrl("web/run.php");
 
@@ -154,6 +155,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     <th>Configuration Name</th>
     <th>Data Export</th>
     <th>Configure</th>
+    <th>Test</th>
     <?php
     
     if ($adminConfig->getAllowOnDemand()) {
@@ -186,6 +188,7 @@ foreach ($configurationNames as $configurationName) {
     }
     
     $configureUrl = $configUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
+    $testingUrl = $testUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
     $runConfigurationUrl = $runUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
     $scheduleConfigUrl = $scheduleUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
 
@@ -206,6 +209,19 @@ foreach ($configurationNames as $configurationName) {
     } else {
         echo '<td style="text-align:center;">'
             .'<img src="'.APP_PATH_IMAGES.'gear.png" alt="CONFIG" class="disabled">'
+            ."</td>\n";
+    }
+    
+    #-------------------------------------------------------------------------------------
+    # TEST BUTTON - disable if user does not have permission to access configuration
+    #-------------------------------------------------------------------------------------
+    if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
+        echo '<td style="text-align:center;">'
+            .'<a href="'.$testingUrl.'"><img alt="TEST" src="'.APP_PATH_IMAGES.'wrench.png"></a>'
+            ."</td>\n";
+    } else {
+        echo '<td style="text-align:center;">'
+            .'<img src="'.APP_PATH_IMAGES.'gear.png" alt="TEST" class="disabled">'
             ."</td>\n";
     }
     

@@ -192,8 +192,8 @@ try {
 
                 if (empty($apiUrl)) {
                     $error = 'ERROR: No REDCap API URL specified.';
-                } elseif (empty($dataToken)) {
-                    $error = 'ERROR: No data source API token information specified.';
+                #} elseif (empty($dataToken)) {
+                #    $error = 'ERROR: No data source API token information specified.';
                 } else {
                     $existingRulesText = $properties[Configuration::TRANSFORM_RULES_TEXT];
                     $areExistingRules = false;
@@ -221,7 +221,8 @@ try {
                         #$caCertFile = $configuration->getProperty(Configuration::CA_CERT_FILE);
                     }
 
-                    $dataProject = new \IU\REDCapETL\EtlRedCapProject($apiUrl, $dataToken, $sslVerify, $caCertFile);
+                    #$dataProject = new \IU\REDCapETL\EtlRedCapProject($apiUrl, $dataToken, $sslVerify, $caCertFile);
+                    $dataProject = new \IU\RedCapEtlModule\EtlExtRedCapProject($apiUrl, $dataToken, $sslVerify, $caCertFile);
                             
                     $rulesGenerator = new \IU\REDCapETL\RulesGenerator();
                     $rulesText = $rulesGenerator->generate($dataProject);
@@ -234,7 +235,8 @@ try {
                 $dataToken = $configuration->getProperty(Configuration::DATA_SOURCE_API_TOKEN);
                 $sslVerify  = $adminConfig->getSslVerify();
                 $caCertFile = null;
-                $dataProject = new \IU\REDCapETL\EtlRedCapProject($apiUrl, $dataToken, $sslVerify, $caCertFile);
+                #$dataProject = new \IU\REDCapETL\EtlRedCapProject($apiUrl, $dataToken, $sslVerify, $caCertFile);
+                $dataProject = new \IU\RedCapEtlModule\EtlExtRedCapProject($apiUrl, $dataToken, $sslVerify, $caCertFile);
                 
                 $logger = new \IU\REDCapETL\Logger('rules-check');
                 $logger->setOn(false);

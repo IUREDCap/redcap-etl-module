@@ -209,10 +209,16 @@ class ServerConfig implements \JsonSerializable
             $properties = $etlConfig->getPropertiesArray();
             $properties[Configuration::PRINT_LOGGING] = false;
             
+            # Set a syntactically valid API token to avoid getting an error,
+            # which would not be valid in this case, since the REDCap Project class
+            # being used here does not need an API token
+            $properties[Configuration::DATA_SOURCE_API_TOKEN] = '12345678901234567890123456789012'; 
+            
             $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
 
             try {
-                $redCapEtl = new \IU\REDCapETL\RedCapEtl($logger, $properties);
+                $redcapProjectClass = EtlExtRedCapProject::class;
+                $redCapEtl = new \IU\REDCapETL\RedCapEtl($logger, $properties, null, $redcapProjectClass);
                 $redCapEtl->run();
             } catch (\Exception $exception) {
                 $logger->logException($exception);
