@@ -155,7 +155,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     <th>Configuration Name</th>
     <th>Data Export</th>
     <th>Configure</th>
-    <th>Test</th>
+    <!-- <th>Test</th> -->
     <?php
     
     if ($adminConfig->getAllowOnDemand()) {
@@ -215,15 +215,15 @@ foreach ($configurationNames as $configurationName) {
     #-------------------------------------------------------------------------------------
     # TEST BUTTON - disable if user does not have permission to access configuration
     #-------------------------------------------------------------------------------------
-    if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
-        echo '<td style="text-align:center;">'
-            .'<a href="'.$testingUrl.'"><img alt="TEST" src="'.APP_PATH_IMAGES.'wrench.png"></a>'
-            ."</td>\n";
-    } else {
-        echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'gear.png" alt="TEST" class="disabled">'
-            ."</td>\n";
-    }
+    #if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
+    #    echo '<td style="text-align:center;">'
+    #        .'<a href="'.$testingUrl.'"><img alt="TEST" src="'.APP_PATH_IMAGES.'wrench.png"></a>'
+    #        ."</td>\n";
+    #} else {
+    #    echo '<td style="text-align:center;">'
+    #        .'<img src="'.APP_PATH_IMAGES.'gear.png" alt="TEST" class="disabled">'
+    #        ."</td>\n";
+    #}
     
     #--------------------------------------------------------------------------------------
     # RUN BUTTON - display if running on demand allowed, but disable if user does not have
