@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4cf990f110bd6a92d0c4d5a4a0617e68",
-    "content-hash": "06788a74fbf0c3056e63ca24bfae8ed0",
+    "hash": "24ebe7833af24b75b5d3346558d76a85",
+    "content-hash": "141fd09e7c1d385c83e2b477963e3400",
     "packages": [
         {
             "name": "iu-redcap/redcap-etl",
-            "version": "0.7.5",
+            "version": "0.7.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/redcap-etl.git",
-                "reference": "c630da6750286a2506504ba1743a3a7d90b23464"
+                "reference": "41f240bc1a0b4813fe2913983b6ed27b0756fb24"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/c630da6750286a2506504ba1743a3a7d90b23464",
-                "reference": "c630da6750286a2506504ba1743a3a7d90b23464",
+                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/41f240bc1a0b4813fe2913983b6ed27b0756fb24",
+                "reference": "41f240bc1a0b4813fe2913983b6ed27b0756fb24",
                 "shasum": ""
             },
             "require": {
@@ -49,7 +49,7 @@
                 "etl",
                 "redcap"
             ],
-            "time": "2019-06-24 20:31:12"
+            "time": "2019-06-27 12:00:36"
         },
         {
             "name": "phpcap/phpcap",

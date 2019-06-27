@@ -44,52 +44,6 @@
         ]
     },
     {
-        "name": "iu-redcap/redcap-etl",
-        "version": "0.7.5",
-        "version_normalized": "0.7.5.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/IUREDCap/redcap-etl.git",
-            "reference": "c630da6750286a2506504ba1743a3a7d90b23464"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/c630da6750286a2506504ba1743a3a7d90b23464",
-            "reference": "c630da6750286a2506504ba1743a3a7d90b23464",
-            "shasum": ""
-        },
-        "require": {
-            "ext-curl": "*",
-            "ext-dom": "*",
-            "ext-openssl": "*",
-            "php": ">=5.6.0",
-            "phpcap/phpcap": "0.3.3"
-        },
-        "require-dev": {
-            "apigen/apigen": "v4.1.2",
-            "kzykhys/php-csv-parser": "1.4.1",
-            "phpunit/phpunit": "6.5.8",
-            "squizlabs/php_codesniffer": "3.2.3"
-        },
-        "time": "2019-06-24 20:31:12",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "IU\\REDCapETL\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "Apache-2.0"
-        ],
-        "description": "REDCap-ETL",
-        "keywords": [
-            "etl",
-            "redcap"
-        ]
-    },
-    {
         "name": "phpseclib/phpseclib",
         "version": "2.0.20",
         "version_normalized": "2.0.20.0",
@@ -181,6 +135,52 @@
             "twofish",
             "x.509",
             "x509"
+        ]
+    },
+    {
+        "name": "iu-redcap/redcap-etl",
+        "version": "0.7.6",
+        "version_normalized": "0.7.6.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/IUREDCap/redcap-etl.git",
+            "reference": "41f240bc1a0b4813fe2913983b6ed27b0756fb24"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/41f240bc1a0b4813fe2913983b6ed27b0756fb24",
+            "reference": "41f240bc1a0b4813fe2913983b6ed27b0756fb24",
+            "shasum": ""
+        },
+        "require": {
+            "ext-curl": "*",
+            "ext-dom": "*",
+            "ext-openssl": "*",
+            "php": ">=5.6.0",
+            "phpcap/phpcap": "0.3.3"
+        },
+        "require-dev": {
+            "apigen/apigen": "v4.1.2",
+            "kzykhys/php-csv-parser": "1.4.1",
+            "phpunit/phpunit": "6.5.8",
+            "squizlabs/php_codesniffer": "3.2.3"
+        },
+        "time": "2019-06-27 12:00:36",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-4": {
+                "IU\\REDCapETL\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "Apache-2.0"
+        ],
+        "description": "REDCap-ETL",
+        "keywords": [
+            "etl",
+            "redcap"
         ]
     }
 ]
