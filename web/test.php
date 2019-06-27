@@ -135,6 +135,15 @@ $primaryKey1 = $dataProject->getPrimaryKey();
 $primaryKey2 = $extProject->getPrimaryKey();
 
 
+$fields1 = $dataProject->exportFieldNames();
+$fields2 = $extProject->exportFieldNames();
+
+$userRights = REDCap::getUserRights(USERID);
+$dataExportRight = $userRights[USERID]['data_export_tool'];
+print('<pre>');
+print_r($dataExportRight);
+print('</pre>');
+
 if (array_map(trim, $metadata) == array_map(trim, $metadata2)) {
     print "Metadata matches <br/>\n";
 } else {
@@ -186,6 +195,18 @@ if ($batches === $batches2) {
 print "<br/>\n";
 
 print "<table border=\"1\">\n";
+
+
+print "<tr>\n";
+print "<td><pre>\n";
+print "EXPORT FIELD NAMES:\n";
+print_r($fields1);
+print "</pre></td>\n";
+print "<td><pre>\n";
+print "EXPORT FIELD NAMES:\n";
+print_r($fields2);
+print "</pre></td>\n";
+print "</tr>\n";
 
 
 print "<tr>\n";
