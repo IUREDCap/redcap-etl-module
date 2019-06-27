@@ -133,12 +133,12 @@ class EtlExtRedCapProject extends \IU\REDCapETL\EtlRedCapProject
         return $projectXml;
     }
 
-    public function exportRecords()
-    {
-        $data = REDCap::getData('array');
-        $data = json_decode($data, true);
-        return $data;
-    }
+    #public function exportRecords()
+    #{
+    #    $data = REDCap::getData('array');
+    #    $data = json_decode($data, true);
+    #    return $data;
+    #}
     
     public function exportRecordsAp($parameters)
     {
