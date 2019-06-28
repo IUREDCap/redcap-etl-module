@@ -959,7 +959,8 @@ Configuration form
                             name="<?php echo $sqlName;?>"><?php echo Filter::escapeForHtml($sql);?></textarea>
                     </td>
                     <td>
-                        <a href="#" id="post-processing-sql-help-link" class="etl-help" style="margin-left: 2em;">?</a>                      
+                        <a href="#" id="post-processing-sql-help-link" class="etl-help"
+                           style="margin-left: 2em;">?</a>                      
                         <div id="post-processing-sql-help" title="Post-Processing SQL" style="display: none;">
                             <?php echo Help::getHelpWithPageLink('post-processing-sql', $module); ?>
                         </div>                         

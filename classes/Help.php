@@ -66,7 +66,7 @@ class Help
             ." </li>"
             ."</ul>"
             ."</p>"
-        ,        
+        ,
         'email-subject' =>
             "<p>"
             ."The subject to use for e-mails sent to you from REDCap-ETL servers."
