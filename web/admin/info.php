@@ -122,7 +122,7 @@ The REDCap-ETL external module has the following admin pages:
     <li><a href="<?php echo $usersUrl;?>" style="font-weight: bold;">Users</a>
     - List of users who have been given permission to use REDCap-ETL.
     </li>
-    <li><a href="<?php echo $userConfigUrl;?>" style="font-weight: bold;">User Config</a>
+    <li><a href="<?php echo $userConfigUrl;?>" style="font-weight: bold;">User Search</a>
     - User search and user ETL permission configuration.
     </li>
     <li><a href="<?php echo $etlServersUrl;?>" style="font-weight: bold;">ETL Servers</a>

@@ -25,7 +25,7 @@ class Help
         'batch-size' =>
             "<p>The batch size indicates how many REDCap record IDs will be processed at a time."
             ." In general, the larger the batch size, the"
-            ." faster your ETL process will run, and the more memory it will use."
+            ." faster your ETL process will run, but the more memory it will use."
             ." For very large projects, using a large batch size may cause"
             ." system memory limits to be exceeded and the ETL process to fail.</p>"
         ,
@@ -36,7 +36,7 @@ class Help
             ."</p>"
             ."<ul>"
             ."<li><b>database log table</b> - the main database log table, which contains"
-            ." one entry for ETL process that is run.</li>"
+            ." one entry for each ETL process that is run.</li>"
             ."<li><b>database event log table</b> - contains one entry for each logged event"
             ." for the ETL processes that have run. All events with the same log_id belong to"
             ." the same ETL process.</li>"
@@ -47,6 +47,26 @@ class Help
             ."Indicates if an e-mail should be sent if the ETL process encounters an error."
             ."</p>"
         ,
+        'email-notifications' =>
+            "<p>"
+            ."REDCap-ETL can send e-mail notifications about ETL processes. The following options can be set:</p>"
+            ." <ul>"
+            ." <li><b>E-mail errors</b>"
+            ." - if checked, an e-mail will be sent if an ETL process encounters an error."
+            ." </li>"
+            ." <li><b>E-mail summary</b>"
+            ." - if checked, an e-mail summary of logging information will be sent when, and if, the ETL"
+            ." process completes successfully."
+            ." </li>"
+            ." <li><b>E-mail subject</b>"
+            ." - the subject to use for e-mail notifications."
+            ." </li>"
+            ." <li><b>E-mail to list</b>"
+            ." - the comma-separated list of e-mails that e-mail notifications should be sent to."
+            ." </li>"
+            ."</ul>"
+            ."</p>"
+        ,        
         'email-subject' =>
             "<p>"
             ."The subject to use for e-mails sent to you from REDCap-ETL servers."
@@ -114,7 +134,8 @@ class Help
             ." <p>Post-processing is intended for SQL commands that update the database, and any"
             ." select commands entered will not generate output."
             ." Note that the table name prefix (if any) will NOT be added automatically to "
-            ." post-processing SQL commands.</p>"
+            ." post-processing SQL commands, so if you are using a table prefix, you will"
+            ." need to manually add it to table names in these commands.</p>"
         ,
         'table-name-prefix' =>
             "<p>"

@@ -298,7 +298,7 @@ echo $buffer;
     $(document).ready(function() {
         $( function() {
             $('#batch-size-help-link').click(function () {
-                $('#batch-size-help').dialog({dialogClass: 'redcap-etl-help'})
+                $('#batch-size-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
                     .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
                     ;
                 return false;
@@ -321,30 +321,12 @@ echo $buffer;
                     ;
                 return false;
             });
-            $('#email-errors-help-link').click(function () {
-                $('#email-errors-help').dialog({dialogClass: 'redcap-etl-help'})
-                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+            $('#email-notifications-help-link').click(function () {
+                $('#email-notifications-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
+                    .dialog('widget').position({my: 'left top', at: 'right-20 top', of: $(this)})
                     ;
                 return false;
-            });
-            $('#email-subject-help-link').click(function () {
-                $('#email-subject-help').dialog({dialogClass: 'redcap-etl-help'})
-                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
-                    ;
-                return false;
-            });
-            $('#email-summary-help-link').click(function () {
-                $('#email-summary-help').dialog({dialogClass: 'redcap-etl-help'})
-                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
-                    ;
-                return false;
-            });
-            $('#email-to-list-help-link').click(function () {
-                $('#email-to-list-help').dialog({dialogClass: 'redcap-etl-help'})
-                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
-                    ;
-                return false;
-            });
+            });            
             $('#extract-settings-help-link').click(function () {
                 $('#extract-settings-help').dialog({dialogClass: 'redcap-etl-help', width: 500, maxHeight: 440})
                     .dialog('widget').position({my: 'left top', at: 'right top+60', of: $(this)})
@@ -364,8 +346,8 @@ echo $buffer;
                 return false;
             }); 
             $('#post-processing-sql-help-link').click(function () {
-                $('#post-processing-sql-help').dialog({dialogClass: 'redcap-etl-help'})
-                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                $('#post-processing-sql-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 400})
+                    .dialog('widget').position({my: 'left top', at: 'right+10 top', of: $(this)})
                     ;
                 return false;
             });            
@@ -813,6 +795,14 @@ Configuration form
                     </td>
                 </tr>
      
+     
+    </tbody>
+        </table>
+                <fieldset class="config-nested">
+                <legend>Database Tables</legend>
+                        <table>
+            <tbody>
+          
                 <!-- TABLE NAME PREFIX -->
                 <tr>
                     <td style="padding-right: 1em;">Table name prefix</td>
@@ -839,6 +829,7 @@ Configuration form
 
             </tbody>
         </table>
+        </fieldset>
         
         <fieldset class="config-nested">
         <legend>Database Logging</legend>
@@ -861,7 +852,7 @@ Configuration form
                     <td>
                         <a href="#" id="database-logging-help-link" class="etl-help" style="margin-left: 2em">?</a> 
                         <div id="database-logging-help" title="Database Logging" style="display: none;">
-                            <?php echo Help::getHelp('database-logging', $module); ?>
+                            <?php echo Help::getHelpWithPageLink('database-logging', $module); ?>
                         </div>  
                     </td>
                 </tr>
@@ -904,10 +895,13 @@ Configuration form
                         ?>
                         <input type="checkbox" name="<?php echo Configuration::EMAIL_ERRORS;?>" value="true"
                             <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
-                        <a href="#" id="email-errors-help-link" class="etl-help">?</a>                      
-                        <div id="email-errors-help" title="E-Mail Errors" style="display: none;">
-                            <?php echo Help::getHelp('email-errors', $module); ?>
-                        </div>
+                    </td>
+                    <td>
+                        <!-- E-MAIL NOTIFICATION HELP BUTTON -->
+                        <a href="#" id="email-notifications-help-link" class="etl-help" style="margin-left: 2em">?</a> 
+                        <div id="email-notifications-help" title="E-mail Notifications" style="display: none;">
+                            <?php echo Help::getHelpWithPageLink('email-notifications', $module); ?>
+                        </div>  
                     </td>
                 </tr>
 
@@ -923,10 +917,6 @@ Configuration form
                         ?>
                         <input type="checkbox" name="<?php echo Configuration::EMAIL_SUMMARY;?>" value="true"
                             <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
-                        <a href="#" id="email-summary-help-link" class="etl-help">?</a>                      
-                        <div id="email-summary-help" title="E-Mail Summary" style="display: none;">
-                            <?php echo Help::getHelp('email-summary', $module); ?>   
-                        </div>
                     </td>
                 </tr>
                 
@@ -936,10 +926,6 @@ Configuration form
                     <td><input type="text" name="<?php echo Configuration::EMAIL_SUBJECT;?>" size="64"
                         value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::EMAIL_SUBJECT]);?>"
                         />
-                        <a href="#" id="email-subject-help-link" class="etl-help">?</a>                      
-                        <div id="email-subject-help" title="E-Mail Subject" style="display: none;">
-                            <?php echo Help::getHelp('email-subject', $module); ?>
-                        </div>
                     </td>
                 </tr>
                 
@@ -948,11 +934,7 @@ Configuration form
                     <td>E-mail to list</td>
                     <td><input type="text" name="<?php echo Configuration::EMAIL_TO_LIST;?>" size="64"
                         value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::EMAIL_TO_LIST]);?>"
-                        />
-                        <a href="#" id="email-to-list-help-link" class="etl-help">?</a>                      
-                        <div id="email-to-list-help" title="E-Mail To List" style="display: none;">
-                            <?php echo Help::getHelp('email-to-list', $module); ?>
-                        </div>                    
+                        />                  
                     </td>
                 </tr>
             </tbody>
@@ -977,9 +959,9 @@ Configuration form
                             name="<?php echo $sqlName;?>"><?php echo Filter::escapeForHtml($sql);?></textarea>
                     </td>
                     <td>
-                        <a href="#" id="post-processing-sql-help-link" class="etl-help">?</a>                      
+                        <a href="#" id="post-processing-sql-help-link" class="etl-help" style="margin-left: 2em;">?</a>                      
                         <div id="post-processing-sql-help" title="Post-Processing SQL" style="display: none;">
-                            <?php echo Help::getHelp('post-processing-sql', $module); ?>
+                            <?php echo Help::getHelpWithPageLink('post-processing-sql', $module); ?>
                         </div>                         
                     </td>
                 </tr>
