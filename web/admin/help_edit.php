@@ -102,12 +102,12 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
 #print "<hr/>Help Setting: {$helpSetting}<hr/>\n";
 ?>
 
+
 <!-- TOPIC SELECTION -->
 <form action="<?php echo $selfUrl;?>" method="post">
     
   <fieldset class="server-config" style="margin-top: 12px;">
-    <legend>Help</legend>
-      Topic:
+    <legend>Help Topic</legend>
       <select name="topic" onchange="this.form.submit()">
         <?php
         $topics = Help::getTopics();
@@ -123,13 +123,21 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
         ?>
     </select>
   </fieldset>
+  
+  <fieldset class="server-config" style="margin-top: 12px;">
+    <legend>Allowed HTML Tags</legend>
+        <?php echo Filter::escapeForHtml(Filter::getAllowedHelpTagsString()); ?>
+  </fieldset>
+  
     <?php Csrf::generateFormToken(); ?>
 </form>
+
+
 
 <form action="<?php echo $selfUrl;?>" method="post">
 
   <fieldset class="server-config" style="margin-top: 12px;">
-    
+    <legend>Help Text</legend>
     <input type="hidden" name="topic" value="<?php echo $topic; ?>">
     
     <!-- Help setting selection -->
@@ -175,8 +183,8 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
 
     <table style="margin-top: 12px; width: 100%;">
       <tr>
-        <th style="width: 40%;"><strong>Default Help</strong></th>
-        <th style="width: 40%;"><strong>Custom Help</strong></th>
+        <th style="width: 40%;"><strong>Default Help Text</strong></th>
+        <th style="width: 40%;"><strong>Custom Help Text</strong></th>
       </tr>
       <tr style="vertical-align: top;">
         <td>

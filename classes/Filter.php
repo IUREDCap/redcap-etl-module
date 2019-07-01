@@ -7,6 +7,14 @@ namespace IU\RedCapEtlModule;
  */
 class Filter
 {
+    public static $allowedHelpTags = [
+        'a', 'b', 'blockquote', 'em',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'hr', 'i', 'li', 'ol', 'p', 'pre', 'strong',
+        'table', 'tbody', 'td', 'th', 'thead', 'tr',
+        'ul'
+    ];
+        
     /**
      * Escape text for displaying as HTML.
      * This method only works within REDCap context.
@@ -105,14 +113,6 @@ class Filter
      */
     public static function sanitizeHelp($text)
     {
-        $allowedTags = [
-            'a', 'b', 'blockquote', 'em',
-            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-            'hr', 'i', 'li', 'ol', 'p', 'pre', 'strong',
-            'table', 'tbody', 'td', 'th', 'thead', 'tr',
-            'ul'
-        ];
-
         # Remove leading spacing from tags
         $text = preg_replace('/<\s+/', '<', $text);
 
@@ -123,7 +123,7 @@ class Filter
         $text = preg_replace('/<\s*([a-zA-Z]+)([^<>]*<)/', '<${1}>${2}', $text);
 
         # Remove all attributes of allowed tags, except for the "a" tag
-        foreach ($allowedTags as $tag) {
+        foreach (self::$allowedHelpTags as $tag) {
             if ($tag !== 'a') {
                 #$text = preg_replace('/<\s*'.$tag.'[^(>|\/>)]*/', '<'.$tag, $text);
             }
@@ -136,9 +136,24 @@ class Filter
         $text = preg_replace('/<\s*a\s+([^>]*$)/i', '<a>$1', $text);
 
         # Remove non-allowed tags
-        $allowedTagsString = '<'.implode('><', $allowedTags).'>';
+        $allowedTagsString = '<'.implode('><', self::$allowedHelpTags).'>';
         $text = strip_tags($text, $allowedTagsString);
 
         return $text;
+    }
+    
+    public static function getAllowedHelpTagsString()
+    {
+        $isFirstTag = true;
+        $tagString = '';
+        foreach (self::$allowedHelpTags as $tag) {
+            if ($isFirstTag) {
+                $isFirstTag = false;
+            } else {
+                $tagString .= ', ';
+            }
+            $tagString .= '<'.$tag.'>';
+        }
+        return $tagString;
     }
 }
