@@ -24,6 +24,9 @@ $deleteButtonLabel = 'Delete User from REDCap-ETL';
 
 $selfUrl       = $module->getUrl(RedCapEtlModule::USER_CONFIG_PAGE);
 $userSearchUrl = $module->getUrl('web/admin/user_search.php');
+
+$usersUrl       = $module->getUrl(RedCapEtlModule::USERS_PAGE);
+
 $adminUrl      = $module->getUrl(RedCapEtlModule::ADMIN_HOME_PAGE);
 
 $adminConfigJson = $module->getSystemSetting(AdminConfig::KEY);
@@ -96,7 +99,7 @@ echo $buffer;
 
 <?php
 
-$module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
+$module->renderAdminPageContentHeader($usersUrl, $error, $warning, $success);
 $module->renderAdminUsersSubTabs($selfUrl);
 
 ?>
