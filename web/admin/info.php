@@ -15,6 +15,7 @@ use \IU\REDCapETL\Version;
 use \IU\RedCapEtlModule\AdminConfig;
 use \IU\RedCapEtlModule\Filter;
 use \IU\RedCapEtlModule\RedCapEtlModule;
+use \IU\RedCapEtlModule\ServerConfig;
 
 $selfUrl   = $module->getUrl(RedCapEtlModule::ADMIN_INFO_PAGE);
 
@@ -26,6 +27,9 @@ $userConfigUrl  = $module->getUrl(RedCapEtlModule::USER_CONFIG_PAGE);
 
 $etlServersUrl  = $module->getUrl(RedCapEtlModule::SERVERS_PAGE);
 $etlServerConfigUrl = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
+
+$embeddedServerConfigUrl =
+    $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE.'?serverName='.ServerConfig::EMBEDDED_SERVER_NAME);
 
 $adminConfig = $module->getAdminConfig();
 
@@ -88,7 +92,7 @@ The REDCap-ETL external module needs at least one REDCap-ETL server to function.
         <span style="font-weight: bold;">Embedded Server</span>
         - the external module has an embedded REDCap-ETL server that can be used without
         any additional setup effort. It can be enabled/disabled and configured
-        here: <a href="<?php echo $etlServerConfigUrl;?>" style="font-weight: bold;">ETL Server Config</a>
+        here: <a href="<?php echo $embeddedServerConfigUrl;?>" style="font-weight: bold;">Embedded ETL Server Config</a>
     </li>
     <li>
         <span style="font-weight: bold;">Standard REDCap-ETL Server</span>
