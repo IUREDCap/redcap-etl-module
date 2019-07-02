@@ -1,6 +1,6 @@
 {
 	"name" : "iu-redcap/redcap-etl-module",
-	"license" : "Apache-2.0",
+	"license" : "BSD 3-Clause",
 	"description" : "REDCap-ETL Module",
 	"keywords" : [
 		"REDCap", "ETL", "REDCap-ETL"

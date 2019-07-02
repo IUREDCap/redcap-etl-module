@@ -1,4 +1,9 @@
 <?php
+#-------------------------------------------------------
+# Copyright (C) 2019 The Trustees of Indiana University
+# SPDX-License-Identifier: BSD-3-Clause
+#-------------------------------------------------------
+
 
 #----------------------------------------------------------------------
 # Script for generating documentation page for transformation rules
@@ -22,6 +27,11 @@ $content = str_replace('<table>', '<table class="dataTable">', $content);
 $content = str_replace('<h1>Transformation Rules</h1>', '<h1>REDCap-ETL Transformation Rules</h1>', $content);
 
 $html = "<?php\n"
+    ."#-------------------------------------------------------\n"
+    ."# Copyright (C) 2019 The Trustees of Indiana University\n"
+    ."# SPDX-License-Identifier: BSD-3-Clause\n"
+    ."#-------------------------------------------------------\n"
+    ."\n"
     ."require_once APP_PATH_DOCROOT . 'Config/init_global.php';\n"
     ."\n"
     ."# THIS PAGE WAS AUTO-GENERATED\n"

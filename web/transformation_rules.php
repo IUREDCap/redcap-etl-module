@@ -1,4 +1,9 @@
 <?php
+#-------------------------------------------------------
+# Copyright (C) 2019 The Trustees of Indiana University
+# SPDX-License-Identifier: BSD-3-Clause
+#-------------------------------------------------------
+
 require_once APP_PATH_DOCROOT . 'Config/init_global.php';
 
 # THIS PAGE WAS AUTO-GENERATED
