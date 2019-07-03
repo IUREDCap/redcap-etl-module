@@ -101,5 +101,4 @@ class Util
         $page->fillField('inboxfield', $emailPrefix);
         $page->pressButton('Go!');
     }
-
 }
