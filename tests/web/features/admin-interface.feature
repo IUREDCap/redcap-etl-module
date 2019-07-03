@@ -51,10 +51,24 @@ Feature: Admin-Interface
     And I follow "Configuration"
     Then I should see "Server:"
 
-  Scenario: Access the admin help edit page
+  Scenario: Access the admin help edit list page
     When I follow "Help Edit"
     Then I should see "List"
     And I should see "Edit"
     And I should see "Topic"
     And I should see "Setting"
+
+  Scenario: Access the admin help edit edit page
+    When I follow "Help Edit"
+    And I follow "Edit"
+    Then I should see "Help Topic"
+    And I should see "Help Text"
+    And I should see "Preview"
+    And I should see "Default Help Text"
+
+  Scenario: Access the admin info page
+    When I follow "Info"
+    Then I should see "Overview"
+    And I should see "REDCap-ETL Servers"
+    And I should see "Extract Transform Load"
 
