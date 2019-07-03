@@ -159,6 +159,8 @@ permissions above.
 
 <p>
 There are 2 options for logging the results of your ETL processes, and they can be used simultaneously:
+</p>
+<div style="max-width: 800px;">
 <ol>
     <li><strong>Data Logging</strong> - REDCap-ETL, by default, logs to 2 tables in the
     database where your transformed data is loaded. The names of these tables
@@ -167,11 +169,14 @@ There are 2 options for logging the results of your ETL processes, and they can 
     want to receive an e-mail when an error occurs and/or that you receive an e-mail
     summary of ETL processing when your process completes successfully.</li>
 </ol>
-</p>
+</div>
 
 <h4 style="font-weight: bold;">Running REDCap-ETL</h4>
 
+<p>
 There are 2 basic ways to run REDCap-ETL:
+</p>
+<div style="max-width: 800px;">
 <ol>
     <li><strong>On Demand</strong> - You can run an ETL process on demand
     by going to the <strong>Run</strong>
@@ -183,5 +188,14 @@ There are 2 basic ways to run REDCap-ETL:
     day of the week for the job to run.
     </li>
 </ol>
+</div>
+
+<p class="blue">
+<strong>Note:</strong> REDCap-ETL deletes the tables specified in the transformation rules at the start of
+each run, and then regenerates these tables. This is done
+because there is no good way to know what data has changed in REDCap since the last time REDCap-ETL was run.
+So you would not want to use these tables as a place to manually add data. Although you could create
+<em>addtional</em> tables in the database that you update manually.
+</p>
 
 <?php require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
