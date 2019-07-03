@@ -23,3 +23,11 @@ composer.phar
 
 # Test mode configuration file
 test-config.ini
+
+# Web tests Composer dependencies directory
+/tests/web/vendor/
+
+# Ignore web tests .ini files, except for the example .ini file
+/tests/web/*.ini
+!/tests/web/config-example.ini
+
