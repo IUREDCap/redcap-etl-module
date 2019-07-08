@@ -1,4 +1,8 @@
 <?php
+#-------------------------------------------------------
+# Copyright (C) 2019 The Trustees of Indiana University
+# SPDX-License-Identifier: BSD-3-Clause
+#-------------------------------------------------------
 
 use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Context\Context;
@@ -34,6 +38,11 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
      */
     public function setUpBeforeScenario()
     {
+        $cookieName  = 'test';
+        $cookieValue = 'web-test';
+        $this->getSession()->setCookie('test', 'web-test');
+        echo "Cookie '{$cookieName}' set to '{$cookieValue}'\n";
+
         $this->setMinkParameter('base_url', $this->properties['base_url']);
         echo "Base URL set to: ".$this->properties['base_url'];
     }
