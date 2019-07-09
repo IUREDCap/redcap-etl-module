@@ -25,6 +25,7 @@ One-time initial setup:
     * the title of the project is unique
     * the project is approved for REDCap-ETL use (by the non-admin user)
     * the project has no ETL configurations
+    * the project has an API token with export permission
 
 4. Install Composer if you don't already have it, and run the following command in the tests/web directory:
 
@@ -39,6 +40,20 @@ One-time initial setup:
 
 Setup each time before tests are run
 ---------------------------------------
+
+Clear any previous coverage data:
+
+    php clear_coverage_data.php
+
+Set coverage code to run at the begginning and end of each request. You need to set the following
+PHP properties as follows:
+
+    * **auto_prepend_file** - should be set to the full path of the start_coverage.php script in this directory
+    * **auto_append_file** - should be set to the full path of the end_coverage.php script in this directory
+
+The easiest way to do this is to set these in the php.ini file for the web server running REDCap. The scripts
+are designed to only collect test coverage data for the web tests.
+
 
 Run chrome browser setting ports as shown below (running Chrome for use with DMore chromebrowser):
 
@@ -56,6 +71,10 @@ You can use the following commands in the top-level web tests directory (tests/w
     ./vendor/bin/behat
     ./vendor/bin/behat -f progress      # just prints summary of results
     ./vendor/bin/behat <path-to-feature-file>    # for testing a single feature file
+
+Combine the coverage data:
+
+    php combine_coverage.php
 
 
 Other commands
