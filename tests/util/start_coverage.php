@@ -2,14 +2,15 @@
 
 require_once __DIR__.'/../../vendor/autoload.php';
 
-use SebastianBergmann\CodeCoverage\CodeCoverage;
-
-$test = $_COOKIE['test'];
+$test = null;
+if (array_key_exists('test', $_COOKIE)) {
+    $test = $_COOKIE['test'];
+}
 
 if ($test === 'web-test') {
-    $coverage = new CodeCoverage;
-    $coverage->filter()->addDirectoryToWhitelist(__DIR__.'/../..');
-    $coverage->filter()->addDirectoryToWhitelist(__DIR__.'/../classes');
-    $coverage->filter()->addDirectoryToWhitelist(__DIR__.'/../web');
+    $coverage = new \SebastianBergmann\CodeCoverage\CodeCoverage;
+    $coverage->filter()->addFileToWhitelist(__DIR__.'/../../RedCapEtlModule.php');
+    $coverage->filter()->addDirectoryToWhitelist(__DIR__.'/../../classes');
+    $coverage->filter()->addDirectoryToWhitelist(__DIR__.'/../../web');
     $coverage->start($test);
 }
