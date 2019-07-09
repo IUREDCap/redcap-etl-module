@@ -299,7 +299,8 @@ foreach ($configurationNames as $configurationName) {
     #-----------------------------------------------------------
     if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
-            .'<input type="image" src="'.APP_PATH_IMAGES.'delete.png" alt="DELETE" class="deleteConfig" style="cursor: pointer;"'
+            .'<input type="image" src="'.APP_PATH_IMAGES.'delete.png" alt="DELETE"'
+            .' class="deleteConfig" style="cursor: pointer;"'
             .' id="deleteConfig'.$row.'"/>'
             ."</td>\n";
     } else {

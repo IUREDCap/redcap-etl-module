@@ -12,6 +12,7 @@ I need to be able to view the REDCap-ETL external module pages
   Background:
     Given I am on "/"
     And I am logged in as user
+    And I follow "My Projects"
     When I select the test project
     And I follow "REDCap-ETL"
 
