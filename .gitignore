@@ -31,3 +31,10 @@ test-config.ini
 /tests/web/*.ini
 !/tests/web/config-example.ini
 
+# Ignore web test coverage files, except for README
+/tests/web/coverage/*
+!/tests/web/coverage/README.md
+
+# Ignore web test coverage data files, except for README
+/tests/web/coverage-data/*
+!/tests/web/coverage-data/README.md
