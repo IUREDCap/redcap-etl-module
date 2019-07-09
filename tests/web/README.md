@@ -37,6 +37,10 @@ One-time initial setup:
 
 6. Edit the config.ini file created above, and enter appropriate values for properties
 
+7. If you want to collect test coverage data, make sure that the tests/web/coverage-data/ directory can be written to by your REDCap web server.
+    The REDCap web server has to have permission to write to this directory for code coverage
+    data to be collected.
+
 
 Setup each time before tests are run
 ---------------------------------------
@@ -45,7 +49,7 @@ Clear any previous coverage data:
 
     php clear_coverage_data.php
 
-Set coverage code to run at the begginning and end of each request. You need to set the following
+Set coverage code to run at the beginning and end of each request. You need to set the following
 PHP properties as follows:
 
     * **auto_prepend_file** - should be set to the full path of the start_coverage.php script in this directory
@@ -72,9 +76,17 @@ You can use the following commands in the top-level web tests directory (tests/w
     ./vendor/bin/behat -f progress      # just prints summary of results
     ./vendor/bin/behat <path-to-feature-file>    # for testing a single feature file
 
+
+Viewing the test coverage data
+-------------------------------
+
 Combine the coverage data:
 
     php combine_coverage.php
+
+Open the following file with a web browser:
+
+    tests/web/coverage/index.php
 
 
 Other commands
