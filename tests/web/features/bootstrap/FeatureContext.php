@@ -56,6 +56,65 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @When /^I print window names$/
+     */
+    public function iPrintWindowNames()
+    {
+        $windowName = $this->getSession()->getWindowName();
+        $windowNames = $this->getSession()->getWindowNames();
+        print "Current window: {$windowName} [".array_search($windowName, $windowNames)."]\n";
+        print_r($windowNames);
+    }
+
+    /**
+     * @When /^print link "([^"]*)"$/
+     */
+    public function printLink($linkId)
+    {
+        $session = $this->getSession();
+
+        $page = $session->getPage();
+        $link = $page->findLink($linkId);
+        print "\n{$linkId}\n";
+        print_r($link);
+    }
+
+    /**
+     * @When /^I go to new window in (\d+) seconds$/
+     */
+    public function iGoToNewWindow($seconds)
+    {
+        sleep($seconds);  // Need time for new window to open
+        $windowNames = $this->getSession()->getWindowNames();
+        $numWindows  = count($windowNames);
+
+        $currentWindowName  = $this->getSession()->getWindowName();
+        $currentWindowIndex = array_search($currentWindowName, $windowNames);
+
+        if (isset($currentWindowIndex) && $numWindows > $currentWindowIndex + 1) {
+            $this->getSession()->switchToWindow($windowNames[$currentWindowIndex + 1]);
+            #$this->getSession()->reset();
+        }
+    }
+
+    /**
+     * @When /^I go to old window$/
+     */
+    public function iGoToOldWindow()
+    {
+        $windowNames = $this->getSession()->getWindowNames();
+
+        $currentWindowName  = $this->getSession()->getWindowName();
+        $currentWindowIndex = array_search($currentWindowName, $windowNames);
+
+        if (isset($currentWindowIndex) && $currentWindowIndex > 0) {
+            $this->getSession()->switchToWindow($windowNames[$currentWindowIndex - 1]);
+            $this->getSession()->restart();
+        }
+    }
+
+
+    /**
      * @Given I am logged in as user
      */
     public function iAmLoggedInAsUser()

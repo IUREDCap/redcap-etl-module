@@ -214,7 +214,7 @@ class Help
     public static function getHelpWithPageLink($topic, $module)
     {
         $help = self::getHelp($topic, $module);
-        $help = '<a href="'.$module->getUrl('web/help.php?topic='.$topic).'"'
+        $help = '<a id="'.$topic.'-help-page" href="'.$module->getUrl('web/help.php?topic='.$topic).'"'
             .' target="_blank" style="float: right;"'
             .'>'
             .'View text on separate page</a>'

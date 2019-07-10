@@ -268,7 +268,8 @@ foreach ($configurationNames as $configurationName) {
     #-----------------------------------------------------------
     if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'page_copy.png" alt="COPY" class="copyConfig" style="cursor: pointer;"'
+            .'<input type="image" src="'.APP_PATH_IMAGES.'page_copy.png" alt="COPY"'
+            .' class="copyConfig" style="cursor: pointer;"'
             .' id="copyConfig'.$row.'"/>'
             ."</td>\n";
     } else {
@@ -283,7 +284,7 @@ foreach ($configurationNames as $configurationName) {
     #-----------------------------------------------------------
     if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME"'
+            .'<input type="image" src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME"'
             .' class="renameConfig" style="cursor: pointer;"'
             .' id="renameConfig'.$row.'"/>'
             ."</td>\n";
