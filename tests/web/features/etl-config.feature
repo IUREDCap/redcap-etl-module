@@ -23,8 +23,11 @@ I need to be able to view the REDCap-ETL external module pages
 
   Scenario: Check configuration
     When I follow "configure-behat-test"
-    When I press "Auto-Generate"
+    And I select user from "api_token_username"
+    And I press "Auto-Generate"
+    And I press "Save"
     Then I should see "Extract Settings"
+    And I should see "Table"
 
     #  Scenario: Configure configuration
     #When I press "Auto-Generate"

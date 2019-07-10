@@ -98,6 +98,16 @@ class Util
         $page->clickLink('New Project');
     }
 
+    public static function selectUserFromSelect($session, $select)
+    {
+        $properties = parse_ini_file(__DIR__.'/../../config.ini');
+        $username = $properties['username'];
+
+        $page = $session->getPage();
+        $page->selectFieldOption($select, $username);
+    }
+
+
     public static function mailinator($session, $emailPrefix)
     {
         $session->visit("https://www.mailinator.com");

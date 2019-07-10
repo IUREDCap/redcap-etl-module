@@ -91,6 +91,15 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @When /^I select user from "([^"]*)"$/
+     */
+    public function iSelectUserFromSelect($select)
+    {
+        $session = $this->getSession();
+        Util::selectUserFromSelect($session, $select);
+    }
+
+    /**
      * @When /^I check mailinator for "([^"]*)"$/
      */
     public function iCheckMailinatorFor($emailPrefix)
