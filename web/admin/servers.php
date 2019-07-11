@@ -142,6 +142,9 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
 
         $serverConfigureUrl = $configureUrl.'&serverName='.Filter::escapeForUrlParameter($server);
         
+        #-------------------------------
+        # Active
+        #-------------------------------
         echo '<td style="text-align:center;">';
         if ($serverConfig->getIsActive()) {
             echo '<img src="'.APP_PATH_IMAGES.'tick.png" alt="Yes">';
@@ -150,6 +153,9 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
         }
         echo "</td>\n";
 
+        #-------------------------------
+        # Configure
+        #-------------------------------
         echo '<td style="text-align:center;">'
             .'<a href="'.$serverConfigureUrl.'">'
             .'<img src="'.APP_PATH_IMAGES.'gear.png" alt="CONFIG"></a>'
@@ -159,20 +165,32 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
         if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
             echo "<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>\n";
         } else {
+            #-------------------------------
+            # Copy
+            #-------------------------------
             echo '<td style="text-align:center;">'
-                .'<img src="'.APP_PATH_IMAGES.'page_copy.png" alt="COPY" id="copyServer'.$row.'"'
+                .'<input type="image" src="'.APP_PATH_IMAGES.'page_copy.png" alt="COPY" '
+                .'id="copyServer'.$row.'"'
                 .' class="copyServer" style="cursor: pointer;">'
                 ."</td>\n";
 
+            #-------------------------------
+            # Rename
+            #-------------------------------
             echo '<td style="text-align:center;">'
-                .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME" id="renameServer'.$row.'"'
+                .'<input type="image" src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME"'
+                .' id="renameServer'.$row.'"'
                 .' class="renameServer" style="cursor: pointer;">'
                 ."</td>\n";
           
+            #-------------------------------
+            # Delete
+            #-------------------------------
             echo '<td style="text-align:center;">'
-                  .'<img src="'.APP_PATH_IMAGES.'delete.png" alt="DELETE" id="deleteServer'.$row.'"'
-                  .' class="deleteServer" style="cursor: pointer;">'
-                  ."</td>\n";
+                .'<input type="image" src="'.APP_PATH_IMAGES.'delete.png" alt="DELETE"'
+                .' id="deleteServer'.$row.'"'
+                .' class="deleteServer" style="cursor: pointer;">'
+                ."</td>\n";
         }
               
         echo "</tr>\n";

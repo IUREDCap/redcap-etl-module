@@ -31,7 +31,7 @@ I need to be able to create, copy, rename and delete configurations
     When I follow "configure-behat-help-test"
     And I follow "batch-size-help-link"
     And I follow "batch-size-help-page"
-    And I go to new window in 30 seconds
+    And I go to new window in 12 seconds
     Then I should see "The batch size indicates how many REDCap record IDs will be processed"
     But I should not see "View text on separate page"
     And I go to old window
@@ -39,13 +39,12 @@ I need to be able to create, copy, rename and delete configurations
   Scenario: Transformation rules guide
     When I follow "configure-behat-help-test"
     And I follow "Transformation Rules Guide"
-    And I go to new window in 30 seconds
+    And I go to new window in 12 seconds
     Then I should see "Transformation Rules"
     And I should see "This is a simple example"
     And I go to old window
 
   Scenario: Delete configuration
-    When print current URL
     When I follow "ETL Configurations"
     And I press "deleteConfig1"
     And I press "Delete configuration"
