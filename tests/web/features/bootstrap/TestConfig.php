@@ -29,7 +29,7 @@ class TestConfig
         foreach ($properties as $name => $value) {
             $matches = array();
             if ($name === 'redcap') {
-                $this->redcap = $value;
+                $this->redCap = $value;
             } elseif ($name === 'admin') {
                 $this->admin = $value;
             } elseif ($name === 'user') {
@@ -79,12 +79,3 @@ class TestConfig
         return $this->serverConfigs[$name];
     }
 }
-
-
-$file = __DIR__.'/../../config-example.ini';
-$testConfig = new TestConfig($file);
-print_r($testConfig);
-
-$etlConfig = $testConfig->getEtlConfig('behat');
-print_r($etlConfig);
-

@@ -17,12 +17,14 @@ use Behat\Behat\Context\SnippetAcceptingContext;
  */
 class Util
 {
+    const CONFIG_FILE = __DIR__.'/../../config.ini';
+
     public static function loginAsUser($session)
     {
-        $properties = parse_ini_file(__DIR__.'/../../config.ini');
-        $baseUrl  = $properties['base_url'];
-        $username = $properties['username'];
-        $password = $properties['password'];
+        $testConfig = new TestConfig(self::CONFIG_FILE);
+        $baseUrl  = $testConfig->getRedCap()['base_url'];
+        $username = $testConfig->getUser()['username'];
+        $password = $testConfig->getUser()['password'];
 
         $session->visit($baseUrl);
 
@@ -35,10 +37,10 @@ class Util
 
     public static function loginAsAdmin($session)
     {
-        $properties = parse_ini_file(__DIR__.'/../../config.ini');
-        $baseUrl  = $properties['base_url'];
-        $username = $properties['admin_username'];
-        $password = $properties['admin_password'];
+        $testConfig = new TestConfig(self::CONFIG_FILE);
+        $baseUrl  = $testConfig->getRedCap()['base_url'];
+        $username = $testConfig->getAdmin()['username'];
+        $password = $testConfig->getAdmin()['password'];
 
         $session->visit($baseUrl);
 
@@ -52,10 +54,10 @@ class Util
 
     public static function accessAdminInterface($session)
     {
-        $properties = parse_ini_file(__DIR__.'/../../config.ini');
-        $baseUrl  = $properties['base_url'];
-        $username = $properties['admin_username'];
-        $password = $properties['admin_password'];
+        $testConfig = new TestConfig(self::CONFIG_FILE);
+        $baseUrl  = $testConfig->getRedCap()['base_url'];
+        $username = $testConfig->getAdmin()['username'];
+        $password = $testConfig->getAdmin()['password'];
 
         $session->visit($baseUrl);
 
@@ -72,8 +74,9 @@ class Util
 
     public static function selectTestProject($session)
     {
-        $properties = parse_ini_file(__DIR__.'/../../config.ini');
-        $testProjectTitle = $properties['test_project_title'];
+        $testConfig = new TestConfig(self::CONFIG_FILE);
+        $baseUrl  = $testConfig->getRedCap()['base_url'];
+        $testProjectTitle = $testConfig->getUser()['test_project_title'];
 
         $page = $session->getPage();
 
@@ -100,8 +103,9 @@ class Util
 
     public static function selectUserFromSelect($session, $select)
     {
-        $properties = parse_ini_file(__DIR__.'/../../config.ini');
-        $username = $properties['username'];
+        $testConfig = new TestConfig(self::CONFIG_FILE);
+        $baseUrl  = $testConfig->getRedCap()['base_url'];
+        $username = $testConfig->getUser()['username'];
 
         $page = $session->getPage();
         $page->selectFieldOption($select, $username);
