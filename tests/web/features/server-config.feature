@@ -4,7 +4,7 @@
 #-------------------------------------------------------
 
 Feature: Server configuration management
-  In order to manage up servers
+  In order to manage servers
   As an admin
   I need to be able to create, configure, copy, delete and rename servers
 
@@ -12,7 +12,7 @@ Feature: Server configuration management
     Given I am on "/"
     When I access the admin interface
 
-    Scenario: Create local server configuration
+  Scenario: Create local server configuration
     When I follow "ETL Servers"
     And I fill in "server-name" with "local-server"
     And I press "Add Server"
@@ -21,17 +21,13 @@ Feature: Server configuration management
 
   Scenario: Copy server configuration
     When I follow "ETL Servers"
-    And I press "copyServer2"
-    And I fill in "copy-to-server-name" with "local-server-copy"
-    And I press "Copy server"
+    And I copy server "local-server" to "local-server-copy"
     Then I should see "local-server-copy"
     But I should not see "Error: "
 
   Scenario: Rename copied server configuration
     When I follow "ETL Servers"
-    And I press "renameServer3"
-    And I fill in "rename-new-server-name" with "local-server-rename"
-    And I press "Rename server"
+    And I rename server "local-server-copy" to "local-server-rename"
     Then I should see "local-server-rename"
     But I should not see "local-server-copy"
     And I should not see "Error: "
@@ -49,4 +45,5 @@ Feature: Server configuration management
     And I delete server "local-server"
     Then I should see "(embedded server)"
     But I should not see "local-server"
+    And I should not see "Error: "
 

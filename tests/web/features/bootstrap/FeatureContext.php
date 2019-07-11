@@ -167,6 +167,24 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @When /^I copy server "([^"]*)" to "([^"]*)"$/
+     */
+    public function iCopyServer($serverName, $copyToServerName)
+    {
+        $session = $this->getSession();
+        Util::copyServer($session, $serverName, $copyToServerName);
+    }
+
+    /**
+     * @When /^I rename server "([^"]*)" to "([^"]*)"$/
+     */
+    public function iRenameServer($serverName, $newServerName)
+    {
+        $session = $this->getSession();
+        Util::renameServer($session, $serverName, $newServerName);
+    }
+
+    /**
      * @When /^I delete server "([^"]*)"$/
      */
     public function iDeleteServer($serverName)

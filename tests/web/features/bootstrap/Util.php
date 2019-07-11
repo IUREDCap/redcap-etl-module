@@ -120,6 +120,35 @@ class Util
         $page->pressButton('Go!');
     }
 
+    public static function copyServer($session, $serverName, $copyToServerName)
+    {
+        $page = $session->getPage();
+
+        # Find the table row where the first element matches the server name, and then get the
+        # 4th column element and click it
+        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[3]");
+        $element->click();
+
+        # Handle confirmation dialog
+        $page->fillField("copy-to-server-name", $copyToServerName);
+        $page->pressButton("Copy server");
+    }
+
+    public static function renameServer($session, $serverName, $renameNewServerName)
+    {
+        $page = $session->getPage();
+
+        # Find the table row where the first element matches the server name, and then get the
+        # 5th column element and click it
+        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[4]");
+        $element->click();
+
+        # Handle confirmation dialog
+        $page->fillField("rename-new-server-name", $renameNewServerName);
+        $page->pressButton("Rename server");
+    }
+
+
     /**
      * Deletes the specified server from the ETL servers list page
      *
