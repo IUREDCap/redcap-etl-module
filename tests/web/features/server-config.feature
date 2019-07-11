@@ -38,8 +38,7 @@ Feature: Server configuration management
 
   Scenario: Delete renamed configuration
     When I follow "ETL Servers"
-    And I press "deleteServer3"
-    And I press "Delete server"
+    And I delete server "local-server-rename"
     Then I should see "(embedded server)"
     And I should see "local-server"
     But I should not see "local-server-rename"
@@ -47,8 +46,7 @@ Feature: Server configuration management
 
   Scenario: Delete local server configuration
     When I follow "ETL Servers"
-    And I press "deleteServer2"
-    And I press "Delete server"
+    And I delete server "local-server"
     Then I should see "(embedded server)"
     But I should not see "local-server"
 

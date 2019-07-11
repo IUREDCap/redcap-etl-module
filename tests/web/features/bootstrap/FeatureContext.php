@@ -167,6 +167,15 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @When /^I delete server "([^"]*)"$/
+     */
+    public function iDeleteServer($serverName)
+    {
+        $session = $this->getSession();
+        Util::deleteServer($session, $serverName);
+    }
+
+    /**
      * @When /^I check mailinator for "([^"]*)"$/
      */
     public function iCheckMailinatorFor($emailPrefix)

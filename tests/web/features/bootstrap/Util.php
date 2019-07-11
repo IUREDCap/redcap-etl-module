@@ -119,4 +119,22 @@ class Util
         $page->fillField('inboxfield', $emailPrefix);
         $page->pressButton('Go!');
     }
+
+    /**
+     * Deletes the specified server from the ETL servers list page
+     *
+     * @param string $serverName the name of the server to delete.
+     */
+    public static function deleteServer($session, $serverName)
+    {
+        $page = $session->getPage();
+
+        # Find the table row where the first element matches the server name, and then get the
+        # 6th column element and click it
+        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[5]");
+        $element->click();
+
+        # Handle confirmation dialog
+        $page->pressButton("Delete server");
+    }
 }
