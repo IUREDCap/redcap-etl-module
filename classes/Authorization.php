@@ -128,7 +128,10 @@ class Authorization
             $hasPermission = true;
         } else {
             $rights = $module->getUserRights();
-            if ($rights['design']) {
+
+            # Users need to have project design permission and
+            # not belong to a data access group (DAG)
+            if ($rights['design'] && !isset($rights['group_id'])) {
                 $hasPermission = true;
             }
         }

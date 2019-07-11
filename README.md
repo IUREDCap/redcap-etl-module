@@ -31,6 +31,9 @@ To use REDCap-ETL on a project, you need the following:
 * **Project Design and Setup Permission**. In general, you need this REDCap user
     right to access external modules for a project,
     and it is also required for REDCap-ETL.
+* **No Data Access Group (DAG)**. REDCap-ETL does not currently support
+    DAG restrictions on exported data, so users who
+    belong to a DAG are not allowed to use REDCap-ETL.
 * **Data Export Permission**. REDCap "Data Exports" user right of at least
     "De-identified" for the project.
 * **REDCap API Token**. REDCap-ETL uses the REDCap API (Application
