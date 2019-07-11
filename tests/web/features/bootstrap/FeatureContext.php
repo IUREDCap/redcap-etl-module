@@ -172,7 +172,7 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     public function iCopyServer($serverName, $copyToServerName)
     {
         $session = $this->getSession();
-        Util::copyServer($session, $serverName, $copyToServerName);
+        EtlServersPage::copyServer($session, $serverName, $copyToServerName);
     }
 
     /**
@@ -181,7 +181,7 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     public function iRenameServer($serverName, $newServerName)
     {
         $session = $this->getSession();
-        Util::renameServer($session, $serverName, $newServerName);
+        EtlServersPage::renameServer($session, $serverName, $newServerName);
     }
 
     /**
@@ -190,7 +190,7 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     public function iDeleteServer($serverName)
     {
         $session = $this->getSession();
-        Util::deleteServer($session, $serverName);
+        EtlServersPage::deleteServer($session, $serverName);
     }
 
     /**

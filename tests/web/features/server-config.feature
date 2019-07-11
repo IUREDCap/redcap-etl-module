@@ -19,6 +19,11 @@ Feature: Server configuration management
     Then I should see "local-server"
     But I should not see "Error: "
 
+    #Scenario: Configure local server configuration
+    #When I follow "ETL Servers"
+    #And I follow "local-server"
+    #Then I should see "Server Address:"
+
   Scenario: Copy server configuration
     When I follow "ETL Servers"
     And I copy server "local-server" to "local-server-copy"
