@@ -365,27 +365,6 @@ echo $buffer;
     });
 </script>
 
-<?php
-
-
-#print '<br/>TRANSFORM RULES: '.$properties[Configuration::TRANSFORM_RULES_TEXT]."<br/>\n";
-#print "submitValue {$submitValue}\n";
-#print "PROJECTS:<br />\n";
-#while ($row = db_fetch_assoc($q)) {
-#    print $row['project_id']." ".$row['app_title']." ".$row['api_token']."<br />";
-#}
-#print "Properties text: <pre>\n".$configuration->getRedCapEtlPropertiesText()."</pre>\n";
-#print "Transformation rules text: <pre>\n".$configuration->getTransformationRulesText()."</pre>\n";
-#print "<pre>_POST\n"; print_r($_POST); print "</pre>\n";
-#print "<pre>\n"; print_r($properties); print "</pre>\n";
-#print "<pre>_FILES\n"; print_r($_FILES); print "</pre>\n";
-#$tmp = $_FILES['uploadCsvFile']['tmp_name'];
-#print "tmp file: {$tmp}<br />\n";
-#$fileContents = file_get_contents($_FILES['uploadCsvFile']['tmp_name']);
-#print "\nCONTENTS: <pre>{$fileContents}</pre>\n\n";
-
-?>
-
 <div class="projhdr"> 
     <img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>database_table.png" alt="">REDCap-ETL
     <?php
@@ -397,11 +376,8 @@ echo $buffer;
 
 
 <?php
-
 $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
-
 ?>
-
 
 
 <?php

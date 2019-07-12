@@ -148,13 +148,6 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 <br />
 
 
-<?php
-#print '<pre>'; print_r($_POST); print '</pre>'."\n";
-#print '<pre>'; print_r($schedule); print '</pre>'."\n";
-#print "SERVER: {$server} <br />\n";
-?>
-
-
 <script type="text/javascript">
 // Change radio buttons so that a checked
 // radio button that is clicked will be

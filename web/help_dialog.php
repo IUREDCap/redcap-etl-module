@@ -14,7 +14,7 @@ require_once __DIR__.'/../dependencies/autoload.php';
 use IU\RedCapEtlModule\Help;
 use IU\RedCapEtlModule\Filter;
 
-$setting = (int) $_POST['setting'];
+$setting     = Filter::sanitizeInt($_POST['setting']);
 $defaultHelp = Filter::sanitizeHelp($_POST['defaultHelp']);
 $customHelp  = Filter::sanitizeHelp($_POST['customHelp']);
 

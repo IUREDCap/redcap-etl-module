@@ -114,14 +114,6 @@ echo $buffer;
 ?>
 
 
-<?php
-#print "SUBMIT = {$submit} <br/> \n";
-#print "serverName: = {$serverName} <br/> \n";
-#print "ServerConfig: <pre><br />\n"; print_r($serverConfig); print "</pre> <br/> \n";
-#print "POST: <pre><br />\n"; print_r($_POST); print "</pre> <br/> \n";
-?>
-
-
 <h4><img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>table_gear.png" alt="">REDCap-ETL Admin</h4>
 
 <?php

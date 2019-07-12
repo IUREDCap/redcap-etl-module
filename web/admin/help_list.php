@@ -61,11 +61,6 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
 
 ?>
 
-<?php
-#print "<pre>POST:\n"; print_r($_POST); print "</pre>\n";
-#print "<pre>TOPIC: ".$topic."</pre>"
-?>
-
 <table class="dataTable">
     <thead>
         <tr> <th>Topic</th> <th>Setting</th> </th><th>Edit</th>

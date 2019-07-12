@@ -66,10 +66,6 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
 
 ?>
 
-<?php
-#print "<pre>POST:\n"; print_r($_POST); print "</pre>\n";
-?>
-
 
 <h5 style="font-weight: bold;">Overview</h5>
 

@@ -46,9 +46,9 @@ try {
             $error = 'No help topic specified.';
             throw new Exception($error);
         } else {
-            $helpSetting = (int) $_POST['helpSetting'];
+            $helpSetting = Filter::sanitizeInt($_POST['helpSetting']);
             $defaultHelp = Help::getDefaultHelp($topic);
-            $customHelp = Filter::sanitizeHelp($_POST['customHelp']);
+            $customHelp  = Filter::sanitizeHelp($_POST['customHelp']);
             
             if (Help::isValidSetting($helpSetting)) {
                 $module->setHelpSetting($topic, $helpSetting);
@@ -60,7 +60,7 @@ try {
             }
         }
     } if (strcasecmp($submitValue, 'Preivew') === 0) {
-        $helpSetting = (int) $_POST['helpSetting'];
+        $helpSetting = Filter::sanitizeInt($_POST['helpSetting']);
         $defaultHelp = Help::getDefaultHelp($topic);
         $customHelp = Filter::sanitizeHelp($_POST['customHelp']);
     } elseif (!empty($topic)) {
@@ -97,13 +97,6 @@ echo $buffer;
 $module->renderAdminPageContentHeader($helpListUrl, $error, $warning, $success);
 $module->renderAdminHelpEditSubTabs($selfUrl);
 
-?>
-
-<?php
-#print "<pre>POST:\n"; print_r($_POST); print "</pre>\n";
-#print "<pre>TOPIC: ".$topic."</pre>"
-#print "<hr/>Topic: {$topic}<hr/>\n";
-#print "<hr/>Help Setting: {$helpSetting}<hr/>\n";
 ?>
 
 

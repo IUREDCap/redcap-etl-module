@@ -72,13 +72,6 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
 ?>
 
 <?php
-#print "<pre>POST:\n"; print_r($_POST); print "</pre>\n";
-#print "SELECTED DAY: {$selectedDay}<br/>\n";
-#print "<pre>GET:\n"; print_r($_GET); print "</pre>\n";
-#print "<pre>CRON JOBS:\n"; print_r($cronJobs); print "</pre>\n";
-?>
-
-<?php
 #---------------------------------
 # Server selection form
 #---------------------------------

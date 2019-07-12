@@ -22,7 +22,7 @@ require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 
 <?php
 
-$accessError = (int) $_GET['accessError'];
+$accessError = Filter::sanitizeInt($_GET['accessError']);
 
 $projectId = $module->getProjectId();
 

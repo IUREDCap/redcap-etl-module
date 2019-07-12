@@ -81,22 +81,6 @@ try {
     $error = 'ERROR: '.$exception->getMessage();
 }
 
-
-#$selfUrl     = $module->getUrl('web/index.php');
-#print "<hr />{$selfUrl}<br />\n";
-#print('<pre>');
-#print_r($_POST);
-#print('</pre>');
-#print('<pre>');
-#print_r($_SESSION);
-#print('</pre>');
-
-#$rights = $module->getUserRights();
-#print "<hr/><pre>RIGHTS\n";
-#print_r($rights);
-#print "</pre>\n";
-
-
 #---------------------------------------------
 # Add custom files to head section of page
 #---------------------------------------------

@@ -63,13 +63,6 @@ echo $buffer;
 ?>
 
 
-<?php
-#print "SUBMIT = {$submit} <br/> \n";
-#$users = $module->getUsers();
-#print "Users: <pre><br />\n"; print_r($users); print "</pre> <br/> \n";
-#print "<pre><br />\n"; print_r($_POST); print "</pre> <br/> \n";
-?>
-
 
 <h4><img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>table_gear.png" alt="">REDCap-ETL Admin</h4>
 
