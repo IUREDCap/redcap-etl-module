@@ -13,7 +13,7 @@ use Behat\MinkExtension\Context\MinkContext;
 use Behat\Behat\Context\SnippetAcceptingContext;
 
 /**
- * Defines application features from the specific context.
+ * Utility class that has helpful methods.
  */
 class Util
 {
