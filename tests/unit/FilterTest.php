@@ -26,4 +26,12 @@ class FilterTest extends TestCase
         $escapedText = Filter::escapeForHtmlAttribute($text);
         $this->assertEquals($text, $escapedText);
     }
+
+    public function testSanitizeInt()
+    {
+        $text = '123<scrtip>alert("xss");</script>';
+        $sanitizedText = Filter::sanitizeInt($text);
+        $expectedResult = '123';
+        $this->assertEquals($expectedResult, $sanitizedText, 'Sanitized int check');
+    }
 }
