@@ -6,6 +6,24 @@ SPDX-License-Identifier: BSD-3-Clause
 Developer Guide
 ===================
 
+Directory Structure
+-----------------------
+
+* __classes/__ - PHP classes other than the main module class
+* config.json - module configuration file
+* __dependencies/__ - production dependencies
+* docgen.php - script for generating the external module version of the transformation rules
+    guide from the REDCap-ETL version
+* __docs/__ - documents
+* README.md - module description and usage requirements
+* RedCapEtlModule.php - main module class
+* __resources/__ - CSS, image, and JavaScript files
+* __tests/__ - test files
+    * __unit/__ - unit tests
+    * __web/__ - web tests (that access a running instance of the module)
+* __vendor/__ - development dependencies (if these have been installed)
+* __web/__ - user web pages
+    * __admin/__ - admin web pages
 
 Updating Dependencies
 --------------------------
@@ -41,8 +59,13 @@ The configuration for phpcs is in file __phpcs.xml__ in the top-level directory.
 
 Automated Tests
 --------------------------
-To run the automated tests, enter the following command in the top-level directory:
+To run the unit tests, enter the following command in the top-level directory:
 
     ./vendor/bin/phpunit
     
 The configuration for phpunit is in file __phpunit.xml__ in the top-level directory.
+
+The module also has web tests that access a running REDCap-ETL external module. For
+information on running these tests, see the file:
+
+[tests/web/README.md](../tests/web/README.md)
