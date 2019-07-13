@@ -27,8 +27,23 @@ class EtlConfigsPage
         $element->click();
     }
 
-    public static function configureEtlConfiguration($configName)
+    public static function configureConfiguration($session, $configName)
     {
+        $testConfig = new TestConfig(Util::CONFIG_FILE);
+
+        $etlConfig = $testConfig->getEtlConfig($configName);
+
+        $dbHost     = $etlConfig['db_host'];
+        $dbName     = $etlConfig['db_name'];
+        $dbUser     = $etlConfig['db_user'];
+        $dbPassword = $etlConfig['db_password'];
+
+        $page = $session->getPage();
+
+        $page->fillField('db_host', $dbHost);
+        $page->fillField('db_name', $dbName);
+        $page->fillField('db_username', $dbUser);
+        $page->fillField('db_password', $dbPassword);
     }
 
     public static function copyConfiguration($session, $configName, $copyToConfigName)

@@ -167,6 +167,15 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @When /^I configure configuration "([^"]*)"$/
+     */
+    public function iConfigureConfiguration($configName)
+    {
+        $session = $this->getSession();
+        EtlConfigsPage::configureConfiguration($session, $configName);
+    }
+
+    /**
      * @When /^I copy server "([^"]*)" to "([^"]*)"$/
      */
     public function iCopyServer($serverName, $copyToServerName)

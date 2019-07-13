@@ -17,24 +17,35 @@ I need to be able to create, copy, rename and delete configurations
     And I follow "REDCap-ETL"
 
   Scenario: Create configuration
-    When I fill in "configurationName" with "behat-test"
+    When I fill in "configurationName" with "behat"
     And I press "Add"
-    Then I should see "behat-test"
+    Then I should see "behat"
 
-  Scenario: Check configuration
-    When I follow "configure-behat-test"
+  Scenario: Configure configuration
+    When I follow "configure-behat"
     And I select user from "api_token_username"
     And I press "Auto-Generate"
+    And I configure configuration "behat"
     And I press "Save"
     Then I should see "Extract Settings"
     And I should see "Table"
 
+  Scenario: Run configuration
+    When I follow "Run"
+    And I select "behat" from "configName"
+    And I press "Run"
+    Then I should see "Configuration:"
+    And I should see "Created table"
+    And I should see "Number of record_ids found: 100"
+    And I should see "Processing complete."
+    But I should not see "Error:"
+    
   Scenario: Copy configuration
     When I follow "ETL Configurations"
     And I press "copyConfig1"
     And I fill in "copyToConfigName" with "behat-test-copy"
     And I press "Copy configuration"
-    Then I should see "behat-test"
+    Then I should see "behat"
     And I should see "behat-test-copy"
 
   Scenario: Rename configuration
@@ -50,10 +61,10 @@ I need to be able to create, copy, rename and delete configurations
     And I press "deleteConfig2"
     And I press "Delete configuration"
     Then I should not see "behat-test-rename"
-    But I should see "behat-test"
+    But I should see "behat"
 
   Scenario: Delete configuration
     When I follow "ETL Configurations"
     And I press "deleteConfig1"
     And I press "Delete configuration"
-    Then I should not see "behat-test"
+    Then I should not see "behat"
