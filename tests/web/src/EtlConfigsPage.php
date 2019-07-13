@@ -58,7 +58,7 @@ class EtlConfigsPage
         $element->click();
 
         # Handle confirmation dialog
-        $page->fillField("copy-to-config-name", $copyToConfigName);
+        $page->fillField("copyToConfigName", $copyToConfigName);
         $page->pressButton("Copy config");
     }
 
@@ -72,7 +72,7 @@ class EtlConfigsPage
         $element->click();
 
         # Handle confirmation dialog
-        $page->fillField("rename-new-config-name", $renameNewConfigName);
+        $page->fillField("renameNewConfigName", $renameNewConfigName);
         $page->pressButton("Rename config");
     }
 
@@ -82,7 +82,7 @@ class EtlConfigsPage
      *
      * @param string $configName the name of the config to delete.
      */
-    public static function deleteEtlConfiguration($session, $configName)
+    public static function deleteConfiguration($session, $configName)
     {
         $page = $session->getPage();
 

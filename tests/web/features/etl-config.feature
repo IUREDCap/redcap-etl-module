@@ -20,6 +20,7 @@ I need to be able to create, copy, rename and delete configurations
     When I fill in "configurationName" with "behat"
     And I press "Add"
     Then I should see "behat"
+    But I should not see "Error:"
 
   Scenario: Configure configuration
     When I follow "configure-behat"
@@ -42,29 +43,23 @@ I need to be able to create, copy, rename and delete configurations
     
   Scenario: Copy configuration
     When I follow "ETL Configurations"
-    And I press "copyConfig1"
-    And I fill in "copyToConfigName" with "behat-test-copy"
-    And I press "Copy configuration"
+    And I copy configuration "behat" to "behat-test-copy"
     Then I should see "behat"
     And I should see "behat-test-copy"
 
   Scenario: Rename configuration
     When I follow "ETL Configurations"
-    And I press "renameConfig2"
-    And I fill in "renameNewConfigName" with "behat-test-rename"
-    And I press "Rename configuration"
+    And I rename configuration "behat-test-copy" to "behat-test-rename"
     Then I should see "behat-test-rename"
     But I should not see "behat-test-copy"
 
   Scenario: Delete renamed configuration
     When I follow "ETL Configurations"
-    And I press "deleteConfig2"
-    And I press "Delete configuration"
+    And I delete configuration "behat-test-rename"
     Then I should not see "behat-test-rename"
     But I should see "behat"
 
   Scenario: Delete configuration
     When I follow "ETL Configurations"
-    And I press "deleteConfig1"
-    And I press "Delete configuration"
+    And I delete configuration "behat"
     Then I should not see "behat"

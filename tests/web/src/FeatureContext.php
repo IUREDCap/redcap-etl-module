@@ -182,6 +182,34 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @When /^I copy configuration "([^"]*)" to "([^"]*)"$/
+     */
+    public function iCopyConfiguration($configName, $copyToConfigName)
+    {
+        $session = $this->getSession();
+        EtlConfigsPage::copyConfiguration($session, $configName, $copyToConfigName);
+    }
+
+    /**
+     * @When /^I rename configuration "([^"]*)" to "([^"]*)"$/
+     */
+    public function iRenameConfiguration($configName, $newConfigName)
+    {
+        $session = $this->getSession();
+        EtlConfigsPage::renameConfiguration($session, $configName, $newConfigName);
+    }
+
+    /**
+     * @When /^I delete configuration "([^"]*)"$/
+     */
+    public function iDeleteConfiguration($configName)
+    {
+        $session = $this->getSession();
+        EtlConfigsPage::deleteConfiguration($session, $configName);
+    }
+
+
+    /**
      * @When /^I copy server "([^"]*)" to "([^"]*)"$/
      */
     public function iCopyServer($serverName, $copyToServerName)
