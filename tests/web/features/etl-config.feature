@@ -25,7 +25,6 @@ I need to be able to create, copy, rename and delete configurations
   Scenario: Configure configuration
     When I follow "configure-behat"
     And I configure configuration "behat"
-    And I sleep for 5 seconds
     Then I should see "Extract Settings"
     And I should see "Table"
 
@@ -33,7 +32,6 @@ I need to be able to create, copy, rename and delete configurations
     When I follow "Run"
     And I select "behat" from "configName"
     And I press "Run"
-    And I sleep for 10 seconds
     Then I should see "Configuration:"
     And I should see "Created table"
     And I should see "Number of record_ids found: 100"
