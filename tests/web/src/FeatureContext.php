@@ -135,11 +135,11 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
-     * @When /^I sleep for (\d+) seconds$/
+     * @When /^I wait for (\d+) seconds$/
      */
-    public function iSleepForSeconds($seconds)
+    public function iWaitForSeconds($seconds)
     {
-        sleep($seconds);  // Need time for new window to open
+        sleep($seconds);
     }
 
     /**

@@ -71,6 +71,11 @@ class TestConfig
         return $this->etlConfigs[$name];
     }
 
+    public function setEtlConfig($name, $etlConfig)
+    {
+        $this->etlConfigs[$name] = $etlConfig;
+    }
+
     public function getServerConfigs()
     {
         return $this->serverConfigs;
@@ -79,5 +84,10 @@ class TestConfig
     public function getServerConfig($name)
     {
         return $this->serverConfigs[$name];
+    }
+
+    public function setServerConfig($name, $serverConfig)
+    {
+        $this->serverConfigs[$name] = $serverConfig;
     }
 }
