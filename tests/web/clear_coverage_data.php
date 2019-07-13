@@ -1,4 +1,9 @@
+#!/usr/bin/php
 <?php
+#-------------------------------------------------------
+# Copyright (C) 2019 The Trustees of Indiana University
+# SPDX-License-Identifier: BSD-3-Clause
+#-------------------------------------------------------
 
 require_once __DIR__.'/../../vendor/autoload.php';
 
