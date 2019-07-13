@@ -42,10 +42,16 @@ class EtlConfigsPage
 
         $page = $session->getPage();
 
+        $page->selectFieldOption('api_token_username', $etlConfig['api_token_username']);
+
+        $page->pressButton('Auto-Generate');
+
         $page->fillField('db_host', $dbHost);
         $page->fillField('db_name', $dbName);
         $page->fillField('db_username', $dbUser);
         $page->fillField('db_password', $dbPassword);
+
+        $page->pressButton('Save');
     }
 
     public static function copyConfiguration($session, $configName, $copyToConfigName)

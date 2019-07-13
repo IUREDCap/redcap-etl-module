@@ -24,10 +24,7 @@ I need to be able to create, copy, rename and delete configurations
 
   Scenario: Configure configuration
     When I follow "configure-behat"
-    And I select user from "api_token_username"
-    And I press "Auto-Generate"
     And I configure configuration "behat"
-    And I press "Save"
     Then I should see "Extract Settings"
     And I should see "Table"
 
