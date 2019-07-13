@@ -239,7 +239,8 @@ if (!empty($serverName)) {
                 <tr>
                     <td style="padding-top: 4px; padding-bottom: 4px; vertical-align: top;">Authentication method:</td>
                     <td style="padding: 4px;">
-                        <input type="radio" name="authMethod" value="<?php echo ServerConfig::AUTH_METHOD_SSH_KEY;?>"
+                        <input type="radio" name="authMethod" id="authMethodSshKey"
+                            value="<?php echo ServerConfig::AUTH_METHOD_SSH_KEY;?>"
                         <?php
                         if ($authMethod == ServerConfig::AUTH_METHOD_SSH_KEY) {
                             echo ' checked ';
@@ -247,7 +248,8 @@ if (!empty($serverName)) {
                         ?>
                         style="vertical-align: middle; margin: 0;">
                         <span style="vertical-align: top; margin-right: 8px;">SSH Key</span>
-                        <input type="radio" name="authMethod" value="<?php echo ServerConfig::AUTH_METHOD_PASSWORD;?>"
+                        <input type="radio" name="authMethod" id="authMethodPassword"
+                            value="<?php echo ServerConfig::AUTH_METHOD_PASSWORD;?>"
                         <?php
                         if ($authMethod == ServerConfig::AUTH_METHOD_PASSWORD) {
                             echo ' checked ';

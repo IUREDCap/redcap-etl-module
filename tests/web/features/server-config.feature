@@ -12,6 +12,13 @@ Feature: Server configuration management
     Given I am on "/"
     When I access the admin interface
 
+  Scenario: Delete local server (if it exist)
+    When I follow "ETL Servers"
+    And I delete server "local-server"
+    Then I should see "(embedded server)"
+    But I should not see "local-server"
+    And I should not see "Error:"
+
   Scenario: Create local server configuration
     When I follow "ETL Servers"
     And I fill in "server-name" with "local-server"
@@ -19,10 +26,11 @@ Feature: Server configuration management
     Then I should see "local-server"
     But I should not see "Error: "
 
-    #Scenario: Configure local server configuration
-    #When I follow "ETL Servers"
-    #And I follow "local-server"
-    #Then I should see "Server Address:"
+  Scenario: Configure local server configuration
+    When I follow "ETL Servers"
+    And I follow server "local-server"
+    And I configure server "local"
+    Then I should see "local-server"
 
   Scenario: Copy server configuration
     When I follow "ETL Servers"
@@ -43,12 +51,5 @@ Feature: Server configuration management
     Then I should see "(embedded server)"
     And I should see "local-server"
     But I should not see "local-server-rename"
-    And I should not see "Error: "
-
-  Scenario: Delete local server configuration
-    When I follow "ETL Servers"
-    And I delete server "local-server"
-    Then I should see "(embedded server)"
-    But I should not see "local-server"
     And I should not see "Error: "
 

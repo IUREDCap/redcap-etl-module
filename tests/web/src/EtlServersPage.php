@@ -19,7 +19,7 @@ use Behat\Behat\Context\SnippetAcceptingContext;
  */
 class EtlServersPage
 {
-    public static function followServerConfiguration($session, $serverName)
+    public static function followServer($session, $serverName)
     {
         $page = $session->getPage();
 
@@ -27,6 +27,53 @@ class EtlServersPage
         # 3rd column element and click it
         $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[2]");
         $element->click();
+    }
+
+    public static function configureServer($session, $serverName)
+    {
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
+
+        $serverConfig = $testConfig->getServerConfig($serverName);
+
+        $page = $session->getPage();
+
+        if ($serverConfig['active'] === 'true' || $serverConfig['active'] === '1') {
+            $page->checkField('isActive');
+        }
+
+        $page->fillField('serverAddress', $serverConfig['server_address']);
+        if ($serverConfig['auth_method'] === "0") {
+            $element = $page->find('xpath', "//*[@id='authMethodSshKey']");
+            $element->click();
+            $page->fillField('username', $serverConfig['username']);
+            $page->fillField('sshKeyFile', $serverConfig['ssh_key_file']);
+            $page->fillField('sshKeyPassword', $serverConfig['ssh_key_password']);
+        } elseif ($serverConfig['auth_method'] === "1") {
+            $element = $page->find('xpath', "//*[@id='authMethodPassword']");
+            $element->click();
+            $page->fillField('username', $serverConfig['username']);
+            $page->fillField('password', $serverConfig['password']);
+        }
+
+        $page->fillField('configDir', $serverConfig['configuration_directory']);
+        $page->fillField('etlCommand', $serverConfig['etl_command']);
+
+        $page->fillField('emailFromAddress', $serverConfig['email_from_address']);
+
+        if ($serverConfig['enable_error_email'] === 'true' || $serverConfig['enable_error_email'] === '1') {
+            $page->checkField('enableErrorEmail');
+        }
+
+        if ($serverConfig['enable_summary_email'] === 'true' || $serverConfig['enable_summary_email'] === '1') {
+            $page->checkField('enableSummaryEmail');
+        }
+
+        sleep(7);
+
+        #------------------------------
+        # Save
+        #------------------------------
+        $page->pressButton('Save');
     }
 
     public static function copyServer($session, $serverName, $copyToServerName)
@@ -70,9 +117,12 @@ class EtlServersPage
         # Find the table row where the first element matches the server name, and then get the
         # 6th column element and click it
         $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[5]");
-        $element->click();
 
-        # Handle confirmation dialog
-        $page->pressButton("Delete server");
+        if (isset($element)) {
+            $element->click();
+
+            # Handle confirmation dialog
+            $page->pressButton("Delete server");
+        }
     }
 }

@@ -88,6 +88,11 @@ Open the following file with a web browser:
 
     tests/web/coverage/index.php
 
+You can add the unit test coverage data by executing the following command in the top-level module directory:
+
+    ./vendor/bin/phpunit --coverage-php tests/web/coverage-data/coverage.unit
+
+Then to update the coverage/index.php file, you need to re-run the comine_coverage.php script.
 
 Other commands
 ----------------------

@@ -210,6 +210,24 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
 
 
     /**
+     * @When /^I follow server "([^"]*)"$/
+     */
+    public function iFollowServer($serverName)
+    {
+        $session = $this->getSession();
+        EtlServersPage::followServer($session, $serverName);
+    }
+
+    /**
+     * @When /^I configure server "([^"]*)"$/
+     */
+    public function iConfigureServer($serverName)
+    {
+        $session = $this->getSession();
+        EtlServersPage::configureServer($session, $serverName);
+    }
+
+    /**
      * @When /^I copy server "([^"]*)" to "([^"]*)"$/
      */
     public function iCopyServer($serverName, $copyToServerName)

@@ -24,4 +24,13 @@ SPDX-License-Identifier: BSD-3-Clause
         </testsuite>
     </testsuites>
 
+  <filter>
+    <whitelist>
+      <directory suffix=".php">classes</directory>
+      <exclude>
+        <file>classes/EtlExtRedCapProject.php</file>
+      </exclude>
+    </whitelist>
+  </filter>
+
 </phpunit>
