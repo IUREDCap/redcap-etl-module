@@ -4,6 +4,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
+namespace IU\RedCapEtlModule\WebTests;
+
 use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
@@ -17,8 +19,11 @@ use Behat\Behat\Context\SnippetAcceptingContext;
  */
 class FeatureContext extends MinkContext implements SnippetAcceptingContext
 {
-    private $properties;
+    const CONFIG_FILE = __DIR__.'/../config.ini';
+
+    private $testConfig;
     private $timestamp;
+    private $baseUrl;
 
     /**
      * Initializes context.
@@ -30,7 +35,8 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     public function __construct()
     {
         $this->timestamp = date('Y-m-d-H-i-s');
-        $this->properties = parse_ini_file(__DIR__.'/../../config.ini');
+        $this->testConfig = new TestConfig(self::CONFIG_FILE);
+        $this->baseUrl = $this->testConfig->getRedCap()['base_url'];
     }
 
     /**
@@ -43,8 +49,8 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         $this->getSession()->setCookie($cookieName, $cookieValue);
         echo "Cookie '{$cookieName}' set to '{$cookieValue}'\n";
 
-        $this->setMinkParameter('base_url', $this->properties['base_url']);
-        echo "Base URL set to: ".$this->properties['base_url'];
+        $this->setMinkParameter('base_url', $this->baseUrl);
+        echo "Base URL set to: ".$this->baseUrl;
     }
 
     /**

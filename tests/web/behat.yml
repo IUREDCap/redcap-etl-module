@@ -13,18 +13,7 @@ default:
                 default:
                     chrome:
                       api_url: http://localhost:9222
-
-#            sessions:
-#                first_session:
-#                    chrome: ~
-#                    selenium2:
-#                        browser: chrome
-#                first_session:
-#                    goutte: ~
-#
-#
-#
-
-
-
+    suites:
+        default:
+            contexts: [IU\RedCapEtlModule\WebTests\FeatureContext]
 

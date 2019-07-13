@@ -4,6 +4,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
+namespace IU\RedCapEtlModule\WebTests;
+
 use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
@@ -17,11 +19,9 @@ use Behat\Behat\Context\SnippetAcceptingContext;
  */
 class Util
 {
-    const CONFIG_FILE = __DIR__.'/../../config.ini';
-
     public static function loginAsUser($session)
     {
-        $testConfig = new TestConfig(self::CONFIG_FILE);
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
         $baseUrl  = $testConfig->getRedCap()['base_url'];
         $username = $testConfig->getUser()['username'];
         $password = $testConfig->getUser()['password'];
@@ -37,7 +37,7 @@ class Util
 
     public static function loginAsAdmin($session)
     {
-        $testConfig = new TestConfig(self::CONFIG_FILE);
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
         $baseUrl  = $testConfig->getRedCap()['base_url'];
         $username = $testConfig->getAdmin()['username'];
         $password = $testConfig->getAdmin()['password'];
@@ -54,7 +54,7 @@ class Util
 
     public static function accessAdminInterface($session)
     {
-        $testConfig = new TestConfig(self::CONFIG_FILE);
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
         $baseUrl  = $testConfig->getRedCap()['base_url'];
         $username = $testConfig->getAdmin()['username'];
         $password = $testConfig->getAdmin()['password'];
@@ -74,7 +74,7 @@ class Util
 
     public static function selectTestProject($session)
     {
-        $testConfig = new TestConfig(self::CONFIG_FILE);
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
         $baseUrl  = $testConfig->getRedCap()['base_url'];
         $testProjectTitle = $testConfig->getUser()['test_project_title'];
 
@@ -103,7 +103,7 @@ class Util
 
     public static function selectUserFromSelect($session, $select)
     {
-        $testConfig = new TestConfig(self::CONFIG_FILE);
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
         $baseUrl  = $testConfig->getRedCap()['base_url'];
         $username = $testConfig->getUser()['username'];
 

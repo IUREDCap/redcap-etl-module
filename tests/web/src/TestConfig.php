@@ -4,6 +4,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
+namespace IU\RedCapEtlModule\WebTests;
+
 /**
  * Test Configuration class. Instances of this class are created
  * using a .ini configuration file.

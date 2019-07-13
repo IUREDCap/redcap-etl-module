@@ -4,6 +4,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
+namespace IU\RedCapEtlModule\WebTests;
+
 use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\PyStringNode;
@@ -29,7 +31,7 @@ class EtlConfigsPage
 
     public static function configureConfiguration($session, $configName)
     {
-        $testConfig = new TestConfig(Util::CONFIG_FILE);
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
 
         $etlConfig = $testConfig->getEtlConfig($configName);
 
