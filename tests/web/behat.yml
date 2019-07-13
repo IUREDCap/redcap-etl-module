@@ -13,6 +13,8 @@ default:
                 default:
                     chrome:
                       api_url: http://localhost:9222
+                      socket_timeout: 300
+
     suites:
         default:
             contexts: [IU\RedCapEtlModule\WebTests\FeatureContext]

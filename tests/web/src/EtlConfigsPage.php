@@ -46,11 +46,29 @@ class EtlConfigsPage
 
         $page->pressButton('Auto-Generate');
 
+        #------------------------------
+        # Load database
+        #------------------------------
         $page->fillField('db_host', $dbHost);
         $page->fillField('db_name', $dbName);
         $page->fillField('db_username', $dbUser);
         $page->fillField('db_password', $dbPassword);
 
+        #------------------------------
+        # E-mail notifications
+        #------------------------------
+        if ($etlConfig['email_errors'] === "1" || $etlConfig['email_errors'] === "true") {
+            $page->checkField('email_errors');
+        }
+        if ($etlConfig['email_summary'] === "1" || $etlConfig['email_summary'] === "true") {
+            $page->checkField('email_summary');
+        }
+        $page->fillField('email_subject', $etlConfig['email_subject']);
+        $page->fillField('email_to_list', $etlConfig['email_to_list']);
+
+        #------------------------------
+        # Save
+        #------------------------------
         $page->pressButton('Save');
     }
 
