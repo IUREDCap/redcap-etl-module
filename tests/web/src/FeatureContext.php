@@ -86,6 +86,37 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @When /^I click on element containing "([^"]*)"$/
+     */
+    public function iClickOnElementContaining($text)
+    {
+        $session = $this->getSession();
+
+        $page = $session->getPage();
+        $element = $page->find('xpath', "//*[contains(text(), '{$text}')]");
+        $element->click();
+    }
+
+    /**
+     * @When /^I search for user$/
+     */
+    public function iSearchForUser()
+    {
+        $user = $this->testConfig->getUser();
+
+        $session = $this->getSession();
+        $page = $session->getPage();
+
+        $page->fillField('user-search', $user['username']);
+
+        sleep(4);
+
+        $element = $page->find('xpath', "//*[contains(text(), '".$user['email']."')]");
+        $element->click();
+    }
+
+
+    /**
      * @When /^I go to new window in (\d+) seconds$/
      */
     public function iGoToNewWindow($seconds)
