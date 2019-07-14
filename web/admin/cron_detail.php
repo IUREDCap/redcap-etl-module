@@ -42,7 +42,20 @@ if (empty($selectedTime)) {
     }
 }
 
+$submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
+
 $cronJobs = $module->getCronJobs($selectedDay, $selectedTime);
+
+/*
+if ($submitValue === 'Run') {
+    try {
+        $module->runCronJobs($selectedDay, $selectedTime);
+        $success = "Cron jobs were run for: day={$selectedDay} hour={$selectedTime}\n\n";
+    } catch (\Exception $exception) {
+        $error = $exception->getMessage();
+    }
+}
+*/
 
 ?>
 
@@ -148,7 +161,40 @@ $times = $adminConfig->getTimeLabels();
     </tbody>
 </table>
 
+
+<!--
+<form action="<?php #echo $selfUrl;?>" method="post" style="margin-top: 12px;">
+    <input type="hidden" name="selectedDay" value="<?php #echo $selectedDay; ?>">
+    <input type="hidden" name="selectedTime" value="<?php #echo $selectedTime; ?>">
+    <input type="submit" id="runButton" name="submitValue" value="Run"
+       onclick='$("#runButton").css("cursor", "progress"); $("body").css("cursor", "progress");'/>
+-->
+    <?php # Csrf::generateFormToken(); ?>
+<!--
+</form>
+-->
+
+<?php
+
+/*
+if (isset($exception)) {
+    echo "<div>\n";
+    echo "<pre>\n";
+    echo "Message: ".$exception->getMessage()."\n";
+    echo $exception->getTraceAsString()."\n";
+    $previous = $exception->getPrevious();
+    if (isset($previous)) {
+        echo "Previous: ".$previous->getMessage()."\n";
+    }
+    echo "</pre>\n";
+    echo "</div>\n";
+}
+ */
+
+?>
+
 <div id="popup" style="display: none;"></div>
+
 
 <script>
 $(function() {
