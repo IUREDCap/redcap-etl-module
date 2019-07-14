@@ -144,13 +144,15 @@ class RedCapDb
     /**
      * Gets all the ETL configuration settings.
      */
-    public function getEtlConfigurationSettings()
+    public function getEtlConfigurationSettings($module)
     {
+        $dirName = $module->getModuleDirectoryName();
+
         $etlConfigs = array();
         $sql = "select rems.* "
             ." from redcap.redcap_external_modules rem, redcap.redcap_external_module_settings rems "
             ." where rem.external_module_id = rems.external_module_id "
-            ." and rem.directory_prefix = 'redcap-etl-module' "
+            ." and '".Filter::escapeForMySql($dirName)."' like concat(rem.directory_prefix, '%') "
             ." and `key` like 'configuration:%'"
             ;
         $queryResult = db_query($sql);

@@ -463,7 +463,7 @@ class Settings
         }
 
         # Get all ETL configuration settings
-        $etlConfigSettings = $this->db->getEtlConfigurationSettings();
+        $etlConfigSettings = $this->db->getEtlConfigurationSettings($this->module);
         foreach ($etlConfigSettings as $configJson) {
             $configValues = json_decode($configJson, true);
             $config = null;
@@ -522,7 +522,7 @@ class Settings
         $cronJobs = array();
                 
         # Get all ETL configuration settings
-        $etlConfigSettings = $this->db->getEtlConfigurationSettings();
+        $etlConfigSettings = $this->db->getEtlConfigurationSettings($this->module);
         foreach ($etlConfigSettings as $configJson) {
             $configValues = json_decode($configJson, true);
             $config = null;
