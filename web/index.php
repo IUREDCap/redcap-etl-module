@@ -120,7 +120,7 @@ $projectId = $module->getProjectId();
 <?php
 
 $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
-
+        
 ?>
 
 <?php

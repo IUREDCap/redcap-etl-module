@@ -141,7 +141,24 @@ class RedCapDb
         return $tokens;
     }
 
-
+    /**
+     * Gets all the ETL configuration settings.
+     */
+    public function getEtlConfigurationSettings()
+    {
+        $etlConfigs = array();
+        $sql = "select rems.* "
+            ." from redcap.redcap_external_modules rem, redcap.redcap_external_module_settings rems "
+            ." where rem.external_module_id = rems.external_module_id "
+            ." and rem.directory_prefix = 'redcap-etl-module' "
+            ." and `key` like 'configuration:%'"
+            ;
+        $queryResult = db_query($sql);
+        while ($row = db_fetch_assoc($queryResult)) {
+            $etlConfigs[] = $row['value'];
+        }
+        return $etlConfigs;
+    }
 
     /**
      * Starts a database transaction.

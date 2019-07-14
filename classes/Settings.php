@@ -10,6 +10,7 @@ class Settings
 {
     const ADMIN_CONFIG_KEY         = 'admin-config';
     const SERVER_CONFIG_KEY_PREFIX = 'server-config:';
+    const ETL_CONFIG_KEY           = 'configuration:';
     const PROJECT_INFO_KEY         = 'project-info';
     const SERVERS_KEY              = 'servers';
     const USER_LIST_KEY            = 'user-list';
@@ -192,7 +193,7 @@ class Settings
         
     public function getConfigurationKey($name)
     {
-        $key = 'configuration:'.$name;
+        $key = self::ETL_CONFIG_KEY.$name;
         return $key;
     }
 
@@ -460,38 +461,39 @@ class Settings
                 $cronJobs[$day][$hour] = array();
             }
         }
-        
-        # Get set of ETL project IDs
-        $projectIds = array();
-        $usernames = $this->getUsers();
-        foreach ($usernames as $username) {
-            $etlProjects = $this->getUserEtlProjects($username);
-            foreach ($etlProjects as $etlProject) {
-                $projectIds[$etlProject] = 1;
-            }
-        }
 
-        foreach (array_keys($projectIds) as $etlProject) {
-            # print "Project {$etlProject}<br/>\n";
-            $project = $this->getProjectInfo($etlProject);
-            $configNames = $project->getConfigNames();
-            foreach ($configNames as $configName) {
-                # print "&nbsp;&nbsp;&nbsp;&nbsp;Configuration {$configName}<br/>\n";
-                $config = $this->getConfiguration($configName, $etlProject);
-                if (isset($config)) {
-                    $server = $config->getProperty(Configuration::CRON_SERVER);
-                    $times  = $config->getProperty(Configuration::CRON_SCHEDULE);
-                    for ($day = 0; $day < 7; $day++) {
-                        $hour = $times[$day];
-                        if (isset($hour)) {
-                            $run = array(
-                                'username'  => $username,
-                                'projectId' => $etlProject,
-                                'config'    => $configName,
-                                'server'    => $server
-                            );
-                            array_push($cronJobs[$day][$hour], $run);
-                        }
+        # Get all ETL configuration settings
+        $etlConfigSettings = $this->db->getEtlConfigurationSettings();
+        foreach ($etlConfigSettings as $configJson) {
+            $configValues = json_decode($configJson, true);
+            $config = null;
+            if (isset($configValues) && is_array($configValues)) {
+                $configName = $configValues['name'];
+                $username   = $configValues['username'];
+                $projectId  = $configValues['projectId'];
+                
+                $config = new Configuration(
+                    $configName,
+                    $username,
+                    $projectId
+                );
+                $config->set($configValues['properties']);
+            }
+
+            if (isset($config)) {
+                $server = $config->getProperty(Configuration::CRON_SERVER);
+                $times  = $config->getProperty(Configuration::CRON_SCHEDULE);
+                    
+                for ($day = 0; $day < 7; $day++) {
+                    $hour = $times[$day];
+                    if (isset($hour)) {
+                        $run = array(
+                            'username'  => $username,
+                            'projectId' => $projectId,
+                            'config'    => $configName,
+                            'server'    => $server
+                        );
+                        array_push($cronJobs[$day][$hour], $run);
                     }
                 }
             }
@@ -518,44 +520,40 @@ class Settings
         }
         
         $cronJobs = array();
-        
-        $usernames = $this->getUsers();
-        #\REDCap::logEvent('REDCap-ETL getCronJobs: usernames: '.print_r($usernames, true));
-        
-        # Get set of ETL project IDs
-        $projectIds = array();
-        $usernames = $this->getUsers();
-        foreach ($usernames as $username) {
-            $etlProjects = $this->getUserEtlProjects($username);
-            foreach ($etlProjects as $etlProject) {
-                $projectIds[$etlProject] = 1;
+                
+        # Get all ETL configuration settings
+        $etlConfigSettings = $this->db->getEtlConfigurationSettings();
+        foreach ($etlConfigSettings as $configJson) {
+            $configValues = json_decode($configJson, true);
+            $config = null;
+            if (isset($configValues) && is_array($configValues)) {
+                $configName = $configValues['name'];
+                $username   = $configValues['username'];
+                $projectId  = $configValues['projectId'];
+                
+                $config = new Configuration(
+                    $configName,
+                    $username,
+                    $projectId
+                );
+                $config->set($configValues['properties']);
             }
-        }
-        
-        foreach (array_keys($projectIds) as $etlProject) {
-            #\REDCap::logEvent('REDCap-ETL getCronJobs: username: '.$username);
-            $projectInfo = $this->getProjectInfo($etlProject);
-            $configNames = $projectInfo->getConfigNames();
-            #\REDCap::logEvent('REDCap-ETL getCronJobs: configNames: '.print_r($configNames, true));
-            
-            foreach ($configNames as $configName) {
-                $config = $this->getConfiguration($configName, $etlProject);
-                if (isset($config)) {
-                    $server = $config->getProperty(Configuration::CRON_SERVER);
-                    $times  = $config->getProperty(Configuration::CRON_SCHEDULE);
+
+            if (isset($config)) {
+                $server = $config->getProperty(Configuration::CRON_SERVER);
+                $times  = $config->getProperty(Configuration::CRON_SCHEDULE);
                     
-                    if (isset($times) && is_array($times)) {
-                        for ($cronDay = 0; $cronDay < 7; $cronDay++) {
-                            $cronTime = $times[$cronDay];
-                            if (isset($cronTime) && $cronTime != "" && $time == $cronTime && $day == $cronDay) {
-                                $job = array(
-                                    'username'  => $username,
-                                    'projectId' => $etlProject,
-                                    'config'    => $configName,
-                                    'server'    => $server
-                                );
-                                array_push($cronJobs, $job);
-                            }
+                if (isset($times) && is_array($times)) {
+                    for ($cronDay = 0; $cronDay < 7; $cronDay++) {
+                        $cronTime = $times[$cronDay];
+                        if (isset($cronTime) && $cronTime != "" && $time == $cronTime && $day == $cronDay) {
+                            $job = array(
+                                'username'  => $username,
+                                'projectId' => $projectId,
+                                'config'    => $configName,
+                                'server'    => $server
+                            );
+                            array_push($cronJobs, $job);
                         }
                     }
                 }

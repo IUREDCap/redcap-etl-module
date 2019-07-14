@@ -185,8 +185,5 @@ $('#popup').dialog({
 });
 </script>
 
-<?php
-#print "<pre>\n"; print_r($cronJobs); print "</pre>";
-?>
 
 <?php require_once APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>
