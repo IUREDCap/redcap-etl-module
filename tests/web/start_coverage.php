@@ -6,13 +6,13 @@
 
 require_once __DIR__.'/../../vendor/autoload.php';
 
-$codeCoverage = null;
-if (array_key_exists('code-coverage', $_COOKIE)) {
-    $codeCoverage = $_COOKIE['code-coverage'];
+$codeCoverageId = null;
+if (array_key_exists('code-coverage-id', $_COOKIE)) {
+    $codeCoverageId = $_COOKIE['code-coverage-id'];
 }
 
-if ($codeCoverage === 'web-test') {
-    $coverage = new \SebastianBergmann\CodeCoverage\CodeCoverage;
+if (!empty($codeCoverageId)) {
+    $coverage = new \SebastianBergmann\CodeCoverage\CodeCoverage();
 
     # Included files and directories
     $coverage->filter()->addFileToWhitelist(__DIR__.'/../../RedCapEtlModule.php');
@@ -23,5 +23,5 @@ if ($codeCoverage === 'web-test') {
     $coverage->filter()->removeFileFromWhitelist(__DIR__.'/../../classes/EtlExtRedCapProject.php');
     $coverage->filter()->removeFileFromWhitelist(__DIR__.'/../../web/test.php');
 
-    $coverage->start($codeCoverage);
+    $coverage->start($codeCoverageId);
 }

@@ -55,8 +55,8 @@ PHP properties as follows:
     * **auto_prepend_file** - should be set to the full path of the start_coverage.php script in this directory
     * **auto_append_file** - should be set to the full path of the end_coverage.php script in this directory
 
-The easiest way to do this is to set these in the php.ini file for the web server running REDCap. The scripts
-are designed to only collect test coverage data for the web tests.
+The easiest way to do this is to set these in the php.ini file for the web server running REDCap.
+The scripts are designed to only collect test coverage data for the web tests.
 
 
 Run chrome browser setting ports as shown below (running Chrome for use with DMore chromebrowser):
@@ -93,6 +93,14 @@ You can add the unit test coverage data by executing the following command in th
     ./vendor/bin/phpunit --coverage-php tests/web/coverage-data/coverage.unit
 
 Then to update the coverage/index.php file, you need to re-run the comine_coverage.php script.
+
+Similarly, you can also add manual test coverage data by setting the 'code-coverage-id' cookie in your browser, and then going through your tests in that browser. For example, in Chrome:
+
+    * Enter <CTRL><SHIFT>J to bring up the developer tools console
+    * In the web console, enter:
+
+        document.cookie="code-coverage-id=manual"
+
 
 Other commands
 ----------------------

@@ -8,6 +8,8 @@ if (isset($coverage)) {
     $coverage->stop();
 
     $writer = new \SebastianBergmann\CodeCoverage\Report\PHP();
-    $writer->process($coverage, __DIR__.'/coverage-data/coverage.'.uniqid('', true));
+    $directory = __DIR__.'/coverage-data/';
+    $fileName = 'coverage.'.$codeCoverageId.'.'.uniqid('', true);
+    $writer->process($coverage, $directory.$fileName);
 }
 

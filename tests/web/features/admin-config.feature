@@ -16,6 +16,7 @@ Feature: Admin Config
     When I follow "Config"
     And I uncheck "allowOnDemand"
     And I uncheck "allowCron"
+    And I uncheck "allowedCronTimes[6][23]"
     And I press "Save"
     Then I should see "Last ETL cron run time"
     And I should see "Sunday"
@@ -25,6 +26,7 @@ Feature: Admin Config
     And I should see "Thursday"
     And I should see "Friday"
     And I should see "Saturday"
+    And the checkbox "allowedCronTimes[6][23]" should be unchecked
 
   Scenario: User logged in with "allow on demand" and "allow cron" disabled
     Given I am logged in as user
@@ -42,8 +44,10 @@ Feature: Admin Config
     When I follow "Config"
     And I check "allowOnDemand"
     And I check "allowCron"
+    And I check "allowedCronTimes[6][23]"
     And I press "Save"
     Then I should see "Last ETL cron run time"
+    And the checkbox "allowedCronTimes[6][23]" should be checked
 
   Scenario: User logged in with "allow on demand" and "allow cron" enabled
     Given I am logged in as user
