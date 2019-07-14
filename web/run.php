@@ -149,17 +149,6 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
         
         echo '<select name="server">'."\n";
             
-        #if ($adminConfig->getAllowEmbeddedServer()) {
-        #    $selected = '';
-        #    if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
-        #        $selected = 'selected';
-        #    }
-        #
-        #    echo '<option value="'.ServerConfig::EMBEDDED_SERVER_NAME.'" '.$selected.'>'
-        #        .ServerConfig::EMBEDDED_SERVER_NAME
-        #        .'</option>'."\n";
-        #}
-        
         foreach ($servers as $serverName) {
             $serverConfig = $module->getServerConfig($serverName);
             
