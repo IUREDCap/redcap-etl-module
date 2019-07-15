@@ -13,6 +13,42 @@ use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Filter;
 
 require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
+
+$selfUrl = $module->getUrl('web/access.php');
+$requestLabel = 'Request ETL access for this project';
+
+$requestError = '';
+
+$submitValue = '';
+if (array_key_exists('submitValue', $_POST)) {
+    $submitValue = $_POST['submitValue'];
+    if ($submitValue === $requestLabel) {
+        // phpcs:disable
+        $to = $homepage_contact_email; 
+        $from = RedCapEtlModule::getFromEmail();
+        $subject = 'REDCap-ETL Access Request';
+        $projectLink = APP_PATH_WEBROOT_FULL."redcap_v{$redcap_version}/index.php?pid=".PROJECT_ID;
+        $adminLink = $module->getUrl(RedCapEtlModule::USER_CONFIG_PAGE.'?username='.USERID);
+
+        $message = '<html><bod>'
+            .'REDCap-ETL access request from user '.$user_firstname.' '.$user_lastname.' ('.USERID.')'
+            .' [<a href="mailto:'.$user_email.'">'.$user_email.'</a>]'."\n"
+            .'for project "'.strip_tags(REDCap::getProjectTitle()).'" [Project ID='.PROJECT_ID.'].'."<br/>\n\n"
+            .'Project link: <a href="'.$projectLink.'">'.$projectLink.'</a><br/>'."\n\n"
+            .'Admin link: <a href="'.$adminLink.'">'.$adminLink.'</a>'."\n\n"
+            .'</body></html>'
+            ;
+        // phpcs:enable
+
+        $cc = null;
+
+        try {
+            REDCap::email($to, $from, $subject, $message, $cc);
+        } catch (Exception $exception) {
+            $requestError = $exception->getMessage();
+        }
+    }
+}
 ?>
 
 <div class="projhdr">
@@ -22,7 +58,7 @@ require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 
 <?php
 
-$accessError = Filter::sanitizeInt($_GET['accessError']);
+$accessError = (int) Filter::sanitizeInt($_GET['accessError']);
 
 $projectId = $module->getProjectId();
 
@@ -43,8 +79,21 @@ if ($accessError === RedCapEtlModule::CSRF_ERROR) {
     # but does have permission to request ETL permission, so
     # display a link to send e-mail to request access
     #--------------------------------------------------------------------
+
+    echo "<p>You don't currently have permission to use REDCap-ETL for this project."
+        ." To request access, click on the button below\n";
+
     echo '<div style="padding-top:15px; padding-bottom:15px;">'."\n";
-    $label = 'Request ETL access for this project';
+
+    echo '<form action="'.$selfUrl.'" method="post">'."\n";
+    echo '    <input type="submit" name="submitValue" id="requestButton" '
+        .' value="Request ETL access for this project" '
+        .' onclick="$(\'#requestButton\').css(\'cursor\', \'progress\'); $(\'body\').css(\'cursor\', \'progress\');" >'
+        ;
+
+    echo '    <?php Csrf::generateFormToken(); ?>'."\n";
+    echo "</form>\n";
+
 
     # The underscore variable names are internal REDCap variables
     // phpcs:disable
@@ -54,24 +103,13 @@ if ($accessError === RedCapEtlModule::CSRF_ERROR) {
     $userLastName  = $user_lastname;
     // phpcs:enable
     
-    echo '<a href="mailto:'.$homepageContactEmail
-        .'?subject='.rawurlencode('REDCap-ETL Access Request')
-        .'&body='
-        .rawurlencode(
-            'Username: '.USERID."\n"
-            .'Project title: "'.' '.strip_tags(REDCap::getProjectTitle()).'"'."\n"
-            .'Project link: '.APP_PATH_WEBROOT_FULL."redcap_v{$redcapVersion}/index.php?pid={$projectId}\n\n"
-            .'Dear REDCap administrator,'."\n\n"
-            .'Please add REDCap-ETL access for me to project "'.strip_tags(REDCap::getProjectTitle()).'"'."\n\n"
-            ."Sincerely,\n"
-            .$userFirstName.' '.$userLastName
-        )
-        .'" '
-        .' class="btn-contact-admin btn btn-primary btn-xs" style="color:#fff;">'
-        .'<span class="fas fa-envelope"></span> '.$label
-        .'</a>'."\n";
-    ;
     echo "</div>\n";
+} elseif ($submitValue === $requestLabel) {
+    if (empty($requestError)) {
+        echo 'Request for REDCap-ETL access for project "'.strip_tags(REDCap::getProjectTitle()).'" sent.';
+    } else {
+        echo "Request for REDCap-ETL failed: {$requestError}";
+    }
 } else {
     echo 'An unknown access error occurred.';
 }

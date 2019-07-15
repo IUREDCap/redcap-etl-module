@@ -466,11 +466,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public static function getFromEmail()
     {
+        // phpcs:disable
+        global $from_email;
+        global $homepage_contact_email;
+
         $fromEmail = '';
 
         # Need to diable phpcs here, because the REDCap e-mail variables
         # ($from_email and $homepage_contact_email) don't use camel-case.
-        // phpcs:disable
         if (!empty($from_email)) {
             $fromEmail = $from_email;
         } else {
