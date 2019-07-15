@@ -170,8 +170,7 @@ $times = $adminConfig->getTimeLabels();
        onclick='$("#runButton").css("cursor", "progress"); $("body").css("cursor", "progress");'/>
 -->
     <?php # Csrf::generateFormToken(); ?>
-<!--
-</form>
+<!-- </form>
 -->
 
 <?php
