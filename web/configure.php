@@ -268,10 +268,12 @@ try {
                 if ($sslVerify) {
                     $checkProperties[Configuration::SSL_VERIFY] = 'true';
                 }
+                $checkProperties[Configuration::EMAIL_ERRORS] = false;
+                $checkProperties[Configuration::EMAIL_SUMMARY] = false;
                 
-                $configuration = new \IU\REDCapETL\Configuration($logger, $checkProperties);
-                $schemaGenerator = new \IU\REDCapETL\SchemaGenerator($dataProject, $configuration, $logger);
-                $rulesText = $configuration->getProperty(Configuration::TRANSFORM_RULES_TEXT);
+                $checkConfiguration = new \IU\REDCapETL\Configuration($logger, $checkProperties);
+                $schemaGenerator = new \IU\REDCapETL\SchemaGenerator($dataProject, $checkConfiguration, $logger);
+                $rulesText = $checkConfiguration->getProperty(Configuration::TRANSFORM_RULES_TEXT);
                 list($schema, $parseResult) = $schemaGenerator->generateSchema($rulesText);
             }
         } catch (\Exception $exception) {
@@ -376,7 +378,9 @@ echo $buffer;
 
 
 <?php
+
 $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
+
 ?>
 
 

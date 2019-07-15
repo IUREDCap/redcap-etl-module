@@ -28,6 +28,14 @@ I need to be able to create, copy, rename and delete configurations
     Then I should see "Extract Settings"
     And I should see "Table"
 
+  Scenario: Check rules for configuration
+    When I follow "configure-behat"
+    And I configure configuration "behat"
+    And I press "Check Rules"
+    Then I should see "Transformation Rules Check"
+    And I should see "Status: valid"
+    But I should not see "Error:"
+
   Scenario: Run configuration
     When I follow "Run"
     And I select "behat" from "configName"
