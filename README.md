@@ -50,6 +50,3 @@ To use REDCap-ETL on a project, you need the following:
     * DROP
     * CREATE VIEW
 
-
-
--
