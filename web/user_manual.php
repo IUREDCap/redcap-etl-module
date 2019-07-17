@@ -162,7 +162,7 @@ There are 2 options for logging the results of your ETL processes, and they can 
 </p>
 <div style="max-width: 800px;">
 <ol>
-    <li><strong>Data Logging</strong> - REDCap-ETL, by default, logs to 2 tables in the
+    <li><strong>Database Logging</strong> - REDCap-ETL, by default, logs to 2 tables in the
     database where your transformed data is loaded. The names of these tables
     can be changed in your configuration, or you can turn off this logging.</li>
     <li><strong>E-mail logging</strong> - you can specify that you
@@ -194,8 +194,8 @@ There are 2 basic ways to run REDCap-ETL:
 <strong>Note:</strong> REDCap-ETL deletes the tables specified in the transformation rules at the start of
 each run, and then regenerates these tables. This is done
 because there is no good way to know what data has changed in REDCap since the last time REDCap-ETL was run.
-So you would not want to use these tables as a place to manually add data. Although you could create
-<em>addtional</em> tables in the database that you update manually.
+So you would not want to use these tables as a place to manually add data. 
+However, you could create <em>additional</em> tables in the database that you update manually.
 </p>
 
 <?php require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>

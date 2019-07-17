@@ -118,7 +118,7 @@ The REDCap-ETL external module needs at least one REDCap-ETL server to function.
 The REDCap-ETL external module has the following admin pages:
 <ul>
     <li><a href="<?php echo $configUrl;?>" style="font-weight: bold;">Config</a>
-        - General REDCap-ETL configuration with information on number and time of crom (scheduled) ETL jobs.
+        - General REDCap-ETL configuration with information on number and time of cron (scheduled) ETL jobs.
     </li>
     <li><a href="<?php echo $cronDetailUrl;?>" style="font-weight: bold;">Cron Detail</a>
     - Detailed information on cron (scheduled) ETL jobs.
