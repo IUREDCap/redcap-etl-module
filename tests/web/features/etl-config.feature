@@ -23,7 +23,7 @@ I need to be able to create, copy, rename and delete configurations
     But I should not see "Error:"
 
   Scenario: Configure configuration
-    When I follow "configure-behat"
+    When I follow configuration "behat"
     And I configure configuration "behat"
     Then I should see "Extract Settings"
     And I should see "Table"

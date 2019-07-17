@@ -13,7 +13,7 @@ Feature: Admin Config
 
   Scenario: Admin uncheck "allow on demand" and "allow cron"
     When I access the admin interface
-    When I follow "Config"
+    And I follow "Config"
     And I uncheck "allowOnDemand"
     And I uncheck "allowCron"
     And I uncheck "allowedCronTimes[6][23]"

@@ -973,7 +973,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
         $scheduleUrl = $this->getUrl('web/schedule.php');
         $scheduleLabel =
-           '<span class="fas fa-clock"></span>'
+           '<span id="schedule-tab" class="fas fa-clock"></span>'
            .' Schedule';
 
         $runUrl = $this->getUrl('web/run.php');

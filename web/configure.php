@@ -789,8 +789,11 @@ Configuration form
           
                 <!-- TABLE NAME PREFIX -->
                 <tr>
-                    <td style="padding-right: 1em;">Table name prefix</td>
+                    <td style="padding-right: 1em;">
+                        <label for="<?php echo Configuration::TABLE_PREFIX;?>">Table name prefix</label>
+                    </td>
                     <td><input type="text" name="<?php echo Configuration::TABLE_PREFIX;?>"
+                        id="<?php echo Configuration::TABLE_PREFIX;?>"
                         value="<?php echo Filter::escapeForHtml($properties[Configuration::TABLE_PREFIX]);?>"/>
                         <a href="#" id="table-name-prefix-help-link" class="etl-help">?</a>
                         <div id="table-name-prefix-help" title="Table Name Prefix" style="display: none;">

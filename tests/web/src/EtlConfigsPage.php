@@ -19,7 +19,7 @@ use Behat\Behat\Context\SnippetAcceptingContext;
  */
 class EtlConfigsPage
 {
-    public static function followEtlConfiguration($session, $configName)
+    public static function followConfiguration($session, $configName)
     {
         $page = $session->getPage();
 
@@ -117,5 +117,21 @@ class EtlConfigsPage
 
         # Handle confirmation dialog
         $page->pressButton("Delete configuration");
+    }
+
+    public static function deleteConfigurationIfExists($session, $configName)
+    {
+        $page = $session->getPage();
+
+        # Find the table row where the first element matches the config name, and then get the
+        # 8th column element and click it
+        $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[7]");
+
+        if (isset($element)) {
+            $element->click();
+
+            # Handle confirmation dialog
+            $page->pressButton("Delete configuration");
+        }
     }
 }

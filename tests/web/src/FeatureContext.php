@@ -204,6 +204,15 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @When /^I follow configuration "([^"]*)"$/
+     */
+    public function iFollowConfiguration($configName)
+    {
+        $session = $this->getSession();
+        EtlConfigsPage::followConfiguration($session, $configName);
+    }
+
+    /**
      * @When /^I configure configuration "([^"]*)"$/
      */
     public function iConfigureConfiguration($configName)
@@ -237,6 +246,15 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     {
         $session = $this->getSession();
         EtlConfigsPage::deleteConfiguration($session, $configName);
+    }
+
+    /**
+     * @When /^I delete configuration "([^"]*)" if it exists$/
+     */
+    public function iDeleteConfigurationIfExists($configName)
+    {
+        $session = $this->getSession();
+        EtlConfigsPage::deleteConfigurationIfExists($session, $configName);
     }
 
 
@@ -286,6 +304,15 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @When /^I schedule for next hour$/
+     */
+    public function iScheduleForNextHour()
+    {
+        $session = $this->getSession();
+        SchedulePage::scheduleForNextHour($session);
+    }
+
+    /**
      * @When /^I check mailinator for "([^"]*)"$/
      */
     public function iCheckMailinatorFor($emailPrefix)
@@ -293,5 +320,4 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         $session = $this->getSession();
         Util::mailinator($session, $emailPrefix);
     }
-
 }
