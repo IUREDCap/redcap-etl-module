@@ -12,29 +12,6 @@ namespace IU\RedCapEtlModule;
 class RedCapDb
 {
     /**
-     * Gets information for the specified user.
-     *
-     * @param string $username the username specifying the user for which to
-     *     retieve information.
-     *
-     * @return array map from field name to field value of user information.
-     */
-    public function getUserInfo($username)
-    {
-        $userInfo = array();
-        $sql = "select ui_id, username, user_firstname, user_lastname, user_email "
-            ." from redcap_user_information "
-            ." where username = '".Filter::escapeForMysql($username)."' and user_suspended_time is null "
-            ;
-        $result = db_query($sql);
-        if ($row = db_fetch_assoc($result)) {
-            $userInfo = $row;
-        }
-
-        return $userInfo;
-    }
-
-    /**
      * Returns information on all REDCap users that have not been suspended who have the
      * specified term in their username, first name, last name or (first) e-mail.
      */
@@ -48,9 +25,8 @@ class RedCapDb
             ."     (username like '%".Filter::escapeForMysql($term)."%' "
             ."     or user_firstname like '%".Filter::escapeForMysql($term)."%'"
             ."     or user_lastname like '%".Filter::escapeForMysql($term)."%'"
-            ."     or user_email like '%".Filter::escapeForMysql($term)."%'"
-            ."     ) "
-            ;
+            ."     or user_email like '%".Filter::escapeForMysql($term)."%'".")";
+
         $result = db_query($sql);
         while ($row = db_fetch_assoc($result)) {
             array_push($users, $row);
@@ -74,8 +50,9 @@ class RedCapDb
             ." if(u.api_token is null, 0, 1) as has_api_token, u.api_export "
             ." from redcap_projects p, redcap_user_rights u "
             ." where u.username = '".Filter::escapeForMysql($username)."' "
-            ." and p.project_id = u.project_id and p.date_deleted is null"
+            ." and p.project_id = u.project_id and p.date_deleted is null" // @codeCoverageIgnore
             ;
+
         $result = db_query($sql);
         while ($row = db_fetch_assoc($result)) {
             array_push($projects, $row);
@@ -83,30 +60,6 @@ class RedCapDb
         return $projects;
     }
     
-    /**
-     * Get the API token for the specified user and project.
-     *
-     * @param string $username the username for the API token.
-     * @param string $projectId the project ID for the API token.
-     *
-     * @return string the API token for the specified user and project.
-     */
-    public function getApiToken($username, $projectId)
-    {
-        $apiToken = null;
-        
-        $sql = "select api_token from redcap_user_rights "
-            . " where project_id = ".((int) PROJECT_ID)." "
-            . " and username = '".Filter::escapeForMysql(USERID)."'"
-            . " and api_export = 1 "
-            ;
-        $result = db_query($sql);
-        if ($row = db_fetch_assoc($result)) {
-            $apiToken = $row['api_token'];
-        }
-        return $apiToken;
-    }
-
     
     /**
      * Gets the API tokens for the specified project and data export right.
@@ -129,7 +82,7 @@ class RedCapDb
             ." where project_id = ".((int) $projectId)." "
             ." and api_export = 1 "
             ." and api_token is not null "
-            ." and data_export_tool = ".((int) $exportRight)
+            ." and data_export_tool = ".((int) $exportRight) // @codeCoverageIgnore
             ;
         
         $queryResult = db_query($sql);
@@ -153,7 +106,7 @@ class RedCapDb
             ." from redcap.redcap_external_modules rem, redcap.redcap_external_module_settings rems "
             ." where rem.external_module_id = rems.external_module_id "
             ." and '".Filter::escapeForMySql($dirName)."' like concat(rem.directory_prefix, '%') "
-            ." and `key` like 'configuration:%'"
+            ." and `key` like 'configuration:%'" // @codeCoverageIgnore
             ;
         $queryResult = db_query($sql);
         while ($row = db_fetch_assoc($queryResult)) {
