@@ -112,6 +112,48 @@ class Configuration implements \JsonSerializable
         $this->properties[self::EMAIL_SUMMARY] = false;
     }
 
+    /**
+     * Validation for case where a user is trying to run or schedule a configuration.
+     * Users may save incomplete configurations, but they should be prevented from
+     * trying to run or schedule one.
+     */
+    public function validateForRunning()
+    {
+        $this->validate();
+        
+        if (empty($this->getProperty(self::API_TOKEN_USERNAME))) {
+            throw new \Exception('No API token specified in configuration.');
+        }
+        
+        if (empty($this->getProperty(self::TRANSFORM_RULES_TEXT))) {
+            throw new \Exception('No transformation rules were specified in configuration.');
+        }
+        
+        if (empty($this->getProperty(self::DB_HOST))) {
+            throw new \Exception('No database host was specified in configuration.');
+        }
+        
+        if (empty($this->getProperty(self::DB_NAME))) {
+            throw new \Exception('No database name was specified in configuration.');
+        }
+                
+        if (empty($this->getProperty(self::DB_USERNAME))) {
+            throw new \Exception('No database username was specified in configuration.');
+        }
+        
+        if (empty($this->getProperty(self::DB_PASSWORD))) {
+            throw new \Exception('No database password was specified in configuration.');
+        }
+        
+        if ($this->getProperty(self::EMAIL_ERRORS) || $this->getProperty(self::EMAIL_SUMMARY)) {
+            if (empty($this->getProperty(self::EMAIL_TO_LIST))) {
+                throw new \Exception(
+                    'E-mailing of errors and/or summary specified in configuration,'
+                    .' but no e-mail to list address was provided.'
+                );
+            }
+        }
+    }
 
     /**
      * Validate the configuration.

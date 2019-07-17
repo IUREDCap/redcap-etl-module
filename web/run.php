@@ -65,6 +65,7 @@ try {
         } elseif (!isset($configuration)) {
             $error = 'ERROR: No ETL configuration found for '.$configName.'.';
         } else {
+            $configuration->validateForRunning();
             $isCronJob = false;
             $runOutput = $module->run($configName, $server, $isCronJob);
         }

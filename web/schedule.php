@@ -51,6 +51,8 @@ try {
     }
 
     if (strcasecmp($submitValue, 'Save') === 0) {
+        $configuration->validateForRunning();
+        
         $server = Filter::stripTags($_POST['server']);
         
         # Saving the schedule values
