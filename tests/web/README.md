@@ -92,7 +92,7 @@ You can add the unit test coverage data by executing the following command in th
 
     ./vendor/bin/phpunit --coverage-php tests/web/coverage-data/coverage.unit
 
-Then to update the coverage/index.php file, you need to re-run the comine_coverage.php script.
+Then to update the coverage/index.php file, you need to re-run the combine_coverage.php script.
 
 Similarly, you can also add manual test coverage data by setting the 'code-coverage-id' cookie in your browser, and then going through your tests in that browser. For example, in Chrome:
 

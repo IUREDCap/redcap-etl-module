@@ -27,7 +27,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals('test', $config->getName(), 'Configuration name test');
     }
     
-    public function testValidation()
+    public function testNameValidation()
     {
         $result = Configuration::validateName('test');
         $this->assertTrue($result, 'Config name "test" test.');

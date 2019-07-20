@@ -129,8 +129,8 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 #------------------------------------------------------------
 ?>
 <form action="<?=$selfUrl;?>" method="post" style="margin-bottom: 12px;">
-    REDCap-ETL configuration name:
-    <input name="configurationName" type="text" size="40" />
+    <label for="configurationName">REDCap-ETL configuration name:</label>
+    <input name="configurationName" id="configurationName" type="text" size="40" />
     <input type="submit" name="submitValue" value="Add" />
     <?php Csrf::generateFormToken(); ?>
 </form>

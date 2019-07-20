@@ -504,16 +504,6 @@ class Configuration implements \JsonSerializable
         return $this->username;
     }
 
-    public function getApiUrl()
-    {
-        return $this->properties[self::REDCAP_API_URL];
-    }
-
-    public function setApiUrl($value)
-    {
-        $this->properties[self::REDCAP_API_URL] = $value;
-    }
-    
     public function getDataExportRight()
     {
         return $this->properties[self::DATA_EXPORT_RIGHT];
