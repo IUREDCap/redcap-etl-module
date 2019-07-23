@@ -17,19 +17,19 @@ I need to be able to create, copy, rename and delete configurations
     And I follow "REDCap-ETL"
 
   Scenario: Create configuration
-    When I fill in "configurationName" with "behat"
+    When I fill in "configurationName" with "behat-config-test"
     And I press "Add"
-    Then I should see "behat"
+    Then I should see "behat-config-test"
     But I should not see "Error:"
 
   Scenario: Configure configuration
-    When I follow configuration "behat"
+    When I follow configuration "behat-config-test"
     And I configure configuration "behat"
     Then I should see "Extract Settings"
     And I should see "Table"
 
   Scenario: Check rules for configuration
-    When I follow "configure-behat"
+    When I follow configuration "behat-config-test"
     And I configure configuration "behat"
     And I press "Check Rules"
     Then I should see "Transformation Rules Check"
@@ -38,7 +38,7 @@ I need to be able to create, copy, rename and delete configurations
 
   Scenario: Run configuration
     When I follow "Run"
-    And I select "behat" from "configName"
+    And I select "behat-config-test" from "configName"
     And I press "Run"
     Then I should see "Configuration:"
     And I should see "Created table"
@@ -48,23 +48,23 @@ I need to be able to create, copy, rename and delete configurations
     
   Scenario: Copy configuration
     When I follow "ETL Configurations"
-    And I copy configuration "behat" to "behat-test-copy"
-    Then I should see "behat"
-    And I should see "behat-test-copy"
+    And I copy configuration "behat-config-test" to "behat-copy-test"
+    Then I should see "behat-config-test"
+    And I should see "behat-copy-test"
 
   Scenario: Rename configuration
     When I follow "ETL Configurations"
-    And I rename configuration "behat-test-copy" to "behat-test-rename"
-    Then I should see "behat-test-rename"
-    But I should not see "behat-test-copy"
+    And I rename configuration "behat-copy-test" to "behat-rename-test"
+    Then I should see "behat-rename-test"
+    But I should not see "behat-copy-test"
 
   Scenario: Delete renamed configuration
     When I follow "ETL Configurations"
-    And I delete configuration "behat-test-rename"
-    Then I should not see "behat-test-rename"
-    But I should see "behat"
+    And I delete configuration "behat-rename-test"
+    Then I should not see "behat-rename-test"
+    But I should see "behat-config-test"
 
   Scenario: Delete configuration
     When I follow "ETL Configurations"
-    And I delete configuration "behat"
-    Then I should not see "behat"
+    And I delete configuration "behat-config-test"
+    Then I should not see "behat-config-test"

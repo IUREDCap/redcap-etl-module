@@ -215,10 +215,10 @@ class Help
     {
         $help = self::getHelp($topic, $module);
         $help = '<a id="'.$topic.'-help-page" href="'.$module->getUrl('web/help.php?topic='.$topic).'"'
-            .' target="_blank" style="float: right;"'
-            .'>'
-            .'View text on separate page</a>'
-            .'<div style="clear: both;"></div>'
+            .' target="_blank" style="float: right;"'   // @codeCoverageIgnore
+            .'>'                                        // @codeCoverageIgnore
+            .'View text on separate page</a>'           // @codeCoverageIgnore
+            .'<div style="clear: both;"></div>'         // @codeCoverageIgnore
             .Filter::sanitizeHelp($help);
         return $help;
     }
@@ -245,11 +245,6 @@ class Help
         return $help;
     }
     
-    
-    public static function helpPreview()
-    {
-        // todo ...
-    }
     
     /**
      * Gets a string that will display the help as HTML.

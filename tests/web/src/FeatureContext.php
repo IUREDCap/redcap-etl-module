@@ -160,9 +160,18 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
 
 
     /**
-     * @Given I am logged in as user
+     * @Given /^I am logged in as user$/
      */
     public function iAmLoggedInAsUser()
+    {
+        $session = $this->getSession();
+        Util::loginAsUser($session);
+    }
+
+    /**
+     * @When /^I log in as user$/
+     */
+    public function iLogInAsUser()
     {
         $session = $this->getSession();
         Util::loginAsUser($session);

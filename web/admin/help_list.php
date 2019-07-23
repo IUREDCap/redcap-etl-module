@@ -23,8 +23,6 @@ use \IU\RedCapEtlModule\RedCapEtlModule;
 try {
     $selfUrl     = $module->getUrl(RedCapEtlModule::HELP_LIST_PAGE);
     
-    $helpInfoUrl = $module->getUrl('web/admin/help_info.php');
-    
     $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
     if (strcasecmp($submitValue, 'Save') === 0) {
@@ -78,10 +76,12 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
             } else {
                 echo "<tr class=\"odd\">\n";
             }
-            echo "<td>".Help::getTitle($topic)."</td>";
-            echo "<td>".Help::getSettingText($module->getHelpSetting($topic))."</td>";
+            echo '<td>'.Help::getTitle($topic).'</td>';
+            echo '<td>'.Help::getSettingText($module->getHelpSetting($topic)).'</td>';
             echo '<td style="text-align:center;">'
-                .'<a href="'.$editUrl.'"><img src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="EDIT"></a>'
+                .'<a href="'.$editUrl.'" id="'.Help::getTitle($topic).'">'
+                .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="EDIT">'
+                .'</a>'
                 ."</td>\n";
             echo "</tr>\n";
             $row++;

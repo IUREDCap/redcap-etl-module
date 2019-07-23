@@ -18,17 +18,17 @@ I need to be able to create, copy, rename and delete configurations
 
   Scenario: Delete existing schedule configuration (if any)
     When I follow "ETL Configurations"
-    And I delete configuration "bh-sched" if it exists
-    Then I should not see "bh-sched"
+    And I delete configuration "behat-sched-test" if it exists
+    Then I should not see "behat-sched-test"
     And I should not see "Error:"
 
   Scenario: Create configuration
-    When I fill in "configurationName" with "bh-sched"
+    When I fill in "configurationName" with "behat-sched-test"
     And I press "Add"
-    Then I should see "bh-sched"
+    Then I should see "behat-sched-test"
 
   Scenario: Configure configuration
-    When I follow configuration "bh-sched"
+    When I follow configuration "behat-sched-test"
     And I configure configuration "behat"
     And I fill in "Table name prefix" with "sched_"
     And I check "email_errors"
@@ -40,7 +40,7 @@ I need to be able to create, copy, rename and delete configurations
 
   Scenario: Schedule configuration
     When I follow "Schedule"
-    And I select "bh-sched" from "configName"
+    And I select "behat-sched-test" from "configName"
     And I select "(embedded server)" from "server"
     And I schedule for next hour
     And I press "Save"
