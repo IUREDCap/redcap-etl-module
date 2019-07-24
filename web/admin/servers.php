@@ -31,7 +31,6 @@ if (!empty($serverName)) {
     if (strcasecmp($submit, 'Add Server') === 0) {
         try {
             ServerConfig::validateName($serverName);
-            $isActive = false;
             $module->addServer($serverName);
         } catch (Exception $exception) {
             $error = 'ERROR: ' . $exception->getMessage();
@@ -261,13 +260,13 @@ $row = 1;
 foreach ($servers as $server) {
     echo '$("#copyServer'.$row.'").click({server: "'
         .Filter::escapeForJavaScriptInDoubleQuotes($server)
-        .'"}, copyServer);'."\n";
+        .'"}, RedCapEtlModule.copyServer);'."\n";
     echo '$("#renameServer'.$row.'").click({server: "'
         .Filter::escapeForJavaScriptInDoubleQuotes($server)
-        .'"}, renameServer);'."\n";
+        .'"}, RedCapEtlModule.renameServer);'."\n";
     echo '$("#deleteServer'.$row.'").click({server: "'
         .Filter::escapeForJavaScriptInDoubleQuotes($server)
-        .'"}, deleteServer);'."\n";
+        .'"}, RedCapEtlModule.deleteServer);'."\n";
     $row++;
 }
 
