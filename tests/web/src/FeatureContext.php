@@ -39,6 +39,17 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         $this->baseUrl = $this->testConfig->getRedCap()['base_url'];
     }
 
+    /** @BeforeFeature */
+    public static function setupFeature($event)
+    {
+    }
+
+    /** @AfterFeature */
+    public static function teardownFeature($event)
+    {
+    }
+
+
     /**
      * @BeforeScenario
      */

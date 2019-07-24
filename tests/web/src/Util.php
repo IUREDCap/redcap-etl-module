@@ -83,14 +83,11 @@ class Util
         $page->clickLink($testProjectTitle);
     }
 
-    public static function addUserAsAdmin($session, $username, $firstName, $lastName, $password, $email)
+    public static function deleteConfiguration($session, $configName)
     {
-        self::loginAsAdmin($session);
+        $this->loginAsUser($session);
         $page = $session->getPage();
-
-        $page->clickLink('Control Center');
-        $page->clickLink('Add Users (Table-based Only)');
-        // ...
+        // to be completed...
     }
 
     public static function createProject($session, $projectTitle)

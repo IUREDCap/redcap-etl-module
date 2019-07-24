@@ -111,28 +111,6 @@ class AdminConfig implements \JsonSerializable
             $this->allowedCronTimes = array();
         }
         
-        # Set allow embedded server (false will return no value)
-        #if (array_key_exists(self::ALLOW_EMBEDDED_SERVER, $properties)) {
-        #    $this->allowEmbeddedServer = true;
-        #} else {
-        #    $this->allowEmbeddedServer = false;
-        #}
-    
-        # Set the e-mail from address for the embedded server
-        #if (array_key_exists(self::EMBEDDED_SERVER_EMAIL_FROM_ADDRESS, $properties)) {
-        #    $this->embeddedServerEmailFromAddress =
-        #        trim(strip_tags($properties[self::EMBEDDED_SERVER_EMAIL_FROM_ADDRESS]));
-        #} else {
-        #    $this->embeddedServerEmailFromAddress = '';
-        #}
-
-        # Set the log file for the embedded server
-        #if (array_key_exists(self::EMBEDDED_SERVER_LOG_FILE, $properties)) {
-        #    $this->embeddedServerLogFile = trim(strip_tags($properties[self::EMBEDDED_SERVER_LOG_FILE]));
-        #} else {
-        #    $this->embeddedServerLogFile = '';
-        #}
-
         # Set flag that indicates if users can run jobs on demand
         if (array_key_exists(self::ALLOW_ON_DEMAND, $properties)) {
             $this->allowOnDemand = true;
@@ -166,16 +144,6 @@ class AdminConfig implements \JsonSerializable
     public function jsonSerialize()
     {
         return (object) get_object_vars($this);
-    }
-
-    public function getDayLabel($dayNumber)
-    {
-
-        $label = '';
-        if (array_key_exists($dayNumber, self::DAY_LABELS)) {
-            $label = self::DAY_LABELS[$dayNumber];
-        }
-        return $label;
     }
 
     public function getTimes()
@@ -264,77 +232,6 @@ class AdminConfig implements \JsonSerializable
         return $labels;
     }
 
-    public function getLongTimeLabels()
-    {
-        $labels = array();
-        $labelNumbers = range(0, 23);
-        for ($i = 0; $i < count($labelNumbers); $i++) {
-            $start = $i;
-            $end   = $i + 1;
-
-            $startSuffix = 'am';
-            if ($start >= 12) {
-                $startSuffix = 'pm';
-                $start -= 12;
-            }
-            if ($start === 0) {
-                $start = 12;
-            }
-
-            $endSuffix = 'am';
-            if ($end >= 12) {
-                $endSuffix = 'pm';
-                $end -= 12;
-            }
-
-            if ($start < 10) {
-                $start = '0'.$start;
-            }
-            $start .= ':00'.$startSuffix;
-
-            if ($end < 10) {
-                $end = '0'.$end;
-            }
-            $end .= ':00'.$endSuffix;
-
-            $labels[$i] = $start.'-'.$end;
-        }
-        return $labels;
-    }
-
-    #public function getAllowEmbeddedServer()
-    #{
-    #    return $this->allowEmbeddedServer;
-    #}
-    
-    #public function setAllowEmbeddedServer($allowEmbeddedServer)
-    #{
-    #    $this->allowEmbeddedServer = $allowEmbeddedServer;
-    #}
- 
-
-    #public function getEmbeddedServerLogFile()
-    #{
-    #    return $this->embeddedServerLogFile;
-    #}
-    
-    #public function setEmbeddedServerLogFile($logFile)
-    #{
-    #    $this->embeddedServerLogFile = $logFile;
-    #}
- 
-
-    #public function getEmbeddedServerEmailFromAddress()
-    #{
-    #    return $this->embeddedServerEmailFromAddress;
-    #}
-    
-    #public function setEmbeddedServerEmailFromAddress($fromEmail)
-    #{
-    #    $this->embeddedServerEmailFromAddress = $fromEmail;
-    #}
- 
-
     public function getAllowOnDemand()
     {
         return $this->allowOnDemand;
@@ -350,38 +247,12 @@ class AdminConfig implements \JsonSerializable
         return $this->allowCron;
     }
     
-    public function setAllowCron($allowCron)
-    {
-        $this->allowCron = $allowCron;
-    }
-
     public function isAllowedCronTime($day, $time)
     {
         $isAllowed = $this->allowedCronTimes[$day][$time];
         return $isAllowed;
     }
      
-    public function getAllowedCronTimes()
-    {
-        return $this->allowedCronTimes;
-    }
-    
-    public function setAllowedCronTimes($times)
-    {
-        $this->allowedCronTimes = array();
-        foreach (range(0, 6) as $day) {
-            $this->allowedCronTimes[$day] = array();
-            
-            foreach (range(0, 23) as $hour) {
-                if (array_key_exists($day, $times) && array_key_exists($hour, $times[$day])) {
-                    $this->allowedCronTimes[$day][$hour] = 1;
-                } else {
-                    $this->allowedCronTimes[$day][$hour] = 0;
-                }
-            }
-        }
-    }
-    
     public function getSslVerify()
     {
         return $this->sslVerify;
