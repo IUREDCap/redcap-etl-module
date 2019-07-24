@@ -53,3 +53,10 @@ Feature: Server configuration management
     But I should not see "local-server-rename"
     And I should not see "Error: "
 
+  Scenario: Create local server configuration that already exists
+    When I follow "ETL Servers"
+    And I fill in "server-name" with "local-server"
+    And I press "Add Server"
+    Then I should see "Error: "
+    And I should see "already exists"
+
