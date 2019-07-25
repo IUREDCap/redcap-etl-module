@@ -339,6 +339,23 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @When /^I check test project access$/
+     */
+    public function iCheckTestProjectAccess()
+    {
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
+        $userConfig = $testConfig->getUser();
+        $testProjectTitle = $userConfig['test_project_title'];
+
+        $session = $this->getSession();
+        $page = $session->getPage();
+
+        $element = $page->find("xpath", "//tr[contains(td[3],'".$testProjectTitle."')]/td[1]/input[@type='checkbox']");
+
+        $element->click();
+    }
+
+    /**
      * @When /^I check mailinator for "([^"]*)"$/
      */
     public function iCheckMailinatorFor($emailPrefix)

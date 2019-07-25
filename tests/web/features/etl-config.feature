@@ -12,7 +12,7 @@ I need to be able to create, copy, rename and delete configurations
   Background:
     Given I am on "/"
     And I am logged in as user
-    And I follow "My Projects"
+    When I follow "My Projects"
     When I select the test project
     And I follow "REDCap-ETL"
 

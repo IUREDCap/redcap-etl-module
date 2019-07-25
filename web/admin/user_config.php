@@ -48,6 +48,7 @@ $userLabel = Filter::stripTags($_POST['userLabel']);
 try {
     if (!empty($username)) {
         if (strcmp($submitValue, $deleteButtonLabel) === 0) {
+            print "<br/>DELETE USER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br/>\n";
             $module->deleteUser($username);
             $success = 'User "'.$username.'" deleted from REDCap-ETL.';
             $urlValue = RedCapEtlModule::USERS_PAGE.'?success='.Filter::escapeForUrlParameter($success);
@@ -105,7 +106,7 @@ $module->renderAdminUsersSubTabs($selfUrl);
 User:&nbsp;
 <input type="text" id="user-search" name="user-search" size="48" 
      value="<?php echo Filter::escapeForHtmlAttribute($username); ?>">
-<input type="hidden" name="username" id="username-result">
+<input type="hidden" name="username" id="username">
 <input type="hidden" name="userLabel" id="userLabel">
 <?php Csrf::generateFormToken(); ?>
 </form>
@@ -123,7 +124,7 @@ $(function() {
         minLength: 2,
         select: function(event, ui) {
             $("#user-search").val(ui.item.username);
-            $("#username-result").val(ui.item.username);
+            $("#username").val(ui.item.username);
             $("#userLabel").val(ui.item.label);
             $("#searchForm").submit();
         }
@@ -159,7 +160,7 @@ if (!empty($username)) {
     <p>This action will NOT delete the user from REDCap and will NOT delete any
     of the REDCap-ETL configurations this user has created or edited.
     </p>
-    <input type="hidden" name="username-result" value="<?php echo $username;?>">
+    <input type="hidden" name="username" value="<?php echo $username;?>">
     <input type="hidden" name="submitValue" value="<?php echo $deleteButtonLabel;?>">
     <?php Csrf::generateFormToken(); ?>
     </form>
@@ -175,7 +176,7 @@ $(function() {
         modal: true,
         buttons: {
             Cancel: function() {$(this).dialog("close");},
-            "<?php echo $deleteButtonLabel;?>": function() {deleteUserForm.submit();}
+            "Delete user": function() {deleteUserForm.submit();}
         },
         title: "<?php echo $deleteButtonLabel;?>"
     });
