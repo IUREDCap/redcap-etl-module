@@ -13,10 +13,6 @@ use PHPUnit\Framework\TestCase;
  */
 class UserListTest extends TestCase
 {
-    public function setup()
-    {
-    }
-
     public function testCreate()
     {
         $userList = new UserList();

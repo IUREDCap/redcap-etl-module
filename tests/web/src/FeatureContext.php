@@ -25,6 +25,8 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     private $timestamp;
     private $baseUrl;
 
+    private static $featureFileName;
+
     /**
      * Initializes context.
      *
@@ -40,12 +42,16 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /** @BeforeFeature */
-    public static function setupFeature($event)
+    public static function setupFeature($scope)
     {
+        $feature = $scope->getFeature();
+        $filePath = $feature->getFile();
+        $fileName = pathinfo($filePath, PATHINFO_FILENAME);
+        self::$featureFileName = $fileName;
     }
 
     /** @AfterFeature */
-    public static function teardownFeature($event)
+    public static function teardownFeature($scope)
     {
     }
 

@@ -90,8 +90,6 @@ $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
 $link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
 $buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
-
-#$buffer = $module->renderProjectPageHeader();
 echo $buffer;
 ?>
 

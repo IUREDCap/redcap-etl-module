@@ -29,15 +29,6 @@ class AdminConfig implements \JsonSerializable
     /** @var string certificate authority certificate file used for SSL verification of REDCap. */
     private $caCertFile;
     
-    # private $allowEmbeddedServer;  // Allow embedded REDCap-ETL server to be used
-    
-    /** @var string log file (if any) on REDCap server to use for the embedded ETL server. */
-    # private $embeddedServerLogFile;
-    
-    /** @var string E-mail from address to use for embedded server
-     *     (must be set for e-mail logging to work for embedded server). */
-    #private $embeddedServerEmailFromAddress;
-    
     private $allowOnDemand;  // Allow the ETL process to be run on demand
     
     private $allowCron;
@@ -58,9 +49,9 @@ class AdminConfig implements \JsonSerializable
             $this->allowedCronTimes[$day] = array();
             foreach (range(0, 23) as $hour) {
                 if ($day === 0 || $day === 6 || $hour < 8 || $hour > 17) {
-                    $this->allowedCronTimes[$day][$hour] = '1';
+                    $this->allowedCronTimes[$day][$hour] = true;
                 } else {
-                    $this->allowedCronTimes[$day][$hour] = '0';
+                    $this->allowedCronTimes[$day][$hour] = false;
                 }
             }
         }
@@ -96,19 +87,21 @@ class AdminConfig implements \JsonSerializable
         if (array_key_exists(self::ALLOWED_CRON_TIMES, $properties)) {
             $times = $properties[self::ALLOWED_CRON_TIMES];
             if (is_array($times)) {
-                foreach ($times as $rownum => $row) {
-                    if (is_array($row)) {
-                        foreach ($row as $colnum => $value) {
-                            $times[$rownum][$colnum] = Filter::sanitizeLabel($value);
+                for ($row = 0; $row < count($this->allowedCronTimes); $row++) {
+                    if (array_key_exists($row, $times)) {
+                        $dayTimes = $times[$row];
+                        if (is_array($dayTimes)) {
+                            for ($col = 0; $col < count($this->allowedCronTimes[$row]); $col++) {
+                                if (array_key_exists($col, $dayTimes)) {
+                                    $this->allowedCronTimes[$row][$col] = true;
+                                } else {
+                                    $this->allowedCronTimes[$row][$col] = false;
+                                }
+                            }
                         }
                     }
                 }
-            } else {
-                $times = array();
             }
-            $this->allowedCronTimes = $times;
-        } else {
-            $this->allowedCronTimes = array();
         }
         
         # Set flag that indicates if users can run jobs on demand
@@ -237,11 +230,6 @@ class AdminConfig implements \JsonSerializable
         return $this->allowOnDemand;
     }
     
-    public function setAllowOnDemand($allowOnDemand)
-    {
-        $this->allowOnDemand = $allowOnDemand;
-    }
-    
     public function getAllowCron()
     {
         return $this->allowCron;
@@ -256,11 +244,6 @@ class AdminConfig implements \JsonSerializable
     public function getSslVerify()
     {
         return $this->sslVerify;
-    }
-    
-    public function setSslVerify($sslVerify)
-    {
-        $this->sslVerify = $sslVerify;
     }
     
     public function getCaCertFile()

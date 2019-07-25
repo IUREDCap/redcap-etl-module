@@ -10,10 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class RedCapDbTest extends TestCase
 {
-    public function setup()
-    {
-    }
-
     public function testCreate()
     {
         $redCapDb = new RedCapDb();

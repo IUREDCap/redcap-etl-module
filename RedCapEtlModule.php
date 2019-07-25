@@ -61,6 +61,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             return $link;
         }
 
+        # If you are in a project (vs. being on admin page) and you have permissions
+        # to use REDCap-ETL on the page, then return the REDCap-ETL link (so that it
+        # can be displayed)
         if (!empty($project_id) && Authorization::hasRedCapUserRightsForEtl($this, USERID)) {
             return $link;
         }
@@ -1124,19 +1127,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $this->renderWarningMessageDiv($warningMessage);
         $this->renderSuccessMessageDiv($successMessage);
     }
-    
-    public function renderProjectPageHeader()
-    {
-        ob_start();
-        require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
-        $buffer = ob_get_clean();
-        #$cssFile = $this->getUrl('resources/redcap-etl.css');
-        #$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-        #$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
-        return $buffer;
-    }
-    
-    
+
 
     /**
      * Checks if the user has permission to a user (non-admin) page, and

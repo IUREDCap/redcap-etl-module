@@ -44,15 +44,8 @@ I need to be able to create, copy, rename and delete configurations
     And I select "(embedded server)" from "server"
     And I schedule for next hour
     And I press "Save"
-    And I wait for 10 seconds
+    And I wait for 4 seconds
     Then I should see "Configuration:"
     And I should see "Server:"
     And I should see "(embedded server)"
-    #And I select "behat" from "configName"
-    #And I press "Run"
-    #Then I should see "Configuration:"
-    #And I should see "Created table"
-    #And I should see "Number of record_ids found: 100"
-    #And I should see "Processing complete."
-    #But I should not see "Error:"
     

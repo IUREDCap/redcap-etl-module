@@ -27,8 +27,6 @@ try {
 
     $adminConfig = $module->getAdminConfig();
 
-    $helpInfoUrl = $module->getUrl('web/admin/help_info.php');
-
     $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
     if (strcasecmp($submitValue, 'Save') === 0) {
@@ -194,16 +192,6 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     ?>
     </tbody>
   </table>
-
-  <script type="text/javascript">
-      $('#help-select').change(function(event) {
-          $.get("<?php echo $helpInfoUrl;?>", { topic: $('#help-select').val() },
-              function(data) {
-                  $('#help-text').html(data);
-              }
-        );
-    });
-  </script>
 
   <p>
     <input type="submit" name="submitValue" value="Save">

@@ -11,6 +11,9 @@ composer.phar
 # ignore swap files
 *.swp
 
+# ignore cache files
+*.cache
+
 # Eclipse project file and settings directory
 .project
 .settings/

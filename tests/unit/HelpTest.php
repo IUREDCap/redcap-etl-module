@@ -10,10 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class HelpTest extends TestCase
 {
-    public function setup()
-    {
-    }
-
     public function testCreate()
     {
         $help = new Help();

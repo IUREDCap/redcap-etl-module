@@ -14,11 +14,6 @@ define('APP_PATH_WEBROOT_FULL', '/var/www/html/redcap/');
 
 class ConfigurationTest extends TestCase
 {
-
-    public function setup()
-    {
-    }
-
     public function testCreate()
     {
         $config = new Configuration('test');

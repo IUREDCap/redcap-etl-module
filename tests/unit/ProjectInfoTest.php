@@ -10,10 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class ProjectInfoTest extends TestCase
 {
-    public function setup()
-    {
-    }
-
     public function testCreate()
     {
         $projectInfo = new ProjectInfo();

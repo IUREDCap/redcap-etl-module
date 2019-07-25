@@ -26,10 +26,10 @@ class Authorization
         $hasPermission = false;
 
         $projectId = $module->getProjectId();
-        
+
         if ($module->isSuperUser()) {
             $hasPermission = true;
-        } elseif (!empty($projectId)) {
+        } elseif (!empty($projectId)) {     // @codeCoverageIgnore
             if (self::hasRedCapUserRightsForEtl($module)) {
                 $userEtlProjects = $module->getUserEtlProjects();
                 if (in_array($projectId, $userEtlProjects)) {
@@ -104,7 +104,7 @@ class Authorization
         
         if ($module->isSuperUser()) {
             $hasPermission = true;
-        } elseif (!empty($projectId)) {
+        } elseif (!empty($projectId)) {    // @codeCoverageIgnore
             $rights = $module->getUserRights();
             if (self::hasRedCapUserRightsForEtl($module) && $rights['data_export_tool'] > 0) {
                 $hasPermission = true;

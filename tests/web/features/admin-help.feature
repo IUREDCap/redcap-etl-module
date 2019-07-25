@@ -11,6 +11,21 @@ Feature: Admin Help Customization
   Background:
     Given I am on "/"
 
+  Scenario: Use help topic selection to access a help topic
+    When I access the admin interface
+    And I follow "Help Edit"
+    And I follow "Edit"
+    And I select "E-mail To List" from "Help Topic"
+    Then I should see "A comma-separated list of e-mail addresses"
+
+  Scenario: Try to save help with no help topic selected
+    When I access the admin interface
+    And I follow "Help Edit"
+    And I follow "Edit"
+    And I press "Save"
+    Then I should see "Error:"
+    And I should see "No help topic specified"
+
   Scenario: Preview custom help prepended to default help
     When I access the admin interface
     And I follow "Help Edit"

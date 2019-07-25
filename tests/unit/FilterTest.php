@@ -10,10 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class FilterTest extends TestCase
 {
-    public function setup()
-    {
-    }
-
     public function testCreate()
     {
         $filter = new Filter();

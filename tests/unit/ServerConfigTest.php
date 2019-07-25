@@ -10,10 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class ServerConfigTest extends TestCase
 {
-    public function setup()
-    {
-    }
-
     public function testCreate()
     {
         $serverConfig = new ServerConfig('test');

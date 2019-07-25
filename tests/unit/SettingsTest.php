@@ -10,10 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class SettingsTest extends TestCase
 {
-    public function setup()
-    {
-    }
-
     public function testCreate()
     {
         $module = null;

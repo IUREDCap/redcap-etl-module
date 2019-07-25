@@ -24,7 +24,6 @@ try {
     $selfUrl     = $module->getUrl(RedCapEtlModule::HELP_EDIT_PAGE);
     $helpListUrl = $module->getUrl(RedCapEtlModule::HELP_LIST_PAGE);
 
-    $helpInfoUrl = $module->getUrl('web/admin/help_info.php');
     $helpPreviewUrl = $module->getUrl('web/admin/help_preview.php');
     
     #------------------------------------------------------
@@ -59,10 +58,6 @@ try {
                 throw new Exception($error);
             }
         }
-    } if (strcasecmp($submitValue, 'Preivew') === 0) {
-        $helpSetting = Filter::sanitizeInt($_POST['helpSetting']);
-        $defaultHelp = Help::getDefaultHelp($topic);
-        $customHelp = Filter::sanitizeHelp($_POST['customHelp']);
     } elseif (!empty($topic)) {
         $helpSetting = $module->getHelpSetting($topic);
         $defaultHelp = Help::getDefaultHelp($topic);
@@ -104,8 +99,8 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
 <form action="<?php echo $selfUrl;?>" method="post">
     
   <fieldset class="server-config" style="margin-top: 12px;">
-    <legend>Help Topic</legend>
-      <select name="topic" onchange="this.form.submit()">
+    <legend><label for="help-topic">Help Topic</label></legend>
+      <select name="topic" id="help-topic" onchange="this.form.submit()">
         <?php
         $topics = Help::getTopics();
         array_unshift($topics, '');  # Add blank selection at beginning
@@ -196,16 +191,6 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
       </tr>
     </table>
   </fieldset>
-
-  <script type="text/javascript">
-      $('#topicSelect').change(function(event) {
-          $.get("<?php echo $helpInfoUrl;?>", { topic: $('#topicSelect').val() },
-              function(data) {
-                  $('#help-text').html(data);
-              }
-        );
-    });
-  </script>
 
   <p>
     <input type="submit" name="submitValue" value="Save">
