@@ -28,6 +28,15 @@ Feature: Admin User Management
     And I follow "REDCap-ETL"
     Then I should see "To request access, click on the button below"
 
+  Scenario: Try to request ETL access for test project as the test user
+    When I log in as user
+    And I follow "My Projects"
+    And I select the test project
+    And I follow "REDCap-ETL"
+    And I press "Request ETL access for this project"
+    Then I should see "Request"
+    And I should see "sent"
+
   Scenario: Add back the test user to REDCap-ETL
     When I access the admin interface
     When I follow "Users"
