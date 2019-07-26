@@ -181,7 +181,7 @@ class Help
     
     public static function getCustomHelp($topic, $module)
     {
-        $help = $module->getCustomHelp($topic, $module);
+        $help = $module->getCustomHelp($topic);
         $help = Filter::sanitizeHelp($help);
         return $help;
     }
@@ -246,15 +246,6 @@ class Help
     }
     
     
-    /**
-     * Gets a string that will display the help as HTML.
-     */
-    public static function getHelpHtml($topic, $module)
-    {
-        $help = htmlspecialchars(self::getHelp($topic, $module));
-        return $help;
-    }
-
     public static function getTopics()
     {
         return array_keys(self::$help);

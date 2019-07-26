@@ -6,7 +6,7 @@
 Feature: Server configuration management
   In order to manage servers
   As an admin
-  I need to be able to create, configure, copy, delete and rename servers
+  I need to be able to create, configure, test, copy, delete and rename servers
 
   Background:
     Given I am on "/"
@@ -18,6 +18,13 @@ Feature: Server configuration management
     Then I should see "(embedded server)"
     But I should not see "local-server"
     And I should not see "Error:"
+
+  Scenario: Test embedded server connection
+    When I follow "ETL Servers"
+    And I follow server "(embedded server)"
+    And I press "Test Server Connection"
+    Then the "#testOutput" element should contain "REDCap-ETL"
+    And the "#testOutput" element should contain "found"
 
   Scenario: Create local server configuration
     When I follow "ETL Servers"

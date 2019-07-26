@@ -199,13 +199,13 @@ class ServerConfig implements \JsonSerializable
             throw new \Exception($message);
         }
         
-        $this->updateEtlConfig($etlConfig, $isCronJob);
-        
         if (!$this->getIsActive()) {
-            $message = 'Server "'.$this->name.'" have been inactivated.';
+            $message = 'Server "'.$this->name.'" is set as inactive.';
             throw new \Exception($message);
         }
 
+        $this->updateEtlConfig($etlConfig, $isCronJob);
+        
         if ($this->isEmbeddedServer()) {
             #-------------------------------------------------
             # Embedded server
