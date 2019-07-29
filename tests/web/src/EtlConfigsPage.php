@@ -24,8 +24,8 @@ class EtlConfigsPage
         $page = $session->getPage();
 
         # Find the table row where the first element matches the config name, and then get the
-        # 3rd column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[2]");
+        # 2nd column element and click it
+        $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[1]");
         $element->click();
     }
 
@@ -77,8 +77,8 @@ class EtlConfigsPage
         $page = $session->getPage();
 
         # Find the table row where the first element matches the config name, and then get the
-        # 6th column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[5]");
+        # 5th column element and click it
+        $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[4]");
         $element->click();
 
         # Handle confirmation dialog
@@ -91,8 +91,8 @@ class EtlConfigsPage
         $page = $session->getPage();
 
         # Find the table row where the first element matches the config name, and then get the
-        # 7th column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[6]");
+        # 6th column element and click it
+        $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[5]");
         $element->click();
 
         # Handle confirmation dialog
@@ -111,8 +111,8 @@ class EtlConfigsPage
         $page = $session->getPage();
 
         # Find the table row where the first element matches the config name, and then get the
-        # 8th column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[7]");
+        # 7th column element and click it
+        $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[6]");
         $element->click();
 
         # Handle confirmation dialog
@@ -124,8 +124,8 @@ class EtlConfigsPage
         $page = $session->getPage();
 
         # Find the table row where the first element matches the config name, and then get the
-        # 8th column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[7]");
+        # 7th column element and click it
+        $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[6]");
 
         if (isset($element)) {
             $element->click();

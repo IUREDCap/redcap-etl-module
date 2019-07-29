@@ -39,7 +39,8 @@ class HelpTest extends TestCase
         $this->getMockBuilder('ExternalModules\AbstractExternalModule')->getMock();
 
         $moduleMock = $this->createMock(RedCapEtlModule::class);
-        $moduleMock->expects($this->any())->method('getCustomHelp')->with($topic)->will($this->returnValue($expectedHelp));
+        $moduleMock->expects($this->any())->method('getCustomHelp')
+            ->with($topic)->will($this->returnValue($expectedHelp));
 
         $help = Help::getCustomHelp($topic, $moduleMock);
         $this->assertNotNull($help, 'Help not null');

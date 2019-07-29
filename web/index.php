@@ -139,7 +139,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 <thead>
 <tr class="hrd">
     <th>Configuration Name</th>
-    <th>Data Export</th>
+    <!-- <th>Data Export</th> -->
     <th>Configure</th>
     <!-- <th>Test</th> -->
     <?php
@@ -183,7 +183,7 @@ foreach ($configurationNames as $configurationName) {
     $exportRightLabel = $module->getExportRightLabel($exportRight);
     
     echo "<td>".Filter::escapeForHtml($configurationName)."</td>\n";
-    echo "<td>".Filter::escapeForHtml($exportRightLabel)."</td>\n";
+    #echo "<td>".Filter::escapeForHtml($exportRightLabel)."</td>\n";
     
     #-------------------------------------------------------------------------------------
     # CONFIGURE BUTTON - disable if user does not have permission to access configuration
