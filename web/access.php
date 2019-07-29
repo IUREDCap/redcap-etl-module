@@ -67,10 +67,13 @@ if ($accessError === RedCapEtlModule::CSRF_ERROR) {
         .' may have expired. Please make sure that you are logged in and '
         .' try again.';
 } elseif ($accessError === RedCapEtlModule::USER_RIGHTS_ERROR) {
-    echo 'You do not have permission to use, or request the use of, REDCap-ETL'
-        .' for this project. You need to have REDCap user right '
-        .' "Project Design and Setup" and REDCap data export user right of at'
-        .' least "De-Identified".';
+    echo 'You do not have permission to use REDCap-ETL'
+        .' for this project. You need to have:'
+        .' <ul>'
+        .' <li>REDCap user right "Project Design and Setup"</li>'
+        .' <li>REDCap data export user right of "Full Data Set"</li>'
+        .' <li>No data access group (i.e., you can access all records)</li>.'
+        .' </ul>';
 } elseif ($accessError === RedCapEtlModule::NO_CONFIGURATION_PERMISSION) {
     echo 'You do not have permission to access the specified configuration.';
 } elseif ($accessError === RedCapEtlModule::NO_ETL_PROJECT_PERMISSION) {

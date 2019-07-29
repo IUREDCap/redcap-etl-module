@@ -93,10 +93,7 @@ The configuration needs to specify at least the following things:
 </ul>
 
 <p>
-ETL configurations have a data export permission that matches the REDCap data export user right of
-the user who created the configuration at the time the configuration was created. ETL configurations
-are shared among the users of the project, but you will only be able to access configurations that
-have a data export permission that is the same or less than yours.
+ETL configurations are shared among the users of the project who have permission to use REDCap-ETL.
 </p>
 
 <h5 style="font-weight: bold;">REDCap API Tokens</h5>
@@ -105,11 +102,8 @@ have a data export permission that is the same or less than yours.
 Each ETL configuration must specify a REDCap API token. The token is used to access REDCap so that
 the data can be extracted from it.
 The API token is specified by selecting the username of the owner of the API token.
-So, users are allowed to use the API token of another user for ETL processing, but they cannot see the token.
-Also, only API tokens
-that have the same data export permission as the configuration can be used. Since users can only access
-configurations that have the same of less data export permission than they have, this means that users can
-only use API tokens that have the same or less data export permission than they have.
+Users are allowed to use the API token of any other
+user who also has permission to user REDCap-ETL, but they cannot see the token.
 </p>
 
 <h5 style="font-weight: bold;">Transformation Rules</h5>
