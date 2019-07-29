@@ -25,8 +25,15 @@ I need to be able to create, copy, rename and delete configurations
   Scenario: Configure configuration
     When I follow configuration "behat-config-test"
     And I configure configuration "behat"
+    And I press "Save"
     Then I should see "Extract Settings"
     And I should see "Table"
+
+  Scenario: Save and exit configuration
+    When I follow configuration "behat-config-test"
+    And I press "Save and Exit"
+    Then I should see "Configuration Name"
+    And I should see "behat-config-test"
 
   Scenario: Check rules for configuration
     When I follow configuration "behat-config-test"

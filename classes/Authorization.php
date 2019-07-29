@@ -69,20 +69,21 @@ class Authorization
         if ($module->isSuperUser()) {
             $hasPermission = true;
         } else {
-            $configExportRight = $configuration->getProperty(Configuration::DATA_EXPORT_RIGHT);
+            # $configExportRight = $configuration->getProperty(Configuration::DATA_EXPORT_RIGHT);
             $userExportRight   = $module->getDataExportRight();
-            if (!empty($configExportRight) && !empty($userExportRight)) {
+            #if (!empty($configExportRight) && !empty($userExportRight)) {
+            if (!empty($userExportRight)) {
                 if ($userExportRight == 1) {
                     # User has full data set export permission
                     $hasPermission = true;
-                } elseif ($userExportRight == 3 && $configExportRight != 1) {
-                    # User cannot see tagged identifier fields, and configuration
-                    # is NOT "full data set"
-                    $hasPermission = true;
-                } elseif ($userExportRight == 2 && ($configExportRight == 2 || $configExportRight == 0)) {
-                    # User and configuration export permissions are both "de-identified"
-                    # (the most restrive access other than "no access")
-                    $hasPermission = true;
+                #} elseif ($userExportRight == 3 && $configExportRight != 1) {
+                #    # User cannot see tagged identifier fields, and configuration
+                #    # is NOT "full data set"
+                #    $hasPermission = true;
+                #} elseif ($userExportRight == 2 && ($configExportRight == 2 || $configExportRight == 0)) {
+                #    # User and configuration export permissions are both "de-identified"
+                #    # (the most restrive access other than "no access")
+                #    $hasPermission = true;
                 }
             }
         }
@@ -106,7 +107,7 @@ class Authorization
             $hasPermission = true;
         } elseif (!empty($projectId)) {    // @codeCoverageIgnore
             $rights = $module->getUserRights();
-            if (self::hasRedCapUserRightsForEtl($module) && $rights['data_export_tool'] > 0) {
+            if (self::hasRedCapUserRightsForEtl($module)) {  //  && $rights['data_export_tool'] > 0) {
                 $hasPermission = true;
             }
         }
@@ -129,9 +130,9 @@ class Authorization
         } else {
             $rights = $module->getUserRights();
 
-            # Users need to have project design permission and
-            # not belong to a data access group (DAG)
-            if ($rights['design'] && !isset($rights['group_id'])) {
+            # Users need to have project design permission and "full data set" data export permission
+            # and not belong to a data access group (DAG)
+            if ($rights['design'] && $rights['data_export_tool'] == 1 && !isset($rights['group_id'])) {
                 $hasPermission = true;
             }
         }

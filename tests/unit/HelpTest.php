@@ -31,19 +31,21 @@ class HelpTest extends TestCase
         $this->assertNotNull($help, 'Help not null');
     }
 
-#    public function testGetCustomHelp()
-#    {
-#        $topic = 'batch-size';
-#        $expectedHelp = 'The batch size indicates how many record IDs are processed at a time.';
-#
-#        $moduleMock = $this->createMock(RedCapEtlModule::class);
-#        $moduleMock->expects($this->any())->method('getCustomHelp')->with($topic)->will($this->returnValue($expectedHelp));
-#
-#        $help = Help::getCustomHelp($topic, $moduleMock);
-#        $this->assertNotNull($help, 'Help not null');
-#
-#        $this->assertEquals($expectedHelp, $help, 'Help text check');
-#    }
+    public function testGetCustomHelp()
+    {
+        $topic = 'batch-size';
+        $expectedHelp = 'The batch size indicates how many record IDs are processed at a time.';
+
+        $this->getMockBuilder('ExternalModules\AbstractExternalModule')->getMock();
+
+        $moduleMock = $this->createMock(RedCapEtlModule::class);
+        $moduleMock->expects($this->any())->method('getCustomHelp')->with($topic)->will($this->returnValue($expectedHelp));
+
+        $help = Help::getCustomHelp($topic, $moduleMock);
+        $this->assertNotNull($help, 'Help not null');
+
+        $this->assertEquals($expectedHelp, $help, 'Help text check');
+    }
 
     public function testGetTopics()
     {
