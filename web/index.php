@@ -180,7 +180,7 @@ foreach ($configurationNames as $configurationName) {
 
     $configuration = $module->getConfiguration($configurationName);
     $exportRight = $module->getConfigurationExportRight($configuration);
-    $exportRightLabel = $module->getExportRightLabel($exportRight);
+    #$exportRightLabel = $module->getExportRightLabel($exportRight);
     
     echo "<td>".Filter::escapeForHtml($configurationName)."</td>\n";
     #echo "<td>".Filter::escapeForHtml($exportRightLabel)."</td>\n";

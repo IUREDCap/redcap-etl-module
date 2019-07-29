@@ -67,8 +67,7 @@ class Filter
     
     public function isUrl($value)
     {
-        # Use REDCap's function
-        return isUrl($value);
+        return filter_var($value, FILTER_VALIDATE_URL);
     }
     
     public function sanitizeInt($value)

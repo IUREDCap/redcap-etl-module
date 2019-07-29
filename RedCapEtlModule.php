@@ -607,29 +607,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     }
     
     /**
-     * Gets the label for the specified exportRight.
-     */
-    public function getExportRightLabel($exportRight)
-    {
-        $label = '';
-        switch ($exportRight) {
-            case 0:
-                $label = 'No access';
-                break;
-            case 1:
-                $label = 'Full data set';
-                break;
-            case 2:
-                $label = 'De-identified data';
-                break;
-            case 3:
-                $label = 'No tagged identifiers';
-                break;
-        }
-        return $label;
-    }
-    
-    /**
      * Gets all the configuration names for the specified project.
      */
     public function getConfigurationNames($projectId = PROJECT_ID)
@@ -650,13 +627,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             # If user has "full data set" export permissions, improve performance by
             # avoiding individual configuration permission checks below
             $configNames = $allConfigNames;
-        } else {
-            foreach ($allConfigNames as $configName) {
-                $config = $this->getConfiguration($configName, $projectId);
-                if (Authorization::hasEtlConfigurationPermission($this, $config)) {
-                    array_push($configNames, $configName);
-                }
-            }
+        #} else {
+        #    foreach ($allConfigNames as $configName) {
+        #        $config = $this->getConfiguration($configName, $projectId);
+        #        if (Authorization::hasEtlConfigurationPermission($this, $config)) {
+        #            array_push($configNames, $configName);
+        #        }
+        #    }
         }
         return $configNames;
     }
@@ -789,11 +766,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     # Server Config methods
     #==================================================================================
     
-    public function serverConfigExists($serverName)
-    {
-        return $this->settings->serverConfigExists($serverName);
-    }
-    
     public function getServerConfig($serverName)
     {
         return $this->settings->getServerConfig($serverName);
@@ -850,11 +822,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $this->settings->setCustomHelp($topic, $help);
     }
     
-    public function removeCustomHelp($topic)
-    {
-        $this->settings->removeCustomHelp($topic);
-    }
-
 
     /**
      * Renders the page content tabs for REDCap-ETL admin pages.

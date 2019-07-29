@@ -902,10 +902,4 @@ class Settings
         $key = Help::HELP_TEXT_PREFIX . $topic;
         $this->module->setSystemSetting($key, $help);
     }
-
-    public function removeCustomHelp($topic)
-    {
-        $key = Help::HELP_TEXT_PREFIX . $topic;
-        $this->module->removeSystemSetting($key);
-    }
 }

@@ -91,30 +91,6 @@ class Authorization
     }
     
     /**
-     * Indicates if the current user has the right to request permission to
-     * use ETL on the current project.
-     *
-     * @return boolean true if the user has permission, and
-     *     false otherwise.
-     */
-    public static function hasEtlRequestPermission($module)
-    {
-        $hasPermission = false;
-
-        $projectId = $module->getProjectId();
-        
-        if ($module->isSuperUser()) {
-            $hasPermission = true;
-        } elseif (!empty($projectId)) {    // @codeCoverageIgnore
-            $rights = $module->getUserRights();
-            if (self::hasRedCapUserRightsForEtl($module)) {  //  && $rights['data_export_tool'] > 0) {
-                $hasPermission = true;
-            }
-        }
-        return $hasPermission;
-    }
-    
-    /**
      * Indicates if the current user has the REDCap user rights
      * to access ETL for the current project (admins always have access).
      *

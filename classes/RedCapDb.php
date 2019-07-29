@@ -50,7 +50,7 @@ class RedCapDb
             ." if(u.api_token is null, 0, 1) as has_api_token, u.api_export "
             ." from redcap_projects p, redcap_user_rights u "
             ." where u.username = '".Filter::escapeForMysql($username)."' "
-            ." and p.project_id = u.project_id and p.date_deleted is null" // @codeCoverageIgnore
+            ." and p.project_id = u.project_id and p.date_deleted is null"     // @codeCoverageIgnore
             ;
 
         $result = db_query($sql);
@@ -80,8 +80,8 @@ class RedCapDb
         
         $sql = "select username, api_token from redcap_user_rights "
             ." where project_id = ".((int) $projectId)." "
-            ." and api_export = 1 "
-            ." and api_token is not null "
+            ." and api_export = 1 "                          // @codeCoverageIgnore
+            ." and api_token is not null "                   // @codeCoverageIgnore
             ." and data_export_tool = ".((int) $exportRight) // @codeCoverageIgnore
             ;
         

@@ -71,4 +71,37 @@ class ConfigurationTest extends TestCase
         }
         $this->assertTrue($exceptionCaught, 'Config ; exception)');
     }
+
+
+    public function testValidateForRunning()
+    {
+        $configuration = new Configuration('test');
+
+        $properties = array();
+        $properties[Configuration::REDCAP_API_URL] = '';
+        $properties[Configuration::API_TOKEN_USERNAME] = 'test_user';
+        $properties[Configuration::TRANSFORM_RULES_TEXT] = 'TABLE,root,root_id,ROOT';
+        $properties[Configuration::BATCH_SIZE] = '100';
+        $properties[Configuration::DB_HOST] = 'localhost';
+        $properties[Configuration::DB_NAME] = 'redcap_etl';
+        $properties[Configuration::DB_USERNAME] = 'etl_user';
+        $properties[Configuration::DB_PASSWORD] = 'EtlUserPassword';
+
+        #------------------------------------------
+        # API token username
+        #------------------------------------------
+        $originalValue = $properties[Configuration::API_TOKEN_USERNAME];
+        $properties[Configuration::API_TOKEN_USERNAME] = '';
+        $configuration->set($properties);
+        $exceptionCaught = false;
+        try {
+            $configuration->validateForRunning();
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
+            $exceptionCaught = true;
+        }
+        $this->assertTrue($exceptionCaught, 'API token exception check');
+        $this->assertRegExp('/No API token specified/', $message, 'API Token message check');
+        $properties[Configuration::API_TOKEN_USERNAME] = $originalValue;
+    }
 }
