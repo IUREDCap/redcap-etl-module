@@ -173,7 +173,7 @@ class Settings
     #            $projectIds[$etlProject] = 1;
     #        }
     #    }
-    #    
+    #
     #    return array_key_exists($projectId, $projectIds);
     #}
     

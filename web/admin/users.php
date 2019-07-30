@@ -32,24 +32,6 @@ $username    = Filter::stripTags($_POST['username-result']);
 
 $users = $module->getUsers();
 
-
-if (!empty($username)) {
-    if (strcasecmp($submitValue, 'Save') === 0) {
-        $checkbox = Filter::sanitizeLabel($_POST['checkbox']);
-        $userEtlProjects = array();
-        foreach (array_keys($checkbox) as $projectId) {
-            array_push($userEtlProjects, $projectId);
-        }
-        $module->addUser($username);
-        $module->setUserEtlProjects($username, $userEtlProjects);
-        header('Location: '.$adminUrl);
-        exit;
-    }
-    $db = new RedCapDb();
-    $userProjects = $db->getUserProjects($username);
-    $userEtlProjects = $module->getUserEtlProjects($username);
-}
-
 #---------------------------------------------
 # Include REDCap's Control Center page header
 #---------------------------------------------
