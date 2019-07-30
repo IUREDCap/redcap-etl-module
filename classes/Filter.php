@@ -61,8 +61,7 @@ class Filter
     
     public function isEmail($value)
     {
-        # Use REDCap's function
-        return isEmail($value);
+        return filter_var($value, FILTER_VALIDATE_EMAIL);
     }
     
     public function isUrl($value)

@@ -116,14 +116,6 @@ class Settings
         return $projectInfo;
     }
     
-    public function setProjectInfo($projectInfo, $projectId = PROJECT_ID)
-    {
-        $key = self::PROJECT_INFO_KEY;
-        $json = $projectInfo->toJson();
-        $this->module->setProjectSetting($key, $json, $projectId);
-    }
-
-
     /**
      * Gets the ETL configurations for the specified project.
      *
@@ -166,24 +158,24 @@ class Settings
         $this->module->setSystemSetting($key, $json);
     }
     
-    /**
-     * Indicates if the project that has the specified project ID
-     * has a user who has permission to run ETL.
-     */
-    public function hasEtlUser($projectId)
-    {
-        # Get set of ETL project IDs
-        $projectIds = array();
-        $usernames = $this->getUsers();
-        foreach ($usernames as $username) {
-            $etlProjects = $this->getUserEtlProjects($username);
-            foreach ($etlProjects as $etlProject) {
-                $projectIds[$etlProject] = 1;
-            }
-        }
-        
-        return array_key_exists($projectId, $projectIds);
-    }
+    #/**
+    # * Indicates if the project that has the specified project ID
+    # * has a user who has permission to run ETL.
+    # */
+    #public function hasEtlUser($projectId)
+    #{
+    #    # Get set of ETL project IDs
+    #    $projectIds = array();
+    #    $usernames = $this->getUsers();
+    #    foreach ($usernames as $username) {
+    #        $etlProjects = $this->getUserEtlProjects($username);
+    #        foreach ($etlProjects as $etlProject) {
+    #            $projectIds[$etlProject] = 1;
+    #        }
+    #    }
+    #    
+    #    return array_key_exists($projectId, $projectIds);
+    #}
     
     
     #-------------------------------------------------------------------

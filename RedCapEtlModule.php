@@ -442,17 +442,17 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         return $this->settings->getUserEtlProjects($username);
     }
     
-    /**
-     * Checks if the specified project has at least one user that has
-     * permission to user REDCap-ETL for the project.
-     *
-     * @return boolean true if there is at least one user who has permission to
-     *     run REDCap-ETL for the project, and false otherwise.
-     */
-    public function hasEtlUser($projectId = PROJECT_ID)
-    {
-        return $this->settings->hasEtlUser($projectId);
-    }
+    #/**
+    # * Checks if the specified project has at least one user that has
+    # * permission to user REDCap-ETL for the project.
+    # *
+    # * @return boolean true if there is at least one user who has permission to
+    # *     run REDCap-ETL for the project, and false otherwise.
+    # */
+    #public function hasEtlUser($projectId = PROJECT_ID)
+    #{
+    #    return $this->settings->hasEtlUser($projectId);
+    #}
     
     /**
      * Gets the current username.
