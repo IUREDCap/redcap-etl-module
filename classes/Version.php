@@ -12,5 +12,5 @@ namespace IU\RedCapEtlModule;
 class Version
 {
     # This release number should be updated each time a release is made.
-    const RELEASE_NUMBER = "0.0.6";
+    const RELEASE_NUMBER = "1.0.0";
 }
