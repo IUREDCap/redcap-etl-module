@@ -48,7 +48,6 @@ $userLabel = Filter::stripTags($_POST['userLabel']);
 try {
     if (!empty($username)) {
         if (strcmp($submitValue, $deleteButtonLabel) === 0) {
-            print "<br/>DELETE USER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br/>\n";
             $module->deleteUser($username);
             $success = 'User "'.$username.'" deleted from REDCap-ETL.';
             $urlValue = RedCapEtlModule::USERS_PAGE.'?success='.Filter::escapeForUrlParameter($success);
