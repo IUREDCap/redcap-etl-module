@@ -31,11 +31,17 @@ if (array_key_exists('submitValue', $_POST)) {
         $adminLink = $module->getUrl(RedCapEtlModule::USER_CONFIG_PAGE.'?username='.USERID);
 
         $message = '<html><bod>'
+            .'<p>'
             .'REDCap-ETL access request from user '.$user_firstname.' '.$user_lastname.' ('.USERID.')'
             .' [<a href="mailto:'.$user_email.'">'.$user_email.'</a>]'."\n"
-            .'for project "'.strip_tags(REDCap::getProjectTitle()).'" [Project ID='.PROJECT_ID.'].'."<br/>\n\n"
+            .'for project "'.strip_tags(REDCap::getProjectTitle()).'" [Project ID='.PROJECT_ID.'].'
+            ."</p>\n\n"
+            .'<p>'
             .'Project link: <a href="'.$projectLink.'">'.$projectLink.'</a><br/>'."\n\n"
+            .'</p>'
+            .'<p>'
             .'Admin link: <a href="'.$adminLink.'">'.$adminLink.'</a>'."\n\n"
+            .'</p>'
             .'</body></html>'
             ;
         // phpcs:enable
