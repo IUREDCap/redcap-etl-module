@@ -811,7 +811,7 @@ FIELD,  var5, int
 FIELD,  var6, int
 
 TABLE,  Fifth, Main, EVENTS:a;b
-FIELD,  var8, st</code></pre>
+FIELD,  var8, string</code></pre>
 <p><strong>Database Tables</strong></p>
 <p>NOTE: This only shows data transformed from REDCap record 1</p>
 <p><strong>Main</strong></p>
