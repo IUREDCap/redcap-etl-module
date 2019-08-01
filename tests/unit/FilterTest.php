@@ -30,4 +30,39 @@ class FilterTest extends TestCase
         $expectedResult = '123';
         $this->assertEquals($expectedResult, $sanitizedText, 'Sanitized int check');
     }
+
+
+    public function testStripTags()
+    {
+        $text = '<b>This is a test</b>';
+        $filteredText = Filter::stripTags($text);
+        $this->assertEquals('This is a test', $filteredText, 'Scalar test');
+    }
+
+    public function testStripTagsArray()
+    {
+        $post = [
+            'prop1' => '<b>test</b>',
+            'prop2' => [
+                'prop2_1' => '<i>test21</i>',
+                'prop2_2' => [
+                    'prop3_1' => '<p>test31</p>', 'prop3_2' => '<em>test32</em>'
+                ]
+            ]
+        ];
+
+        $filteredPost = Filter::stripTagsArrayRecursive($post);
+
+        $expectedPost = [
+            'prop1' => 'test',
+            'prop2' => [
+                'prop2_1' => 'test21',
+                'prop2_2' => [
+                    'prop3_1' => 'test31', 'prop3_2' => 'test32'
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expectedPost, $filteredPost, 'Array test');
+    }
 }

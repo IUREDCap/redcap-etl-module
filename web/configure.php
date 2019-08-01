@@ -91,13 +91,11 @@ try {
         # update the configuration properties with the POST values
         #---------------------------------------------------------------
         if (!empty($submitValue) && strcasecmp($submitValue, 'Cancel')) {
-            $_POST = array_map('strip_tags', $_POST);
-            $_POST = array_map('trim', $_POST);
 
             if (!isset($_POST[Configuration::API_TOKEN_USERNAME])) {
                 $_POST[Configuration::API_TOKEN_USERNAME] = '';
             }
-            $configuration->set($_POST);
+            $configuration->set(Filter::stripTagsArrayRecursive($_POST));
             
             # If this is NOT a remote REDCap configuration, set SSL certificate verification
             # to the global value (this can only be set in the configuration for remote

@@ -78,7 +78,7 @@ if (strcasecmp($submit, 'Save') === 0) {
     } else {
         try {
             $serverConfig = new ServerConfig($serverName);
-            $serverConfig->set($_POST);
+            $serverConfig->set(Filter::stripTagsArrayRecursive($_POST));
             $serverConfig->validate();
             $module->setServerConfig($serverConfig);
             header('Location: '.$serversUrl);

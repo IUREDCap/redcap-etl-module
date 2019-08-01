@@ -56,7 +56,20 @@ class Filter
     
     public static function stripTags($value)
     {
-        return strip_tags($value);
+        return trim(strip_tags($value));
+    }
+
+    public static function stripTagsArrayRecursive($values)
+    {
+        $newValues = $values;
+        foreach ($values as $key => $value) {
+            if (is_array($value)) {
+                $newValues[$key] = self::stripTagsArrayRecursive($values[$key]);
+            } else {
+                $newValues[$key] = trim(strip_tags($value));
+            }
+        }
+        return $newValues;
     }
     
     public function isEmail($value)

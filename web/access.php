@@ -21,7 +21,7 @@ $requestError = '';
 
 $submitValue = '';
 if (array_key_exists('submitValue', $_POST)) {
-    $submitValue = $_POST['submitValue'];
+    $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
     if ($submitValue === $requestLabel) {
         // phpcs:disable
         $to = $homepage_contact_email; 

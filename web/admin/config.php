@@ -30,7 +30,7 @@ try {
     $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
     if (strcasecmp($submitValue, 'Save') === 0) {
-        $adminConfig->set($_POST);
+        $adminConfig->set(Filter::stripTagsArrayRecursive($_POST));
         
         $module->setAdminConfig($adminConfig);
         $success = "Admin configuration saved.";

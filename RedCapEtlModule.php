@@ -647,11 +647,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function getConfigurationFromRequest()
     {
         $configuration = null;
-        $configName = $_POST['configName'];
+        $configName = Filter::stripTags($_POST['configName']);
         if (empty($configName)) {
-            $configName = $_GET['configName'];
+            $configName = Filter::stripTags($_GET['configName']);
             if (empty($configName)) {
-                $configName = $_SESSION['configName'];
+                $configName = Filter::stripTags($_SESSION['configName']);
             }
         }
         
