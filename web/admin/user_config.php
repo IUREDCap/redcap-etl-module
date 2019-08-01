@@ -153,13 +153,15 @@ if (!empty($username)) {
     style="display: none;"
     >
     <form id="deleteUserForm" action="<?php echo $selfUrl;?>" method="post">
-    <p>To delete user &quot;<?php echo $username;?>&quot; from the REDCap-ETL users,
+    <p>To delete user &quot;<?php echo Filter::escapeForHtml($username);?>&quot;
+    from the REDCap-ETL users,
     click on the <span style="font-weight: bold;"><?php echo $deleteButtonLabel;?></span> button.
     </p>
     <p>This action will NOT delete the user from REDCap and will NOT delete any
     of the REDCap-ETL configurations this user has created or edited.
     </p>
-    <input type="hidden" name="username" value="<?php echo $username;?>">
+    <input type="hidden" name="username"
+        value="<?php echo Filter::escapeForHtmlAttribute($username);?>">
     <input type="hidden" name="submitValue" value="<?php echo $deleteButtonLabel;?>">
     <?php Csrf::generateFormToken(); ?>
     </form>

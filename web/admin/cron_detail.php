@@ -149,7 +149,7 @@ $times = $adminConfig->getTimeLabels();
                 echo '<tr class="odd">'."\n";
             }
             echo "<td>".'<a href="'.APP_PATH_WEBROOT.'index.php?pid='.(int)$projectId.'">'
-                .$projectId.'</a>'."</td>\n";
+                .(int)$projectId.'</a>'."</td>\n";
             echo "<td>".'<a href="'.$configUrl.'">'.Filter::escapeForHtml($config).'</a>'."</td>\n";
             
             echo "<td>".'<a href="'.$serverUrl.'">'.Filter::escapeForHtml($server).'</a>'."</td>\n";

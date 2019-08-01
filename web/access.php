@@ -115,9 +115,10 @@ if ($accessError === RedCapEtlModule::CSRF_ERROR) {
     echo "</div>\n";
 } elseif ($submitValue === $requestLabel) {
     if (empty($requestError)) {
-        echo 'Request for REDCap-ETL access for project "'.strip_tags(REDCap::getProjectTitle()).'" sent.';
+        echo 'Request for REDCap-ETL access for project "'
+            .Filter::escapeForHtml(REDCap::getProjectTitle()).'" sent.';
     } else {
-        echo "Request for REDCap-ETL failed: {$requestError}";
+        echo "Request for REDCap-ETL failed: ".Filter::escapeForHtml($requestError);
     }
 } else {
     echo 'An unknown access error occurred.';
