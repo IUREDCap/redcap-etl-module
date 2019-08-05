@@ -39,8 +39,8 @@ class AdminConfig implements \JsonSerializable
 
     public function __construct()
     {
-        $this->allowOnDemandRuns = true;
-        $this->allowCron         = true;
+        $this->allowOnDemand = true;
+        $this->allowCron     = true;
         
         $this->maxJobsPerTime = 10;
 
