@@ -209,7 +209,7 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     public function iAccessTheAdminInterface()
     {
         $session = $this->getSession();
-        Util::accessAdminInterface($session);
+        Util::accessModuleAdminInterface($session);
     }
     /**
      * @When /^I select the test project$/

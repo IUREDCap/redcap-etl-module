@@ -1,5 +1,6 @@
 {
     "require-dev": {
+        "phpunit/phpunit": "6.5.8",
         "behat/behat": "^3.5",
         "behat/mink": "^1.7",
         "behat/mink-extension": "^2.3",

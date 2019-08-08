@@ -19,6 +19,9 @@ use Behat\Behat\Context\SnippetAcceptingContext;
  */
 class Util
 {
+    /**
+     * Logs in to REDCap as the test user.
+     */
     public static function loginAsUser($session)
     {
         $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
@@ -30,11 +33,16 @@ class Util
 
         $page = $session->getPage();
 
+        # Search for text "Logged in as user {$username}"
+
         $page->fillField('username', $username);
         $page->fillField('password', $password);
         $page->pressButton('login_btn');
     }
 
+    /**
+     * Logs in to REDCap as the admin.
+     */
     public static function loginAsAdmin($session)
     {
         $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
@@ -52,25 +60,25 @@ class Util
     }
 
 
-    public static function accessAdminInterface($session)
+    /**
+     * Logs in to REDCap as the admin and accesses the REDCap-ETL admin interface.
+     */
+    public static function accessModuleAdminInterface($session)
     {
-        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
-        $baseUrl  = $testConfig->getRedCap()['base_url'];
-        $username = $testConfig->getAdmin()['username'];
-        $password = $testConfig->getAdmin()['password'];
-
-        $session->visit($baseUrl);
+        self::loginAsAdmin($session);
 
         $page = $session->getPage();
-
-        $page->fillField('username', $username);
-        $page->fillField('password', $password);
-        $page->pressButton('login_btn');
-
         $page->clickLink('Control Center');
         $page->clickLink('REDCap-ETL');
     }
 
+    public static function accessTestProjectRedCapEtl($session)
+    {
+        self::loginAsUser($session);
+        self::selectTestProject($session);
+        $page = $session->getPage();
+        $page->clickLink('REDCap-ETL');
+    }
 
     public static function selectTestProject($session)
     {
