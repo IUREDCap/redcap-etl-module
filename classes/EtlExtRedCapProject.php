@@ -196,6 +196,12 @@ class EtlExtRedCapProject extends \IU\REDCapETL\EtlRedCapProject
         return $data;
     }
 
+    public function exportRedcapVersion()
+    {
+        global $redcap_version;
+        return $redcap_version;
+    }
+
     public function getRecordIdFieldName()
     {
         $recordIdFieldName = \REDCap::getRecordIdField();
