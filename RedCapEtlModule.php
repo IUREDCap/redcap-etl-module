@@ -212,8 +212,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      *
      * @return string the status of the run.
      */
-    public function run($configName, $serverName, $isCronJob = false, $projectId = PROJECT_ID)
-    {
+    public function run(
+        $configName,
+        $serverName,
+        $isCronJob = false,
+        $projectId = PROJECT_ID,
+        $dataTarget = DataTarget::DB
+    ) {
         try {
             $adminConfig = $this->getAdminConfig();
             
@@ -321,7 +326,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             #    # Run on the specified server
             #    $status = $serverConfig->run($etlConfig, $isCronJob);
             #}
-            $status = $serverConfig->run($etlConfig, $isCronJob);
+            $status = $serverConfig->run($etlConfig, $isCronJob, $dataTarget);
         } catch (\Exception $exception) {
             $status = "ETL job failed: ".$exception->getMessage();
             $details = "ETL job failed\n".$details

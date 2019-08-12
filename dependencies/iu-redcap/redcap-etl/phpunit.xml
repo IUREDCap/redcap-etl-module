@@ -10,6 +10,9 @@
       <file>tests/unit/ConfigPropertiesTest.php</file>
       <file>tests/unit/ConfigurationTest.php</file>
       <file>tests/unit/EtlExceptionTest.php</file>
+      <file>tests/unit/EtlEventLogTableTest.php</file>
+      <file>tests/unit/EtlLogTableTest.php</file>
+      <file>tests/unit/LookupTableTest.php</file>
       <file>tests/unit/LoggerTest.php</file>
       <file>tests/unit/RedCapDetHandlerTest.php</file>
       <file>tests/unit/RulesParserTest.php</file>
@@ -17,7 +20,8 @@
 
       <file>tests/unit/Database/DbConnectionFactoryTest.php</file>
       <file>tests/unit/Database/DbConnectionTest.php</file>
-      
+      <file>tests/unit/Database/CsvDbConnectionTest.php</file>
+
       <file>tests/unit/Rules/RuleTest.php</file>
       <file>tests/unit/Rules/TableRuleTest.php</file>
       <file>tests/unit/Rules/FieldRuleTest.php</file>
@@ -56,9 +60,11 @@
           a server
     -->
     <testsuite name="system">
-      <file>tests/system/RepeatingEventsTest.php</file>
+      <file>tests/system/RepeatingEventsMysqlTest.php</file>
+      <file>tests/system/RepeatingEventsSqliteTest.php</file>
       <file>tests/system/VisitsTest.php</file>
       <file>tests/system/VisitsCodeTest.php</file>
+      <file>tests/system/VisitsSqliteCodeTest.php</file>
       <file>tests/system/VisitsWebTest.php</file>
     </testsuite>
 
@@ -67,7 +73,7 @@
     <whitelist>
       <directory suffix=".php">src</directory>
       <exclude>
-        <file>src/Database/PdoMysqlDbConnection.php</file>
+        <file>src/Database/MysqlPdoDbConnection.php</file>
       </exclude>
     </whitelist>
   </filter>

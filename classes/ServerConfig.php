@@ -192,7 +192,7 @@ class ServerConfig implements \JsonSerializable
      * @param Configuration $etlConfig the ETL configuration to run.
      * @param boolean $isCronJob indicates if this run is a cron job.
      */
-    public function run($etlConfig, $isCronJob = false)
+    public function run($etlConfig, $isCronJob = false, $dataTarget = DataTarget::DB)
     {
         if (!isset($etlConfig)) {
             $message = 'No ETL configuration specified.';
@@ -224,13 +224,32 @@ class ServerConfig implements \JsonSerializable
                 #$redcapProjectClass = EtlExtRedCapProject::class;
                 $redcapProjectClass = null;
                 $redCapEtl = new \IU\REDCapETL\RedCapEtl($logger, $properties, null, $redcapProjectClass);
-                $redCapEtl->run();
+
+                switch ($dataTarget) {
+                    case DataTarget::DB:
+                        $redCapEtl->run();
+                        break;
+                    case DataTarget::CSV_ZIP:
+                        $result = $redCapEtl->exportEtlCsvZip();
+                        break;
+                    case DataTarget::SQLITE_FILE:
+                        $result = $redCapEtl->exportEtlSqlite();
+                        break;
+                }
             } catch (\Exception $exception) {
                 $logger->logException($exception);
                 $logger->log('Processing failed.');
             }
 
-            $output = implode("\n", $logger->getLogArray());
+            switch ($dataTarget) {
+                case DataTarget::DB:
+                    $output = implode("\n", $logger->getLogArray());
+                    break;
+                case DataTarget::CSV_ZIP:
+                case DataTarget::SQLITE_FILE:
+                    $output = $result;
+                    break;
+            }
         } else {
             #-------------------------------------------------
             # Remote server

@@ -12,6 +12,7 @@ use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Configuration;
 use IU\RedCapEtlModule\Csrf;
+use IU\RedCapEtlModule\DataTarget;
 use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
@@ -58,6 +59,8 @@ try {
         $submit = Filter::sanitizeButtonLabel($_POST['submit']);
     }
 
+    $dataTarget = Filter::sanitizeButtonLabel($_POST['dataTarget']);
+
     $runOutput = '';
     if (strcasecmp($submit, 'Run') === 0) {
         if (empty($configName)) {
@@ -67,7 +70,25 @@ try {
         } else {
             $configuration->validateForRunning();
             $isCronJob = false;
-            $runOutput = $module->run($configName, $server, $isCronJob);
+            $projectId = null;
+            $runOutput = $module->run($configName, $server, $isCronJob, $projectId, $dataTarget);
+
+            if ($dataTarget === DataTarget::CSV_ZIP) {
+                $filename = $runOutput;
+                header('Content-Type: application/zip');
+                header('Content-Disposition: attachment; filename="redcap-etl.zip"');
+                header('Content-Length: ' . filesize($filename));
+                echo file_get_contents($filename);
+                exit(0);
+            } elseif ($dataTarget === DataTarget::SQLITE_FILE) {
+                $filename = $runOutput;
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="redcap-etl.db"');
+                header('Content-Length: ' . filesize($filename));
+                readfile($filename);
+                exit(0);
+                ;
+            }
         }
     }
 } catch (Exception $exception) {
@@ -164,6 +185,13 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
         }
         echo "</select>\n";
         ?>
+
+  <select name="dataTarget" style="margin-left: 1em;">
+    <option value="<?php echo DataTarget::DB; ?>">Load data into database </option>
+    <option value="<?php echo DataTarget::CSV_ZIP; ?>">Export data as CSV zip file</option>
+    <option value="<?php echo DataTarget::SQLITE_FILE; ?>">Export data as SQLite database file</option>
+  </select>
+
   <p><pre id="runOutput"><?php echo Filter::escapeForHtml($runOutput);?></pre></p>
   </fieldset>
     <?php Csrf::generateFormToken(); ?>
