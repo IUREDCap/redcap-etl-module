@@ -198,8 +198,10 @@ class EtlExtRedCapProject extends \IU\REDCapETL\EtlRedCapProject
 
     public function exportRedcapVersion()
     {
+        // phpcs:disable
         global $redcap_version;
         return $redcap_version;
+        // phpcs:enable
     }
 
     public function getRecordIdFieldName()
