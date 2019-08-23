@@ -21,9 +21,12 @@ class Help
     private static $help = [
         'api-token-user' =>
             "<p>"
-            ."REDCap-ETL uses the REDCap API (Application Programming Interface) to access REDCap,"
-            ." and the REDCap API requires an API token."
             ." This selection specifies which user's token will be used for REDCap-ETL."
+            ." REDCap-ETL uses the REDCap API (Application Programming Interface) to access REDCap,"
+            ." and the REDCap API requires an API token."
+            ." For the embedded server that comes with the REDCap-ETL external module, you "
+            ." may not need an API token (depending on how your system has been configured), but "
+            ." for other servers, you will always need an API token."
             ."</p>"
         ,
         'batch-size' =>
