@@ -86,6 +86,19 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     <br />
 
     <?php
+    #--------------------------------------------------------
+    # Rquire API token
+    #--------------------------------------------------------
+    $checked = '';
+    if ($adminConfig->getRequireApiToken()) {
+        $checked = 'checked';
+    }
+    ?>
+    <input type="checkbox" name="<?php echo AdminConfig::REQUIRE_API_TOKEN;?>" <?php echo $checked;?> >
+    Require API token for embedded server
+    <br />
+
+    <?php
     #--------------------------------------------------
     # Allow On Demand
     #--------------------------------------------------

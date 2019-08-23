@@ -34,6 +34,7 @@ try {
     }
 
     $adminConfig = $module->getAdminConfig();
+    $apiTokenRequired = $adminConfig->getRequireApiToken();
 
     $servers = $module->getServers();
 
@@ -65,7 +66,7 @@ try {
         } elseif (!isset($configuration)) {
             $error = 'ERROR: No ETL configuration found for '.$configName.'.';
         } else {
-            $configuration->validateForRunning();
+            $configuration->validateForRunning($apiTokenRequired);
             $isCronJob = false;
             $runOutput = $module->run($configName, $server, $isCronJob);
         }

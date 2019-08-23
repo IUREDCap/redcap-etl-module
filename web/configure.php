@@ -58,6 +58,7 @@ try {
     $generateRulesUrl = $module->getUrl('web/generate_rules.php');
 
     $adminConfig = $module->getAdminConfig();
+    $apiTokenRequired = $adminConfig->getRequireApiToken();
 
 
     /** @var array configurations property map from property name to value */
@@ -157,12 +158,12 @@ try {
                 header('Location: '.$listUrl);
             } elseif (strcasecmp($submitValue, 'Save') === 0) {
                 if (empty($warning) && empty($error)) {
-                    $configuration->validate();
+                    $configuration->validate($apiTokenRequired);
                     $module->setConfiguration($configuration);  // Save configuration to database
                 }
             } elseif (strcasecmp($submitValue, 'Save and Exit') === 0) {
                 if (empty($warning) && empty($error)) {
-                    $configuration->validate();
+                    $configuration->validate($apiTokenRequired);
                     $module->setConfiguration($configuration);  // Save configuration to database
                     $location = 'Location: '.$listUrl;
                     header($location);
@@ -188,12 +189,15 @@ try {
                 echo $properties[Configuration::TRANSFORM_RULES_TEXT];
                 return;
             } elseif (strcasecmp($submitValue, 'Auto-Generate') === 0) {
+                #----------------------------------------------------
+                # AUTO GENERATE
+                #----------------------------------------------------
                 $apiUrl    = $configuration->getProperty(Configuration::REDCAP_API_URL);
                 $dataToken = $configuration->getProperty(Configuration::DATA_SOURCE_API_TOKEN);
 
                 if (empty($apiUrl)) {
                     $error = 'ERROR: No REDCap API URL specified.';
-                } elseif (empty($dataToken)) {
+                } elseif ($apiTokenRequired && empty($dataToken)) {
                     $error = 'ERROR: No data source API token information specified.';
                 } else {
                     $existingRulesText = $properties[Configuration::TRANSFORM_RULES_TEXT];
@@ -234,13 +238,23 @@ try {
                     #} else {
                         # Non-remote API URL, create a data project for rules generation
                         # that uses REDCap's developer methods
-                        #$dataProject = new \IU\RedCapEtlModule\EtlExtRedCapProject(
+
+                    if ($apiTokenRequired) {
                         $dataProject = new \IU\REDCapETL\EtlRedCapProject(
                             $apiUrl,
                             $dataToken,
                             $sslVerify,
                             $caCertFile
                         );
+                    } else {
+                        $dataProject = new \IU\RedCapEtlModule\EtlExtRedCapProject(
+                            $apiUrl,
+                            $dataToken,
+                            $sslVerify,
+                            $caCertFile
+                        );
+                    }
+
                     #}
                 
                     $rulesGenerator = new \IU\REDCapETL\RulesGenerator();

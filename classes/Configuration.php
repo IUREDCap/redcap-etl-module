@@ -117,12 +117,14 @@ class Configuration implements \JsonSerializable
      * Users may save incomplete configurations, but they should be prevented from
      * trying to run or schedule one.
      */
-    public function validateForRunning()
+    public function validateForRunning($apiTokenRequired = true)
     {
-        $this->validate();
+        $this->validate($apiTokenRequired);
         
-        if (empty($this->getProperty(self::API_TOKEN_USERNAME))) {
-            throw new \Exception('No API token specified in configuration.');
+        if ($apiTokenRequired) {
+            if (empty($this->getProperty(self::API_TOKEN_USERNAME))) {
+                throw new \Exception('No API token specified in configuration.');
+            }
         }
         
         if (empty($this->getProperty(self::TRANSFORM_RULES_TEXT))) {
@@ -158,15 +160,17 @@ class Configuration implements \JsonSerializable
     /**
      * Validate the configuration.
      */
-    public function validate()
+    public function validate($apiTokenRequired = true)
     {
         self::validateName($this->name);
         
         $redcapApiUrl =  $this->getProperty(self::REDCAP_API_URL);
         self::validateRedcapApiUrl($redcapApiUrl);
         
-        $apiToken =  $this->getProperty(self::DATA_SOURCE_API_TOKEN);
-        self::validateApiToken($apiToken);
+        if ($apiTokenRequired) {
+            $apiToken =  $this->getProperty(self::DATA_SOURCE_API_TOKEN);
+            self::validateApiToken($apiToken);
+        }
         
         $batchSize = $this->getProperty(self::BATCH_SIZE);
         self::validateBatchSize($batchSize);

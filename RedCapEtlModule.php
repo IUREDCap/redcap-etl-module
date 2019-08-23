@@ -321,7 +321,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             #    # Run on the specified server
             #    $status = $serverConfig->run($etlConfig, $isCronJob);
             #}
-            $status = $serverConfig->run($etlConfig, $isCronJob);
+            $apiTokenRequired = $adminConfig->getRequireApiToken();
+            $status = $serverConfig->run($etlConfig, $isCronJob, $apiTokenRequired);
         } catch (\Exception $exception) {
             $status = "ETL job failed: ".$exception->getMessage();
             $details = "ETL job failed\n".$details

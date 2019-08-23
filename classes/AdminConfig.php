@@ -22,6 +22,9 @@ class AdminConfig implements \JsonSerializable
     const ALLOW_ON_DEMAND    = 'allowOnDemand';
     const ALLOW_CRON         = 'allowCron';
     const ALLOWED_CRON_TIMES = 'allowedCronTimes';
+
+    const REQUIRE_API_TOKEN = 'requireApiToken';  # For indicating if an API token is required
+                                                  # for the embedded server
     
     /** @var boolean indicates if SSL verification should be done for local REDCap */
     private $sslVerify;
@@ -33,14 +36,17 @@ class AdminConfig implements \JsonSerializable
     
     private $allowCron;
     private $allowedCronTimes;
+
+    private $requireApiToken;
     
     private $maxJobsPerTime;
 
 
     public function __construct()
     {
-        $this->allowOnDemand = true;
-        $this->allowCron     = true;
+        $this->allowOnDemand   = true;
+        $this->allowCron       = true;
+        $this->requireApiToken = false;
         
         $this->maxJobsPerTime = 10;
 
@@ -116,6 +122,13 @@ class AdminConfig implements \JsonSerializable
             $this->allowCron = true;
         } else {
             $this->allowCron = false;
+        }
+    
+        # Set flag that indicates if API tokens are required for the embedded server
+        if (array_key_exists(self::REQUIRE_API_TOKEN, $properties)) {
+            $this->requireApiToken = true;
+        } else {
+            $this->requireApiToken = false;
         }
     
         # Set flag indicating of SSL certificate verification should be done
@@ -239,6 +252,11 @@ class AdminConfig implements \JsonSerializable
     {
         $isAllowed = $this->allowedCronTimes[$day][$time];
         return $isAllowed;
+    }
+
+    public function getRequireApiToken()
+    {
+        return $this->requireApiToken;
     }
      
     public function getSslVerify()
