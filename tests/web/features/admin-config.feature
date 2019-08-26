@@ -11,7 +11,8 @@ Feature: Admin Config
   Background:
     Given I am on "/"
 
-  Scenario: Admin uncheck "allow on demand" and "allow cron"
+  Scenario: Admin save of config changes for "allow on demand", "allow cron", and
+      and an allowed cron time.
     When I access the admin interface
     And I follow "Config"
     And I uncheck "allowOnDemand"
@@ -19,25 +20,28 @@ Feature: Admin Config
     And I uncheck "allowedCronTimes[6][23]"
     And I press "Save"
     Then I should see "Last ETL cron run time"
-    And I should see "Sunday"
-    And I should see "Monday"
-    And I should see "Tuesday"
-    And I should see "Wednesday"
-    And I should see "Thursday"
-    And I should see "Friday"
-    And I should see "Saturday"
+    And I should see table headers "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
     And the checkbox "allowedCronTimes[6][23]" should be unchecked
 
   Scenario: User logged in with "allow on demand" and "allow cron" disabled
-    Given I am logged in as user
+    # Make changes as admin:
+    When I access the admin interface
+    And I follow "Config"
+    And I uncheck "allowOnDemand"
+    And I uncheck "allowCron"
+    And I press "Save"
+    And I log out
+
+    # Access test project as user:
+    And I log in as user
     And I follow "My Projects"
-    When I select the test project
+    And I select the test project
     And I follow "REDCap-ETL"
-    Then I should see "ETL Configurations"
-    And I should see "Configure"
-    And I should see "User Manual"
-    But I should not see "Run"
-    And I should not see "Schedule"
+
+    # Check the tabs:
+    Then I should see "ETL Configurations" in the "#sub-nav" element
+    And I should see tabs "Configure", "User Manual", "Configure", "User Manual"
+    But I should not see tabs "Run", "Schedule"
 
   Scenario: Check "allow on demand" and "allow cron"
     When I access the admin interface
@@ -50,14 +54,7 @@ Feature: Admin Config
     And the checkbox "allowedCronTimes[6][23]" should be checked
 
   Scenario: User logged in with "allow on demand" and "allow cron" enabled
-    Given I am logged in as user
-    And I follow "My Projects"
-    When I select the test project
-    And I follow "REDCap-ETL"
-    Then I should see "ETL Configurations"
-    And I should see "Configure"
-    And I should see "User Manual"
-    And I should see "Run"
-    And I should see "Schedule"
+    When I log in as user and access REDCap-ETL for test project
+    Then I should see tabs "ETL Configurations", "Configure", "User Manual", "Run", "Schedule"
 
 

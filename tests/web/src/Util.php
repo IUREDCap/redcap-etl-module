@@ -39,6 +39,15 @@ class Util
         $page->fillField('password', $password);
         $page->pressButton('login_btn');
     }
+    
+    public static function logInAsUserAndAccessRedCapEtlForTestProject($session)
+    {
+        self::logInAsUser($session);
+        $page = $session->getPage();
+        $page->clickLink('My Projects');
+        self::selectTestProject($session);
+        $page->clickLink('REDCap-ETL');
+    }
 
     /**
      * Logs in to REDCap as the admin.
@@ -59,11 +68,20 @@ class Util
         $page->pressButton('login_btn');
     }
 
+    /**
+     * Logs out of REDCap.
+     */
+    public static function logOut($session)
+    {
+        $page = $session->getPage();
+        $page->clickLink('Log out');
+    }
+
 
     /**
      * Logs in to REDCap as the admin and accesses the REDCap-ETL admin interface.
      */
-    public static function accessModuleAdminInterface($session)
+    public static function logInAsAdminAndAccessRedCapEtl($session)
     {
         self::loginAsAdmin($session);
 
@@ -72,6 +90,56 @@ class Util
         $page->clickLink('REDCap-ETL');
     }
 
+    /**
+     * Checks for module page tabs.
+     *
+     * @param array $tabs array of strings that are tab names
+     * @param boolean $shouldFind if true, checks that tabs exist, if false
+     *     checks that tabs do not exist.
+     */
+    public static function checkTabs($session, $tabs, $shouldFind = true)
+    {
+        $page = $session->getPage();
+        $element = $page->find('css', '#sub-nav');
+
+        foreach ($tabs as $tab) {
+            $link = $element->findLink($tab);
+            if (empty($link)) {
+                if ($shouldFind) {
+                    throw new \Exception("Tab {$tab} not found.");
+                }
+            } else {
+                if (!$shouldFind) {
+                    throw new \Exception("Tab {$tab} found.");
+                }                
+            }
+        }
+    }
+    
+    /**
+     * Checks that the specified table headers exist on the current page.
+     *
+     * @param array $headers array of strings that are table headers.
+     */
+    public static function checkTableHeaders($session, $headers)
+    {
+        $page = $session->getPage();
+        $elements = $page->findAll('css', 'th');
+        
+        $headersMap = array();
+        if (!empty($elements)) {
+            foreach ($elements as $element) {
+                $headersMap[$element->getText()] = 1;
+            }
+        }
+
+        foreach ($headers as $header) {
+            if (!array_key_exists($header, $headersMap)) {
+                throw new \Exception("Table header \"{$header}\" not found.");
+            }
+        }
+    }
+            
     public static function accessTestProjectRedCapEtl($session)
     {
         self::loginAsUser($session);
@@ -83,7 +151,6 @@ class Util
     public static function selectTestProject($session)
     {
         $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
-        $baseUrl  = $testConfig->getRedCap()['base_url'];
         $testProjectTitle = $testConfig->getUser()['test_project_title'];
 
         $page = $session->getPage();
