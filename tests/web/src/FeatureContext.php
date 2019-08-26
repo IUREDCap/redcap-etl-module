@@ -71,12 +71,125 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
-     * @Given I wait
+     * @AfterScenario
+     */
+    public function afterScenario($event)
+    {
+        $session = $this->getSession();
+        $session->reset();
+        #print_r(get_class_methods($session));
+
+        $scenario = $event->getScenario();
+        $tags = $scenario->getTags();
+
+        if ($scenario->hasTag('modified-help-for-batch-size')) {
+            Util::logInAsAdminAndAccessRedCapEtl($session);
+            $page = $session->getPage();
+            $page->clickLink("Help Edit");
+            $page->clickLink("Batch Size");
+            $page->fillField("customHelp", "");
+            $page->selectFieldOption("helpSetting", "Use default text");
+            $page->pressButton("Save");
+        }
+    }
+
+
+    /**
+     * @Given /^I wait$/
      */
     public function iWait()
     {
         $this->getSession()->wait(10000);
     }
+
+    /**
+     * @Then /^Print element "([^"]*)" text$/
+     */
+    public function printElementText($css)
+    {
+        $session = $this->getSession();
+        $page = $session->getPage();
+        $element = $page->find('css', $css);
+        $text = $element->getText();
+        print "{$text}\n";
+    }
+
+    /**
+     * @Then /^Print select "([^"]*)" text$/
+     */
+    public function printSelectText($selectCss)
+    {
+        $session = $this->getSession();
+        $page = $session->getPage();
+        $select = $page->find('css', $selectCss);
+        if (!empty($select)) {
+            #$html = $select->getHtml();
+            #print "\n{$html}\n\n";
+            $option = $page->find('css', $selectCss." option:selected");
+            #$option = $select->find('css', "option:selected");
+            #$option = $select->find('xpath', "//option[@selected]");
+            if (!empty($option)) {
+                $text = $option->getText();
+                print "{$text}\n";
+            } else {
+                print "Selected option not found\n";
+            }
+        } else {
+            print 'Select "'.$selectCss.'" not found'."\n";
+        }
+    }
+
+    /**
+     * @Then /^I should see tabs? ("([^"]*)"(,(\s)*"([^"]*)")*)$/
+     */
+    public function iShouldSeeTabs($tabs)
+    {
+        $tabs = explode(',', $tabs);
+        for ($i = 0; $i < count($tabs); $i++) {
+            # trim standard character plus quotes
+            $tabs[$i] = trim($tabs[$i], " \t\n\r\0\x0B\"");
+        }
+        #print_r($tabs);
+
+        $session = $this->getSession();
+        Util::checkTabs($session, $tabs);
+    }
+
+    /**
+     * @Then /^I should not see tabs? ("([^"]*)"(,(\s)*"([^"]*)")*)$/
+     */
+    public function iShouldNotSeeTabs($tabs)
+    {
+        $tabs = explode(',', $tabs);
+        for ($i = 0; $i < count($tabs); $i++) {
+            # trim standard character plus quotes
+            $tabs[$i] = trim($tabs[$i], " \t\n\r\0\x0B\"");
+        }
+        #print_r($tabs);
+
+        $session = $this->getSession();
+        $shouldFind = false;
+        Util::checkTabs($session, $tabs, $shouldFind);
+    }
+
+
+    /**
+     * @Then /^I should see table headers ("([^"]*)"(,(\s)*"([^"]*)")*)$/
+     */
+    public function iShouldSeeTableHeaders($headers)
+    {
+        $headers = explode(',', $headers);
+        for ($i = 0; $i < count($headers); $i++) {
+            # trim standard character plus quotes
+            $headers[$i] = trim($headers[$i], " \t\n\r\0\x0B\"");
+        }
+
+        $session = $this->getSession();
+        
+        Util::checkTableHeaders($session, $headers);
+    }
+
+
 
     /**
      * @When /^I print window names$/
@@ -203,14 +316,43 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         Util::loginAsAdmin($session);
     }
 
+
+    /**
+     * @When /^I log out$/
+     */
+    public function iLogOut()
+    {
+        $session = $this->getSession();
+        Util::logOut($session);
+    }
+
     /**
      * @When /^I access the admin interface$/
      */
     public function iAccessTheAdminInterface()
     {
         $session = $this->getSession();
-        Util::accessModuleAdminInterface($session);
+        Util::logInAsAdminAndAccessRedCapEtl($session);
     }
+
+    /**
+     * @When /^I log in as admin and access REDCap-ETL$/
+     */
+    public function i()
+    {
+        $session = $this->getSession();
+        Util::logInAsAdminAndAccessRedCapEtl($session);
+    }
+
+    /**
+     * @When /^I log in as user and access REDCap-ETL for test project$/
+     */
+    public function iLogInAsUserAndAccessRedCapEtlForTestProject()
+    {
+        $session = $this->getSession();
+        Util::logInAsUserAndAccessRedCapEtlForTestProject($session);
+    }
+
     /**
      * @When /^I select the test project$/
      */

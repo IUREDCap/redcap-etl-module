@@ -17,5 +17,6 @@ default:
 
     suites:
         default:
+            paths:    [ "%paths.base%/features" ]
             contexts: [IU\RedCapEtlModule\WebTests\FeatureContext]
 

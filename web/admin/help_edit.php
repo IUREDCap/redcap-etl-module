@@ -136,7 +136,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
     <select id="helpSetting" name="helpSetting">
         <?php
         $selected = '';
-        if (empty($helpSetting) || $helpSetting === Help::DEFAULT_TEXT) {
+        if (empty($helpSetting) || $helpSetting == Help::DEFAULT_TEXT) {
             $selected = ' selected ';
         }
         ?>
@@ -144,7 +144,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
       
         <?php
         $selected = '';
-        if ($helpSetting === Help::CUSTOM_TEXT) {
+        if ($helpSetting == Help::CUSTOM_TEXT) {
             $selected = ' selected ';
         }
         ?>      
@@ -152,7 +152,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
       
         <?php
         $selected = '';
-        if ($helpSetting === Help::PREPEND_CUSTOM_TEXT) {
+        if ($helpSetting == Help::PREPEND_CUSTOM_TEXT) {
             $selected = ' selected ';
         }
         ?>
@@ -161,7 +161,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
       
         <?php
         $selected = '';
-        if ($helpSetting === Help::APPEND_CUSTOM_TEXT) {
+        if ($helpSetting == Help::APPEND_CUSTOM_TEXT) {
             $selected = ' selected ';
         }
         ?>   
