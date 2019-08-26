@@ -34,7 +34,7 @@ Feature: Admin Help Customization
     And I select "Prepend custom text to default" from "helpSetting"
     And I press "Preview"
     And I wait for 2 seconds
-    Then I should see "custom help REDCap-ETL uses the REDCap API"
+    Then I should see "custom help This selection specifies"
 
   Scenario: Preview custom help appended to default help
     When I log in as admin and access REDCap-ETL
