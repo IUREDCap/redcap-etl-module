@@ -86,7 +86,8 @@ To run REDCap-ETL, you need to create an ETL configuration.
 The configuration needs to specify at least the following things:
 </p>
 <ul>
-    <li><strong>API Token</strong> - used to access the data to be extracted</li>
+    <li><strong>API Token</strong> - used to access the data to be extracted (under certain conditions, an API
+        token will not be required; see below)</li>
     <li><strong>Transformation Rules</strong> - that explain how the extracted data is transformed</li>
     <li><strong>Database Information</strong> - that contains the database and user account to be used
         for loading the transformed data</li>
@@ -99,8 +100,13 @@ ETL configurations are shared among the users of the project who have permission
 <h5 style="font-weight: bold;">REDCap API Tokens</h5>
 
 <p>
-Each ETL configuration must specify a REDCap API token. The token is used to access REDCap so that
-the data can be extracted from it.
+REDCap-ETL uses API tokens to extract data from REDCap using REDCap's API (Application Programming Interface).
+An API token is required to run REDCap-ETL, except for the case where you are running your ETL process
+on the embedded server (the ETL server included in the REDCap-ETL external module), and your system
+has been configured to not require an API token for the embedded server.
+</p>
+
+<p>
 The API token is specified by selecting the username of the owner of the API token.
 Users are allowed to use the API token of any other
 user who also has permission to user REDCap-ETL, but they cannot see the token.
@@ -183,6 +189,13 @@ There are 2 basic ways to run REDCap-ETL:
     </li>
 </ol>
 </div>
+
+<p>
+When you run or schedule an ETL process, you will need to select an ETL server for the process to run on.
+The REDCap-ETL external module comes with an embedded REDCap-ETL server that can be used (unless it has been disabled
+by an admin). Admins can also define custom ETL servers that can be used, but
+they are not required to do this. By default, the embedded server will be the only server available.
+</p>
 
 <p class="blue">
 <strong>Note:</strong> REDCap-ETL deletes the tables specified in the transformation rules at the start of
