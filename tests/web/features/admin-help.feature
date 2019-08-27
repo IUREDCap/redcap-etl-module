@@ -47,7 +47,7 @@ Feature: Admin Help Customization
     Then I should see "the same ETL process. custom help"
 
   @modified-help-for-batch-size
-  Scenario: Replacing default help text with custom help text shhould update the help setting select
+  Scenario: Replacing default help text with custom help text and saving should update the admin help edit page
     When I log in as admin and access REDCap-ETL
     And I follow "Help Edit"
     # Edit batch size help:
@@ -55,12 +55,13 @@ Feature: Admin Help Customization
     And I fill in "customHelp" with "<p>Batch sizes over 100 are not recommended.</p>"
     And I select "Use custom text" from "helpSetting"
     And I press "Save"
-    # Check that the help setting select has been updated:
+    # Check that the custom help and help setting select has been updated:
+    Then the "#customHelp" element should contain "Batch sizes over 100 are not recommended."
     Then the "#helpSetting option:selected" element should contain "Use custom text"
-    And the "#helpSetting option:selected" element should not contain "Use default text"
+    But the "#helpSetting option:selected" element should not contain "Use default text"
 
   @modified-help-for-batch-size
-  Scenario: Replace default help text with custom help text (check user interface)
+  Scenario: Replacing default help text with custom help should update user help
     When I log in as admin and access REDCap-ETL
     And I follow "Help Edit"
     # Edit batch size help
