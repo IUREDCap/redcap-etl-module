@@ -647,12 +647,21 @@ Configuration form
                                     ."An API token needs to be requested "
                                     ." by a user whose data export rights matches those of the configuration.";
                             } elseif (empty($apiTokenUser)) {
-                                echo '<img alt="X" style="color: red; font-weight: bold;" src='
-                                    .APP_PATH_IMAGES.'cross.png>&nbsp;&nbsp;';
-                                echo "No user's API token has been selected for this project."
-                                    ."<br /><br />"
-                                    ."You need to select an API token user"
-                                    ." (whose API token will be used to access REDCap).";
+                                if ($apiTokenRequired) {
+                                    echo '<img alt="X" style="color: red; font-weight: bold;" src='
+                                        .APP_PATH_IMAGES.'cross.png>&nbsp;&nbsp;';
+                                    echo "No user's API token has been selected for this project."
+                                        ."<br /><br />"
+                                        ."You need to select an API token user"
+                                        ." (whose API token will be used to access REDCap).";
+                                } else {
+                                    echo '<img alt="!" style="color: yellow; font-weight: bold;" src='
+                                        .APP_PATH_IMAGES.'exclamation_frame.png>&nbsp;&nbsp;';
+                                    echo "No user's API token has been selected for this project."
+                                        ."<br /><br />"
+                                        ."You need to select an API token user to use REDCap-ETL"
+                                        ." servers other than the embedded server.";
+                                }
                             } else {
                                 # If there is an API token and it has export permission
                                 echo '<img alt="OK" style="color: green; font-weight: bold;" src='
