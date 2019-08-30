@@ -51,7 +51,7 @@ try {
     }
 
     if (strcasecmp($submitValue, 'Save') === 0) {
-        $configuration->validateForRunning();
+        $configuration->validateForRunning($apiTokenRequired);
         
         $server = Filter::stripTags($_POST['server']);
         
