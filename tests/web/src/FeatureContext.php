@@ -390,6 +390,17 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @When /^I configure configuration "([^"]*)" without API token$/
+     */
+    public function iConfigureConfigurationWithoutApiToken($configName)
+    {
+        $session = $this->getSession();
+
+        $withApiToken = false;
+        EtlConfigsPage::configureConfiguration($session, $configName, $withApiToken);
+    }
+
+    /**
      * @When /^I copy configuration "([^"]*)" to "([^"]*)"$/
      */
     public function iCopyConfiguration($configName, $copyToConfigName)

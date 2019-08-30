@@ -1,13 +1,13 @@
-#-------------------------------------------------------
+#------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
 Feature: User-Interface
 In order to use REDCap-ETL
-As a non-admin user
+As a user
 I need to be able to create, copy, rename and delete configurations
-  and get help for a REDCap-ETL enabled project
+  for a REDCap-ETL enabled project
 
   Background:
     Given I am on "/"

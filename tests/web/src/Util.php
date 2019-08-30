@@ -21,6 +21,8 @@ class Util
 {
     /**
      * Logs in to REDCap as the test user.
+     *
+     * @param Behat\Mink\Session $session the testing session.
      */
     public static function loginAsUser($session)
     {
@@ -40,6 +42,10 @@ class Util
         $page->pressButton('login_btn');
     }
     
+    /**
+     * Logs in as the (non-admin) test user and accesses REDCap-ETL for the
+     * test project.
+     */
     public static function logInAsUserAndAccessRedCapEtlForTestProject($session)
     {
         self::logInAsUser($session);

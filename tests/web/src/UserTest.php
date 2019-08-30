@@ -24,6 +24,7 @@ class UserTest extends TestCase
         ));
 
         self::$session = self::$mink->getSession('browser');
+        print "\n\nSESSION CLASS: ".get_class(self::$session)."\n";
     }
 
     public function testLoginAndLogout()

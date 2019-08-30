@@ -29,7 +29,7 @@ class EtlConfigsPage
         $element->click();
     }
 
-    public static function configureConfiguration($session, $configName)
+    public static function configureConfiguration($session, $configName, $withApiToken = true)
     {
         $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
 
@@ -42,7 +42,9 @@ class EtlConfigsPage
 
         $page = $session->getPage();
 
-        $page->selectFieldOption('api_token_username', $etlConfig['api_token_username']);
+        if ($withApiToken) {
+            $page->selectFieldOption('api_token_username', $etlConfig['api_token_username']);
+        }
 
         $page->pressButton('Auto-Generate');
 

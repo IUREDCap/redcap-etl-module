@@ -94,8 +94,10 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
         $checked = 'checked';
     }
     ?>
-    <input type="checkbox" name="<?php echo AdminConfig::REQUIRE_API_TOKEN;?>" <?php echo $checked;?> >
-    Require API token for embedded server
+    <input type="checkbox"
+        id="<?php echo AdminConfig::REQUIRE_API_TOKEN;?>" 
+        name="<?php echo AdminConfig::REQUIRE_API_TOKEN;?>" <?php echo $checked;?> >
+    <label for="<?php echo AdminConfig::REQUIRE_API_TOKEN;?>">Require API token for embedded server</label>
     <br />
 
     <?php
@@ -107,8 +109,11 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
         $checked = 'checked';
     }
     ?>
-    <input type="checkbox" name="<?php echo AdminConfig::ALLOW_ON_DEMAND;?>" <?php echo $checked;?>>
-    Allow ETL jobs to be run on demand? <br />
+    <input type="checkbox"
+         id="<?php echo AdminConfig::ALLOW_ON_DEMAND;?>"
+         name="<?php echo AdminConfig::ALLOW_ON_DEMAND;?>" <?php echo $checked;?>>
+    <label for="<?php echo AdminConfig::ALLOW_ON_DEMAND;?>">Allow ETL jobs to be run on demand?</label>
+    <br />
     
     <?php
     #------------------------------------------------
