@@ -81,8 +81,10 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
         $checked = 'checked';
     }
     ?>
-    <input type="checkbox" name="<?php echo AdminConfig::SSL_VERIFY;?>" <?php echo $checked;?> >
-    REDCap SSL certificate verification
+    <input type="checkbox"
+        id="<?php echo AdminConfig::SSL_VERIFY;?>"
+        name="<?php echo AdminConfig::SSL_VERIFY;?>" <?php echo $checked;?> >
+    <label for="<?php echo AdminConfig::SSL_VERIFY;?>">REDCap SSL certificate verification</label>
     <br />
 
     <?php

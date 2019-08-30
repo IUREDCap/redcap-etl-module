@@ -109,7 +109,7 @@ has been configured to not require an API token for the embedded server.
 <p>
 The API token is specified by selecting the username of the owner of the API token.
 Users are allowed to use the API token of any other
-user who also has permission to user REDCap-ETL, but they cannot see the token.
+user who also has permission to use REDCap-ETL, but they cannot see the token.
 </p>
 
 <h5 style="font-weight: bold;">Transformation Rules</h5>

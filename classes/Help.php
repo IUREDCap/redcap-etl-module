@@ -94,15 +94,17 @@ class Help
         ,
         'extract-settings' =>
             "<p>"
-            ."REDCap-ETL uses the REDCap API (Application Programming Interface) to extract data from REDCap."
-            ." You need to have an API token for your project that REDCap-ETL can use."
-            ."</p>"
+            ."REDCap-ETL uses API tokens to extract data from REDCap using REDCap's API"
+            ." (Application Programming Interface). An API token is required to run REDCap-ETL,"
+            ." except for the case where you are running your ETL process on the embedded server"
+            ."  (the ETL server included in the REDCap-ETL external module), and your system"
+            ." has been configured to not require an API token for the embedded server."
+            ."</p>\n"
             ."<p>"
-            ."If an API token with the correct data export permission already exists for the project,"
-            ." there should be at least one username in the API token drop-down. If there are none,"
-            ." then a user who has the same data export permission as the configuration will"
-            ." need to request one."
-            ."</p>"
+            ."You specify the API token by selecting the username of the owner of the API token."
+            ." You are allowed to use the API token of any other user who also has permission"
+            ." to use REDCap-ETL."
+            ."</p>\n"
         ,
         'label-view-suffix' =>
             "<p>"
