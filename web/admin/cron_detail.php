@@ -46,7 +46,6 @@ $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
 $cronJobs = $module->getCronJobs($selectedDay, $selectedTime);
 
-/*
 if ($submitValue === 'Run') {
     try {
         $module->runCronJobs($selectedDay, $selectedTime);
@@ -55,7 +54,6 @@ if ($submitValue === 'Run') {
         $error = $exception->getMessage();
     }
 }
-*/
 
 ?>
 
@@ -162,16 +160,13 @@ $times = $adminConfig->getTimeLabels();
 </table>
 
 
-<!--
 <form action="<?php #echo $selfUrl;?>" method="post" style="margin-top: 12px;">
     <input type="hidden" name="selectedDay" value="<?php #echo $selectedDay; ?>">
     <input type="hidden" name="selectedTime" value="<?php #echo $selectedTime; ?>">
     <input type="submit" id="runButton" name="submitValue" value="Run"
        onclick='$("#runButton").css("cursor", "progress"); $("body").css("cursor", "progress");'/>
--->
-    <?php # Csrf::generateFormToken(); ?>
-<!-- </form>
--->
+    <?php Csrf::generateFormToken(); ?>
+</form>
 
 <?php
 
