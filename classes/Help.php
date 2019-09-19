@@ -114,7 +114,7 @@ class Help
             "<p>"
             ."The load settings specify the database where the extracted and transformed"
             ." data from REDCap will be loaded."
-            ." Only MySQL database are currently supported."
+            ." Only MySQL databases are currently supported."
             ."</p>"
             ."<p>"
             ."The host name and database name for the database need to be specified, as well as a"
