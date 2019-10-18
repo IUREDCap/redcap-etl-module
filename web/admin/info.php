@@ -119,6 +119,14 @@ The REDCap-ETL external module has the following admin pages:
 <ul>
     <li><a href="<?php echo $configUrl;?>" style="font-weight: bold;">Config</a>
         - General REDCap-ETL configuration with information on number and time of cron (scheduled) ETL jobs.
+        <ul>
+            <li>
+                This is where you set whether users can run ETL jobs on demand (interactively) or schedule them.
+            </li>
+            <li>
+                By default, users are allowed to schedule ETL jobs, but not run them interactively.
+            </li>
+        </ul>
     </li>
     <li><a href="<?php echo $cronDetailUrl;?>" style="font-weight: bold;">Cron Detail</a>
     - Detailed information on cron (scheduled) ETL jobs.
