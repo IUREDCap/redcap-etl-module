@@ -26,6 +26,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     
     const HELP_LIST_PAGE     = 'web/admin/help_list.php';
     const HELP_EDIT_PAGE     = 'web/admin/help_edit.php';
+
+    const LOG_PAGE           = 'web/admin/log.php';
             
     const USER_ETL_CONFIG_PAGE  = 'web/configure.php';
     
@@ -122,7 +124,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $minutes = $now->format('i');
         $date    = $now->format('Y-m-d');
         
-        #$this->log('REDCap-ETL cron - date: '.$date.', hour: '.$hour);
+        $this->log('REDCap-ETL cron - date: '.$date.', day: '.$day.' hour: '.$hour);
         
         if ($this->isLastRunTime($date, $hour)) {
             ; # Cron jobs for this time were already processed
@@ -142,7 +144,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $cronJobs = $this->getCronJobs($day, $hour);
             
-        #$this->log('REDCap-ETL cron - number of cron jobs: '.count($cronJobs));
+        $this->log('REDCap-ETL cron day '.$day.' hour '.$hour.' - number of cron jobs: '.count($cronJobs));
         #\REDCap::logEvent('REDCap-ETL cron - '.count($cronJobs).' cron jobs.');
         
         $pid = -1;   # process ID
@@ -215,6 +217,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function run($configName, $serverName, $isCronJob = false, $projectId = PROJECT_ID)
     {
         try {
+            $logParams = ['username' => USERID, 'cron' => $isCronJob, 'config' => $configName, 'server' => $serverName];
+            $logMessage = "Run of configuration \"{$configName}\" on server \"{$serverName}\""
+                + " for project ID {$projectId}";
+            $this->log($logMessage, $logParams);
+
             $adminConfig = $this->getAdminConfig();
             
             #---------------------------------------------
@@ -852,6 +859,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $helpEditLabel = '<span class="fas fa-edit"></span>'
            .' Help Edit';
                       
+        $logUrl = $this->getUrl(self::LOG_PAGE);
+        $logLabel = '<span class="fas fa-file-alt"></span>'
+           .' Log';
+                      
         $tabs = array();
         
         $tabs[$infoUrl]          = $infoLabel;
@@ -865,6 +876,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         #$tabs[$serverConfigUrl]  = $serverConfigLabel;
 
         $tabs[$helpEditUrl]      = $helpEditLabel;
+
+        $tabs[$logUrl]  = $logLabel;
                 
         $this->renderTabs($tabs, $activeUrl);
     }

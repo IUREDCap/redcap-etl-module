@@ -35,21 +35,28 @@ table.cron-schedule th.day {
     width: 8em;
 }
 
-table.cron-schedule td.day {
-    text-align: center;
+
+/* ETL Log table */
+table.etl-log {
+    border-spacing: 0;
+    border-collapse: collapse;
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    font-size: 80%;
 }
 
-table.cron-schedule input[type="radio"],
-table.cron-schedule input[type="checkbox"] {
-    margin: 0;
-    padding: 0;
-    vertical-align: middle;
-    /* margin: 0;
-    padding: 0;
-    height: 6px;
-    width: 6px;
-    */
+table.etl-log th {
+    background-color: #ECECEC;
+    text-align: center;
+    font-weight: bold;
 }
+
+table.etl-log th, table.etl-log td {
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding: 2px;
+}
+
 
 /* User projects table */
 table.user-projects {
