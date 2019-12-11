@@ -105,6 +105,15 @@ class Filter
         $value = preg_replace('/([^a-zA-Z0-9_\- .])/', '', $value);
         return $value;
     }
+
+    /**
+     * Removes invalid characters from dates
+     */
+    public function sanitizeDate($value)
+    {
+        $value = preg_replace('/([^0-9\-\/)/', '', $value);
+        return $value;
+    }
     
     /**
      * Removes tags and invalid characters for strings.

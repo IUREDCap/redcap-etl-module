@@ -31,12 +31,18 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             
     const USER_ETL_CONFIG_PAGE  = 'web/configure.php';
     
+    # REDCap event log constants
     const RUN_LOG_ACTION    = 'REDCap-ETL Export';
     const CHANGE_LOG_ACTION = 'REDCap-ETL Change';
     const LOG_EVENT         = -1;
     
+    # REDCap external module log constants
+    const ETL_CRON        = 'ETL cron';
+    const ETL_RUN         = 'ETL run';
+    const ETL_RUN_DETAILS = 'ETL run details';
+     
     # Access/permission errors
-    const CSRF_ERROR                  = 1;
+    const CSRF_ERROR                  = 1;   # (Possible) Cross-Site Request Forgery Error
     const USER_RIGHTS_ERROR           = 2;
     const NO_ETL_PROJECT_PERMISSION   = 3;
     const NO_CONFIGURATION_PERMISSION = 4;
@@ -217,10 +223,20 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function run($configName, $serverName, $isCronJob = false, $projectId = PROJECT_ID)
     {
         try {
-            $logParams = ['username' => USERID, 'cron' => $isCronJob, 'config' => $configName, 'server' => $serverName];
-            $logMessage = "Run of configuration \"{$configName}\" on server \"{$serverName}\""
-                + " for project ID {$projectId}";
+            #-------------------------------------------------
+            # Log run information to external module log
+            #-------------------------------------------------
+            $logParams = [
+                'log_type' => self::ETL_RUN,
+                'etl_username' => USERID,
+                'cron' => $isCronJob,
+                'config' => $configName,
+                'etl_server' => $serverName
+            ];
+            $logMessage = "ETL run of configuration \"{$configName}\" on server \"{$serverName}\""
+                . " for project ID {$projectId}";
             $this->log($logMessage, $logParams);
+
 
             $adminConfig = $this->getAdminConfig();
             
