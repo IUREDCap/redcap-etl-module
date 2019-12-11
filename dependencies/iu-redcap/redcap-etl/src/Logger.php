@@ -1,4 +1,8 @@
 <?php
+#-------------------------------------------------------
+# Copyright (C) 2019 The Trustees of Indiana University
+# SPDX-License-Identifier: BSD-3-Clause
+#-------------------------------------------------------
 
 namespace IU\REDCapETL;
 
@@ -22,8 +26,6 @@ class Logger
     
     /** @var string the name of the log file (if any) */
     private $logFile;
-
-    private $logProject;
 
     /** @var boolean Whether messages logged should be printed to standard output */
     private $printLogging;
@@ -79,6 +81,9 @@ class Logger
     private $fileLoggingErrorLogged;
     private $dbLoggingErrorLogged;
     private $projectLoggingErrorLogged;
+
+    /** @var callable callback for custom logging. */
+    private $loggingCallback;
         
     /**
      * Creates a logger.
@@ -100,7 +105,6 @@ class Logger
         $this->logArray      = array();
 
         $this->logFile    = null;
-        $this->logProject = null;
 
         $this->logFromEmail = null;
         $this->logToEmail   = null;
@@ -193,28 +197,16 @@ class Logger
         $this->logToEmail = $to;
     }
 
-
     /**
-     * Sets the REDCap project for logging.
+     * Sets the logging callback that is used for custom logging.
      *
-     * @param EtlRedCapProject $project the REDCap logging project.
+     * @param callable $loggingCallback callback used for custom logging. The callback
+     *     will be passed a single string argument that is the message to log.
      */
-    public function setLogProject($project)
+    public function setLoggingCallback($loggingCallback)
     {
-        $this->logProject = $project;
-
-        // REDCap must have a record_id when importing a new record. It does
-        // not auto generate a new record_id on API Imports (or regular imports?),
-        // even when the project is set to auto generate new record_ids.
-        // Because multiple people may be using this application simultaneously,
-        // it's not sufficient to simply use a timestamp. There is a risk that
-        // even with the timestamp and a random number, logs might overwrite each
-        // other, but I haven't found a better solution.
-        $this->projectIdBase = time().'-'.rand(1, 9999).'-';
-        $this->projectIndex  = 0;
-        $this->projectDate   = date('g:i:s a d-M-Y T');
+        $this->loggingCallback = $loggingCallback;
     }
-
 
     /**
      * Log the specified information to all logging sources that
@@ -224,10 +216,11 @@ class Logger
      */
     public function log($message)
     {
-        static $printLoggingErrorLogged   = false;
-        static $fileLoggingErrorLogged    = false;
-        static $dbLoggingErrorLogged      = false;
-        static $projectLoggingErrorLogged = false;
+        static $printLoggingErrorLogged    = false;
+        static $fileLoggingErrorLogged     = false;
+        static $dbLoggingErrorLogged       = false;
+        static $projectLoggingErrorLogged  = false;
+        static $callbackLoggingErrorLogged = false;
         
         $this->logToArray($message);
         
@@ -237,7 +230,6 @@ class Logger
             # Only log the first print logging error
             if (!$this->printLoggingErrorLogged) {
                 $this->logLoggingError($exception);
-            } else {
                 $this->printLoggingErrorLogged = true;
             }
         }
@@ -248,7 +240,6 @@ class Logger
             # Only log the first file logging error
             if (!$this->fileLoggingErrorLogged) {
                 $this->logLoggingError($exception);
-            } else {
                 $this->fileLoggingErrorLogged = true;
             }
         }
@@ -259,19 +250,16 @@ class Logger
             # Only log the first database logging error
             if (!$this->dbLoggingErrorLogged) {
                 $this->logLoggingError($exception);
-            } else {
-                 $this->dbLoggingErrorLogged = true;
+                $this->dbLoggingErrorLogged = true;
             }
         }
-            
+
         try {
-            $this->logToProject($message);
+            $this->logToCallback($message);
         } catch (\Exception $exception) {
-            # Only log the first database logging error
-            if (!$this->projectLoggingErrorLogged) {
+            if (!$this->callbackLoggingErrorLogged) {
                 $this->logLoggingError($exception);
-            } else {
-                $this->projectLoggingErrorLogged = true;
+                $this->callbackLoggingErrorLogged = true;
             }
         }
     }
@@ -305,13 +293,13 @@ class Logger
         }
         
         try {
-            $this->logToProject($message);
+            $this->logEventToDatabase($message);
         } catch (\Exception $exception) {
             ; // ignore logging errors
         }
 
         try {
-            $this->logEventToDatabase($message);
+            $this->logToCallback($message);
         } catch (\Exception $exception) {
             ; // ignore logging errors
         }
@@ -341,7 +329,6 @@ class Logger
 
         $this->logToArray($message);
         $this->logWithPrint($message);
-        $this->logToProject($message);
         $this->logEventToDatabase($message);
         
         #--------------------------------------------------
@@ -351,6 +338,8 @@ class Logger
         $message .= PHP_EOL.$stackTrace;
 
         $this->logToFile($message);
+
+        $this->logToCallback($message);
         
         # The exception message should already get included in the
         # e-mail summary from the logging array, so just send the
@@ -493,42 +482,6 @@ class Logger
         $logged = error_log($formattedMessage, 3, $this->logFile);
         return $logged;
     }
-
-    /**
-     * Logs the specified message to the REDCap logging project, if one was specified.
-     *
-     * @param string $message the message to log.
-     *
-     * @return boolean true if the log operated succeeded, and false otherwise.
-     */
-    public function logToProject($message)
-    {
-        $logged = false;
-
-        if (isset($this->logProject) && $this->isOn) {
-            # Prepare data to be imported
-            $this->projectIndex = sprintf("%'.03d", $this->nextIndex());
-            $records = array();
-            $records[0] = array(
-                'record_id' => ($this->projectIdBase).($this->projectIndex),
-                'curdate'   => $this->projectDate,
-                'app'       => $this->app,
-                'message'   => $message
-            );
-
-            $this->logProject->importRecords($records);
-            $logged = true;
-        }
-
-        return $logged;
-    }
-
-    protected function nextIndex()
-    {
-        $this->projectIndex++;
-        return($this->projectIndex);
-    }
-
 
     /**
      * Logs events that have occurred so far to e-mail if settings indicate to do so.
@@ -683,6 +636,19 @@ class Logger
         );
     }
     
+    /**
+     * Logs to the optional user-specified logging callback.
+     *
+     * @param string $message the message to log.
+     */
+    public function logToCallback($message)
+    {
+        if (is_callable($this->loggingCallback) && $this->isOn) {
+            call_user_func($this->loggingCallback, $message);
+        }
+    }
+
+
     public function hasLoggingError()
     {
         return $this->printLoggingErrorLogged
@@ -787,6 +753,12 @@ class Logger
         $this->configuration = $configuration;
     }
     
+    public function getLogId()
+    {
+        return $this->logId;
+    }
+
+
     /**
      * Gets the name of the application that is running the ETL process.
      */

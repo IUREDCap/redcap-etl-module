@@ -1,4 +1,8 @@
 <?php
+#-------------------------------------------------------
+# Copyright (C) 2019 The Trustees of Indiana University
+# SPDX-License-Identifier: BSD-3-Clause
+#-------------------------------------------------------
 
 namespace IU\REDCapETL\Schema;
 
@@ -304,6 +308,9 @@ class Table
             } elseif ($field->name === RedCapEtl::COLUMN_REPEATING_INSTANCE) {
                 # Just copy the repeating instance field and don't count it
                 # as a "data found" field
+                $row->data[$field->dbName] = $data[$field->name];
+            } elseif ($field->name === RedCapEtl::COLUMN_SURVEY_IDENTIFIER) {
+                # Just copy the field and don't count it as a "data found" field
                 $row->data[$field->dbName] = $data[$field->name];
             } else {
                 // Otherwise, get data

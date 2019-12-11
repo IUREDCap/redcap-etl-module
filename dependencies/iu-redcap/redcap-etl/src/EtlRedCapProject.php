@@ -1,4 +1,8 @@
 <?php
+#-------------------------------------------------------
+# Copyright (C) 2019 The Trustees of Indiana University
+# SPDX-License-Identifier: BSD-3-Clause
+#-------------------------------------------------------
 
 namespace IU\REDCapETL;
 
@@ -38,7 +42,6 @@ class EtlRedCapProject extends \IU\PHPCap\RedCapProject
         if (!isset($this->projectInfo)) {
             $this->projectInfo = $this->exportProjectInfo();
         }
-        // print_r($this->projectInfo);
         return $this->projectInfo;
     }
 
@@ -208,6 +211,7 @@ class EtlRedCapProject extends \IU\PHPCap\RedCapProject
 
         $results = $this->exportRecordsAp(
             ['recordIds' => $recordIds,
+            'exportSurveyFields' => true,
             'exportDataAccessGroups' => true]
         );
 

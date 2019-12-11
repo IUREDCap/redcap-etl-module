@@ -1,8 +1,13 @@
 <?php
+#-------------------------------------------------------
+# Copyright (C) 2019 The Trustees of Indiana University
+# SPDX-License-Identifier: BSD-3-Clause
+#-------------------------------------------------------
 
 namespace IU\REDCapETL\Database;
 
 use IU\REDCapETL\RedCapEtl;
+use IU\REDCapETL\EtlException;
 
 /**
  * Factory class for creating database connections.
@@ -10,8 +15,9 @@ use IU\REDCapETL\RedCapEtl;
 class DbConnectionFactory
 {
     // Database types
-    const DBTYPE_CSV    = 'CSV';
-    const DBTYPE_MYSQL  = 'MySQL';
+    const DBTYPE_CSV        = 'CSV';
+    const DBTYPE_MYSQL      = 'MySQL';
+    const DBTYPE_SQLITE     = 'SQLite';
     
     public function __construct()
     {
@@ -51,6 +57,17 @@ class DbConnectionFactory
                 );
                 break;
 
+            case DbConnectionFactory::DBTYPE_SQLITE:
+                $dbcon = new SqliteDbConnection(
+                    $dbString,
+                    $ssl,
+                    $sslVerify,
+                    $caCertFile,
+                    $tablePrefix,
+                    $labelViewSuffix
+                );
+                break;
+
             case DbConnectionFactory::DBTYPE_CSV:
                 $dbcon = new CsvDbConnection(
                     $dbString,
@@ -63,8 +80,8 @@ class DbConnectionFactory
                 break;
 
             default:
-                $message = 'Invalid database type: "'.$dbType.'". Valid types are: CSV and MySQL.';
-                throw new EtlException($mesage, EtlException::INPUT_ERROR);
+                $message = 'Invalid database type: "'.$dbType.'". Valid types are: CSV, MySQL and SQLite.';
+                throw new EtlException($message, EtlException::INPUT_ERROR);
         }
 
         return($dbcon);

@@ -1,6 +1,9 @@
 REDCap-ETL Developer Guide
 ======================================
 
+This guide is intended for people who want to modify or extend the REDCap-ETL software.
+If you just want to use the REDCap-ETL software, please see the installation and configuration guides.
+
 Development Environment Setup
 -------------------------------------
 
@@ -10,7 +13,8 @@ This is a list of the steps for setting up a REDCap-ETL development environment.
 
         sudo apt install php php-curl php-mbstring php-mysql php-xml
         sudo phpenmod mysqli   # enable mysqli extension
-        sudo phpenmod pdo_mysql # enable PDO extension for PHP 
+        sudo phpenmod pdo_mysql # enable PDO extension for PHP
+        sudo apt install php-sqlite3  # add PHP support for SQLite
         sudo apt install php-xdebug  # Install XDebug to be able to see phpunit test code coverage
 
 2. Install Composer (needed to get PHPCap and development dependencies)
@@ -41,9 +45,10 @@ works.
         CREATE USER 'etl_user'@'localhost' IDENTIFIED BY 'etlPassword';
         GRANT ALL ON `etl_test`.* TO 'etl_user'@'localhost';
 
-6. Install Apache (used for DET (Data Entry Trigger) web scripts)
+6. Install SQLite
 
-        sudo apt install apache2 libapache2-mod-php
+        sudo apt install sqlite3
+        sudo apt install sqlitebrowser  # optional
 
 7. Install Git
 
@@ -52,12 +57,12 @@ works.
         git config --global user.email "jsmith@someuniversity.edu"
         git config --global user.name "J Smith"
 
-8. Get the code. Execute the following command in the directory where
+9. Get the code. Execute the following command in the directory where
    you want to put REDCap-ETL:
 
         git clone https://github.com/IUREDCap/redcap-etl
 
-9. Install Composer dependencies. In the top-level directory where the code was downloaded, run:
+10. Install Composer dependencies. In the top-level directory where the code was downloaded, run:
 
         composer install
 
@@ -95,8 +100,6 @@ are installed
 
 
 
-
-
 Automated Tests
 ------------------------------
 
@@ -108,13 +111,11 @@ There are 3 types of automated tests:
 
 The test types above are listed in order of least to most setup effort.
 
-|                                       | Unit |Integration | System    |
-|---------------------------------------|------|:----------:|:---------:|
-| __Configuration file setup required__ |      | &#10003;   | &#10003;  |
-| __REDCap project setup required__     |      | &#10003;   | &#10003;  |
-| __MySQL database setup required__     |      |            | &#10003;  |
-| __Web server setup required__         |      |            | &#10003;  |
-| __Webs script setup required__        |      |            | &#10003;  |
+|                                                               | Unit |Integration | System    |
+|---------------------------------------------------------------|------|:----------:|:---------:|
+| __Configuration file setup required__                         |      | &#10003;   | &#10003;  |
+| __REDCap and REDCap project setup required__                  |      | &#10003;   | &#10003;  |
+| __MySQL and SQLite database setup required for loading data__ |      |            | &#10003;  |
 
 
 
@@ -137,8 +138,8 @@ the tests have much better code coverage when they are.
 
 #### Integration tests
 To set up the integration tests, you need to first set up
-the Basic Demography REDCap project that has the data for the
-tests:
+the "Basic Demography" and "Repeating Events" REDCap projects that have
+the data for the tests:
 
 1. In REDCap, create one project using the
    "Upload a REDCap project XML file" option, for each of the
@@ -146,6 +147,7 @@ tests:
 
         tests/projects/BasicDemography.REDCap.xml
         tests/projects/RepeatingEvents.REDCap.xml
+        tests/projects/Visits.REDCap.xml
 
 2. Request API tokens for the projects you just created (or
    create tokens if you are an admin). The tokens needs to have export
@@ -157,13 +159,21 @@ for the tests:
 1. Copy the configuration and transformation rules
    files from the tests/config-init directory to the tests/config
    directory. From the top-level directory:
-   
+
         cp tests/config-init/basic-demography.ini tests/config
         cp tests/config-init/basic-demography-rules.txt tests/config
         cp tests/config-init/basic-demography.json tests/config
         cp tests/config-init/basic-demography-2.ini tests/config
+        cp tests/config-init/basic-demography-bad-field-name.ini tests/config 
+        cp tests/config-init/basic-demography-rules-badFieldName.txt tests/config
+        cp tests/config-init/basic-demography-bad-rule.ini tests/config
+        cp tests/config-init/basic-demography-rules-badRule.txt tests/config
         cp tests/config-init/repeating-events.ini tests/config
         cp tests/config-init/repeating-events-rules.txt tests/config
+        cp tests/config-init/visits-empty-rules.ini tests/config
+        cp tests/config-init/visits-empty-rules.txt tests/config
+        cp tests/config-init/visits-missing-suffix.ini tests/config
+        cp tests/config-init/visits-missing-suffix-rules.txt tests/config
 
 2. Edit the .ini and .json configuration files that were copied to the tests/config/
    directory, and set the following properties to appropriate values:
@@ -183,6 +193,10 @@ for the tests:
        property to 'false' (note: include the single quotes).
 
 
+3. Also copy the following file, but do not edit it. It is used for error testing.
+
+        cp tests/config-init/basic-demography-3.ini tests/config
+
 After the above steps have been completed successfully, you should be
 able to run the integration tests by executing the following command
 in the top-level directory of your REDCap-ETL installation:
@@ -191,73 +205,86 @@ in the top-level directory of your REDCap-ETL installation:
 
 
 #### System tests
-To set up the system steps:
 
-1. In REDCap, create a project using the
-   "Upload a REDCap project XML file" option for each of the following
-   REDCap project files:
+Steps for setting up the REDCap projects:
 
-        tests/projects/Visits.REDCap.xml
-        tests/projects/VisitsConfig.REDCap.xml
-        tests/projects/VisitsLog.REDCap.xml
-
-2. Request an API token for each of the projects you just created (or
-   create a token if you are an admin). The configuration and logging
-   project tokens need to have export and "API Import/Update"
-   permissions. The data project API token needs to have 
-   "API Export" permission.
-
-In the configuration project (created from the VisitsConfig.REDCap.xml
-file):
-
-1. Set the log project API token in the Admin form of the existing
-   record to the token that you got for the log project
-   (created using file VisitsLog.REDCap.xml).
-
-2. Set the data source API token in the ETL Process
-   form to the value of the API token you got for the
-   data project (created from file Visits.REDCap.xml).
-
-3, If you used a different username, password, or database name
-   than those used in the example above for the MySQL database,
-   change the values appropriately in the database connection string
-   field. The syntax to use is:
-
-        MySQL:<db-host>:<db-username>:<db-password>:<db-name>
+1. If you did not already set up the "Repeating Events" and "Visits" projects as described
+    in the steps for setting up integration tests, then you need to do that now.
 
 
-The next thing you need to do is to create the configuration file
-for the Visits project:
+You need to create SQLite test databases. Use the following commands
+
+    cd tests/output
+    sqlite3 repeating-events.db
+    sqlite3 visits.db
+
+When in the sqlite shell from executing the above sqlite3 commands, enter the following:
+
+    .databases
+    .quit
+
+The next thing you need to do is to create the configuration files
+for the "Repeating Events" and "Visits" projects:
 
 1. Copy the visits configuration and SQL post-processing files from the 
    tests/config-init directory to the tests/config
    directory, for example, from the top-level directory:
-   
-   	    cp tests/config-init/repeating-events-mysql-rules.txt tests/config
-	    cp tests/config-init/repeating-events-mysql.ini tests/config
+         
+        cp tests/config-init/repeating-events-mysql-rules.txt tests/config
+        cp tests/config-init/repeating-events-mysql.ini tests/config
+        cp tests/config-init/repeating-events-sqlite.ini tests/config
         cp tests/config-init/visits.ini tests/config
+        cp tests/config-init/visits-sqlite.ini tests/config
+        cp tests/config-init/visits-rules.txt tests/config
         cp tests/config-init/visits.sql tests/config
 
-2. Edit the files __tests/config/visits.ini__ and __tests/config/repeating-events-mysql.ini__, and set the 
+2. If you have a database that supports SSL and has a certified SSL certificate, then also
+   copy the following configuration file:
+
+        cp tests/config-init/mysql-ssl.ini tests/config
+
+3. Edit the __tests/config/visits.ini__ file and set the 
    following properties to appropriate values:
    
     1. **redcap_api_url** - set this to the URL for your REDCap's API. Be
        sure to set this to the URL for the _API_, which typically ends
        with "/api/".
 
-    2. **config_api_token** - set this to the REDCap API token for
-       your REDCap Visits Config project created above.
+    2. **data_source_api_token** - set this to the REDCap API token for
+       your REDCap Visits project created above.
 
     3. **ssl_verify** - if you are using a REDCap instance for testing that has no,
        or a self-signed, SSL certificate, you will also need to set the ssl_verify
        property to 'false' (note: include the single quotes).
+
+4. Edit the __tests/config/repeating-events-mysql.ini__ file, and set the 
+   following properties to appropriate values:
    
-3. If you used different values than those used in the example
+    1. **redcap_api_url** - set this to the URL for your REDCap's API. Be
+       sure to set this to the URL for the _API_, which typically ends
+       with "/api/".
+
+    2. **data_source_api_token** - set this to the REDCap API token for
+       your REDCap Repeating Events project created above.
+
+    3. **ssl_verify** - if you are using a REDCap instance for testing that has no,
+       or a self-signed, SSL certificate, you will also need to set the ssl_verify
+       property to 'false' (note: include the single quotes).
+
+5. If you are setting up the __mysql-ssl.ini__ file,
+   edit it and modify the values listed in the previous step.
+   In addition, set the **db_connection** property with the information
+   for your database that supports SSL and has a certified SSL certificate. In addition, you need
+   to create a **ca.crt** file in the __tests/config__ directory that is a valid certificate
+   authority certificate file. If this file is missing, the MySQL SSL tests will be skipped.
+
+6. If you used different values than those used in the example
     commands above for creating the MySQL database and user, you will need to
     modify the __db_connection__ property appropriately in file
     __tests/config/repeating-events-mysql.ini__.
 
-You can check the setup so far by running the following command in the
+You can check the setup so far for the visits tests by running
+the following command in the
 top-level directory of you REDCap-ETL installation:
 
         ./bin/project_info.php tests/config/visits.ini 
@@ -271,33 +298,6 @@ command:
 
         ./bin/config_check.php tests/config/visits.ini 
 
-You now need to run the web script installation script to install a
-web script that will handle DETs (Data Entry Triggers) from REDCap.
-The DET will be simulated, so you won't actually need to set this
-up in your REDCap configuration project as you normally would in
-a production installation.
-
-To install the web script, from the top-level directory of your
-REDCap-ETL installation, run the install_web_scripts.php
-script, for example:
-
-        ./bin/install_web_scripts.php -c tests/config -w /var/www/html
-
-Notes:
-
-* You may need to run the command as: 
-  `php ./bin/install_web_script.php ...`
-* `/var/www/html` represents the directory from which your web server
-  serves pages. Change this if your actual directory is different.
-* Make sure that the `web_script_url` property in the 
-  tests/config/visits.ini configuration file is set to a value
-  that corresponds to the directory where the web script is installed 
-* The owner of your web server process must be able to read from
-  your REDCap-ETL installation directory.
-* If you don't have permission to write to the web directory, you
-  may need to run the command as
-  
-      `sudo ./bin/install_web_scripts.php ...`
 
 After the above steps have been completed successfully, you should be
 able to run the system tests by executing the following command
@@ -349,9 +349,13 @@ To view the API documentation, open the following file with a web browser:
 Note that the version of apigen used does not appear to work 
 with PHP 7.2.
 
+---
 
-Coding Standards Compliance
-------------------------------------
+Modifying the Code
+------------------------------
+
+
+### Coding Standards Compliance
 
 REDCap-ETL follows these PHP coding standards:
 
@@ -367,3 +371,28 @@ to check for coding standards compliance:
     ./vendor/bin/phpcs
 
 The coding standards checks that are done (by default) are configured in the file __phpcs.xml__ in the top-level directory.
+
+
+
+### REDCap-ETL Software Architecture
+
+For more information, see: [REDCap-ETL Software Architecture](SoftwareArchitecture.md)
+
+
+### Adding a New Database Type
+
+If you want to add a new database type (e.g., Oracle, PostgreSQL) to REDCap-ETL you need to
+do the following:
+
+* Create a new database connection class for the new database type that:
+    * extends class PdoDbConnection, if the connection uses
+        [PDO](https://www.php.net/manual/en/book.pdo.php) (PHP Data Objects)
+    * extends class DbConnection, if the connection does not use PDO
+* Modify class DbConnectionFactory to add your new database type:
+    * Add a new constant for your database type
+    * Add a case for your new database type in the constructor
+
+
+![REDCap-ETL Database Connection Classes](redcap-etl-db-connections.png)
+
+
