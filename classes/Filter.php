@@ -111,7 +111,7 @@ class Filter
      */
     public function sanitizeDate($value)
     {
-        $value = preg_replace('/([^0-9\-\/)/', '', $value);
+        $value = preg_replace('/([^0-9\-\/])/', '', $value);
         return $value;
     }
     
