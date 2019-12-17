@@ -146,7 +146,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
         # Output table header based on log type
         #----------------------------------------------
         if ($logType === RedCapEtlModule::ETL_CRON) {
-            echo "<tr> <th>Log ID</th> <th>Time</th> <th># Jobs</th> </tr>\n";
+            echo "<tr> <th>Log ID</th> <th>Time</th> <th>Day</th> <th>Hour</th> <th># Jobs</th> </tr>\n";
         } elseif ($logType === RedCapEtlModule::ETL_RUN) {
             echo "<tr>\n";
             echo "<th>Log ID</th> <th>Time</th> <th>User ID</th> <th>Project ID</th>\n";
@@ -183,7 +183,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     }
                     echo "<td>".$entry['etl_username']."</td>\n";
                     echo "</tr>\n";
-                } else {
+                } elseif ($logType === RedCapEtlModule::ETL_CRON) {
                     $cron = null;
                     if (array_key_exists('cron', $entry)) {
                         $cron = $entry['cron'];
@@ -191,6 +191,8 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     echo "<tr>\n";
                     echo '<td style="text-align: right;">'.$entry['log_id']."</td>\n";
                     echo "<td>".$entry['timestamp']."</td>\n";
+                    echo '<td style="text-align: right;">'.$entry['cron_day']."</td>\n";
+                    echo '<td style="text-align: right;">'.$entry['cron_hour']."</td>\n";
                     echo '<td style="text-align: right;">'.$entry['num_jobs']."</td>\n";
                     echo "</tr>\n";
                 }

@@ -27,7 +27,7 @@ class ModuleLog
         if ($type === RedCapEtlModule::ETL_RUN) {
             $query .= ', log_type, cron, config, etl_username, etl_server';
         } elseif ($type === RedCapEtlModule::ETL_CRON) {
-            $query .= ', log_type, num_jobs';
+            $query .= ', log_type, cron_day, cron_hour, num_jobs';
         }
         $query .= " where log_type = '".Filter::escapeForMysql($type)."'";
         
@@ -52,5 +52,13 @@ class ModuleLog
         
         $logData = $this->module->queryLogs($query);
         return $logData;
+    }
+
+    public function getCronJob($logId)
+    {
+        $query = "select log_id, timestamp, ui_id, project_id, message, server, config, cron_log_id";
+        $query .= " where cron_log_id = '".Filter::escapeForMysql($logId)."'";
+        $cronJob = $this->module->queryLogs($query);
+        return $cronJob;
     }
 }

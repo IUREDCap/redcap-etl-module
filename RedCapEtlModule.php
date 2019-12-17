@@ -38,6 +38,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     
     # REDCap external module log constants
     const ETL_CRON        = 'ETL cron';
+    const ETL_CRON_JOB    = 'ETL cron job';
     const ETL_RUN         = 'ETL run';
     const ETL_RUN_DETAILS = 'ETL run details';
      
@@ -130,8 +131,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $minutes = $now->format('i');
         $date    = $now->format('Y-m-d');
         
-        $this->log('REDCap-ETL cron - date: '.$date.', day: '.$day.' hour: '.$hour);
-        
         if ($this->isLastRunTime($date, $hour)) {
             ; # Cron jobs for this time were already processed
             #\REDCap::logEvent('REDCap-ETL cron - cron jobs already processed.');
@@ -160,7 +159,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             'num_jobs'  => count($cronJobs)
             ];
         $logMessage = 'REDCap-ETL cron jobs run';
-        $this->log($logMessage, $logParams);
+        $logId = $this->log($logMessage, $logParams);
         
         $pid = -1;   # process ID
         foreach ($cronJobs as $cronJob) {
@@ -181,6 +180,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 $event  = self::LOG_EVENT;
 
                 $isCronJob = true;
+
+                $logParams = [
+                    'log_type'    => self::ETL_CRON_JOB,
+                    'server'      => $serverName,
+                    'config'      => $configName,
+                    'cron_log_id' => $logId
+                ];
+                $this->log($logMessage, $logParams);
 
                 if (strcmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
                     # Running on the embedded server
