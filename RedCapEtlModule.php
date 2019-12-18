@@ -183,7 +183,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
                 $logParams = [
                     'log_type'    => self::ETL_CRON_JOB,
-                    'server'      => $serverName,
+                    'etl_server'      => $serverName,
                     'config'      => $configName,
                     'cron_log_id' => $logId
                 ];

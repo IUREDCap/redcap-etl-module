@@ -193,7 +193,17 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     echo "<td>".$entry['timestamp']."</td>\n";
                     echo '<td style="text-align: right;">'.$entry['cron_day']."</td>\n";
                     echo '<td style="text-align: right;">'.$entry['cron_hour']."</td>\n";
-                    echo '<td style="text-align: right;">'.$entry['num_jobs']."</td>\n";
+                    
+                    $numJobs = $entry['num_jobs'];
+                    echo '<td style="text-align: right;">';
+                    if ($numJobs > 0) {
+                        echo '<a id="cronDetail" href="#" style="font-weight: bold; text-decoration: underline;">'
+                            .$numJobs.'</a>';
+                    } else {
+                        echo $numJobs;
+                    }
+                    echo "</td>\n";
+                    
                     echo "</tr>\n";
                 }
             }
@@ -203,6 +213,58 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
     <?php Csrf::generateFormToken(); ?>
 </form>
 
+<?php
+echo $moduleLog->renderCronJobs(1038);
+?>
+
+<?php
+#--------------------------------------
+# Cron detail dialog
+#--------------------------------------
+?>
+<script>
+$(function() {
+    /*
+    cronDetail = $("#cronDetailDialog").dialog({
+        autoOpen: false,
+        height: 220,
+        width: 400,
+        modal: true,
+        buttons: {
+            Cancel: function() {$(this).dialog("close");}
+        },
+        title: "CRON Detail"
+    });
+    */
+    
+    $("#cronDetail").click(cronDetail);
+    
+    function cronDetail(event) {
+        alert("test");
+        //var cronLogId = event.data.cronLogId;
+        //$("#configToCopy").text('"'+configName+'"');
+        //$('#copyFromConfigName').val(configName);
+        //$("#cronDetailDialog").dialog("open");
+    }
+});
+</script>
+<div id="cronDetailDialog"
+    title="CRON Detail"
+    style="display: none;"
+    >
+    <form id="copyForm" action="<?php echo $selfUrl;?>" method="post">
+    To copy the configuration <span id="configToCopy" style="font-weight: bold;"></span>,
+    enter the name of the new configuration below, and click on the
+    <span style="font-weight: bold;">Copy configuration</span> button.
+    <p>
+    <span style="font-weight: bold;">New configuration name:</span>
+    <input type="text" name="copyToConfigName" id="copyToConfigName">
+    </p>
+    <input type="hidden" name="copyFromConfigName" id="copyFromConfigName" value="">
+    <input type="hidden" name="submitValue" value="copy">
+    <?php Csrf::generateFormToken(); ?>
+    </form>
+</div>
 
 
 <?php require_once APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>
