@@ -29,22 +29,24 @@ $adminConfigJson = $module->getSystemSetting(AdminConfig::KEY);
 $adminConfig = new AdminConfig();
 
 
+#------------------------------------------------------------------
+# Process parameters
+#------------------------------------------------------------------
 $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
-$username    = Filter::stripTags($_POST['username-result']);
 
-$users = $module->getUsers();
+$logType = Filter::sanitizeLabel($_POST['logType']);
+if (empty($logType)) {
+    $logType = RedCapEtlModule::ETL_RUN;
+}
 
-$logType = RedCapEtlModule::ETL_RUN;
-
-#$startDate = Filter::sanitizeDate($_POST['startDate']);
-$startDate = $_POST['startDate'];
+$startDate = Filter::sanitizeDate($_POST['startDate']);
 if (!empty($startDate) && !checkdate($startDate)) {
     $error = 'invalid start date';
 } else {
     $startDate = date('m/d/Y');
 }
 
-$endDate  = $_POST['endDate'];
+$endDate  = Filter::sanitizeDate($_POST['endDate']);
 if (!empty($endDate) && !checkdate($endDate)) {
     $error = 'invalid end date';
 } else {
@@ -88,7 +90,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
 <!--
 <div style="margin-bottom: 1em;">
 <button type="submit" value="Download CSV file" name="submitValue">
-    <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>" alt="" style="vertical-align: middle;">
+    <img src="<?php #echo APP_PATH_IMAGES.'csv.gif';?>" alt="" style="vertical-align: middle;">
     <span  style="vertical-align: middle;"> Download CSV file</span>
 </button>
 </div>
@@ -102,11 +104,24 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
 
 <form action="<?php echo $selfUrl;?>" method="post">
     
+    <?php
+    $runSelected = '';
+    $cronSelected = '';
+    if ($logType == RedCapEtlModule::ETL_CRON) {
+        $cronSelected = ' selected ';
+    } else {
+        $runSelected = ' selected ';
+    }
+    ?>
     <div style="margin-bottom: 12px;">
         Log Entries:
-        <select>
-            <option value="<?php echo RedCapEtlModule::ETL_CRON?>">Cron Jobs</option>
-            <option>ETL Processes</option>
+        <select name="logType">
+            <option value="<?php echo RedCapEtlModule::ETL_RUN?>" <?php echo $runSelected; ?> >
+                ETL Processes
+            </option>
+            <option value="<?php echo RedCapEtlModule::ETL_CRON?>" <?php echo $cronSelected; ?>>
+                Cron Jobs
+            </option>
         </select>
     </div>
     
@@ -131,10 +146,10 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
         # Output table header based on log type
         #----------------------------------------------
         if ($logType === RedCapEtlModule::ETL_CRON) {
-            echo "<tr> <th>Log ID</th> <th>TimeStamp</th> <th>User ID</th> <th>Project ID</th> <th>Message</th> </tr>\n";
+            echo "<tr> <th>Log ID</th> <th>Time</th> <th># Jobs</th> </tr>\n";
         } elseif ($logType === RedCapEtlModule::ETL_RUN) {
             echo "<tr>\n";
-            echo "<th>Log ID</th> <th>TimeStamp</th> <th>User ID</th> <th>Project ID</th>\n";
+            echo "<th>Log ID</th> <th>Time</th> <th>User ID</th> <th>Project ID</th>\n";
             echo "<th>Server</th> <th>Config</th> <th>Cron?</th> <th>Username</th>\n";
             echo "</tr>\n";
         } else {
@@ -175,9 +190,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     echo "<tr>\n";
                     echo '<td style="text-align: right;">'.$entry['log_id']."</td>\n";
                     echo "<td>".$entry['timestamp']."</td>\n";
-                    echo '<td style="text-align: right;">'.$entry['ui_id']."</td>\n";
-                    echo '<td style="text-align: right;">'.$entry['project_id']."</td>\n";
-                    echo "<td>".$entry['message']."</td>\n";
+                    echo '<td style="text-align: right;">'.$entry['num_jobs']."</td>\n";
                     echo "</tr>\n";
                 }
             }

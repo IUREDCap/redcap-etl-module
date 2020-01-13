@@ -26,6 +26,8 @@ class ModuleLog
         
         if ($type === RedCapEtlModule::ETL_RUN) {
             $query .= ', log_type, cron, config, etl_username, etl_server';
+        } elseif ($type === RedCapEtlModule::ETL_CRON) {
+            $query .= ', log_type, num_jobs';
         }
         $query .= " where log_type = '".Filter::escapeForMysql($type)."'";
         

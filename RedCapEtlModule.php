@@ -149,9 +149,18 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function runCronJobs($day, $hour)
     {
         $cronJobs = $this->getCronJobs($day, $hour);
-            
-        $this->log('REDCap-ETL cron day '.$day.' hour '.$hour.' - number of cron jobs: '.count($cronJobs));
-        #\REDCap::logEvent('REDCap-ETL cron - '.count($cronJobs).' cron jobs.');
+        
+        #-------------------------------------------------
+        # Log cron information to external module log
+        #-------------------------------------------------
+        $logParams = [
+            'log_type'  => self::ETL_CRON,
+            'cron_day'  => $day,
+            'cron_hour' => $hour,
+            'num_jobs'  => count($cronJobs)
+            ];
+        $logMessage = 'REDCap-ETL cron jobs run';
+        $this->log($logMessage, $logParams);
         
         $pid = -1;   # process ID
         foreach ($cronJobs as $cronJob) {
@@ -223,12 +232,17 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function run($configName, $serverName, $isCronJob = false, $projectId = PROJECT_ID)
     {
         try {
+            $username = '';
+            if (defined('USERID')) {
+                $username = USERID;
+            }
+
             #-------------------------------------------------
             # Log run information to external module log
             #-------------------------------------------------
             $logParams = [
                 'log_type' => self::ETL_RUN,
-                'etl_username' => USERID,
+                'etl_username' => $username,
                 'cron' => $isCronJob,
                 'config' => $configName,
                 'etl_server' => $serverName

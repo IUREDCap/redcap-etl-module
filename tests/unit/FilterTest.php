@@ -30,6 +30,13 @@ class FilterTest extends TestCase
         $expectedResult = '123';
         $this->assertEquals($expectedResult, $sanitizedText, 'Sanitized int check');
     }
+    
+    public function testSanitizeDate()
+    {
+        $date = '   12/31/2019 ';
+        $sanitizedDate = Filter::sanitizeDate($date);
+        $this->assertEquals('12/31/2019', $date, 'Sanitized date check');
+    }
 
 
     public function testStripTags()
