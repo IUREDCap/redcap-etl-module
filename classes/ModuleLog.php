@@ -27,7 +27,7 @@ class ModuleLog
         if ($type === RedCapEtlModule::ETL_RUN) {
             $query .= ', log_type, cron, config, etl_username, etl_server';
         } elseif ($type === RedCapEtlModule::ETL_CRON) {
-            $query .= ', log_type, num_jobs';
+            $query .= ', log_type, cron_day, cron_hour, num_jobs';
         }
         $query .= " where log_type = '".Filter::escapeForMysql($type)."'";
         
@@ -52,5 +52,45 @@ class ModuleLog
         
         $logData = $this->module->queryLogs($query);
         return $logData;
+    }
+
+    /**
+     * Gets the cron jobs associated with the specified cron run log ID.
+     */
+    public function getCronJobs($logId)
+    {
+        $query = "select log_id, timestamp, ui_id, project_id, message, log_type, etl_server, config, cron_log_id";
+        $query .= " where log_type = '".RedCapEtlModule::ETL_CRON_JOB."'"
+            ." and cron_log_id = '".Filter::escapeForMysql($logId)."'";
+        $cronJob = $this->module->queryLogs($query);
+        return $cronJob;
+    }
+    
+        
+    public function renderCronJobs($logId)
+    {
+        $cronJobs = "<hr />\n";
+        $cronJobs .= '<table class="etl-log">'."\n";
+        $cronJobs .= "<thead>\n";
+        $cronJobs .= "<tr><th>Log ID</th><th>Server</th><th>Config</th></tr>\n";
+        $cronJobs .= "</thead>\n";
+        $cronJobs .= "<tbody>\n";
+        $cronJobsData = $this->getCronJobs($logId);
+        
+        $tableRows = '';
+        foreach ($cronJobsData as $job) {
+            $row = "<tr>";
+            $row .= "<td>".Filter::sanitizeInt($job['log_id'])."</td>";
+            $row .= "<td>".Filter::sanitizeString($job['etl_server'])."</td>";
+            $row .= "<td>".Filter::sanitizeString($job['config'])."</td>";
+            $row .= "</tr>\n";
+            $tableRows .= $row;
+        }
+        
+        $cronJobs .= $tableRows;
+        $cronJobs .= "</tbody>\n";
+        $cronJobs .= "</table>\n";
+        
+        return $cronJobs;
     }
 }

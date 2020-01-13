@@ -35,7 +35,7 @@ class FilterTest extends TestCase
     {
         $date = '   12/31/2019 ';
         $sanitizedDate = Filter::sanitizeDate($date);
-        $this->assertEquals('12/31/2019', $date, 'Sanitized date check');
+        $this->assertEquals('12/31/2019', $sanitizedDate, 'Sanitized date check');
     }
 
 
