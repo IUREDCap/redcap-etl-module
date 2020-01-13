@@ -1,4 +1,8 @@
 <?php
+#-------------------------------------------------------
+# Copyright (C) 2019 The Trustees of Indiana University
+# SPDX-License-Identifier: BSD-3-Clause
+#-------------------------------------------------------
 
 namespace IU\REDCapETL\Schema;
 
@@ -305,6 +309,9 @@ class Table
                 # Just copy the repeating instance field and don't count it
                 # as a "data found" field
                 $row->data[$field->dbName] = $data[$field->name];
+            } elseif ($field->name === RedCapEtl::COLUMN_SURVEY_IDENTIFIER) {
+                # Just copy the field and don't count it as a "data found" field
+                $row->data[$field->dbName] = $data[$field->name];
             } else {
                 // Otherwise, get data
                 
@@ -315,8 +322,9 @@ class Table
                 // If this is a checkbox field
                 if (preg_match('/'.RedCapEtl::CHECKBOX_SEPARATOR.'/', $field->name)) {
                     $isCheckbox = true;
-                    list($rootName,$cat) = explode(RedCapEtl::CHECKBOX_SEPARATOR, $field->name);
-                    $variableName = $rootName.$suffix.RedCapEtl::CHECKBOX_SEPARATOR.$cat;
+                    list($rootName,$choiceValue) = explode(RedCapEtl::CHECKBOX_SEPARATOR, $field->name);
+                    $choiceValue = str_replace('-', '_', $choiceValue);
+                    $variableName = $rootName.$suffix.RedCapEtl::CHECKBOX_SEPARATOR.$choiceValue;
                 } else {
                     // Otherwise, just append suffix (if any))
                     $variableName = $field->name.$suffix;

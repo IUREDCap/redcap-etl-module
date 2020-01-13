@@ -1,4 +1,8 @@
 <?php
+#-------------------------------------------------------
+# Copyright (C) 2019 The Trustees of Indiana University
+# SPDX-License-Identifier: BSD-3-Clause
+#-------------------------------------------------------
 
 namespace IU\REDCapETL;
 
@@ -68,8 +72,25 @@ class SchemaGenerator
      */
     public function generateSchema($rulesText)
     {
+        $projectInfo       = $this->dataProject->exportProjectInfo();
         $recordIdFieldName = $this->dataProject->getRecordIdFieldName();
         $fieldNames        = $this->dataProject->getFieldNames();
+
+
+        $formInfo = $this->dataProject->exportInstruments();
+        $formNames = array_keys($formInfo);
+
+        #----------------------------------------------------------
+        # If surveys have been enabled, create a map of
+        # survey timestamp fields for checking for field validity
+        #----------------------------------------------------------
+        $timestampFields = array();
+        $surveysEnabled = $projectInfo['surveys_enabled'];
+        if ($surveysEnabled) {
+            foreach ($formNames as $formName) {
+                $timestampFields[$formName.'_timestamp'] = 1;
+            }
+        }
 
         #------------------------------------------------------------------------------
         # Set up $unmappedRedCapFields to keep track of the user-created REDCap fields
@@ -155,7 +176,6 @@ class SchemaGenerator
                 # These generated fields will have type INT and an original field
                 # type of CHECKBOX.
                 $originalFieldType = $rule->dbFieldType;
-                
                                         
                 #-----------------------------------------------------------
                 # Process each field
@@ -167,16 +187,25 @@ class SchemaGenerator
                 foreach ($fields as $field) {
                     $fname = $field->name;
 
+                    #--------------------------------------------------------
+                    # Replace '-' with '_'; needed for case where multiple
+                    # choice values are specified as negative numbers
+                    # or as text and have a '-' in them
+                    #--------------------------------------------------------
+                    $fname = str_replace('-', '_', $fname);
+
                     //-------------------------------------------------------------
                     // !SUFFIXES: Prep for and warn that map field is not in REDCap
                     //-------------------------------------------------------------
                     if (!RowsType::hasSuffixes($table->rowsType) &&
                             $fname !== 'redcap_data_access_group' &&
+                            $fname !== 'redcap_survey_identifier' &&
+                            empty($timestampFields[$fname]) &&
                             (empty($fieldNames[$fname]))) {
                         $message = "Field not found in REDCap: '".$fname."'";
                         $this->logger->log($message);
                         $warnings .= $message."\n";
-                        continue 2; //continue 3;
+                        continue 2;
                     }
 
                     //------------------------------------------------------------

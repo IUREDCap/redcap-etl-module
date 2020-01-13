@@ -1,4 +1,8 @@
 <?php
+#-------------------------------------------------------
+# Copyright (C) 2019 The Trustees of Indiana University
+# SPDX-License-Identifier: BSD-3-Clause
+#-------------------------------------------------------
 
 namespace IU\REDCapETL;
 
@@ -52,7 +56,7 @@ class EtlEventLogTable extends Table
     public function createEventLogDataRow($logId, $message)
     {
         list($microseconds, $seconds) = explode(" ", microtime());
-        $startTime = date("Y-m-d H:i:s", $seconds).substr($microseconds, 1, 7);
+        $startTime = date("Y-m-d\TH:i:s", $seconds).substr($microseconds, 1, 4);
         
         $row = new Row($this);
         $row->addValue(self::FIELD_LOG_ID, $logId);

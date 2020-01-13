@@ -1,32 +1,13 @@
 REDCap-ETL Configuration
 ========================
 
-REDCap-ETL requires a configuration file. In addition, a REDCap
-configuration project can also be used. Using a configuration project
-allows users who do not have access to the REDCap-ETL server to set
-some configuration properties and to start the ETL process.
-However, the configuration project has been deprecated, and the
-plan is to replace its functionality with a REDCap external module.
-
-If a configuration project is used, then REDCap-ETL will use the
-configuration file to locate the configuration project, so in this case
-the file needs to contain:
-
-* the URL for your REDCap API
-* the API token for your REDCap configuration project
-
-The 3 main things that need to be specified in the configuration
-are:
+REDCap-ETL requires a configuration file.  The 3 main things that need to be specified
+in the configuration file are:
 
 1. The data source - where the data is extracted from.
 2. The transformation rules - how to transform the data in the data source
 to the target for the data load.
 3. The database - where the extracted and transformed data is loaded
-
-Several properties can be specified in both the configuration file
-and configuration project. For these properties, a non-blank value in the 
-configuration project will replace the value in the configuration file
-(which is read first).
 
 
 Data Source
@@ -46,7 +27,9 @@ database connection string. This string has the following format:
 Currently, the supported database connection types are
 
 * **MySQL**
-* **CSV** (comma-separated values).
+* **SQLite**
+* **CSV** (comma-separated values)
+* **SQL Server**
 
 
 ### MySQL
@@ -62,9 +45,9 @@ Example MySQL database connection strings:
 
 **Note:** Since the ':' character is used as a separator for the database
 connection string, if any of the values
-in your database connection contain a ':', it needs to be escaped with a blackslash.
+in your database connection contain a ':', it needs to be escaped with a backslash.
 For example, if your password is "my:password", then it would need to be specified
-as "my\:password".
+as "my\\:password".
 
 
 ### CSV
@@ -75,6 +58,33 @@ For CSV, the database connection string format is:
 For example:
 
         CSV:/home/redcap-etl/csv/project1
+
+### SQLite
+For SQLite, the database connection string format is:
+
+        SQLite:<database-file-path>
+
+For example:
+
+        SQLite:/home/redcap-etl/db/etl-data.db
+
+
+### SQL Server
+For SQL Server, the format of the database connection string is:
+
+        SQLServer:<host>:<username>:<password>:<database>[:<port>]
+
+Example SQL server database connection strings:
+
+        SQLServer:localhost:some_user:amazingPW987:etl_test_db
+
+        SQLServer:someplace.edu:admin:adminPassword123:etl_prod_db:1433
+
+**Note:** Since the ':' character is used as a separator for the database connection string, if any of the values in your database connection contain a ':', it needs to be escaped with a backslash. For example, if your password is "my:password", then it would need to be specified
+as "my\\:password".
+
+
+
 
 
 Transformation Rules
@@ -114,20 +124,18 @@ Details about the transformation rules can be found here:
 
 REDCap-ETL Configuration Properties
 --------------------------------------
-This section provides a detailed list of the configuration properties. The property names
-here are the ones that are used in the configuration file and set in the configuration project.
+This section provides a detailed list of the configuration properties.
 
 ### REDCap Connection Properties
 
 <table>
 <thead>
-<tr> <th>Property</th> <th>File</th> <th>Project</th> <th>Description</th> </tr>
+<tr> <th>Property</th> <th>Description</th> </tr>
 </thead>
 <tbody>
 
 <tr>
 <td>redcap_api_url</td>
-<td> X </td> <td> &nbsp; </td>
 <td>The URL for your REDCap API. Typically this will be your REDCap URL
 with "/api/" appended to the end.
 Not ending the URL with a slash (/) may cause an error.</td> 
@@ -135,14 +143,12 @@ Not ending the URL with a slash (/) may cause an error.</td>
 
 <tr>
 <td>ssl_verify</td>
-<td> X </td> <td> &nbsp; </td>
 <td>Indicates if SSL verification is used for the connection to REDCap.
 This defaults to true. Setting it to false is insecure.</td> 
 </tr>
 
 <tr>
 <td>ca_cert_file</td>
-<td> X </td> <td> &nbsp; </td>
 <td>Certificate authority certificate file. This can be used to support
 SSL verification of the connection to REDCap if your system does not
 provide support for it by default</td>
@@ -156,32 +162,18 @@ provide support for it by default</td>
 
 <table>
 <thead>
-<tr> <th>Property</th> <th>File</th> <th>Project</th> <th>Description</th> </tr>
+<tr> <th>Property</th> <th>Description</th> </tr>
 </thead>
 <tbody>
 
 <tr>
-<td>config_api_token</td>
-<td> X </td> <td> &nbsp; </td>
-<td>The REDCap API token for the (optional, and now deprecated) configuration project</td>
-</tr>
-
-<tr>
 <td>data_source_api_token</td>
-<td> X </td> <td> X </td>
 <td>The API token for the REDCap project from which the data
 is being extracted from REDCap.</td>
 </tr>
 
-<tr>
-<td>log_project_api_token</td>
-<td> X </td> <td> X </td>
-<td>REDCap API token of (optional, and now deprecated) logging project</td>
-</tr>
 </tbody>
 </table>
-
-<br />
 
 
 ### Database Properties
@@ -190,39 +182,39 @@ Properties for the database where the extracted data is loaded.
 
 <table>
 <thead>
-<tr> <th>Property</th> <th>File</th> <th>Project</th> <th>Description</th> </tr>
+<tr> <th>Property</th> <th>Description</th> </tr>
 </thead>
 <tbody>
 
 <tr>
 <td>db_connection</td>
-<td> X </td> <td> X </td>
 <td>The database connection string for the database where the data
 is loaded.</td>
 </tr>
 
 <tr>
 <td>db_ssl</td>
-<td> X </td> <td> </td>
-<td>Flag that indicates if SSL should be used for MySQL database accesses
+<td><ul>
+        <li>MySQL: Flag that indicates if SSL should be used for MySQL database accesses
 (true by default). Note: on Linux systems, having this set to true
 may cause the database connection to fail when the database host is specified
 as "localhost". To fix this problem, set db_ssl to 'false' (or 0), or specify
-"127.0.0.1" for the database host instead of "localhost".</td>
+        "127.0.0.1" for the database host instead of "localhost".</li>
+        <li>SQL Server: Flag for the 'encrypt' option of the PHP SQL Server Driver. It indicates whether the connection to the database server should be encrypted (false by default). Uses the self-signed certificate in the SQL Server database instance.</li></ul>
+        </td>
 </tr>
 
 <tr>
 <td>db_ssl_verify</td>
-<td> X </td> <td> </td>
-<td>Flag that indicates if the SSL certificate of the database
-server should be verified. For this to work, a valid ca_cert_file
-(certificate authority certificate file)
-needs to be specified.
+<td><ul>
+        <li>MySQL: Flag that indicates if the SSL certificate of the database server should be verified. For this to work, a valid ca_cert_file (certificate authority certificate file) needs to be specified.</li>
+        <li>SQL Server: Flag for the TrustServerCertificate option for the PHP SQL Server Driver. It indicates whether the certificate on the SQL Server instance should be trusted (default is false.) For this to work, a valid ca_cert_file (certificate authority certificate file) needs to be specified.</li></ul>
 </td>
 </tr>
 
 </tbody>
 </table>
+
 
 ### Database Logging Properties
 
@@ -242,13 +234,12 @@ accumulate the results of all ETL runs.
 
 <table>
 <thead>
-<tr> <th>Property</th> <th>File</th> <th>Project</th> <th>Description</th> </tr>
+<tr> <th>Property</th> <th>Description</th> </tr>
 </thead>
 <tbody>
 
 <tr>
 <td>db_logging</td>
-<td> X </td> <td> </td>
 <td>A true/false property indicating if REDCap-ETL should log to the database.
 The default value for this property is true. Database logging is not
 supported for CSV (comma-separated value) file output.</td>
@@ -256,14 +247,12 @@ supported for CSV (comma-separated value) file output.</td>
 
 <tr>
 <td>db_log_table</td>
-<td> X </td> <td> </td>
 <td>The name of the main database logging table.
 This name defaults to **etl_log**.</td>
 </tr>
 
 <tr>
 <td>db_event_log_table</td>
-<td> X </td> <td> </td>
 <td>The name of the database logging event table.
 This name defaults to **etl_event_log**.</td>
 </tr>
@@ -279,13 +268,12 @@ that can be sent by REDCap-ETL.
 
 <table>
 <thead>
-<tr> <th>Property</th> <th>File</th> <th>Project</th> <th>Description</th> </tr>
+<tr> <th>Property</th> <th>Description</th> </tr>
 </thead>
 <tbody>
 
 <tr>
 <td>email_errors</td>
-<td> X </td> <td> </td>
 <td>True/false value that indicates if an e-mail should be sent
 when errors occur to the "email_to_list".
 The default value is true.
@@ -294,7 +282,6 @@ The default value is true.
 
 <tr>
 <td>email_summary</td>
-<td> X </td> <td> </td>
 <td>True/false value that indicates if an e-mail summary of the
 log messages should be sent to the "email_to_list".
 The default value is false, and no summary will be sent
@@ -304,20 +291,17 @@ if the ETL process encounters an error.
 
 <tr>
 <td>email_from_address</td>
-<td> X </td> <td> </td>
 <td>The from address for e-mail notifications sent by REDCap-ETL</td>
 </tr>
 
 
 <tr>
 <td>email_subject</td>
-<td> X </td> <td> </td>
 <td>The subject for e-mail notifications sent by REDCap-ETL</td>
 </tr>
 
 <tr>
 <td>email_to_list</td>
-<td> X </td> <td> X </td>
 <td>The to address list for e-mail notifications sent by REDCap-ETL</td>
 </tr>
 
@@ -334,13 +318,12 @@ column to a calculated value, etc.
 
 <table>
 <thead>
-<tr> <th>Property</th> <th>File</th> <th>Project</th> <th>Description</th> </tr>
+<tr> <th>Property</th> <th>Description</th> </tr>
 </thead>
 <tbody>
 
 <tr>
 <td>post_processing_sql_file</td>
-<td> X </td> <td> &nbsp; </td>
 <td>File with SQL statements to execute on the database after the ETL process
 has finished. This can be used, for example, to create indexes on tables
 generated by the ETL process. This feature is intended for running commands
@@ -362,13 +345,12 @@ can be used to modify the types of these fields.
 
 <table>
 <thead>
-<tr> <th>Property</th> <th>File</th> <th>Project</th> <th>Description</th> </tr>
+<tr> <th>Property</th> <th>Description</th> </tr>
 </thead>
 <tbody>
 
 <tr>
 <td>generated_instance_type</td>
-<td> X </td> <td> &nbsp; </td>
 <td>The type used for the redcap_repeat_instance field that is generated by REDCap-ETL
 when a REPEATING_INSTRUMENTS rows type is used for a table</td>
 </tr>
@@ -376,21 +358,18 @@ when a REPEATING_INSTRUMENTS rows type is used for a table</td>
 
 <tr>
 <td>generated_key_type</td>
-<td> X </td> <td> &nbsp; </td>
 <td>The type used for the primary and foreign keys generated by REDCap-ETL</td>
 </tr>
 
 
 <tr>
 <td>generated_label_type</td>
-<td> X </td> <td> &nbsp; </td>
 <td>The type used for the label fields generated by REDCap-ETL
 for the label views of tables</td>
 </tr>
 
 <tr>
 <td>generated_name_type</td>
-<td> X </td> <td> &nbsp; </td>
 <td>The type used for name fields for events and instruments generated
 by REDCap-ETL (the redcap_event_name and redcap_repeat_instrument
 fields)</td>
@@ -398,14 +377,12 @@ fields)</td>
 
 <tr>
 <td>generated_record_id_type</td>
-<td> X </td> <td> &nbsp; </td>
 <td>The type used for the REDCap record ID fields
 generated for each table by REDCap-ETL</td>
 </tr>
 
 <tr>
 <td>generated_suffix_type</td>
-<td> X </td> <td> &nbsp; </td>
 <td>The type used for the suffix fields 
 generated by REDCap-ETL when a suffixes rows type is specified</td>
 </tr>
@@ -423,20 +400,18 @@ database.
 
 <table>
 <thead>
-<tr> <th>Property</th> <th>File</th> <th>Project</th> <th>Description</th> </tr>
+<tr> <th>Property</th> <th>Description</th> </tr>
 </thead>
 <tbody>
 
 <tr>
 <td>create_lookup_table</td>
-<td> X </td> <td> &nbsp; </td>
 <td>A true/false property that indicates whether or not a lookup table
 should be created in the database.
 </tr>
 
 <tr>
 <td>lookup_table_name</td>
-<td> X </td> <td> &nbsp; </td>
 <td>The name to use for the lookup table created in the database. The default table
 name is "Lookup".</td>
 </tr>
@@ -445,21 +420,16 @@ name is "Lookup".</td>
 </table>
 
 
-
-
-
-
 ### Other Properties
 
 <table>
 <thead>
-<tr> <th>Property</th> <th>File</th> <th>Project</th> <th>Description</th> </tr>
+<tr> <th>Property</th> <th>Description</th> </tr>
 </thead>
 <tbody>
 
 <tr>
 <td>calc_field_ignore_pattern</td>
-<td> X </td> <td> &nbsp; </td>
 <td>A pattern represented as a PHP regular expression that will be used in
 determining what calculation fields values are considered when
 evaluating REDCap data rows for inclusion in a table. By default, if a calculation field
@@ -472,7 +442,6 @@ included in the table.
 
 <tr>
 <td>extracted_record_count_check</td>
-<td> X </td> <td> &nbsp; </td>
 <td>A true/false property that indicates whether or not a check
 should be done to make sure that the
 number of records extracted from REDCap is the number expected. 
@@ -485,7 +454,6 @@ also cause the counts not to match.
 
 <tr>
 <td>log_file</td>
-<td> X </td> <td> &nbsp; </td>
 <td>File to use for logging</td>
 </tr>
 
@@ -493,7 +461,6 @@ also cause the counts not to match.
 
 <tr>
 <td>time_limit</td>
-<td> X </td> <td> &nbsp; </td>
 <td>
 Maximum number of seconds the ETL process is allowed to run.
 A value of zero (the default value) means there is no limit.
@@ -502,7 +469,6 @@ A value of zero (the default value) means there is no limit.
 
 <tr>
 <td>time_zone</td>
-<td> X </td> <td> &nbsp; </td>
 <td>
 Timezone to use; see the URL below for valid values:
 https://secure.php.net/manual/en/timezones.php
@@ -510,35 +476,6 @@ By default, the default PHP timezone on the system is used.
 </td> 
 </tr>
 
-
-<tr>
-<td>web_script</td>
-<td> X </td> <td> &nbsp; </td>
-<td>The file name to use for the web script that will be
-generated by the web script installation process.
-The file name should normally end with ".php".
-This web script
-is used to handle REDCap DETs (Data Entry Triggers), so if you are not using DETs,
-you can leave this blank.
-DETs are used to allow the ETL process to be started from REDCap, so that users
-who do not have access to the REDCap-ETL server can run the ETL process.
-</td> 
-</tr>
-
-<tr>
-<td>web_script_log_file</td>
-<td> X </td> <td> &nbsp; </td>
-<td>The (optional) log file to use for the web script.</td> 
-</tr>
-
-<tr>
-<td>web_script_url</td>
-<td> X </td> <td> &nbsp; </td>
-<td>This property is only used for the automated tests, so
-is is not needed for normal ETL processing. It is used
-to indicate to the tests the URL of the web script, for example:
-http://localhost/visits.php</td> 
-</tr>
 
 </tbody>
 </table>

@@ -7,11 +7,26 @@ REDCap-ETL Main Classes
 **RedCapEtl** is the main class and starting point for the ETL (Extract
 Transform Load) process. An instance of it is created by the
 redcap_etl.php script that is used to run the ETL process manually
-or from a cron job, and by web scripts that are generated to handle
-REDCap DETs (Data Entry Triggers). 
+or from a cron job. 
 <br />
 
 ![Main REDCap-ETL Classes](redcap-etl-classes.png)
+
+---
+
+Database Connection Classes
+------------------------------------------
+
+REDCap-ETL has a database connection class for each type of database that it supports.
+All database connection classes are subclasses of the abstract **DbConnection** class, and database
+connection classes that use [PDO](https://www.php.net/manual/en/book.pdo.php) (PHP Data Objects)
+are also subclasses of the
+abstract **PdoDbConnection** class.
+
+![REDCap-ETL Database Connection Classes](redcap-etl-db-connections.png)
+
+
+---
 
 Transformation Rules Processing Classes
 ------------------------------------------
