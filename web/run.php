@@ -98,7 +98,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 ?>
 
 <?php
-#print '<pre>'; print_r($props); print '</pre>'."\n";
+#print '<pre>'; print_r($configuration); print '</pre>'."\n";
 #print '<pre>'; print_r($servers); print '</pre>'."\n";
 ?>
 

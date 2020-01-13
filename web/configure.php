@@ -9,6 +9,7 @@
 require_once __DIR__.'/../dependencies/autoload.php';
 
 use IU\REDCapETL\EtlRedCapProject;
+use IU\REDCapETL\Database\DbConnectionFactory;
 
 use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Configuration;
@@ -716,17 +717,54 @@ Configuration form
        
         <table>
             <tbody style="padding: 20px;">
-                <!-- DATABASE HOST -->
+                <!-- DATABASE TYPE -->
                 <tr>
-                    <td>Database host</td>
-                    <td><input type="text" name="<?php echo Configuration::DB_HOST;?>"
-                        value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_HOST])?>"/>
+                    <td>Database type</td>
+                    <td>
+                        <select name="<?php echo Configuration::DB_TYPE;?>">
+                            <?php
+                            # MySQL database type option
+                            $dbType = DbConnectionFactory::DBTYPE_MYSQL;
+                            $selected = '';
+                            if (empty($properties) || $properties[Configuration::DB_TYPE] === $dbType) {
+                                $selected = ' selected ';
+                            }
+                            ?>
+                            <option value="<?php echo $dbType; ?>" <?php echo $selected; ?> >MySQL</option>
+
+                            <?php
+                            # SQL Server database type option
+                            $dbType = DbConnectionFactory::DBTYPE_SQLSERVER;
+                            $selected = '';
+                            if ($properties[Configuration::DB_TYPE] === $dbType) {
+                                $selected = ' selected ';
+                            }
+                            ?>
+                            <option value="<?php echo $dbType; ?>" <?php echo $selected; ?> >SQL Server</option>
+                        </select>
                     </td>
                     <td>
                         <a href="#" id="load-settings-help-link" class="etl-help" title="help">?</a>
                         <div id="load-settings-help" title="Load Settings" style="display: none; clear: both;">
                             <?php echo Help::getHelpWithPageLink('load-settings', $module); ?>
                         </div> 
+                    </td>
+                </tr>
+
+
+                <!-- DATABASE HOST -->
+                <tr>
+                    <td>Database host</td>
+                    <td><input type="text" name="<?php echo Configuration::DB_HOST;?>"
+                        value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_HOST])?>"/>
+                    </td>
+                </tr>
+
+                <!-- DATABASE PORT NUMBER -->
+                <tr>
+                    <td style="padding-right: 1em;">Database port number</td>
+                    <td><input type="text" name="<?php echo Configuration::DB_PORT;?>"
+                        value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_PORT])?>"/>
                     </td>
                 </tr>
 
