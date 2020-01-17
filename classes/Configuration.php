@@ -395,7 +395,11 @@ class Configuration implements \JsonSerializable
         # Set the database connection string
         # Note: the MySQL server port number, which defaults to 3306, can be included in dbHost value also
         #--------------------------------------------------------------------------------------------------
-        $dbConnectionValues = [$dbType, $dbHost, $dbUsername, $dbPassword, $dbName, $dbPort];
+        if (empty($dbPort)) {
+            $dbConnectionValues = [$dbType, $dbHost, $dbUsername, $dbPassword, $dbName];
+        } else {
+            $dbConnectionValues = [$dbType, $dbHost, $dbUsername, $dbPassword, $dbName, $dbPort];
+        }
         $dbConnection = \IU\REDCapETL\Database\DbConnection::createConnectionString($dbConnectionValues);
         $this->properties[self::DB_CONNECTION] = $dbConnection;
     }
