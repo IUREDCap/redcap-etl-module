@@ -17,29 +17,9 @@ class RepatingEventsMysqlTest extends TestCase
 
     const TEST_DATA_DIR   = __DIR__.'/../data/';     # directory with test data comparison files
 
-    private static $dbh;
-    private static $logger;
+    private $dbh;
 
-    public static function setUpBeforeClass()
-    {
-        self::$logger = new Logger('repeating_events_system_test');
-
-        $configuration = new Configuration(self::$logger, self::CONFIG_FILE);
-
-        list($dbHost, $dbUser, $dbPassword, $dbName) = $configuration->getMySqlConnectionInfo();
-        $dsn = 'mysql:dbname='.$dbName.';host='.$dbHost;
-        try {
-            self::$dbh = new \PDO($dsn, $dbUser, $dbPassword);
-        } catch (Exception $exception) {
-            print "ERROR - database connection error: ".$exception->getMessage()."\n";
-        }
-
-        self::dropTablesAndViews(self::$dbh);
-
-        self::runEtl();
-    }
-
-    private static function dropTablesAndViews($dbh)
+    public function dropTablesAndViews($dbh)
     {
         $dbh->exec("DROP TABLE IF EXISTS re_all_visits");
         $dbh->exec("DROP TABLE IF EXISTS re_baseline");
@@ -54,10 +34,10 @@ class RepatingEventsMysqlTest extends TestCase
     }
 
 
-    public static function runEtl()
+    public static function runEtl($logger, $configFile)
     {
         try {
-            $redCapEtl = new RedCapEtl(self::$logger, self::CONFIG_FILE);
+            $redCapEtl = new RedCapEtl($logger, $configFile);
             $redCapEtl->run();
         } catch (EtlException $exception) {
             self::$logger->logException($exception);
