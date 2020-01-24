@@ -67,6 +67,7 @@ class MysqlDbConnection extends DbConnection
 
         if ($this->mysqli->connect_errno) {
             $message = 'MySQL error ['.$this->mysqli->connect_errno.']: '.$this->mysqli->connect_error;
+            if($sslVerify) $message .= "\nDoes your database support SSL, if not try removing DB SSL in setup";
             $code = EtlException::DATABASE_ERROR;
             throw new EtlException($message, $code);
         }
