@@ -192,7 +192,7 @@ class ServerConfig implements \JsonSerializable
      * @param Configuration $etlConfig the ETL configuration to run.
      * @param boolean $isCronJob indicates if this run is a cron job.
      */
-    public function run($etlConfig, $isCronJob = false)
+    public function run($etlConfig, $isCronJob = false, $moduleLog = null)
     {
         if (!isset($etlConfig)) {
             $message = 'No ETL configuration specified.';
@@ -219,6 +219,11 @@ class ServerConfig implements \JsonSerializable
             #$properties[Configuration::DATA_SOURCE_API_TOKEN] = '12345678901234567890123456789012';
             
             $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
+            $logId = $logger->getLogId();
+
+            if (isset($moduleLog)) {
+                $logger->setLoggingCallback(array($moduleLog, 'logEtlRunMessage'));
+            }
 
             try {
                 #$redcapProjectClass = EtlExtRedCapProject::class;

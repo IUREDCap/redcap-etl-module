@@ -48,14 +48,17 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const NO_ETL_PROJECT_PERMISSION   = 3;
     const NO_CONFIGURATION_PERMISSION = 4;
     
-    private $settings;
     private $db;
+    private $settings;
+    private $moduleLog;
+
     private $changeLogAction;
 
     public function __construct()
     {
         $this->db = new RedCapDb();
         $this->settings = new Settings($this, $this->db);
+        $this->moduleLog = new ModuleLog($this);
         parent::__construct();
     }
     
@@ -149,18 +152,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $cronJobs = $this->getCronJobs($day, $hour);
         
-        #-------------------------------------------------
-        # Log cron information to external module log
-        #-------------------------------------------------
-        $logParams = [
-            'log_type'  => self::ETL_CRON,
-            'cron_day'  => $day,
-            'cron_hour' => $hour,
-            'num_jobs'  => count($cronJobs)
-            ];
+        $logId = $this->moduleLog->logCronJobsRun(count($cronJobs), $day, $hour);
 
-        $logMessage = 'REDCap-ETL cron jobs run';
-        $logId = $this->log($logMessage, $logParams);
         $pid = -1;   # process ID
 
         foreach ($cronJobs as $cronJob) {
@@ -182,13 +175,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
                 $isCronJob = true;
 
-                $logParams = [
-                    'log_type'    => self::ETL_CRON_JOB,
-                    'etl_server'      => $serverName,
-                    'config'      => $configName,
-                    'cron_log_id' => $logId
-                ];
-                $this->log($logMessage, $logParams);
+                $this->moduleLog->logCronJob($projectId, $serverName, $configName, $logId);
 
                 if (strcmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
                     # Running on the embedded server
@@ -248,17 +235,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             #-------------------------------------------------
             # Log run information to external module log
             #-------------------------------------------------
-            $logParams = [
-                'log_type' => self::ETL_RUN,
-                'etl_username' => $username,
-                'cron' => $isCronJob,
-                'config' => $configName,
-                'etl_server' => $serverName
-            ];
-            $logMessage = "ETL run of configuration \"{$configName}\" on server \"{$serverName}\""
-                . " for project ID {$projectId}";
-            $this->log($logMessage, $logParams);
-
+            $this->moduleLog->logEtlRun($projectId, $username, $isCronJob, $configName, $serverName);
 
             $adminConfig = $this->getAdminConfig();
             
@@ -366,7 +343,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             #    # Run on the specified server
             #    $status = $serverConfig->run($etlConfig, $isCronJob);
             #}
-            $status = $serverConfig->run($etlConfig, $isCronJob);
+            $status = $serverConfig->run($etlConfig, $isCronJob, $this->moduleLog);
         } catch (\Exception $exception) {
             $status = "ETL job failed: ".$exception->getMessage();
             $details = "ETL job failed\n".$details
