@@ -5,7 +5,7 @@
 #-------------------------------------------------------
 
 #---------------------------------------------
-# Get log details for the specified cron job
+# Get log details for the specified ETL run
 #---------------------------------------------
 $module->checkAdminPagePermission();
 
@@ -14,10 +14,10 @@ require_once __DIR__.'/../../dependencies/autoload.php';
 use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\ModuleLog;
 
-$cronLogId     = Filter::sanitizeInt($_POST['cron_log_id']);
+$etlRunLogId     = Filter::sanitizeInt($_POST['etl_run_log_id']);
 
 $moduleLog = new ModuleLog($module);
 
-$logInfo = $moduleLog->renderCronJobs($cronLogId);
+$logInfo = $moduleLog->renderEtlRunDetails($etlRunLogId);
 
 echo $logInfo;

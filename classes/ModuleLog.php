@@ -162,7 +162,19 @@ class ModuleLog
         return $cronJob;
     }
     
-        
+    /**
+     * Gets the details for the ETL run with specified log ID (but this only works for ETL processes
+     * run on the embedded server).
+     */
+    public function getEtlRunDetails($etlRunLogId)
+    {
+        $query = "select log_id, timestamp, ui_id, project_id, message, log_type, etl_server, config, etl_run_log_id";
+        $query .= " where log_type = '".self::ETL_RUN_DETAILS."'"
+            ." and etl_run_log_id = '".Filter::escapeForMysql($etlRunLogId)."'";
+        $etlRunDetails = $this->module->queryLogs($query);
+        return $etlRunDetails;
+    }
+    
     public function renderCronJobs($logId)
     {
         $cronJobs = '';
@@ -191,5 +203,34 @@ class ModuleLog
         $cronJobs .= "</table>\n";
         
         return $cronJobs;
+    }
+
+    public function renderEtlRunDetails($logId)
+    {
+        $details = '';
+        $details .= '<h4>ETL Run</h4>'."\n";
+        $details .= '<table class="etl-log">'."\n";
+        $details .= "<thead>\n";
+        $details .= "<tr><th>Log ID</th><th>Time</th></th><th>Message</th></tr>\n";
+        $details .= "</thead>\n";
+        $details .= "<tbody>\n";
+        $logEntries = $this->getEtlRunDetails($logId);
+
+        $tableRows = '';
+        foreach ($logEntries as $logEntry) {
+            $row = "<tr>";
+            $row .= '<td style="text-align: right;">'.Filter::sanitizeInt($logEntry['log_id'])."</td>";
+            $row .= '<td style="text-align: right; padding: 0px 6px 0px 6px;">'
+                .Filter::sanitizeString($logEntry['timestamp'])."</td>";
+            $row .= "<td>".Filter::sanitizeString($logEntry['message'])."</td>";
+            $row .= "</tr>\n";
+            $tableRows .= $row;
+        }
+        
+        $details .= $tableRows;
+        $details .= "</tbody>\n";
+        $details .= "</table>\n";
+        
+        return $details;
     }
 }

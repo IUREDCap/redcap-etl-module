@@ -20,13 +20,15 @@ use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\ModuleLog;
 use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
+use IU\RedCapEtlModule\ServerConfig;
 
 $selfUrl  = $module->getUrl(RedCapEtlModule::LOG_PAGE);
 $adminUrl = $module->getURL(RedCapEtlModule::ADMIN_HOME_PAGE);
 $userUrl  = $module->getURL(RedCapEtlModule::USER_CONFIG_PAGE);
 
-$cronDetailsLogUrl = $module->getUrl('web/admin/cron_details_log.php');
-    
+$cronDetailsLogUrl   = $module->getUrl('web/admin/cron_details_log.php');
+$etlRunDetailsLogUrl = $module->getUrl('web/admin/etl_run_details_log.php');
+
 $adminConfigJson = $module->getSystemSetting(AdminConfig::KEY);
 $adminConfig = new AdminConfig();
 
@@ -153,7 +155,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
         } elseif ($logType === RedCapEtlModule::ETL_RUN) {
             echo "<tr>\n";
             echo "<th>Log ID</th> <th>Time</th> <th>User ID</th> <th>Project ID</th>\n";
-            echo "<th>Server</th> <th>Config</th> <th>Cron?</th> <th>Username</th>\n";
+            echo "<th>Server</th> <th>Config</th> <th>Cron?</th> <th>Username</th><th>Details</th>\n";
             echo "</tr>\n";
         } else {
             echo "<tr> <th>Log ID</th> <th>TimeStamp</th> <th>User ID</th>"
@@ -185,6 +187,17 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                         echo "<td>no</td>\n";
                     }
                     echo "<td>".$entry['etl_username']."</td>\n";
+                    
+                    echo '<td>';
+                    if ($entry['etl_server'] === ServerConfig::EMBEDDED_SERVER_NAME) {
+                        echo '<a id="etl_run_detail_'.($entry['log_id']).'" class="etlRunDetails"'
+                            .' href="#" style="font-weight: bold; text-decoration: underline;">'
+                            .'details'.'</a>';
+                    } else {
+                        echo 'See remote server logs';
+                    }
+                    echo "</td>\n";
+                    
                     echo "</tr>\n";
                 } elseif ($logType === RedCapEtlModule::ETL_CRON) {
                     $cron = null;
@@ -217,13 +230,12 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
     <?php Csrf::generateFormToken(); ?>
 </form>
 
-<?php
-#--------------------------------------
-# Cron detail dialog
-#--------------------------------------
-?>
+
 <script>
     $(document).ready(function() {
+        //--------------------------------------
+        // Cron detail dialog
+        //--------------------------------------
         $(".cronLogDetail").click(function () {
             id = $(this).prop("id");
             id = id.replace('cron_detail_', '');
@@ -237,6 +249,29 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                 }).dialog();
                 
             $dialog.dialog({title: 'Cron Jobs', dialogClass: 'redcap-etl-help', width: 400, maxHeight: 400})
+                //.position({my: 'left top', at: 'right+20 top', of: $(this)})
+                .dialog('open')
+            ;
+            
+            return false;
+        });
+
+        //--------------------------------------
+        // Etl run details dialog
+        //--------------------------------------
+        $(".etlRunDetails").click(function () {
+            id = $(this).prop("id");
+            id = id.replace('etl_run_details_', '');
+            
+            var $url = '<?php echo $etlRunDetailsLogUrl; ?>';
+            var $dialog;
+            $dialog = $('<div></div>')
+                .load($url, {
+                    etl_run_log_id: id,
+                    <?php echo Csrf::TOKEN_NAME; ?>: "<?php echo Csrf::getToken(); ?>"
+                }).dialog();
+                
+            $dialog.dialog({title: 'ETL Run Details', dialogClass: 'redcap-etl-log', width: 400, maxHeight: 400})
                 //.position({my: 'left top', at: 'right+20 top', of: $(this)})
                 .dialog('open')
             ;
