@@ -165,10 +165,11 @@ class ModuleLog
         
     public function renderCronJobs($logId)
     {
-        $cronJobs = "<hr />\n";
+        $cronJobs = '';
+        $cronJobs .= '<h4>Cron Jobs</h4>'."\n";
         $cronJobs .= '<table class="etl-log">'."\n";
         $cronJobs .= "<thead>\n";
-        $cronJobs .= "<tr><th>Log ID</th><th>Server</th><th>Config</th></tr>\n";
+        $cronJobs .= "<tr><th>Log ID</th><th>Cron Log ID</th><th>Server</th><th>Config</th><th>Project ID</th></tr>\n";
         $cronJobs .= "</thead>\n";
         $cronJobs .= "<tbody>\n";
         $cronJobsData = $this->getCronJobs($logId);
@@ -176,9 +177,11 @@ class ModuleLog
         $tableRows = '';
         foreach ($cronJobsData as $job) {
             $row = "<tr>";
-            $row .= "<td>".Filter::sanitizeInt($job['log_id'])."</td>";
+            $row .= '<td style="text-align: right;">'.Filter::sanitizeInt($job['log_id'])."</td>";
+            $row .= '<td style="text-align: right;">'.Filter::sanitizeInt($job['cron_log_id'])."</td>";
             $row .= "<td>".Filter::sanitizeString($job['etl_server'])."</td>";
             $row .= "<td>".Filter::sanitizeString($job['config'])."</td>";
+            $row .= '<td style="text-align: right;">'.Filter::sanitizeString($job['project_id'])."</td>";
             $row .= "</tr>\n";
             $tableRows .= $row;
         }

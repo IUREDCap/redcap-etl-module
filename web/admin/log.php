@@ -25,6 +25,8 @@ $selfUrl  = $module->getUrl(RedCapEtlModule::LOG_PAGE);
 $adminUrl = $module->getURL(RedCapEtlModule::ADMIN_HOME_PAGE);
 $userUrl  = $module->getURL(RedCapEtlModule::USER_CONFIG_PAGE);
 
+$cronDetailsLogUrl = $module->getUrl('web/admin/cron_details_log.php');
+    
 $adminConfigJson = $module->getSystemSetting(AdminConfig::KEY);
 $adminConfig = new AdminConfig();
 
@@ -146,7 +148,8 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
         # Output table header based on log type
         #----------------------------------------------
         if ($logType === RedCapEtlModule::ETL_CRON) {
-            echo "<tr> <th>Log ID</th> <th>Time</th> <th>Day</th> <th>Hour</th> <th># Jobs</th> </tr>\n";
+            echo "<tr> <th>Log ID</th> <th>Time</th> 
+            <th>Day</th> <th>Hour</th> <th># Jobs</th> </tr>\n";
         } elseif ($logType === RedCapEtlModule::ETL_RUN) {
             echo "<tr>\n";
             echo "<th>Log ID</th> <th>Time</th> <th>User ID</th> <th>Project ID</th>\n";
@@ -197,7 +200,8 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     $numJobs = $entry['num_jobs'];
                     echo '<td style="text-align: right;">';
                     if ($numJobs > 0) {
-                        echo '<a id="cronDetail" href="#" style="font-weight: bold; text-decoration: underline;">'
+                        echo '<a id="cron_detail_'.($entry['log_id']).'" class="cronLogDetail"'
+                            .' href="#" style="font-weight: bold; text-decoration: underline;">'
                             .$numJobs.'</a>';
                     } else {
                         echo $numJobs;
@@ -214,57 +218,33 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
 </form>
 
 <?php
-echo $moduleLog->renderCronJobs(1038);
-?>
-
-<?php
 #--------------------------------------
 # Cron detail dialog
 #--------------------------------------
 ?>
 <script>
-$(function() {
-    /*
-    cronDetail = $("#cronDetailDialog").dialog({
-        autoOpen: false,
-        height: 220,
-        width: 400,
-        modal: true,
-        buttons: {
-            Cancel: function() {$(this).dialog("close");}
-        },
-        title: "CRON Detail"
+    $(document).ready(function() {
+        $(".cronLogDetail").click(function () {
+            id = $(this).prop("id");
+            id = id.replace('cron_detail_', '');
+            
+            var $url = '<?php echo $cronDetailsLogUrl; ?>';
+            var $dialog;
+            $dialog = $('<div></div>')
+                .load($url, {
+                    cron_log_id: id,
+                    <?php echo Csrf::TOKEN_NAME; ?>: "<?php echo Csrf::getToken(); ?>"
+                }).dialog();
+                
+            $dialog.dialog({title: 'Cron Jobs', dialogClass: 'redcap-etl-help', width: 400, maxHeight: 400})
+                //.position({my: 'left top', at: 'right+20 top', of: $(this)})
+                .dialog('open')
+            ;
+            
+            return false;
+        });
     });
-    */
-    
-    $("#cronDetail").click(cronDetail);
-    
-    function cronDetail(event) {
-        alert("test");
-        //var cronLogId = event.data.cronLogId;
-        //$("#configToCopy").text('"'+configName+'"');
-        //$('#copyFromConfigName').val(configName);
-        //$("#cronDetailDialog").dialog("open");
-    }
-});
 </script>
-<div id="cronDetailDialog"
-    title="CRON Detail"
-    style="display: none;"
-    >
-    <form id="copyForm" action="<?php echo $selfUrl;?>" method="post">
-    To copy the configuration <span id="configToCopy" style="font-weight: bold;"></span>,
-    enter the name of the new configuration below, and click on the
-    <span style="font-weight: bold;">Copy configuration</span> button.
-    <p>
-    <span style="font-weight: bold;">New configuration name:</span>
-    <input type="text" name="copyToConfigName" id="copyToConfigName">
-    </p>
-    <input type="hidden" name="copyFromConfigName" id="copyFromConfigName" value="">
-    <input type="hidden" name="submitValue" value="copy">
-    <?php Csrf::generateFormToken(); ?>
-    </form>
-</div>
 
 
 <?php require_once APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>
