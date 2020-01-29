@@ -139,8 +139,8 @@ $times = $adminConfig->getTimeLabels();
             
             $configUrl = $module->getURL(
                 RedCapEtlModule::USER_ETL_CONFIG_PAGE
-                .'?pid='.$projectId
-                .'&configName='.$config
+                .'?pid='.Filter::escapeForUrlParameter($projectId)
+                .'&configName='.Filter::escapeForUrlParameter($config)
             );
 
             if ($row % 2 === 0) {

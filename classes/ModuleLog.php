@@ -53,7 +53,7 @@ class ModuleLog
         return $logId;
     }
 
-    public function logCronJob($projectId, $serverName, $configName, $logId)
+    public function logCronJob($projectId, $serverName, $configName, $cronLogId)
     {
         $logParams = [
             'log_type'           => self::ETL_CRON_JOB,
@@ -61,12 +61,14 @@ class ModuleLog
             'project_id'         => $projectId,
             'etl_server'         => $serverName,
             'config'             => $configName,
-            'cron_log_id'        => $logId
+            'cron_log_id'        => $cronLogId
         ];
 
         $logMessage = 'REDCap-ETL cron job';
 
-        $this->module->log($logMessage, $logParams);
+        $logId = $this->module->log($logMessage, $logParams);
+
+        return $logId;
     }
     
 

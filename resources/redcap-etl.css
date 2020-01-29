@@ -57,6 +57,10 @@ table.etl-log th, table.etl-log td {
     padding: 2px;
 }
 
+table.etl-log a {
+    font-size: 100%;
+}
+
 
 /* User projects table */
 table.user-projects {

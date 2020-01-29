@@ -22,15 +22,17 @@ use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
-$selfUrl  = $module->getUrl(RedCapEtlModule::LOG_PAGE);
-$adminUrl = $module->getURL(RedCapEtlModule::ADMIN_HOME_PAGE);
-$userUrl  = $module->getURL(RedCapEtlModule::USER_CONFIG_PAGE);
+$selfUrl         = $module->getUrl(RedCapEtlModule::LOG_PAGE);
+$adminUrl        = $module->getURL(RedCapEtlModule::ADMIN_HOME_PAGE);
+$serverConfigUrl = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
+$userUrl         = $module->getURL(RedCapEtlModule::USER_CONFIG_PAGE);
 
 $cronDetailsLogUrl   = $module->getUrl('web/admin/cron_details_log.php');
 $etlRunDetailsLogUrl = $module->getUrl('web/admin/etl_run_details_log.php');
 
 $adminConfigJson = $module->getSystemSetting(AdminConfig::KEY);
 $adminConfig = new AdminConfig();
+
 
 
 #------------------------------------------------------------------
@@ -142,6 +144,16 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
         <input type="submit" value="Display" name="submitValue" style="margin-left: 7px;">
     </div>
     
+    <p style="margin-top: 12px; font-weight: bold;">
+        <?php
+        if ($logType === RedCapEtlModule::ETL_CRON) {
+            echo "ETL Cron Jobs\n";
+        } elseif ($logType === RedCapEtlModule::ETL_RUN) {
+            echo "ETL Processes\n";
+        }
+        ?>
+    </p>
+    
     <table class="etl-log">
         <thead>
         <?php
@@ -157,9 +169,6 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
             echo "<th>Log ID</th> <th>Time</th> <th>User ID</th> <th>Project ID</th>\n";
             echo "<th>Server</th> <th>Config</th> <th>Cron?</th> <th>Username</th><th>Details</th>\n";
             echo "</tr>\n";
-        } else {
-            echo "<tr> <th>Log ID</th> <th>TimeStamp</th> <th>User ID</th>"
-                ." <th>Project ID</th> <th>Message</th> </tr>\n";
         }
 
         ?>
@@ -173,14 +182,28 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
 
             foreach ($logData as $entry) {
                 if ($logType === RedCapEtlModule::ETL_RUN) {
+                    $projectId = $entry['project_id'];
+                    $projectUrl = APP_PATH_WEBROOT.'index.php?pid='.(int)$projectId;
+                    
                     $cron = $entry['cron'];
+                    
+                    $config = $entry['config'];
+                    $configUrl = $module->getURL(
+                        RedCapEtlModule::USER_ETL_CONFIG_PAGE
+                        .'?pid='.Filter::escapeForUrlParameter($projectId)
+                        .'&configName='.Filter::escapeForUrlParameter($config)
+                    );
+                    
+                    $server = $entry['etl_server'];
+                    $serverUrl = $serverConfigUrl.'&serverName='.Filter::escapeForUrlParameter($server);
+                    
                     echo "<tr>\n";
                     echo '<td style="text-align: right;">'.$entry['log_id']."</td>\n";
                     echo "<td>".$entry['timestamp']."</td>\n";
                     echo '<td style="text-align: right;">'.$entry['ui_id']."</td>\n";
-                    echo '<td style="text-align: right;">'.$entry['project_id']."</td>\n";
-                    echo "<td>".$entry['etl_server']."</td>\n";
-                    echo "<td>".$entry['config']."</td>\n";
+                    echo '<td style="text-align: right;">'.'<a href="'.$projectUrl.'">'.$projectId."</a></td>\n";
+                    echo "<td>".'<a href="'.$serverUrl.'">'.$server.'</a>'."</td>\n";
+                    echo "<td>".'<a href="'.$configUrl.'">'.$config.'</a>'."</td>\n";
                     if ($cron) {
                         echo "<td>yes</td>\n";
                     } else {
@@ -191,7 +214,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     echo '<td>';
                     if ($entry['etl_server'] === ServerConfig::EMBEDDED_SERVER_NAME) {
                         echo '<a id="etl_run_detail_'.($entry['log_id']).'" class="etlRunDetails"'
-                            .' href="#" style="font-weight: bold; text-decoration: underline;">'
+                            .' href="#">'
                             .'details'.'</a>';
                     } else {
                         echo 'See remote server logs';
