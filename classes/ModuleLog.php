@@ -77,7 +77,7 @@ class ModuleLog
      *
      * @return int log ID for the generated log entry
      */
-    public function logEtlRun($projectId, $username, $isCronJob, $configName, $serverName)
+    public function logEtlRun($projectId, $username, $isCronJob, $configName, $serverName, $cronJobLogId = '')
     {
         $logParams = [
             'log_type'           => self::ETL_RUN,
@@ -85,6 +85,7 @@ class ModuleLog
             'project_id'         => $projectId,
             'etl_username'       => $username,
             'cron'               => $isCronJob,
+            'cron_job_log_id'    => $cronJobLogId,
             'config'             => $configName,
             'etl_server'         => $serverName
         ];

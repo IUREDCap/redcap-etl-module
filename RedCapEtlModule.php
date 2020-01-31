@@ -152,7 +152,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $cronJobs = $this->getCronJobs($day, $hour);
         
-        $logId = $this->moduleLog->logCronJobsRun(count($cronJobs), $day, $hour);
+        $cronJobsRunLogId = $this->moduleLog->logCronJobsRun(count($cronJobs), $day, $hour);
 
         $pid = -1;   # process ID
 
@@ -175,7 +175,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
                 $isCronJob = true;
 
-                $this->moduleLog->logCronJob($projectId, $serverName, $configName, $logId);
+                $cronJobLogId = $this->moduleLog->logCronJob($projectId, $serverName, $configName, $cronJobsRunLogId);
 
                 if (strcmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
                     # Running on the embedded server
@@ -193,10 +193,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                     #    }
                     #} else {
                     # Forking not supported; run serially
-                       $this->run($configName, $serverName, $isCronJob, $projectId);
+                       $this->run($configName, $serverName, $isCronJob, $projectId, $cronJobLogId);
                     #}
                 } else {
-                    $this->run($configName, $serverName, $isCronJob, $projectId);
+                    $this->run($configName, $serverName, $isCronJob, $projectId, $cronJobLogId);
                 }
             } catch (\Exception $exception) {
                 $details = "Cron job failed\n".$details.'error: '.$exception->getMessage();
@@ -224,7 +224,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      *
      * @return string the status of the run.
      */
-    public function run($configName, $serverName, $isCronJob = false, $projectId = PROJECT_ID)
+    public function run($configName, $serverName, $isCronJob = false, $projectId = PROJECT_ID, $cronJobLogId = null)
     {
         try {
             $username = '';
@@ -235,7 +235,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             #-------------------------------------------------
             # Log run information to external module log
             #-------------------------------------------------
-            $this->moduleLog->logEtlRun($projectId, $username, $isCronJob, $configName, $serverName);
+            $this->moduleLog->logEtlRun($projectId, $username, $isCronJob, $configName, $serverName, $cronJobLogId);
 
             $adminConfig = $this->getAdminConfig();
             
@@ -348,7 +348,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             $status = "ETL job failed: ".$exception->getMessage();
             $details = "ETL job failed\n".$details
                 .'error: '.$exception->getMessage();
-            #$this->log('ETL job error: '.$exception->getTraceAsString());
             \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
         }
         

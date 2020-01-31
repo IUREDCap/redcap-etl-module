@@ -147,10 +147,17 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
     <p style="margin-top: 12px; font-weight: bold;">
         <?php
         if ($logType === RedCapEtlModule::ETL_CRON) {
-            echo "ETL Cron Jobs\n";
+            echo "ETL Cron Jobs";
         } elseif ($logType === RedCapEtlModule::ETL_RUN) {
-            echo "ETL Processes\n";
+            echo "ETL Processes";
         }
+        
+        if ($startDate === $endDate) {
+            echo " for {$startDate}";
+        } else {
+            echo " for {$startDate} to {$endDate}";
+        }
+        echo "\n";
         ?>
     </p>
     
