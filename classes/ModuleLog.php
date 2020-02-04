@@ -77,8 +77,16 @@ class ModuleLog
      *
      * @return int log ID for the generated log entry
      */
-    public function logEtlRun($projectId, $username, $isCronJob, $configName, $serverName, $cronJobLogId = '')
-    {
+    public function logEtlRun(
+        $projectId,
+        $username,
+        $isCronJob,
+        $configName,
+        $serverName,
+        $cronJobLogId = '',
+        $cronDay = null,
+        $cronHour = null
+    ) {
         $logParams = [
             'log_type'           => self::ETL_RUN,
             'log_format_version' => self::LOG_FORMAT_VERSION,
@@ -86,6 +94,8 @@ class ModuleLog
             'etl_username'       => $username,
             'cron'               => $isCronJob,
             'cron_job_log_id'    => $cronJobLogId,
+            'cron_day'           => $cronDay,
+            'cron_hour'          => $cronHour,
             'config'             => $configName,
             'etl_server'         => $serverName
         ];
@@ -123,9 +133,9 @@ class ModuleLog
         
         $query = "select log_id, timestamp, ui_id, project_id, message";
         
-        if ($type === RedCapEtlModule::ETL_RUN) {
-            $query .= ', log_type, cron, config, etl_username, etl_server';
-        } elseif ($type === RedCapEtlModule::ETL_CRON) {
+        if ($type === self::ETL_RUN) {
+            $query .= ', log_type, cron, config, etl_username, etl_server, cron_job_log_id, cron_day, cron_hour';
+        } elseif ($type === self::ETL_CRON) {
             $query .= ', log_type, cron_day, cron_hour, num_jobs';
         }
         $query .= " where log_type = '".Filter::escapeForMysql($type)."'";
@@ -152,6 +162,71 @@ class ModuleLog
         $logData = $this->module->queryLogs($query);
         return $logData;
     }
+    
+    
+    public function generateCsvDownload($logType, $startDate, $endDate)
+    {
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        if ($logType === self::ETL_RUN) {
+            header('Content-Disposition: attachment; filename=redcap-etl-runs.csv');
+                    
+            $header = [
+                'Log ID', 'Time', 'Project ID', 'Server', 'Config',
+                'User ID', 'Username', 'Cron?', 'Cron Day', 'Cron Hour'
+            ];
+            
+            $out = fopen('php://output', 'w');
+            fputcsv($out, $header);
+
+            $entries = $this->getData(self::ETL_RUN, $startDate, $endDate);
+            foreach ($entries as $entry) {
+                $i = 0;
+                $csvEntry = array();
+                $csvEntry[$i++] = $entry['log_id'];
+                $csvEntry[$i++] = $entry['timestamp'];
+                $csvEntry[$i++] = $entry['project_id'];
+                $csvEntry[$i++] = $entry['etl_server'];
+                $csvEntry[$i++] = $entry['config'];
+                $csvEntry[$i++] = $entry['ui_id'];
+                $csvEntry[$i++] = $entry['etl_username'];
+                
+                if ($entry['cron']) {
+                    $csvEntry[$i++] = 'yes';
+                } else {
+                    $csvEntry[$i++] = 'no';
+                }
+                
+                $csvEntry[$i++] = $entry['cron_day'];
+                $csvEntry[$i++] = $entry['cron_hour'];
+                fputcsv($out, $csvEntry);
+            }
+        } elseif ($logType === self::ETL_CRON) {
+            header('Content-Disposition: attachment; filename=redcap-etl-cron-jobs.csv');
+            
+            $header = [
+                'Log ID', 'Time', 'Cron Day', 'Cron Hour', 'Jobs'
+            ];
+            $out = fopen('php://output', 'w');
+            fputcsv($out, $header);
+            
+            $entries = $this->getData(self::ETL_CRON, $startDate, $endDate);
+            foreach ($entries as $entry) {
+                $i = 0;
+                $csvEntry = array();
+                $csvEntry[$i++] = $entry['log_id'];
+                $csvEntry[$i++] = $entry['timestamp'];
+                $csvEntry[$i++] = $entry['cron_day'];
+                $csvEntry[$i++] = $entry['cron_hour'];
+                $csvEntry[$i++] = $entry['num_jobs'];
+                fputcsv($out, $csvEntry);
+            }
+        }
+        
+        fclose($out);
+    }
 
     /**
      * Gets the cron jobs associated with the specified cron run log ID.
@@ -159,12 +234,29 @@ class ModuleLog
     public function getCronJobs($logId)
     {
         $query = "select log_id, timestamp, ui_id, project_id, message, log_type, etl_server, config, cron_log_id";
-        $query .= " where log_type = '".RedCapEtlModule::ETL_CRON_JOB."'"
+        $query .= " where log_type = '".self::ETL_CRON_JOB."'"
             ." and cron_log_id = '".Filter::escapeForMysql($logId)."'";
         $cronJob = $this->module->queryLogs($query);
         return $cronJob;
     }
     
+    /**
+     * Gets the log id from the ETL run of a cron job, given the Cron log ID.
+     */
+    public function getEtlRunLogIdForCronJob($cronLogId)
+    {
+        $query = "select log_id";
+        $query .= " where log_type = '".self::ETL_RUN."'"
+            ." and cron_log_id = '".Filter::escapeForMysql($cronLogId)."'";
+        $result = $this->module->queryLogs($query);
+        
+        $logId = null;
+        if (array_key_exists('log_id', $result)) {
+            $logId = $result['log_id'];
+        }
+        return $logId;
+    }
+
     /**
      * Gets the details for the ETL run with specified log ID (but this only works for ETL processes
      * run on the embedded server).
@@ -197,6 +289,7 @@ class ModuleLog
             $row .= "<td>".Filter::sanitizeString($job['etl_server'])."</td>";
             $row .= "<td>".Filter::sanitizeString($job['config'])."</td>";
             $row .= '<td style="text-align: right;">'.Filter::sanitizeString($job['project_id'])."</td>";
+            
             $row .= "</tr>\n";
             $tableRows .= $row;
         }

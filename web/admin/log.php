@@ -33,6 +33,7 @@ $etlRunDetailsLogUrl = $module->getUrl('web/admin/etl_run_details_log.php');
 $adminConfigJson = $module->getSystemSetting(AdminConfig::KEY);
 $adminConfig = new AdminConfig();
 
+$moduleLog = new ModuleLog($module);
 
 
 #------------------------------------------------------------------
@@ -57,6 +58,11 @@ if (!empty($endDate) && !checkdate($endDate)) {
     $error = 'invalid end date';
 } else {
     $endDate = date('m/d/Y');
+}
+
+if (isset($_POST['downloadButton_x'])) {
+    $moduleLog->generateCsvDownload($logType, $startDate, $endDate);
+    exit(0);
 }
 
 #---------------------------------------------
@@ -90,6 +96,8 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
 #$module->renderAdminUsersSubTabs($selfUrl);
 
 ?>
+
+
 
 <h5>REDCap-ETL Log</h5>
 
@@ -142,7 +150,16 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
         </input>
     
         <input type="submit" value="Display" name="submitValue" style="margin-left: 7px;">
+        
+        <span style="text-align: right; margin-left: 2em;">
+        <input type="image" name="downloadButton" src="<?php echo APP_PATH_IMAGES.'download_csvexcel.gif'; ?>"
+               alt="CSV">
+        </span>
     </div>
+    <?php Csrf::generateFormToken(); ?>
+</form>
+
+
     
     <p style="margin-top: 12px; font-weight: bold;">
         <?php
@@ -164,7 +181,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
     <table class="etl-log">
         <thead>
         <?php
-    
+
         #----------------------------------------------
         # Output table header based on log type
         #----------------------------------------------
@@ -173,8 +190,12 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
             <th>Day</th> <th>Hour</th> <th># Jobs</th> </tr>\n";
         } elseif ($logType === RedCapEtlModule::ETL_RUN) {
             echo "<tr>\n";
-            echo "<th>Log ID</th> <th>Time</th> <th>User ID</th> <th>Project ID</th>\n";
-            echo "<th>Server</th> <th>Config</th> <th>Cron?</th> <th>Username</th><th>Details</th>\n";
+            echo "<th>Log ID</th> <th>Time</th>\n";
+            echo "</th><th>Project ID</th>\n";
+            echo "<th>Server</th> <th>Config</th>\n";
+            echo "<th>User ID</th> <th>Username</th>\n";
+            echo "<th>Cron?</th> <th>Cron<br/>Day</th> <th>Cron<br/>Hour</th>\n";
+            echo "<th>Details</th>\n";
             echo "</tr>\n";
         }
 
@@ -184,7 +205,6 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
         <tbody>
             <?php
 
-            $moduleLog = new ModuleLog($module);
             $logData = $moduleLog->getData($logType, $startDate, $endDate);
 
             foreach ($logData as $entry) {
@@ -207,19 +227,30 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     echo "<tr>\n";
                     echo '<td style="text-align: right;">'.$entry['log_id']."</td>\n";
                     echo "<td>".$entry['timestamp']."</td>\n";
-                    echo '<td style="text-align: right;">'.$entry['ui_id']."</td>\n";
+
                     echo '<td style="text-align: right;">'.'<a href="'.$projectUrl.'">'.$projectId."</a></td>\n";
                     echo "<td>".'<a href="'.$serverUrl.'">'.$server.'</a>'."</td>\n";
                     echo "<td>".'<a href="'.$configUrl.'">'.$config.'</a>'."</td>\n";
+                    
+                    #--------------------------------------------
+                    # User info (not available for cron jobs)
+                    #--------------------------------------------
+                    echo '<td style="text-align: right;">'.$entry['ui_id']."</td>\n";
+                    echo "<td>".$entry['etl_username']."</td>\n";
+                    
+                    #-------------------------------------
+                    # Cron info
+                    #-------------------------------------
                     if ($cron) {
                         echo "<td>yes</td>\n";
                     } else {
                         echo "<td>no</td>\n";
                     }
-                    echo "<td>".$entry['etl_username']."</td>\n";
+                    echo '<td style="text-align: right;">'.$entry['cron_day']."</td>\n";
+                    echo '<td style="text-align: right;">'.$entry['cron_hour']."</td>\n";
                     
                     echo '<td>';
-                    if ($entry['etl_server'] === ServerConfig::EMBEDDED_SERVER_NAME) {
+                    if ($server === ServerConfig::EMBEDDED_SERVER_NAME) {
                         echo '<a id="etl_run_detail_'.($entry['log_id']).'" class="etlRunDetails"'
                             .' href="#">'
                             .'details'.'</a>';
@@ -257,8 +288,8 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
             ?>
         </tbody>
     </table>
-    <?php Csrf::generateFormToken(); ?>
-</form>
+
+
 
 
 <script>
@@ -278,9 +309,14 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     <?php echo Csrf::TOKEN_NAME; ?>: "<?php echo Csrf::getToken(); ?>"
                 }).dialog();
                 
-            $dialog.dialog({title: 'Cron Jobs', dialogClass: 'redcap-etl-help', width: 400, maxHeight: 400})
-                //.position({my: 'left top', at: 'right+20 top', of: $(this)})
-                .dialog('open')
+            $dialog.dialog({
+                title: 'Cron Jobs',
+                dialogClass: 'redcap-etl-help',
+                width: 500,
+                maxHeight: 400
+            })
+            //.position({my: 'left top', at: 'right+20 top', of: $(this)})
+            .dialog('open')
             ;
             
             return false;
@@ -301,7 +337,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     <?php echo Csrf::TOKEN_NAME; ?>: "<?php echo Csrf::getToken(); ?>"
                 }).dialog();
                 
-            $dialog.dialog({title: 'ETL Run Details', dialogClass: 'redcap-etl-log', width: 400, maxHeight: 400})
+            $dialog.dialog({title: 'ETL Run Details', dialogClass: 'redcap-etl-log', width: 600, maxHeight: 400})
                 //.position({my: 'left top', at: 'right+20 top', of: $(this)})
                 .dialog('open')
             ;

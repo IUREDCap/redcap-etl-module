@@ -193,10 +193,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                     #    }
                     #} else {
                     # Forking not supported; run serially
-                       $this->run($configName, $serverName, $isCronJob, $projectId, $cronJobLogId);
+                       $this->run($configName, $serverName, $isCronJob, $projectId, $cronJobLogId, $day, $hour);
                     #}
                 } else {
-                    $this->run($configName, $serverName, $isCronJob, $projectId, $cronJobLogId);
+                    $this->run($configName, $serverName, $isCronJob, $projectId, $cronJobLogId, $day, $hour);
                 }
             } catch (\Exception $exception) {
                 $details = "Cron job failed\n".$details.'error: '.$exception->getMessage();
@@ -221,11 +221,19 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      * @param string $configName the name of the REDCap-ETL configuration to run
      * @param string $serverName name of server to run on
      * @param boolean $isCronJon indicates whether this is being called from a cron job or not.
+     * @param int $conJobLogId the log ID of the cron job log entry
      *
      * @return string the status of the run.
      */
-    public function run($configName, $serverName, $isCronJob = false, $projectId = PROJECT_ID, $cronJobLogId = null)
-    {
+    public function run(
+        $configName,
+        $serverName,
+        $isCronJob = false,
+        $projectId = PROJECT_ID,
+        $cronJobLogId = null,
+        $cronDay = null,
+        $cronHour = null
+    ) {
         try {
             $username = '';
             if (defined('USERID')) {
@@ -235,7 +243,16 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             #-------------------------------------------------
             # Log run information to external module log
             #-------------------------------------------------
-            $this->moduleLog->logEtlRun($projectId, $username, $isCronJob, $configName, $serverName, $cronJobLogId);
+            $this->moduleLog->logEtlRun(
+                $projectId,
+                $username,
+                $isCronJob,
+                $configName,
+                $serverName,
+                $cronJobLogId,
+                $cronDay,
+                $cronHour
+            );
 
             $adminConfig = $this->getAdminConfig();
             
