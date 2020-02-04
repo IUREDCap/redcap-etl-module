@@ -35,7 +35,9 @@ class Configuration implements \JsonSerializable
     const DB_LOG_TABLE       = 'db_log_table';
     const DB_EVENT_LOG_TABLE = 'db_event_log_table';
     
+    const DB_TYPE = 'db_type';
     const DB_HOST = 'db_host';
+    const DB_PORT = 'db_port';
     const DB_NAME = 'db_name';
     const DB_USERNAME = 'db_username';
     const DB_PASSWORD = 'db_password';
@@ -110,6 +112,8 @@ class Configuration implements \JsonSerializable
         
         $this->properties[self::EMAIL_ERRORS]  = false;
         $this->properties[self::EMAIL_SUMMARY] = false;
+
+        $this->properties[self::DB_TYPE] = \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_MYSQL;
     }
 
     /**
@@ -129,6 +133,23 @@ class Configuration implements \JsonSerializable
             throw new \Exception('No transformation rules were specified in configuration.');
         }
         
+        if (empty($this->getProperty(self::DB_TYPE))) {
+            throw new \Exception('No database type was specified in configuration.');
+        } else {
+            $dbType = $this->getProperty(self::DB_TYPE);
+            if ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_MYSQL) {
+                ; // OK
+            } elseif ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_SQLSERVER) {
+                if (!extension_loaded('sqlsrv') || !extension_loaded('pdo_sqlsrv')) {
+                    $message = 'The extensions for running SQL Server (sqlsrv and/or pdo_sqlsrv)'
+                        . ' have not been enabled.';
+                    throw new \Exception($message);
+                }
+            } else {
+                throw new \Exception('Unrecognized database type "'.$dbType.'" specified.');
+            }
+        }
+
         if (empty($this->getProperty(self::DB_HOST))) {
             throw new \Exception('No database host was specified in configuration.');
         }
@@ -355,15 +376,30 @@ class Configuration implements \JsonSerializable
             }
         }
         
+        $dbType = $properties[self::DB_TYPE];
+        if (empty($dbType)) {
+            # Originally, this property didn't exists, because the only database
+            # type was MySQL, so older data will not have this, and it needs
+            # to be set to the default value (MySQL).
+            $dbType = \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_MYSQL;
+        }
+
         $dbHost = $properties[self::DB_HOST];
+        $dbPort = $properties[self::DB_PORT];
         $dbName = $properties[self::DB_NAME];
         
         $dbUsername = $properties[self::DB_USERNAME];
         $dbPassword = $properties[self::DB_PASSWORD];
 
+        #--------------------------------------------------------------------------------------------------
         # Set the database connection string
-        # Note: the MySQL server port number, which defaults to 3306, can be included in dbHost value
-        $dbConnectionValues = ['MySQL', $dbHost, $dbUsername, $dbPassword, $dbName];
+        # Note: the MySQL server port number, which defaults to 3306, can be included in dbHost value also
+        #--------------------------------------------------------------------------------------------------
+        if (empty($dbPort)) {
+            $dbConnectionValues = [$dbType, $dbHost, $dbUsername, $dbPassword, $dbName];
+        } else {
+            $dbConnectionValues = [$dbType, $dbHost, $dbUsername, $dbPassword, $dbName, $dbPort];
+        }
         $dbConnection = \IU\REDCapETL\Database\DbConnection::createConnectionString($dbConnectionValues);
         $this->properties[self::DB_CONNECTION] = $dbConnection;
     }
@@ -395,7 +431,9 @@ class Configuration implements \JsonSerializable
         # Remove properties that aren't used
         # by REDCap-ETL
         #---------------------------------------
+        unset($properties[self::DB_TYPE]);
         unset($properties[self::DB_HOST]);
+        unset($properties[self::DB_PORT]);
         unset($properties[self::DB_NAME]);
         unset($properties[self::DB_USERNAME]);
         unset($properties[self::DB_PASSWORD]);
@@ -429,7 +467,9 @@ class Configuration implements \JsonSerializable
         # Remove properties that aren't used
         # by REDCap-ETL
         #---------------------------------------
+        unset($properties[self::DB_TYPE]);
         unset($properties[self::DB_HOST]);
+        unset($properties[self::DB_PORT]);
         unset($properties[self::DB_NAME]);
         unset($properties[self::DB_USERNAME]);
         unset($properties[self::DB_PASSWORD]);

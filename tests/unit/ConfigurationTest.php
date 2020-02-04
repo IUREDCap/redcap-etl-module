@@ -82,7 +82,9 @@ class ConfigurationTest extends TestCase
         $properties[Configuration::API_TOKEN_USERNAME] = 'test_user';
         $properties[Configuration::TRANSFORM_RULES_TEXT] = 'TABLE,root,root_id,ROOT';
         $properties[Configuration::BATCH_SIZE] = '100';
+        $properties[Configuration::DB_TYPE] = 'MySQL';
         $properties[Configuration::DB_HOST] = 'localhost';
+        $properties[Configuration::DB_PORT] = '';
         $properties[Configuration::DB_NAME] = 'redcap_etl';
         $properties[Configuration::DB_USERNAME] = 'etl_user';
         $properties[Configuration::DB_PASSWORD] = 'EtlUserPassword';

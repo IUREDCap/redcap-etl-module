@@ -9,35 +9,51 @@ namespace IU\REDCapETL;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Runs the "repeating events" tests using MySQL as the database.
+ * Runs the "repeating events" tests using SQL Server as the database.
  */
-class RepatingEventsMysqlTest extends TestCase
+class RepeatingEventsSqlServerTest extends TestCase
 {
-    const CONFIG_FILE = __DIR__.'/../config/repeating-events-mysql.ini';
+    const CONFIG_FILE = __DIR__.'/../config/repeating-events-sqlserver.ini';
 
     const TEST_DATA_DIR   = __DIR__.'/../data/';     # directory with test data comparison files
 
     private static $dbh;
     private static $logger;
 
+    public function setUp()
+    {
+        #These tests depend on the pdo_sqlsrv driver being installed.
+        #If it isn't loaded in PHP, all tests will be skipped.
+     
+        if (!extension_loaded('pdo_sqlsrv')) {
+            $this->markTestSkipped('The pdo_sqlsrv driver is not available.');
+        }
+    }
+
     public static function setUpBeforeClass()
     {
-        self::$logger = new Logger('repeating_events_system_test');
+        self::$logger = new Logger('repeating_events_system_test_sql_server');
 
-        $configuration = new Configuration(self::$logger, self::CONFIG_FILE);
+        if (extension_loaded('pdo_sqlsrv')) {
+            $configuration = new Configuration(self::$logger, self::CONFIG_FILE);
+            $dbString = $configuration->getDbConnection();
+            list($dbType, $dbHost, $dbUser, $dbPassword, $dbName) = explode(":", $dbString);
+            $driver = 'sqlsrv';
 
-        list($dbHost, $dbUser, $dbPassword, $dbName) = $configuration->getMySqlConnectionInfo();
-        $dsn = 'mysql:dbname='.$dbName.';host='.$dbHost;
-        try {
-            self::$dbh = new \PDO($dsn, $dbUser, $dbPassword);
-        } catch (Exception $exception) {
-            print "ERROR - database connection error: ".$exception->getMessage()."\n";
+            $dsn = "$driver:server=$dbHost ; Database=$dbName";
+
+            try {
+                self::$dbh = new \PDO($dsn, $dbUser, $dbPassword);
+            } catch (Exception $exception) {
+                print "ERROR - database connection error: ".$exception->getMessage()."\n";
+            }
+
+            self::dropTablesAndViews(self::$dbh);
+
+            self::runEtl();
         }
-
-        self::dropTablesAndViews(self::$dbh);
-
-        self::runEtl();
     }
+
 
     private static function dropTablesAndViews($dbh)
     {
@@ -65,6 +81,7 @@ class RepatingEventsMysqlTest extends TestCase
         }
     }
 
+
     public function testAllVisitsTable()
     {
         $sql = 'SELECT '
@@ -74,7 +91,7 @@ class RepatingEventsMysqlTest extends TestCase
             .', redcap_event_name '
             .', redcap_repeat_instrument '
             .', redcap_repeat_instance '
-            .", DATE_FORMAT(weight_time, '%Y-%m-%d %H:%i') as 'weight_time' "
+            .", FORMAT(weight_time, 'yyyy-MM-dd HH:mm') as 'weight_time' "
             .', weight_kg '
             .', height_m '
             .', cardiovascular_date '
@@ -97,7 +114,7 @@ class RepatingEventsMysqlTest extends TestCase
 
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 
-        $this->assertEquals($expectedData, $actualData);
+        $this->assertEquals($expectedData, $actualData, 'Sql Server Repeating Events testAllVisitsTable');
     }
 
     public function testBaselineTable()
@@ -107,7 +124,7 @@ class RepatingEventsMysqlTest extends TestCase
             .', enrollment_id '
             .', record_id '
             .', redcap_event_name '
-            .", DATE_FORMAT(weight_time, '%Y-%m-%d %H:%i') as 'weight_time' "
+            .", FORMAT(weight_time, 'yyyy-MM-dd HH:mm') as 'weight_time' "
             .', weight_kg '
             .', height_m '
             .', cardiovascular_date '
@@ -130,9 +147,8 @@ class RepatingEventsMysqlTest extends TestCase
 
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 
-        $this->assertEquals($expectedData, $actualData);
+        $this->assertEquals($expectedData, $actualData, 'Sql Server Repeating Events testBaselineTable');
     }
-
 
     public function testBaselineAndHomeVisitsTable()
     {
@@ -143,7 +159,7 @@ class RepatingEventsMysqlTest extends TestCase
             .', redcap_event_name '
             .', redcap_repeat_instrument '
             .', redcap_repeat_instance '
-            .", DATE_FORMAT(weight_time, '%Y-%m-%d %H:%i') as 'weight_time' "
+            .", FORMAT(weight_time, 'yyyy-MM-dd HH:mm') as 'weight_time' "
             .', weight_kg '
             .', height_m '
             .', cardiovascular_date '
@@ -166,7 +182,7 @@ class RepatingEventsMysqlTest extends TestCase
 
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 
-        $this->assertEquals($expectedData, $actualData);
+        $this->assertEquals($expectedData, $actualData, 'Sql Server Repeating Events testBaselineAndHomeVisitsTable');
     }
 
 
@@ -178,7 +194,7 @@ class RepatingEventsMysqlTest extends TestCase
             .', record_id '
             .', redcap_event_name '
             .', redcap_repeat_instance '
-            .", DATE_FORMAT(weight_time, '%Y-%m-%d %H:%i') as 'weight_time' "
+            .", FORMAT(weight_time, 'yyyy-MM-dd HH:mm') as 'weight_time' "
             .', weight_kg '
             .', height_m '
             .', cardiovascular_date '
@@ -201,7 +217,7 @@ class RepatingEventsMysqlTest extends TestCase
 
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 
-        $this->assertEquals($expectedData, $actualData);
+        $this->assertEquals($expectedData, $actualData, 'Sql Server Repeating Events testBaselineAndVisitsTable');
     }
 
     public function testEnrollmentTable()
@@ -220,7 +236,7 @@ class RepatingEventsMysqlTest extends TestCase
 
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 
-        $this->assertEquals($expectedData, $actualData);
+        $this->assertEquals($expectedData, $actualData, 'Sql Server Repeating Events testEnrollmentTable');
     }
 
     public function testEnrollmentView()
@@ -239,7 +255,7 @@ class RepatingEventsMysqlTest extends TestCase
 
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 
-        $this->assertEquals($expectedData, $actualData);
+        $this->assertEquals($expectedData, $actualData, 'Sql Server Repeating Events testEnrollmentView');
     }
 
     public function testHomeCardioVascularVisitsTable()
@@ -271,7 +287,11 @@ class RepatingEventsMysqlTest extends TestCase
 
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 
-        $this->assertEquals($expectedData, $actualData);
+        $this->assertEquals(
+            $expectedData,
+            $actualData,
+            'Sql Server Repeating Events testHomeCardioVascularVisitsTable'
+        );
     }
 
     public function testHomeWeightVisitsTable()
@@ -283,7 +303,7 @@ class RepatingEventsMysqlTest extends TestCase
             .', redcap_event_name '
             .', redcap_repeat_instrument '
             .', redcap_repeat_instance '
-            .", DATE_FORMAT(weight_time, '%Y-%m-%d %H:%i') as 'weight_time' "
+            .", FORMAT(weight_time, 'yyyy-MM-dd HH:mm') as 'weight_time' "
             .', weight_kg '
             .', height_m '
             .' FROM re_home_weight_visits ORDER BY record_id';
@@ -296,7 +316,7 @@ class RepatingEventsMysqlTest extends TestCase
 
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 
-        $this->assertEquals($expectedData, $actualData);
+        $this->assertEquals($expectedData, $actualData, 'Sql Server Repeating Events testHomeWeightVisitsTable');
     }
 
     public function testVisitsTable()
@@ -307,7 +327,7 @@ class RepatingEventsMysqlTest extends TestCase
             .', record_id '
             .', redcap_event_name '
             .', redcap_repeat_instance '
-            .", DATE_FORMAT(weight_time, '%Y-%m-%d %H:%i') as 'weight_time' "
+            .", FORMAT(weight_time, 'yyyy-MM-dd HH:mm') as 'weight_time' "
             .', weight_kg '
             .', height_m '
             .', cardiovascular_date '
@@ -330,7 +350,7 @@ class RepatingEventsMysqlTest extends TestCase
 
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 
-        $this->assertEquals($expectedData, $actualData);
+        $this->assertEquals($expectedData, $actualData, 'Sql Server Repeating Events testVisitsTable');
     }
 
 
@@ -343,7 +363,7 @@ class RepatingEventsMysqlTest extends TestCase
             .', redcap_event_name '
             .', redcap_repeat_instrument '
             .', redcap_repeat_instance '
-            .", DATE_FORMAT(weight_time, '%Y-%m-%d %H:%i') as 'weight_time' "
+            .", FORMAT(weight_time, 'yyyy-MM-dd HH:mm') as 'weight_time' "
             .', weight_kg '
             .', height_m '
             .', weight_complete '
@@ -368,6 +388,6 @@ class RepatingEventsMysqlTest extends TestCase
 
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 
-        $this->assertEquals($expectedData, $actualData);
+        $this->assertEquals($expectedData, $actualData, 'Sql Server Repeating Events testVisitsAndHomeVisitsTable');
     }
 }
