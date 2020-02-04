@@ -151,10 +151,8 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
     
         <input type="submit" value="Display" name="submitValue" style="margin-left: 7px;">
         
-        <span style="text-align: right; margin-left: 2em;">
         <input type="image" name="downloadButton" src="<?php echo APP_PATH_IMAGES.'download_csvexcel.gif'; ?>"
-               alt="CSV">
-        </span>
+               alt="CSV" style="vertical-align: middle; margin-left: 2em;">
     </div>
     <?php Csrf::generateFormToken(); ?>
 </form>

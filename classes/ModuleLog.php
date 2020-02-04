@@ -179,6 +179,12 @@ class ModuleLog
             ];
             
             $out = fopen('php://output', 'w');
+            fputcsv($out, ['REDCap-ETL Processes']);
+            fputcsv($out, ['']);
+            fputcsv($out, ['Start Date', $startDate]);
+            fputcsv($out, ['End Date', $endDate]);
+            fputcsv($out, ['']);
+                                    
             fputcsv($out, $header);
 
             $entries = $this->getData(self::ETL_RUN, $startDate, $endDate);
@@ -203,6 +209,7 @@ class ModuleLog
                 $csvEntry[$i++] = $entry['cron_hour'];
                 fputcsv($out, $csvEntry);
             }
+            fclose($out);
         } elseif ($logType === self::ETL_CRON) {
             header('Content-Disposition: attachment; filename=redcap-etl-cron-jobs.csv');
             
@@ -210,6 +217,12 @@ class ModuleLog
                 'Log ID', 'Time', 'Cron Day', 'Cron Hour', 'Jobs'
             ];
             $out = fopen('php://output', 'w');
+            fputcsv($out, ['REDCap-ETL Cron Jobs']);
+            fputcsv($out, ['']);
+            fputcsv($out, ['Start Date', $startDate]);
+            fputcsv($out, ['End Date', $endDate]);
+            fputcsv($out, ['']);
+            
             fputcsv($out, $header);
             
             $entries = $this->getData(self::ETL_CRON, $startDate, $endDate);
@@ -223,9 +236,8 @@ class ModuleLog
                 $csvEntry[$i++] = $entry['num_jobs'];
                 fputcsv($out, $csvEntry);
             }
+            fclose($out);
         }
-        
-        fclose($out);
     }
 
     /**
