@@ -35,6 +35,8 @@ $etlServerConfigUrl = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
 $embeddedServerConfigUrl =
     $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE.'?serverName='.ServerConfig::EMBEDDED_SERVER_NAME);
 
+$logUrl = $module->getUrl(RedCapEtlModule::LOG_PAGE);
+
 $adminConfig = $module->getAdminConfig();
 
 $redcapEtlImage = $module->getUrl('resources/redcap-etl.png');
@@ -142,7 +144,10 @@ The REDCap-ETL external module has the following admin pages:
     </li>
     <li><a href="<?php echo $etlServerConfigUrl;?>" style="font-weight: bold;">ETL Server Config</a>
     - ETL server configuration.
-    </li>     
+    </li>
+    <li><a href="<?php echo $logUrl;?>" style="font-weight: bold;">Log</a>
+    - Log of ETL processes and cron jobs.
+    </li> 
 </ul>    
 
 <?php require_once APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>
