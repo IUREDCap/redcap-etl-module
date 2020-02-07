@@ -189,6 +189,10 @@ try {
                 echo $properties[Configuration::TRANSFORM_RULES_TEXT];
                 return;
             } elseif (strcasecmp($submitValue, 'Auto-Generate') === 0) {
+                $formCompleteFields = false;
+                if (array_key_exists('formCompleteFields', $_POST)) {
+                    $formCompleteFields = true;
+                }
                 $apiUrl    = $configuration->getProperty(Configuration::REDCAP_API_URL);
                 $dataToken = $configuration->getProperty(Configuration::DATA_SOURCE_API_TOKEN);
 
@@ -245,7 +249,7 @@ try {
                     #}
                 
                     $rulesGenerator = new \IU\REDCapETL\RulesGenerator();
-                    $rulesText = $rulesGenerator->generate($dataProject);
+                    $rulesText = $rulesGenerator->generate($dataProject, $formCompleteFields);
                     $properties[Configuration::TRANSFORM_RULES_TEXT] = $rulesText;
                     #print "$rulesText\n";
                 }
@@ -675,23 +679,35 @@ Configuration form
                             name="<?php echo $rulesName;?>"><?php echo Filter::escapeForHtml($rules);?></textarea>
                     </td>
                     <td>
-                        <p><input type="submit" name="submitValue" value="Auto-Generate"></p>
-                        <p>
+                        <div>
+                            <input type="checkbox" name="formCompleteFields" 
+                                <?php
+                                if ($formCompleteFields) {
+                                    echo 'checked';
+                                }
+                                ?>
+                            >
+                            Generate Form Complete Fields <br/>
+                            <input type="submit" name="submitValue" value="Auto-Generate"></div>
+                        <hr style="margin: 7px 0px;"/>
+                        <div>
                             <button type="submit" value="Upload CSV file"
                                     name="submitValue" style="vertical-align: middle;">
                                 <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>" alt=""> Upload CSV file
                             </button>
                             <input type="file" name="uploadCsvFile" id="uploadCsvFile" style="display: inline;">
-                        </p>
-                        <p>
+                        </div>
+                        <hr style="margin: 7px 0px;"/>
+                        <div>
                             <button type="submit" value="Download CSV file" name="submitValue">
                                 <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>" alt=""
                                     style="vertical-align: middle;">
                                 <span  style="vertical-align: middle;"> Download CSV file</span>
 
                             </button>
-                        </p>
-                        <p>
+                        </div>
+                        <hr style="margin: 7px 0px;"/>
+                        <div>
                             <button type="submit" id="check-rules-button" value="Check Rules" name="submitValue">
                                 <div>
                                 <span class="fas fa-check-circle etl-rules-check-icon" 
@@ -699,13 +715,14 @@ Configuration form
                                 <span>Check Rules</span>
                                 </div>
                             </button>
-                        </p>                    
-                        <p>
+                        </div>
+                        <hr style="margin: 7px 0px;"/>           
+                        <div>
                             <a href="<?php echo $module->getUrl('web/transformation_rules.php');?>" target="_blank">
                                 <i class="fas fa-book"></i>
                                 Transformation Rules Guide
                             </a>
-                        </p>
+                        </div>
                     </td>
                 </tr>                
             </tbody>
