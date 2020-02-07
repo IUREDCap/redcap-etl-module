@@ -128,8 +128,8 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
     }
     ?>
     <div style="margin-bottom: 12px;">
-        Log Entries:
-        <select name="logType">
+        <label for="logType">Log Entries:</label>
+        <select name="logType" id="logType">
             <option value="<?php echo RedCapEtlModule::ETL_RUN?>" <?php echo $runSelected; ?> >
                 ETL Processes
             </option>

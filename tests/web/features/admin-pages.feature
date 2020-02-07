@@ -77,3 +77,8 @@ Feature: Admin-Interface
     And I should see "REDCap-ETL Servers"
     And I should see "Extract Transform Load"
 
+  Scenario: Access the admin log page
+    When I follow "Log"
+    Then I should see "REDCap-ETL Log"
+    And I should see "Log Entries:"
+
