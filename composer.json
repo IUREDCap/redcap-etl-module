@@ -23,6 +23,9 @@
         "psr-4" : {
             "IU\\RedCapEtlModule\\": [
                 "tests/unit"
+            ],
+            "ExternalModules\\": [
+                "tests/external"
             ]
         }
     }

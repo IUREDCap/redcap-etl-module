@@ -106,4 +106,61 @@ class ConfigurationTest extends TestCase
         $this->assertRegExp('/No API token specified/', $message, 'API Token message check');
         $properties[Configuration::API_TOKEN_USERNAME] = $originalValue;
     }
+
+
+    public function testValidateRedcapApiUrl()
+    {
+        $exceptionCaught = false;
+        try {
+            $result = Configuration::validateRedcapApiUrl("This is not a URL.");
+        } catch (\Exception $exception) {
+            $exceptionCaught = true;
+        }
+
+        $this->assertTrue($exceptionCaught, 'Invalid URL exception caught');
+    }
+
+
+    public function testValidateApiToken()
+    {
+        # Invalid characters
+        $exceptionCaught = false;
+        try {
+            $result = Configuration::validateApiToken("incorrect");
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
+            $exceptionCaught = true;
+        }
+
+        $this->assertTrue($exceptionCaught, 'Invalid characters caught');
+        $this->assertContains('should only contain', $message, 'Invalid characters message');
+
+        # Invalid length
+        $exceptionCaught = false;
+        try {
+            $result = Configuration::validateApiToken("123456789012345678901234567890");
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
+            $exceptionCaught = true;
+        }
+
+        $this->assertTrue($exceptionCaught, 'Invalid length caught');
+        $this->assertContains('length of', $message, 'Invalid length message');
+    }
+
+
+    public function testValidateBatchSize()
+    {
+        # Negative batch size
+        $exceptionCaught = false;
+        try {
+            $result = Configuration::validateBatchSize(-10);
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
+            $exceptionCaught = true;
+        }
+
+        $this->assertTrue($exceptionCaught, 'Invalid batch size caught');
+        $this->assertContains('positive integer', $message, 'Invalid batch size message');
+    }
 }
