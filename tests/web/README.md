@@ -52,8 +52,8 @@ Clear any previous coverage data:
 Set coverage code to run at the beginning and end of each request. You need to set the following
 PHP properties as follows:
 
-    * **auto_prepend_file** - should be set to the full path of the start_coverage.php script in this directory
-    * **auto_append_file** - should be set to the full path of the end_coverage.php script in this directory
+* **auto_prepend_file** - should be set to the full path of the start_coverage.php script in this directory
+* **auto_append_file** - should be set to the full path of the end_coverage.php script in this directory
 
 The easiest way to do this is to set these in the php.ini file for the web server running REDCap.
 The scripts are designed to only collect test coverage data for the web tests.
@@ -96,8 +96,8 @@ Then to update the coverage/index.php file, you need to re-run the combine_cover
 
 Similarly, you can also add manual test coverage data by setting the 'code-coverage-id' cookie in your browser, and then going through your tests in that browser. For example, in Chrome:
 
-    * Enter <CTRL><SHIFT>J to bring up the developer tools console
-    * In the web console, enter:
+* Enter &lt;CTRL&gt;&lt;SHIFT&gt;J to bring up the developer tools console
+* In the web console, enter:
 
         document.cookie="code-coverage-id=manual"
 
