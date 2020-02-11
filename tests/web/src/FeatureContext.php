@@ -505,4 +505,16 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         $session = $this->getSession();
         Util::mailinator($session, $emailPrefix);
     }
+
+    /**
+     * @When /^I run the cron process$/
+     */
+    public function iRunTheCronProcess()
+    {
+        # WORK IN PROGRESS
+        # Need to do 2 things: reset the last cron runtime, so the process will run
+        # Access the cron script (can access through http)
+        $session = $this->getSession();
+        Util::mailinator($session, $emailPrefix);
+    }
 }

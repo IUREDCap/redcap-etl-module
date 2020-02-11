@@ -12,14 +12,14 @@ Feature: Admin Log
     Given I am on "/"
     When I access the admin interface
 
-  Scenario: Use the admin log page
+  Scenario: Use the admin log page to see cron jobs
     When I follow "Log"
     And I select "Cron Jobs" from "Log Entries:"
     And I press "Display"
     Then I should see "Cron Jobs"
     Then I should see table headers "Log ID", "Time", "Day", "Hour", "# Jobs"
 
-  Scenario: Use the admin log page
+  Scenario: Use the admin log page to see ETL processes
     When I follow "Log"
     And I select "ETL Processes" from "Log Entries:"
     And I press "Display"

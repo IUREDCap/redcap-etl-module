@@ -191,4 +191,10 @@ class Util
         $page->fillField('inboxfield', $emailPrefix);
         $page->pressButton('Go!');
     }
+
+    public static function runCron($session)
+    {
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
+        $baseUrl  = $testConfig->getRedCap()['base_url'];
+    }
 }
