@@ -49,4 +49,50 @@ class ModuleLogTest extends TestCase
         ];
         $this->assertEquals($expectedParams, $params, 'Params check');
     }
+    
+    public function testLogEtlRun()
+    {
+        $moduleLog = new ModuleLog($this->moduleMock);
+
+        $message    = 'ETL run';
+        $projectId  = 123;
+        $username   = 'etluser';
+        $isCronJob  = false;
+        $configName = 'export';
+        $serverName = '(embedded)';
+        $cronJobLogId = '456';
+        $cronDay = 2;
+        $cronHour = 14;
+
+        $logId = $moduleLog->logEtlRun(
+            $projectId,
+            $username,
+            $isCronJob,
+            $configName,
+            $serverName,
+            $cronJobLogId,
+            $cronDay,
+            $cronHour
+        );
+        
+        $entry = $this->moduleMock->getLogEntry($logId);
+        $this->assertNotNull($entry, 'Log entry found');
+        
+        $this->assertEquals($message, $entry['message'], 'Message check');
+        
+        $params = $entry['params'];
+        $expectedParams = [
+            'log_type'           => ModuleLog::ETL_RUN,
+            'log_format_version' => ModuleLog::LOG_FORMAT_VERSION,
+            'project_id'         => $projectId,
+            'etl_username'       => $username,
+            'cron'               => $isCronJob,
+            'cron_job_log_id'    => $cronJobLogId,
+            'cron_day'           => $cronDay,
+            'cron_hour'          => $cronHour,
+            'config'             => $configName,
+            'etl_server'         => $serverName
+        ];
+        $this->assertEquals($expectedParams, $params, 'Params check');
+    }
 }

@@ -61,35 +61,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $this->moduleLog = new ModuleLog($this);
         parent::__construct();
     }
-    
-    # Commented out code below so that link will be displayed by default rules.
-    # The module code will check for additional required permissions if the
-    # link is clicked and display an appropriate message.
-    # This should lessen the chance that users do not see a REDCap-ETL
-    # module link and have no idea why.
-#    // phpcs:disable
-#    /**
-#     * Method that determines if the REDCap-ETL link is displayed for
-#     * the user on project pages.
-#     */
-#    public function redcap_module_link_check_display($project_id, $link)
-#    {
-#        if (SUPER_USER) {
-#            return $link;
-#        }
-#
-#        # If you are in a project (vs. being on admin page) and you have permissions
-#        # to use REDCap-ETL on the page, then return the REDCap-ETL link (so that it
-#        # can be displayed)
-#        if (!empty($project_id) && Authorization::hasRedCapUserRightsForEtl($this, USERID)) {
-#            return $link;
-#        }
-#
-#        return null;
-#    }
-#    // phpcs:enable
 
-        
+
     /**
      * Returns REDCap user rights for the current project.
      *
@@ -492,15 +465,15 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     #    return $this->settings->hasEtlUser($projectId);
     #}
     
-    /**
-     * Gets the current username.
-     *
-     * @return string the username of the current user.
-     */
-    public function getUsername()
-    {
-        return USERID;
-    }
+    #/**
+    # * Gets the current username.
+    # *
+    # * @return string the username of the current user.
+    # */
+    #public function getUsername()
+    #{
+    #    return USERID;
+    #}
     
     public function isSuperUser()
     {

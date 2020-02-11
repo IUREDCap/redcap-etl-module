@@ -9,26 +9,9 @@ namespace IU\RedCapEtlModule;
 /**
  * Mock of RedCapEtlModule
  */
-class ModuleMock
+class ModuleMock extends \ExternalModules\AbstractExternalModule
 {
-    private $log;
-    private $index;
-
     public function __construct()
     {
-        $this->log = array();
-        $this->index = 0;
-    }
-
-    public function log($message, $params)
-    {
-        $this->index++;
-        $this->log[$this->index] = array('message' => $message, 'params' => $params);
-        return $this->index;
-    }
-
-    public function getLogEntry($index)
-    {
-        return $this->log[$index];
     }
 }
