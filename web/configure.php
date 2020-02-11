@@ -130,7 +130,11 @@ try {
                 # An API token user was specified
                 if (!array_key_exists($apiTokenUser, $apiTokens)) {
                     $warning = 'WARNING: user "'.$apiTokenUser.'" does not'
-                        .' have an API token for this project. API token user reset to blank.';
+                        .' have a valid API token for using ETL with this project.'
+                        .' The user must have an API token with export rights,'
+                        .' have "Full Data Set" export privilege, '
+                        .' and not belong to a DAG (Data Access Group).'
+                        .' API token user reset to blank.';
                     # The API token user does not have a valid API token, so set it to blank
                     $configuration->setProperty(Configuration::API_TOKEN_USERNAME, '');
                     $configuration->setProperty(Configuration::DATA_SOURCE_API_TOKEN, '');

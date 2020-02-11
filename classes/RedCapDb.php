@@ -62,7 +62,8 @@ class RedCapDb
     
     
     /**
-     * Gets the API tokens for the specified project and data export right.
+     * Gets the API tokens for the specified project and data export right
+     * for users who have API export permissions and not in a DAG (Data Access Group).
      *
      * @param int $projectId the ID for the REDCap project for which the API tokens
      *     are being retrieved.
@@ -83,6 +84,7 @@ class RedCapDb
             ." and api_export = 1 "                          // @codeCoverageIgnore
             ." and api_token is not null "                   // @codeCoverageIgnore
             ." and data_export_tool = ".((int) $exportRight) // @codeCoverageIgnore
+            ." and group_id is null"                         // @codeCoverageIgnore
             ;
         
         $queryResult = db_query($sql);
