@@ -95,10 +95,10 @@ class Help
             ." You need to have an API token for your project that REDCap-ETL can use."
             ."</p>"
             ."<p>"
-            ."If an API token with the correct data export permission already exists for the project,"
-            ." there should be at least one username in the API token drop-down. If there are none,"
-            ." then a user who has the same data export permission as the configuration will"
-            ." need to request one."
+            ."If an API token with full data set export permission already exists for the project,"
+            ." then there should be at least one username in the API token drop-down. If there are none,"
+            ." then a user who has full data set export permission will"
+            ." need to request an API token with export rights."
             ."</p>"
         ,
         'label-view-suffix' =>
