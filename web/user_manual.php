@@ -172,12 +172,24 @@ There are 2 basic ways to run REDCap-ETL:
 </p>
 <div style="max-width: 800px;">
 <ol>
-    <li><strong>On Demand</strong> - You can run an ETL process on demand
+    <li><strong>On Demand</strong> 
+    <?php
+    if (!$adminConfig->getAllowOnDemand()) {
+        echo ' <span style="color: red">(disabled)</span> ';
+    }
+    ?>
+    - You can run an ETL process on demand
     by going to the <strong>Run</strong>
     tab, selecting an ETL server and an ETL configuration, and clicking on the <strong>Run</strong>
     button.
     </li>
-    <li><strong>Scheduled</strong> - You can use the <strong>Schedule</strong> tab to schedule an ETL
+    <li><strong>Scheduled</strong>
+    <?php
+    if (!$adminConfig->getAllowCron()) {
+        echo ' <span style="color: red">(disabled)</span> ';
+    }
+    ?>
+    - You can use the <strong>Schedule</strong> tab to schedule an ETL
     job to run at specified times each week. For a given configuration, you can specify one hour per
     day of the week for the job to run.
     </li>

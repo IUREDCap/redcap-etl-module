@@ -460,21 +460,7 @@ $(function() {
     })
 });    
 
-// Show/hide Db Password
-$(function() {
-    $("#showDbPassword").change(function() {
-        var newType = 'password';
-        if ($(this).is(':checked')) {
-            newType = 'text';
-        }
-        $("#dbPassword").each(function(){
-            $("<input type='" + newType + "'>")
-                .attr({ id: this.id, name: this.name, value: this.value, size: this.size, style: this.style })
-                .insertBefore(this);
-        }).remove();       
-    })
-});
-    
+
 </script>
 
 
@@ -811,8 +797,6 @@ Configuration form
                         <input type="password" name="<?php echo Configuration::DB_PASSWORD;?>"
                             value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_PASSWORD])?>"
                             id="dbPassword"/>
-                        <input type="checkbox" id="showDbPassword" style="vertical-align: middle; margin: 0;">
-                        <span style="vertical-align: middle;">Show</span>
                     </td>
                 </tr>
             </tbody>
