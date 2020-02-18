@@ -105,7 +105,7 @@ class RedCapDb
 
         $etlConfigs = array();
         $sql = "select rems.* "
-            ." from redcap.redcap_external_modules rem, redcap.redcap_external_module_settings rems "
+            ." from redcap_external_modules rem, redcap_external_module_settings rems "
             ." where rem.external_module_id = rems.external_module_id "
             ." and '".Filter::escapeForMySql($dirName)."' like concat(rem.directory_prefix, '%') "
             ." and `key` like 'configuration:%'" // @codeCoverageIgnore
