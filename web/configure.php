@@ -1041,7 +1041,7 @@ echo '<div id ="parse-result" style="display: none;" title="Transformation Rules
 echo '<div '.$class.'>'."\n";
 echo '<strong>Status: '.$status."</strong>\n";
 echo '</div><br/>'."\n";
-echo $parseMessages."\n";
+echo Filter::escapeForHtml($parseMessages)."\n";
 echo '</div>'."\n";
 
 if (!empty($parseResult)) {

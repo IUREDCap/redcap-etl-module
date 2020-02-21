@@ -227,14 +227,14 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     echo "<td>".$entry['timestamp']."</td>\n";
 
                     echo '<td style="text-align: right;">'.'<a href="'.$projectUrl.'">'.$projectId."</a></td>\n";
-                    echo "<td>".'<a href="'.$serverUrl.'">'.$server.'</a>'."</td>\n";
-                    echo "<td>".'<a href="'.$configUrl.'">'.$config.'</a>'."</td>\n";
+                    echo "<td>".'<a href="'.$serverUrl.'">'.Filter::escapeForHtml($server).'</a>'."</td>\n";
+                    echo "<td>".'<a href="'.$configUrl.'">'.Filter::escapeForHtml($config).'</a>'."</td>\n";
                     
                     #--------------------------------------------
                     # User info (not available for cron jobs)
                     #--------------------------------------------
                     echo '<td style="text-align: right;">'.$entry['ui_id']."</td>\n";
-                    echo "<td>".$entry['etl_username']."</td>\n";
+                    echo "<td>".Filter::escapeForHtml($entry['etl_username'])."</td>\n";
                     
                     #-------------------------------------
                     # Cron info

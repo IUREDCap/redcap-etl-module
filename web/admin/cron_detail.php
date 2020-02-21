@@ -173,25 +173,6 @@ $times = $adminConfig->getTimeLabels();
 <!-- </form>
 -->
 
-<?php
-
-/*
-if (isset($exception)) {
-    echo "<div>\n";
-    echo "<pre>\n";
-    echo "Message: ".$exception->getMessage()."\n";
-    echo $exception->getTraceAsString()."\n";
-    $previous = $exception->getPrevious();
-    if (isset($previous)) {
-        echo "Previous: ".$previous->getMessage()."\n";
-    }
-    echo "</pre>\n";
-    echo "</div>\n";
-}
- */
-
-?>
-
 <div id="popup" style="display: none;"></div>
 
 
