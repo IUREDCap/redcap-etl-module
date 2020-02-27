@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
-files=( "./web/user_manual.php" "./web/admin/info.php" );
+files=( "./README.md" "./web/user_manual.php" "./web/admin/info.php" );
 
 for file in "${files[@]}"
 do
@@ -22,6 +22,7 @@ do
         | sed 's/github//g;' \
         | sed 's/https//g;' \
         | sed 's/IU//g;' \
+        | sed 's/MySQL//g;' \
         | sed 's/<\?php//g;' \
         | sed 's/\.png//g;' \
         | sed 's/redcap-etl//g;' \
