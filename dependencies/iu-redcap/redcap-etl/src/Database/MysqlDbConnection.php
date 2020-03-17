@@ -182,6 +182,7 @@ class MysqlDbConnection extends DbConnection
                     }
                     break;
 
+                case FieldType::CHECKBOX:
                 case FieldType::INT:
                     $fieldDef .= 'INT';
                     break;
@@ -228,6 +229,28 @@ class MysqlDbConnection extends DbConnection
         }
 
         return(1);
+    }
+
+
+    public function dropLabelView($table, $ifExists = false)
+    {
+        $view = ($table->name).($this->labelViewSuffix);
+
+        // Define query
+        if ($ifExists) {
+            $query = "DROP VIEW IF EXISTS ". $this->escapeName($view);
+        } else {
+            $query = "DROP VIEW ". $this->escapeName($view);
+        }
+        
+        // Execute query
+        $result = $this->mysqli->query($query);
+        if ($result === false) {
+            $message = 'MySQL error in query "'.$query.'"'
+                .' ['.$this->mysqli->errno.']: '.$this->mysqli->error;
+            $code = EtlException::DATABASE_ERROR;
+            throw new EtlException($message, $code);
+        }
     }
 
 

@@ -15,9 +15,10 @@ use IU\REDCapETL\Schema\Table;
 /**
  * Database connection class for SQL Server databases.
  */
-class SqlServerDbConnection extends PdoDbConnection
+class PostgreSqlDbConnection extends PdoDbConnection
 {
-    const AUTO_INCREMENT_TYPE = 'INT NOT NULL IDENTITY(0,1) PRIMARY KEY';
+    const AUTO_INCREMENT_TYPE = 'SERIAL PRIMARY KEY';
+    const DATETIME_TYPE       = 'timestamptz';
 
     public function __construct($dbString, $ssl, $sslVerify, $caCertFile, $tablePrefix, $labelViewSuffix)
     {
@@ -25,23 +26,30 @@ class SqlServerDbConnection extends PdoDbConnection
 
         // Initialize error string
         $this->errorString = '';
+        
         $this->db = self::getPdoConnection($dbString, $ssl, $sslVerify, $caCertFile);
     }
-
+ 
     public static function getPdoConnection($dbString, $ssl, $sslVerify, $caCertFile)
     {
+        $pdoConnection = null;
+        
         #--------------------------------------------------------------
         # Get the database connection values
         #--------------------------------------------------------------
-        $driver  = 'sqlsrv';
+        $driver  = 'pgsql';
 
         $dbValues = DbConnection::parseConnectionString($dbString);
 
-        $port = null;
+        $schema = null;
+        $port   = null;
+
         if (count($dbValues) == 4) {
             list($host,$username,$password,$database) = $dbValues;
         } elseif (count($dbValues) == 5) {
-            list($host,$username,$password,$database,$port) = $dbValues;
+            list($host,$username,$password,$database,$schema) = $dbValues;
+        } elseif (count($dbValues) == 6) {
+            list($host,$username,$password,$database,$schema, $port) = $dbValues;
             $port = intval($port);
         } else {
             $message = 'The database connection is not correctly formatted: ';
@@ -56,56 +64,58 @@ class SqlServerDbConnection extends PdoDbConnection
       
         if (empty($port)) {
             $port = null;
-            #$port = 1433; not using the default port for SQL Server; allowing it to be null
         } else {
             $host .= ",$port";
-            #print "host has been changed to $host" . PHP_EOL;
         }
         
-        $dataSourceName = "{$driver}:server={$host};Database={$database}";
+        $dataSourceName = "{$driver}:host={$host};dbname={$database}";
         if ($ssl) {
-            $dataSourceName .= ";Encrypt=1";
+            $dataSourceName .= ";sslmode=require";
             if ($sslVerify) {
-                #set the attribute to verify the certificate, i.e., TrustServerCertificate is false.
-                $dataSourceName .= ";TrustServerCertificate=false";
+                # set the attribute to verify the certificate
+                $dataSourceName .= ";sslrootcert={$caCertFile}";
             } else {
-                #set the attribute to so that the cert is not verified,
-                #i.e., TrustServerCertificate is true.
-                $dataSourceName .= ";TrustServerCertificate=true";
+                ;
             }
         }
 
         $options = [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::SQLSRV_ATTR_ENCODING => \PDO::SQLSRV_ENCODING_UTF8
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION #,
+            # \PDO::SQLSRV_ATTR_ENCODING => \PDO::SQLSRV_ENCODING_UTF8
         ];
 
         try {
             $pdoConnection = new \PDO($dataSourceName, $username, $password, $options);
+
+            # Set schema:
+            if (!empty($schema)) {
+                $sql = 'SET search_path TO '.self::escapeNameStatically($schema);
+                $pdoConnection->exec($sql);
+            }
         } catch (\Exception $exception) {
-            $message = 'Database connection error for database "'.$database.'": '.$exception->getMessage();
+            $message = 'Database connection error on host "'.$host.'"'
+                .' for PostgeSQL database "'.$database.'"';
+            if (!empty($schema)) {
+                $message .= ' and schema "'.$schema.'"';
+            }
+            $message .= ' for user "'.$username.'"';
+            $message .= ': '.$exception->getMessage();
             $code = EtlException::DATABASE_ERROR;
             throw new EtlException($message, $code);
         }
-
+        
         return $pdoConnection;
     }
- 
-
-    protected function getCreateTableIfNotExistsQueryPrefix($tableName)
-    {
-        $query = 'IF NOT EXISTS (SELECT [name] FROM sys.tables ';
-        $query .= "WHERE [name] = " . $this->db->quote($tableName) . ') ';
-        $query .= 'CREATE TABLE ' . $this->escapeName($tableName) . ' (';
-        return $query;
-    }
-
-
+    
     protected function escapeName($name)
     {
-        $name = str_replace('[', '', $name);
-        $name = str_replace(']', '', $name);
-        $name = '['.$name.']';
+        $name = self::escapeNameStatically($name);
+        return $name;
+    }
+    
+    protected static function escapeNameStatically($name)
+    {
+        $name = '"'.(str_replace('"', '', $name)).'"';
         return $name;
     }
 }

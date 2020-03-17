@@ -45,17 +45,17 @@
     },
     {
         "name": "iu-redcap/redcap-etl",
-        "version": "1.3.4",
-        "version_normalized": "1.3.4.0",
+        "version": "1.4.0",
+        "version_normalized": "1.4.0.0",
         "source": {
             "type": "git",
-            "url": "git@github.com:IUREDCap/redcap-etl.git",
-            "reference": "f8469ff9e1e769524a8e8c8b4e1c95a9137aa297"
+            "url": "https://github.com/IUREDCap/redcap-etl.git",
+            "reference": "a544a619051d781971094c265fc2963bffd50dc1"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/f8469ff9e1e769524a8e8c8b4e1c95a9137aa297",
-            "reference": "f8469ff9e1e769524a8e8c8b4e1c95a9137aa297",
+            "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/a544a619051d781971094c265fc2963bffd50dc1",
+            "reference": "a544a619051d781971094c265fc2963bffd50dc1",
             "shasum": ""
         },
         "require": {
@@ -71,7 +71,7 @@
             "phpunit/phpunit": "6.5.8",
             "squizlabs/php_codesniffer": "3.2.3"
         },
-        "time": "2020-02-07T16:24:25+00:00",
+        "time": "2020-03-17T13:43:38+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -91,17 +91,17 @@
     },
     {
         "name": "phpseclib/phpseclib",
-        "version": "2.0.23",
-        "version_normalized": "2.0.23.0",
+        "version": "2.0.25",
+        "version_normalized": "2.0.25.0",
         "source": {
             "type": "git",
             "url": "https://github.com/phpseclib/phpseclib.git",
-            "reference": "c78eb5058d5bb1a183133c36d4ba5b6675dfa099"
+            "reference": "c18159618ed7cd7ff721ac1a8fec7860a475d2f0"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/c78eb5058d5bb1a183133c36d4ba5b6675dfa099",
-            "reference": "c78eb5058d5bb1a183133c36d4ba5b6675dfa099",
+            "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/c18159618ed7cd7ff721ac1a8fec7860a475d2f0",
+            "reference": "c18159618ed7cd7ff721ac1a8fec7860a475d2f0",
             "shasum": ""
         },
         "require": {
@@ -119,7 +119,7 @@
             "ext-mcrypt": "Install the Mcrypt extension in order to speed up a few other cryptographic operations.",
             "ext-openssl": "Install the OpenSSL extension in order to speed up a wide variety of cryptographic operations."
         },
-        "time": "2019-09-17T03:41:22+00:00",
+        "time": "2020-02-25T04:16:50+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
