@@ -370,7 +370,22 @@ echo $buffer;
                 return false;
             });
         });
+        
+        // Database schema display
+        $(function() {
+        $("select[name=<?php echo Configuration::DB_TYPE;?>]").change(function() {
+            var value = $(this).val();
+            if (value == "<?php echo DbConnectionFactory::DBTYPE_POSTGRESQL; ?>") {
+                $("#dbSchemaRow").show();
+            } else {
+                $("#dbSchemaRow").hide();
+            }
+        });
+            
     });
+    
+
+});
 </script>
 
 <div class="projhdr"> 
@@ -791,9 +806,16 @@ Configuration form
                     <td><input type="text" name="<?php echo Configuration::DB_NAME;?>"
                         value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_NAME])?>"></td>
                 </tr>
+                
+                <?php
+                $dbSchemaStyle = '';
+                if ($properties[Configuration::DB_TYPE] !== DbConnectionFactory::DBTYPE_POSTGRESQL) {
+                    $dbSchemaStyle = ' style="display: none;" ';
+                }
+                ?>
 
                 <!-- DATABASE SCHEMA -->
-                <tr>
+                <tr id="dbSchemaRow" <?php echo $dbSchemaStyle; ?> >
                     <td>Database schema</td>
                     <td><input type="text" name="<?php echo Configuration::DB_SCHEMA;?>"
                         value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_SCHEMA])?>"></td>
