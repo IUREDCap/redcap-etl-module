@@ -38,7 +38,8 @@ class Configuration implements \JsonSerializable
     const DB_TYPE = 'db_type';
     const DB_HOST = 'db_host';
     const DB_PORT = 'db_port';
-    const DB_NAME = 'db_name';
+    const DB_NAME   = 'db_name';
+    const DB_SCHEMA = 'db_schema';
     const DB_USERNAME = 'db_username';
     const DB_PASSWORD = 'db_password';
 
@@ -142,6 +143,12 @@ class Configuration implements \JsonSerializable
             } elseif ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_SQLSERVER) {
                 if (!extension_loaded('sqlsrv') || !extension_loaded('pdo_sqlsrv')) {
                     $message = 'The extensions for running SQL Server (sqlsrv and/or pdo_sqlsrv)'
+                        . ' have not been enabled.';
+                    throw new \Exception($message);
+                }
+            } elseif ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_POSTGRESQL) {
+                if (!extension_loaded('pgsql') || !extension_loaded('pdo_pgsql')) {
+                    $message = 'The extensions for running PostgreSQL (pgsql and/or pdo_pgsql)'
                         . ' have not been enabled.';
                     throw new \Exception($message);
                 }
@@ -383,10 +390,15 @@ class Configuration implements \JsonSerializable
             # to be set to the default value (MySQL).
             $dbType = \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_MYSQL;
         }
+        
+        if (!array_key_exists(self::DB_SCHEMA, $properties)) {
+            $properties[self::DB_SCHEMA] = '';
+        }
 
-        $dbHost = $properties[self::DB_HOST];
-        $dbPort = $properties[self::DB_PORT];
-        $dbName = $properties[self::DB_NAME];
+        $dbHost   = $properties[self::DB_HOST];
+        $dbPort   = $properties[self::DB_PORT];
+        $dbName   = $properties[self::DB_NAME];
+        $dbSchema = $properties[self::DB_SCHEMA];
         
         $dbUsername = $properties[self::DB_USERNAME];
         $dbPassword = $properties[self::DB_PASSWORD];
@@ -395,11 +407,16 @@ class Configuration implements \JsonSerializable
         # Set the database connection string
         # Note: the MySQL server port number, which defaults to 3306, can be included in dbHost value also
         #--------------------------------------------------------------------------------------------------
-        if (empty($dbPort)) {
-            $dbConnectionValues = [$dbType, $dbHost, $dbUsername, $dbPassword, $dbName];
-        } else {
-            $dbConnectionValues = [$dbType, $dbHost, $dbUsername, $dbPassword, $dbName, $dbPort];
+        $dbConnectionValues = [$dbType, $dbHost, $dbUsername, $dbPassword, $dbName];
+        
+        if ($dbType == \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_POSTGRESQL && !empty($dbSchema)) {
+            array_push($dbConnectionValues, $dbSchema);
         }
+        
+        if (!empty($dbPort)) {
+            array_push($dbConnectionValues, $dbPort);
+        }
+        
         $dbConnection = \IU\REDCapETL\Database\DbConnection::createConnectionString($dbConnectionValues);
         $this->properties[self::DB_CONNECTION] = $dbConnection;
     }

@@ -740,6 +740,16 @@ Configuration form
                             <option value="<?php echo $dbType; ?>" <?php echo $selected; ?> >MySQL</option>
 
                             <?php
+                            # PostgreSQL database type option
+                            $dbType = DbConnectionFactory::DBTYPE_POSTGRESQL;
+                            $selected = '';
+                            if ($properties[Configuration::DB_TYPE] === $dbType) {
+                                $selected = ' selected ';
+                            }
+                            ?>
+                            <option value="<?php echo $dbType; ?>" <?php echo $selected; ?> >PostgreSQL</option>
+
+                            <?php
                             # SQL Server database type option
                             $dbType = DbConnectionFactory::DBTYPE_SQLSERVER;
                             $selected = '';
@@ -780,6 +790,13 @@ Configuration form
                     <td>Database name</td>
                     <td><input type="text" name="<?php echo Configuration::DB_NAME;?>"
                         value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_NAME])?>"></td>
+                </tr>
+
+                <!-- DATABASE SCHEMA -->
+                <tr>
+                    <td>Database schema</td>
+                    <td><input type="text" name="<?php echo Configuration::DB_SCHEMA;?>"
+                        value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_SCHEMA])?>"></td>
                 </tr>
 
                 <!-- DATABASE USERNAME -->

@@ -44,8 +44,9 @@ To use REDCap-ETL on a project, you need the following:
     To be able to request an API token with export
     permission, you need to have the REDCap user right "API Export".
 * **Database Account.** An account for a database where the data can be loaded.
-    The REDCap-ETL external module currently supports MySQL and SQL Server.
-    The account has to have at least the following permissions:
+    The REDCap-ETL external module currently supports the following
+    databases: MySQL, PostgreSQL and SQL Server.
+    The database account has to have at least the following permissions:
     * SELECT
     * INSERT
     * CREATE
