@@ -25,6 +25,7 @@ do
         | sed 's/MySQL//g;' \
         | sed 's/<\?php//g;' \
         | sed 's/\.png//g;' \
+        | sed 's/PostgreSQL//g;' \
         | sed 's/redcap-etl//g;' \
         | sed 's/REDCap-ETL//g;' \
         | sed 's/REDCap//g;' \
