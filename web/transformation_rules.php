@@ -275,47 +275,74 @@ the database types used to store the different REDCap-ETL types.</p>
 <tr>
 <th>REDCap-ETL Type</th>
 <th>MySQL Type</th>
+<th>PostgreSQL Type</th>
+<th>SQL Server Type</th>
+<th>SQLite Type</th>
 <th>CSV (Spreadsheet) Type</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td><strong>int</strong></td>
+<td>int</td>
+<td>int</td>
 <td>int</td>
 <td>int</td>
 <td>number</td>
 </tr>
 <tr>
+<td><strong>float</strong></td>
+<td>float</td>
+<td>float</td>
 <td>float</td>
 <td>float</td>
 <td>number</td>
 </tr>
 <tr>
+<td><strong>char(<em>size</em>)</strong></td>
+<td>char(<em>size</em>)</td>
+<td>char(<em>size</em>)</td>
 <td>char(<em>size</em>)</td>
 <td>char(<em>size</em>)</td>
 <td>text</td>
 </tr>
 <tr>
+<td><strong>varchar(<em>size</em>)</strong></td>
+<td>varchar(<em>size</em>)</td>
+<td>varchar(<em>size</em>)</td>
 <td>varchar(<em>size</em>)</td>
 <td>varchar(<em>size</em>)</td>
 <td>text</td>
 </tr>
 <tr>
-<td>string</td>
+<td><strong>string</strong></td>
+<td>text</td>
+<td>text</td>
+<td>text</td>
 <td>text</td>
 <td>text</td>
 </tr>
 <tr>
+<td><strong>date</strong></td>
+<td>date</td>
+<td>date</td>
 <td>date</td>
 <td>date</td>
 <td>datetime</td>
 </tr>
 <tr>
+<td><strong>datetime</strong></td>
+<td>datetime</td>
+<td>timestamptz</td>
 <td>datetime</td>
 <td>datetime</td>
 <td>datetime</td>
 </tr>
 <tr>
-<td>checkbox</td>
+<td><strong>checkbox</strong></td>
+<td>int</td>
+<td>int</td>
+<td>int</td>
 <td>int</td>
 <td>number</td>
 </tr>
