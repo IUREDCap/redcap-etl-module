@@ -24,7 +24,7 @@ class Configuration
     # Transform rules source values
     const TRANSFORM_RULES_TEXT    = '1';
     const TRANSFORM_RULES_FILE    = '2';
-    const TRANSFORM_RULES_DEFAULT = '3';
+    const TRANSFORM_RULES_DEFAULT = '3';     // Auto-generate default rules
 
     # Default values
     const DEFAULT_BATCH_SIZE          = 100;
@@ -71,8 +71,6 @@ class Configuration
 
     private $cronJob;
         
-    private $dataExportFilter;
-
     private $dataSourceApiToken;
     private $dbConnection;
     private $dbSsl;
@@ -661,14 +659,6 @@ class Configuration
             }
         }
 
-        #-------------------------------------------------
-        # Process the data export filter property
-        #-------------------------------------------------
-        $this->dataExportFilter = null;
-        if (array_key_exists(ConfigProperties::DATA_EXPORT_FILTER, $this->properties)) {
-            $this->dataExportFilter = trim($this->properties[ConfigProperties::DATA_EXPORT_FILTER]);
-        }
-
         return true;
     }
 
@@ -989,11 +979,6 @@ class Configuration
         return $this->cronJob;
     }
     
-    public function getDataExportFilter()
-    {
-        return $this->dataExportFilter;
-    }
-
     public function getDataSourceApiToken()
     {
         return $this->dataSourceApiToken;
