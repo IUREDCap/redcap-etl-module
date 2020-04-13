@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 define('USERID', 'testuser');
 define('PROJECT_ID', 123);
-define('APP_PATH_WEBROOT_FULL', '/var/www/html/redcap/');
+define('APP_PATH_WEBROOT_FULL', 'http://localhost/redcap/');
 
 class ConfigurationTest extends TestCase
 {

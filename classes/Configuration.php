@@ -91,7 +91,7 @@ class Configuration implements \JsonSerializable
         }
 
         # Set non-blank defaults
-        $this->properties[self::REDCAP_API_URL] = APP_PATH_WEBROOT_FULL.'api/';
+        $this->properties[self::REDCAP_API_URL] = RedCapEtlModule::getRedCapApiUrl();
         $this->properties[self::SSL_VERIFY]     = true;
          
         $this->properties[self::API_TOKEN_USERNAME] = '';
@@ -367,6 +367,9 @@ class Configuration implements \JsonSerializable
         foreach (self::getPropertyNames() as $name) {
             if (array_key_exists($name, $properties)) {
                 if (in_array($name, $flags)) {
+                    #------------------------------------------
+                    # If this is a flag (boolean) property
+                    #------------------------------------------
                     $value = $properties[$name];
                     if ($value === true || $value === 'true' || $value === 'on') {
                         $this->properties[$name] = true;
@@ -374,7 +377,18 @@ class Configuration implements \JsonSerializable
                         $this->properties[$name] = false;
                     }
                 } else {
-                    $this->properties[$name] = $properties[$name];
+                    # If this is a non-boolean property
+                    @$testMode = file_exists(__DIR__.'/../test-config.ini');
+                    if ($name === Configuration::REDCAP_API_URL && (!isset($testMode) || !$testMode)) {
+                        #---------------------------------------------------------------
+                        # If this is the REDCap API URL property, set it to the API URL
+                        # for the current server, unless test mode is being used, so
+                        # that this module can be migrated or cloned to a new server
+                        #--------------------------------------------------------------
+                        $this->properties[$name] = RedCapEtlModule::getRedCapApiUrl();
+                    } else {
+                        $this->properties[$name] = $properties[$name];
+                    }
                 }
             } else {
                 if (in_array($name, $flags)) {
