@@ -21,7 +21,7 @@
     "compatibility": {
       "php-version-min": "5.6.0",
       "php-version-max": "",
-      "redcap-version-min": "7.0.0",
+      "redcap-version-min": "8.0.0",
       "redcap-version-max": ""
     },
     "links": {
