@@ -197,6 +197,17 @@ try {
                 if (array_key_exists('formCompleteFields', $_POST)) {
                     $formCompleteFields = true;
                 }
+                
+                $dagFields = false;
+                if (array_key_exists('dagFields', $_POST)) {
+                    $dagFields = true;
+                }
+                
+                $fileFields = false;
+                if (array_key_exists('fileFields', $_POST)) {
+                    $fileFields = true;
+                }
+                                
                 $apiUrl    = $configuration->getProperty(Configuration::REDCAP_API_URL);
                 $dataToken = $configuration->getProperty(Configuration::DATA_SOURCE_API_TOKEN);
 
@@ -253,7 +264,7 @@ try {
                     #}
                 
                     $rulesGenerator = new \IU\REDCapETL\RulesGenerator();
-                    $rulesText = $rulesGenerator->generate($dataProject, $formCompleteFields);
+                    $rulesText = $rulesGenerator->generate($dataProject, $formCompleteFields, $dagFields, $fileFields);
                     $properties[Configuration::TRANSFORM_RULES_TEXT] = $rulesText;
                     #print "$rulesText\n";
                 }
@@ -685,6 +696,24 @@ Configuration form
                     </td>
                     <td>
                         <div>
+                            <input type="checkbox" name="dagFields" 
+                                <?php
+                                if ($dagFields) {
+                                    echo 'checked';
+                                }
+                                ?>
+                            >
+                            Generate Data Access Group Fields <br/>
+                            
+                            <input type="checkbox" name="fileFields" 
+                                <?php
+                                if ($fileFields) {
+                                    echo 'checked';
+                                }
+                                ?>
+                            >
+                            Generate File Fields <br/>
+                            
                             <input type="checkbox" name="formCompleteFields" 
                                 <?php
                                 if ($formCompleteFields) {
@@ -693,7 +722,8 @@ Configuration form
                                 ?>
                             >
                             Generate Form Complete Fields <br/>
-                            <input type="submit" name="submitValue" value="Auto-Generate"></div>
+                            <input type="submit" name="submitValue" value="Auto-Generate">
+                        </div>
                         <hr style="margin: 7px 0px;"/>
                         <div>
                             <button type="submit" value="Upload CSV file"
