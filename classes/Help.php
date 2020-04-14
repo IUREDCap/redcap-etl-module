@@ -26,6 +26,17 @@ class Help
             ." This selection specifies which user's token will be used for REDCap-ETL."
             ."</p>"
         ,
+        'auto-generate-rules' =>
+            "<p>"
+            ."Transformation rules can be generated automatically from the REDCap project."
+            ." You can optionally include the following fields in the rules that are generated: "
+            ." data access group, file, and form complete."
+            ." Including file fields in the rules will only cause the status for the file fields"
+            ." to be exported, and <em>not</em> the contents of those files."
+            ." Specifically, if a file field contains a file, then the string \"[document]\" will be"
+            ." exported, and if the field does not contain a file, then a blank string will be exported."
+            ."</p>"
+        ,
         'batch-size' =>
             "<p>The batch size indicates how many REDCap record IDs will be processed at a time."
             ." In general, the larger the batch size, the"

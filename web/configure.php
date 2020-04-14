@@ -320,6 +320,12 @@ echo $buffer;
     // Help dialog events
     $(document).ready(function() {
         $( function() {
+            $('#auto-generate-rules-help-link').click(function () {
+                $('#auto-generate-rules-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top+56', of: $(this)})
+                    ;
+                return false;
+            });
             $('#batch-size-help-link').click(function () {
                 $('#batch-size-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
                     .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
@@ -690,12 +696,20 @@ Configuration form
                         $rules = $properties[Configuration::TRANSFORM_RULES_TEXT];
                         $rulesName = Configuration::TRANSFORM_RULES_TEXT;
                         ?>
-                        <textarea rows="14" cols="70"
+                        <textarea rows="15" cols="70"
                             style="margin-top: 4px; margin-bottom: 4px;"
                             name="<?php echo $rulesName;?>"><?php echo Filter::escapeForHtml($rules);?></textarea>
                     </td>
                     <td>
                         <div>
+                            Include:
+                            <a href="#" id="auto-generate-rules-help-link"
+                                class="etl-help" style="margin-left: 10px; float: right;">?</a>
+                            <div id="auto-generate-rules-help" title="Auto-Generate Transformation Rules"
+                                style="display: none; clear: both;">
+                                <?php echo Help::getHelpWithPageLink('auto-generate-rules', $module); ?>
+                            </div>
+                            <br />
                             <input type="checkbox" name="dagFields" 
                                 <?php
                                 if ($dagFields) {
@@ -703,7 +717,7 @@ Configuration form
                                 }
                                 ?>
                             >
-                            Generate Data Access Group Fields <br/>
+                            Data Access Group Fields <br/>
                             
                             <input type="checkbox" name="fileFields" 
                                 <?php
@@ -712,7 +726,7 @@ Configuration form
                                 }
                                 ?>
                             >
-                            Generate File Fields <br/>
+                            File Fields <br/>
                             
                             <input type="checkbox" name="formCompleteFields" 
                                 <?php
@@ -721,7 +735,7 @@ Configuration form
                                 }
                                 ?>
                             >
-                            Generate Form Complete Fields <br/>
+                            Form Complete Fields <br/>
                             <input type="submit" name="submitValue" value="Auto-Generate">
                         </div>
                         <hr style="margin: 7px 0px;"/>
@@ -1110,7 +1124,7 @@ echo '<div id ="parse-result" style="display: none;" title="Transformation Rules
 echo '<div '.$class.'>'."\n";
 echo '<strong>Status: '.$status."</strong>\n";
 echo '</div><br/>'."\n";
-echo Filter::escapeForHtml($parseMessages)."\n";
+echo Filter::sanitizeRulesStatus($parseMessages)."\n";
 echo '</div>'."\n";
 
 if (!empty($parseResult)) {

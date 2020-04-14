@@ -160,6 +160,12 @@ class Filter
         return $text;
     }
     
+    public static function sanitizeRulesStatus($text)
+    {
+        $text = strip_tags($text, '<br>');
+        return $text;
+    }
+    
     public static function getAllowedHelpTagsString()
     {
         $isFirstTag = true;
