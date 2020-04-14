@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
-files=( "./README.md" "./web/user_manual.php" "./web/admin/info.php" );
+files=( "./README.md" "classes/Help.php" "./web/user_manual.php" "./web/admin/info.php" );
 
 for file in "${files[@]}"
 do
@@ -17,10 +17,12 @@ do
         | sed 's/API//g;' \
         | sed 's/[Cc]onfig[^u]//g;' \
         | sed 's/\.com//g;' \
+        | sed 's/const//g;' \
         | sed 's/css//g;' \
         | sed 's/ETL//g;' \
         | sed 's/github//g;' \
         | sed 's/https//g;' \
+        | sed 's/IDs//g;' \
         | sed 's/IU//g;' \
         | sed 's/MySQL//g;' \
         | sed 's/<\?php//g;' \
@@ -37,11 +39,12 @@ do
         | sed 's/\@[_a-zA-Z][_a-zA-Z0-9]*//g' \
         | sed 's/\$[_a-zA-Z][_a-zA-Z0-9]*//g' \
         | sed 's/->[_a-zA-Z][_a-zA-Z0-9]*(//g' \
-        | sed 's/[_a-zA-Z][_a-zA-Z0-9]*(//g' \
+        | sed 's/[_a-zA-Z][_a-zA-Z0-9]*([^)]*)//g' \
         | sed 's/[_a-zA-Z][_a-zA-Z0-9]*::[_a-zA-Z][_a-zA-Z0-9]*//g' \
         | sed 's/\?[_a-zA-Z][_a-zA-Z0-9]*=//g' \
         | sed 's/\&[_a-zA-Z][_a-zA-Z0-9]*=//g' \
         | sed 's/RedCapEtlModule//g;' \
+        | sed "s/'[^']*' =>//g" \
         | spell \
         | sort \
         | uniq;

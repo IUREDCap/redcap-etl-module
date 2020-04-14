@@ -130,7 +130,7 @@ class Help
             ."<p>"
             ."The type, host name and name for the database need to be specified, as well as a"
             ." username and password for a valid user account for the database. The port number"
-            ." only needs to be specified if the database is using a non-standed port number"
+            ." only needs to be specified if the database is using a non-standard port number"
             ."</p>"
             ."<p>"
             ." The user account"
