@@ -32,6 +32,7 @@ are copied to the __dependencies/__ directory, and this directory is committed t
 To update the contents of this directory, the following commands
 can be used from the top-level directory:
 
+    composer update
     composer install --no-dev
     rm -rf dependencies
     mv vendor dependencies
