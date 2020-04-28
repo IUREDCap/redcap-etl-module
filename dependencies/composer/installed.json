@@ -45,17 +45,17 @@
     },
     {
         "name": "iu-redcap/redcap-etl",
-        "version": "1.4.3",
-        "version_normalized": "1.4.3.0",
+        "version": "1.4.4",
+        "version_normalized": "1.4.4.0",
         "source": {
             "type": "git",
             "url": "https://github.com/IUREDCap/redcap-etl.git",
-            "reference": "7e862afa8ba00e31291bbb04e7d57b0361e8825f"
+            "reference": "25228cce91248e513a4f5e19fd824867bd448c4d"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/7e862afa8ba00e31291bbb04e7d57b0361e8825f",
-            "reference": "7e862afa8ba00e31291bbb04e7d57b0361e8825f",
+            "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/25228cce91248e513a4f5e19fd824867bd448c4d",
+            "reference": "25228cce91248e513a4f5e19fd824867bd448c4d",
             "shasum": ""
         },
         "require": {
@@ -71,7 +71,7 @@
             "phpunit/phpunit": "6.5.8",
             "squizlabs/php_codesniffer": "3.2.3"
         },
-        "time": "2020-04-21T14:02:22+00:00",
+        "time": "2020-04-28T18:44:35+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
