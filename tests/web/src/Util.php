@@ -158,12 +158,33 @@ class Util
         $page->clickLink($testProjectTitle);
     }
 
-    public static function deleteConfiguration($session, $configName)
+    public static function deleteEtlConfigurationIfExists($session, $configName)
     {
-        $this->loginAsUser($session);
+        self::accessTestProjectRedCapEtl($session);
         $page = $session->getPage();
+        $page->clickLink('ETL Configurations');
+        $ifExists = true;
+        EtlConfigsPage::deleteConfiguration($session, $configName, $ifExists);
+        self::logOut($session);
+    }
+
+    public static function createEtlConfigurationIfNotExists($session, $configName)
+    {
+        self::accessTestProjectRedCapEtl($session);
+
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
+
+        self::loginAsUser($session);
+        $page = $session->getPage();
+        $projectLink = $page->find('named', array('link', $testProjectTitle));
+        if (isset($projectLink)) {
+            print "Project link found\n";
+        } else {
+            print "Project link NOT found\n";
+        }
         // to be completed...
     }
+
 
     public static function createProject($session, $projectTitle)
     {
