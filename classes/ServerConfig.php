@@ -17,6 +17,8 @@ class ServerConfig implements \JsonSerializable
     
     const AUTH_METHOD_SSH_KEY  = 0;
     const AUTH_METHOD_PASSWORD = 1;
+
+    const ACCESS_LEVELS = array('admin','private','public');
     
     private $name;
     
@@ -24,6 +26,8 @@ class ServerConfig implements \JsonSerializable
                      don't show up as choices for users. */
     private $isActive;
     
+    private $accessLevel; #who is allowed to run the server
+
     private $serverAddress; # address of REDCap-ETL server
     private $authMethod;
     private $username;
@@ -56,7 +60,11 @@ class ServerConfig implements \JsonSerializable
         $this->name = $name;
         
         $this->isActive = false;
-        
+
+        //$this->accessLevel = new \stdClass();
+        //$this->accessLevel->level = 'admin';
+        $this->accessLevel = 'public';
+
         $this->authMethod = self::AUTH_METHOD_SSH_KEY;
         $this->sshKeyPassword = '';
         
@@ -507,5 +515,15 @@ class ServerConfig implements \JsonSerializable
     public function getCaCertFile()
     {
         return $this->caCertFile;
+    }
+
+    public function getAccessLevel()
+    {
+        return $this->accessLevel;
+    }
+    
+    public function setAccessLevel($accessLevel)
+    {
+        $this->accessLevel = $accessLevel;
     }
 }

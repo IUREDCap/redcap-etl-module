@@ -208,6 +208,12 @@ if (!empty($serverName)) {
     if ($isActive) {
         $activeChecked = ' checked ';
     }
+    $accessLevels = ServerConfig::ACCESS_LEVELS;
+    $accessLevel = $serverConfig->getAccessLevel();
+    $access = $accessLevel;
+    if (empty($accessLevel)) {
+        $access = 'public';
+    }
 ?>
 <form action=<?php echo $selfUrl;?> method="post">
   <input type="hidden" name="serverName"
@@ -222,7 +228,29 @@ if (!empty($serverName)) {
   </table>
   
   
-    <!-- SERVER CONNECTION SETTINGS -->
+  <!-- ACCESS LEVEL SETTING -->
+  <fieldset class="server-config">
+     <legend>Access Level</legend>
+     <table>
+    <tr>
+      <td>
+         <select name="accessLevel" id="accessLevel">
+            <?php
+            foreach ($accessLevels as $value) {
+                if (strcmp($value, $access) === 0) {
+                    echo '<option value="'.$value.'" selected>'.$value."</option>\n";
+                } else {
+                    echo '<option value="'.$value.'">'.$value."</option>\n";
+                }
+            }
+            ?>
+         </select>
+      </td>
+    </tr>
+  </table>
+     </fieldset> 
+
+  <!-- SERVER CONNECTION SETTINGS -->
     <?php
     if (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) !== 0) {
     ?>
