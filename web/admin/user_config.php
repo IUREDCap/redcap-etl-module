@@ -71,6 +71,7 @@ try {
             $db = new RedCapDb();
             $userProjects = $db->getUserProjects($username);
             $userEtlProjects = $module->getUserEtlProjects($username);
+            $privateServers = $module->getPrivateServers();
         }
     }
 } catch (Exception $exception) {
@@ -140,7 +141,7 @@ $(function() {
 
 <?php
 if (!empty($username)) {
-    echo "<p>Projects for user ".Filter::escapeForHtml($userLabel)."</p>\n";
+    echo "<p>Server private-level access for user ".Filter::escapeForHtml($userLabel)."</p>\n";
 ?>
 
 <?php
@@ -201,6 +202,40 @@ $(function() {
 ?>
 <form action="<?php echo $selfUrl;?>" method="post">
 <input type="hidden" name="username" value="<?php echo Filter::escapeForHtmlAttribute($username);?>">
+<table class="user-projects">
+    <thead>
+        <tr> <th>Access?</th> </th><th>Server with Private Access Level</th></tr>
+    </thead>
+    <tbody>
+        <?php
+        $row = 1;
+        foreach ($privateServers as $serverName) {
+            if ($row % 2 == 0) {
+                echo '<tr class="even-row">'."\n";
+            } else {
+                echo '<tr class="odd-row">'."\n";
+            }
+            
+            $checked = '';
+            #fill this in later, after you figure out how to save a selected user
+            #if (!empty($userEtlProjects) && in_array($projectId, $userEtlProjects)) {
+            #    $checked = ' checked ';
+            #}
+            echo '<td style="text-align: center;"><input type="checkbox" name="checkbox['.$serverName.']" '
+                .$checked.'></td>'."\n";
+            echo '<td style="text-align: left">'.$serverName."</td>\n";
+            echo "</tr>\n";
+            $row++;
+        }
+        ?>
+    </tbody>
+</table>
+
+<hr />
+
+<?php
+   echo "<p>Projects for user ".Filter::escapeForHtml($userLabel)."</p>\n";
+?>
 <table class="user-projects">
     <thead>
         <tr> <th>ETL Access?</th> </th><th>PID</th> <th>Project</th> <th>ETL Configurations</th> </tr>

@@ -61,8 +61,6 @@ class ServerConfig implements \JsonSerializable
         
         $this->isActive = false;
 
-        //$this->accessLevel = new \stdClass();
-        //$this->accessLevel->level = 'admin';
         $this->accessLevel = 'public';
 
         $this->authMethod = self::AUTH_METHOD_SSH_KEY;

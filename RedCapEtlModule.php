@@ -436,6 +436,33 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
+    public function getPrivateServers()
+    {
+        #get server names
+        $privateServers = array();
+        $allServers = $this->settings->getServers();
+
+        #get the user access-levels (do this later, after you figure out how to save them)
+
+        #loop through the server names to get ones with an access level set to private
+        foreach ($allServers as $serverName) {
+           #get the server configurations for the server name
+            $serverConfig=$this->settings->getServerConfig($serverName);
+
+           #if the server has private level access, add it to the array of private servers
+            $private = $serverConfig->getAccessLevel() == 'private' ;
+           #if ($private) {
+              $privateServers[] = $serverName;
+           #}
+  
+           #while looping, check if the user has the server specified in the user access levels
+        }
+        #print PHP_EOL ."<br /><br />privateServers object is: <br />";
+        #print_r($privateServers);
+
+        return $privateServers;
+    }
+
     #-------------------------------------------------------------------
     # User ETL project methods
     #-------------------------------------------------------------------
@@ -681,7 +708,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         return $configuration;
     }
 
-    
     #-------------------------------------------------------------------
     # Cron job methods
     #-------------------------------------------------------------------

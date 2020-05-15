@@ -26,9 +26,9 @@ use IU\RedCapEtlModule\RedCapEtlModule;
 
 $selfUrl      = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
 $serversUrl   = $module->getUrl(RedCapEtlModule::SERVERS_PAGE);
+$configureUserUrl=$module->getUrl(RedCapEtlModule::USER_CONFIG_PAGE);
 
-$submit = Filter::sanitizeButtonLabel($_POST['submit']);
-
+$submit = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
 #-------------------------------------------
 # Get the server name
@@ -69,6 +69,9 @@ if (!empty($serverName)) {
 
 $testOutput = '';
 
+$accessSet = Filter::sanitizeString($_POST['accessLevel']);
+
+
 #------------------------------------
 # Router
 #------------------------------------
@@ -94,6 +97,16 @@ if (strcasecmp($submit, 'Save') === 0) {
     } else {
         $testOutput = $serverConfig->test();
     }
+} elseif ($accessSet) {
+    try {
+        $serverConfig = new ServerConfig($serverName);
+        $serverConfig->set(Filter::stripTagsArrayRecursive($_POST));
+        $serverConfig->validate();
+        $module->setServerConfig($serverConfig);
+       #header('Location: '.$serversUrl);
+    } catch (Exception $exception) {
+        $error = 'ERROR: '.$exception->getMessage();
+    }
 }
 ?>
 
@@ -113,11 +126,9 @@ $buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
 echo $buffer;
 ?>
 
-
 <h4><img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>table_gear.png" alt="">REDCap-ETL Admin</h4>
 
 <?php
-
 $module->renderAdminPageContentHeader($serversUrl, $error, $warning, $success);
 $module->renderAdminEtlServerSubTabs($selfUrl);
 ?>
@@ -128,7 +139,7 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
 # Server selection form
 #---------------------------------
 ?>
-<form action="<?php echo $selfUrl;?>" method="post"
+<form name="selectionForm" id="selectionForm" action="<?php echo $selfUrl;?>" method="post"
       style="padding: 4px; margin-bottom: 12px; border: 1px solid #ccc; background-color: #ccc;">
     <span style="font-weight: bold;">Server:</span>
     <select name="serverName" onchange="this.form.submit()">
@@ -182,9 +193,9 @@ $(function() {
 });
 
 $(function() {
-    $("input[name=authMethod]").change(function() {
+     $("input[name=authMethod]").change(function() {
         var value = $(this).val();
-        if (value == 0) {
+        if (value == 'private') {
             $("#passwordRow").hide();
             $("#sshKeyFileRow").show();
             $("#sshKeyPasswordRow").show();
@@ -195,7 +206,37 @@ $(function() {
         }
     });
 });
+
+//$(function() {
+//$("#accessLevelId").change(function() {
+//alert('access level change');
+//    $('#scForm').submit();
+//});
+//});
 </script>
+
+<script type='text/javascript'>
+function myFunction() {
+   document.getElementById('scForm').submit();
+}
+
+function SubmitForm() {
+   var oForm = document.getElementById('scForm');
+   if (oForm) {
+      oForm.submit();
+   }
+   else {
+var sDebugInfo = "found " + document.forms.length + " forms: \n";
+for (var i = 0; i < document.forms.length; i++) {
+    var curForm = document.forms[i];
+    sDebugInfo += "name: " + curForm.name + ", id: " + curForm.id;
+    sDebugInfo += "\n";
+}
+alert(sDebugInfo);
+      
+   }
+}
+ </script>
 
 <?php
 #----------------------------------------------------
@@ -215,7 +256,7 @@ if (!empty($serverName)) {
         $access = 'public';
     }
 ?>
-<form action=<?php echo $selfUrl;?> method="post">
+<form name="scForm" id="scFormId" action=<?php echo $selfUrl;?> method="post">
   <input type="hidden" name="serverName"
       value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getName());?>">
  
@@ -230,25 +271,37 @@ if (!empty($serverName)) {
   
   <!-- ACCESS LEVEL SETTING -->
   <fieldset class="server-config">
-     <legend>Access Level</legend>
-     <table>
-    <tr>
-      <td>
-         <select name="accessLevel" id="accessLevel">
-            <?php
-            foreach ($accessLevels as $value) {
-                if (strcmp($value, $access) === 0) {
-                    echo '<option value="'.$value.'" selected>'.$value."</option>\n";
-                } else {
-                    echo '<option value="'.$value.'">'.$value."</option>\n";
+     <legend>Access Level Settings</legend>
+     <table> 
+        <tr>
+           <select onchange="scFormId.submit()" name="accessLevel" id="accessLevelId">
+                <?php
+                foreach ($accessLevels as $value) {
+                    if (strcmp($value, $access) === 0) {
+                        echo '<option value="'.$value.'" selected>'.$value."</option>\n";
+                    } else {
+                        echo '<option value="'.$value.'">'.$value."</option>\n";
+                    }
                 }
-            }
-            ?>
-         </select>
-      </td>
-    </tr>
-  </table>
-     </fieldset> 
+                ?>
+           </select>
+           <br /> &nbsp;
+        </tr>
+
+        <?php
+           $usersRowStyle = '';
+        if ($accessLevel != 'private') {
+            $usersRowStyle = ' style="display: none;" ';
+        }
+        ?>
+
+        <tr> 
+           <div id="usersRow" name="usersRow" <?php echo $usersRowStyle; ?> >   
+              <a href='<?php echo $configureUserUrl ?>'>Add User Access</a>
+           </div>
+        </tr>
+   </table>
+  </fieldset> 
 
   <!-- SERVER CONNECTION SETTINGS -->
     <?php
@@ -284,7 +337,7 @@ if (!empty($serverName)) {
                         }
                         ?>
                         style="vertical-align: middle; margin: 0;">
-                        <span style="vertical-align: top; margin-right: 8px;">Password</span>
+                        <span style="vertical-align: top; margin-right: 8px;">Password3333</span>
                     </td>
                 </tr>
     
@@ -469,16 +522,16 @@ if (!empty($serverName)) {
   
   <div style="margin-top: 20px;">
     <div style="width: 50%; float: left;">
-      <input type="submit" name="submit" value="Save" style="margin: auto; display: block;">
+      <input type="submit" name="submitValue" value="Save" style="margin: auto; display: block;">
     </div>
     <div style="width: 50%; float: right;">
-      <input type="submit" name="submit" value="Cancel" style="margin: auto; display: block;">
+      <input type="submit" name="submitValue" value="Cancel" style="margin: auto; display: block;">
     </div>
     <div style="clear: both;">
     </div>
   </div>
   <div style="margin-top: 4ex;">
-    <input type="submit" name="submit" value="Test Server Connection"> <br/>
+    <input type="submit" name="submitValue" value="Test Server Connection"> <br/>
     <textarea id="testOutput" name="testOutput" rows="4" cols="40"><?php
         echo Filter::escapeForHtml($testOutput);
     ?>&nbsp;
