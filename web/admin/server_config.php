@@ -87,9 +87,9 @@ if (strcasecmp($submit, 'Save') === 0) {
             $removeUserCheckbox = $_POST['removeUserCheckbox'];
             $removeUsernames = array();
             if (is_array($removeUserCheckbox) && !empty($removeUserCheckbox)) {
-               foreach (array_keys($removeUserCheckbox) as $username) {
-                  array_push($removeUsernames, $username);
-               }
+                foreach (array_keys($removeUserCheckbox) as $username) {
+                    array_push($removeUsernames, $username);
+                }
             }
             $module->processPrivateServerUsers($serverName, $removeUsernames);
             header('Location: '.$serversUrl);
@@ -111,7 +111,7 @@ if (strcasecmp($submit, 'Save') === 0) {
         $serverConfig->set(Filter::stripTagsArrayRecursive($_POST));
         $serverConfig->validate();
         $module->setServerConfig($serverConfig);
-        #if the access-level was changed from private to something else, 
+        #if the access-level was changed from private to something else,
         #then remove any allowed-users for this server so that they won't
         #immediately have access again if the access-level for the server
         #should go back to private in the future
@@ -241,7 +241,7 @@ if (!empty($serverName)) {
         $access = 'public';
     }
     if ($access === 'private') {
-       $privateUsers = $module->getPrivateServerUsers($serverName);
+        $privateUsers = $module->getPrivateServerUsers($serverName);
     }
 ?>
 <form name="scForm" id="scFormId" action=<?php echo $selfUrl;?> method="post">
@@ -279,13 +279,13 @@ if (!empty($serverName)) {
         <?php
            $usersRowStyle = '';
            $privateUsersStyle = '';
-           if ($accessLevel != 'private') {
-              $usersRowStyle = ' style="display: none;" ';
-           } else {
-              if (!$privateUsers) {
-                 $privateUsersStyle = ' style="display: none;" ';
-              }
-           }
+        if ($accessLevel != 'private') {
+            $usersRowStyle = ' style="display: none;" ';
+        } else {
+            if (!$privateUsers) {
+                $privateUsersStyle = ' style="display: none;" ';
+            }
+        }
         ?>
 
         <tr> 
@@ -293,13 +293,13 @@ if (!empty($serverName)) {
               <legend>Users Currently Granted Access</legend>
               <div id="privateUsers" name="privateUsers" <?php echo $privateUsersStyle; ?>>
                  Remove<br />
-                 <?php
+                    <?php
                     foreach ($privateUsers as $username) {
-                       echo '<input type="checkbox" name="removeUserCheckbox['.$username.']" '
+                        echo '<input type="checkbox" name="removeUserCheckbox['.$username.']" '
                           .'style="vertical-align: middle; margin: 0px 10px 0px 25px;"' .">\n";
-                       echo '<label for="'.$username.'">'.$username."</label>\n<br />";
+                        echo '<label for="'.$username.'">'.$username."</label>\n<br />";
                     }
-                 ?>
+                    ?>
               </div>
 
               <div>

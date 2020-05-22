@@ -106,8 +106,8 @@ class Settings
         # Remove this user from any private-server list of allowed users
         $assignedPrivateServers = $this->getUserPrivateServerNames($username);
         foreach ($assignedPrivateServers as $serverName) {
-            $this->removeUserFromPrivateServer($username, $serverName); 
-        } 
+            $this->removeUserFromPrivateServer($username, $serverName);
+        }
 
         if ($transaction) {
             $this->db->endTransaction($commit);
@@ -117,7 +117,7 @@ class Settings
     #----------------------------------------------------------
     # User allowable-servers methods
     #----------------------------------------------------------
-    public function processUserPrivateServers($username,$userPrivateServerNames, $serversToCheck, $transaction = true)
+    public function processUserPrivateServers($username, $userPrivateServerNames, $serversToCheck, $transaction = true)
     {
         $commit = true;
         if ($transaction) {
@@ -127,27 +127,26 @@ class Settings
         ###UPDATE THE USER-LIST FOR SERVERS THAT THIS USER IS NO LONGER ALLOWED TO ACCESS
         if (!$serversToCheck) {
            #servers that this user was allowed to access before any changes were made
-           $serversToCheck = $this->getUserPrivateServerNames($username); 
+            $serversToCheck = $this->getUserPrivateServerNames($username);
         }
 
         #For each of the servers-to-check, see if access is still allowed for this user
         foreach ($serversToCheck as $serverName) {
-
            #if this server is not in the list of allowed servers for this user
            #then remove the username from the allowed-user list for the server if it's there
-           if (!in_array($serverName, $userPrivateServerNames)) { 
-              $this->removeUserFromPrivateServer($username, $serverName); 
-           }
+            if (!in_array($serverName, $userPrivateServerNames)) {
+                $this->removeUserFromPrivateServer($username, $serverName);
+            }
         }
 
 
         ###UPDATE THE USER-LIST FOR SERVERS THAT THIS USER IS ALLOWED TO ACCESS
         foreach ($userPrivateServerNames as $serverName) {
-           $privateServerUsers = $this->getPrivateServerUsers($serverName);
-           if (!in_array($username, $privateServerUsers)) {      
-              $privateServerUsers[] = $username;
-              $this->setPrivateServerUsers($serverName, $privateServerUsers);
-           }
+            $privateServerUsers = $this->getPrivateServerUsers($serverName);
+            if (!in_array($username, $privateServerUsers)) {
+                $privateServerUsers[] = $username;
+                $this->setPrivateServerUsers($serverName, $privateServerUsers);
+            }
         }
 
 
@@ -159,12 +158,14 @@ class Settings
         }
     }
 
-    public function processPrivateServerUsers($serverName, $removeUsernames,
-    $transaction = true)
-    {
+    public function processPrivateServerUsers(
+        $serverName,
+        $removeUsernames,
+        $transaction = true
+    ) {
         if ($removeUsernames) {
             # find out who is currently allowed to access this server
-            $currentUsernames = $this->getPrivateServerUsers($serverName); 
+            $currentUsernames = $this->getPrivateServerUsers($serverName);
 
             $commit = true;
             if ($transaction) {
@@ -173,23 +174,21 @@ class Settings
 
             # loop through the users to remove
             foreach ($removeUsernames as $username) {
-                
                 # get the server-list for this user
                 $userPrivateServerNames = $this->getUserPrivateServerNames($username);
 
                 if (($serverKey=array_search($serverName, $userPrivateServerNames)) !== false) {
-
                     #remove this server from this user's list of allowed servers
                     unset($userPrivateServerNames[$serverKey]);
 
                     #update the server-list for this user
                     $this->setUserPrivateServerNames($username, $userPrivateServerNames);
-                } 
+                }
 
                 #remove this user from this server's list of allowed users
                 if (($userKey=array_search($username, $currentUsernames)) !== false) {
                     unset($currentUsernames[$userKey]);
-                } 
+                }
             }
         
             #update the user-list for this server
@@ -210,7 +209,7 @@ class Settings
         if (($key=array_search($username, $privateServerUsers)) !== false) {
             unset($privateServerUsers[$key]);
             $this->setPrivateServerUsers($serverName, $privateServerUsers);
-        } 
+        }
     }
 
     public function setPrivateServerUsers($serverName, $usernames)

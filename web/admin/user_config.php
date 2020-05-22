@@ -242,7 +242,7 @@ $(function() {
 </table>
 <?php
 if (empty($privateServers)) {
-   echo '<p>No servers currently have private access.</p>';
+    echo '<p>No servers currently have private access.</p>';
 }
 ?>
 <hr />
