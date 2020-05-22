@@ -102,6 +102,25 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         $this->getSession()->wait(10000);
     }
 
+
+    /**
+     * @Given /^ETL configuration "([^"]*)" does not exist$/
+     */
+    public function etlConfigurationDoesNotExist($configName)
+    {
+        $session = $this->getSession();
+        Util::deleteEtlConfigurationIfExists($session, $configName);
+    }
+
+    /**
+     * @Given /^I am logged in as user$/
+     */
+    public function iAmLoggedInAsUser()
+    {
+        $session = $this->getSession();
+        Util::loginAsUser($session);
+    }
+
     /**
      * @Then /^Print element "([^"]*)" text$/
      */
@@ -286,16 +305,6 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
             $this->getSession()->switchToWindow($windowNames[$currentWindowIndex - 1]);
             $this->getSession()->restart();
         }
-    }
-
-
-    /**
-     * @Given /^I am logged in as user$/
-     */
-    public function iAmLoggedInAsUser()
-    {
-        $session = $this->getSession();
-        Util::loginAsUser($session);
     }
 
     /**

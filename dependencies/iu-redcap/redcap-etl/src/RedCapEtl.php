@@ -57,6 +57,13 @@ class RedCapEtl
 
     private $configuration;
 
+    /** @var array map where the keys represent root tables that have
+     *     fields that have multiple rows of data per record ID.
+     *     Root tables are intended for fields that have a 1:1 mapping
+     *     with the record ID.
+     */
+    private $rootTablesWithMultiValues;
+
 
     /**
      * Constructor.
@@ -75,6 +82,8 @@ class RedCapEtl
         $redcapProjectClass = null
     ) {
         $this->app = $logger->getApp();
+
+        $this->rootTablesWithMultiValues = array();
 
         $this->configuration = new Configuration(
             $logger,
@@ -425,35 +434,72 @@ class RedCapEtl
      */
     protected function transform($table, $records, $foreignKey, $suffix)
     {
+        $tableName = $table->getName();
+        $calcFieldIgnorePattern = $this->configuration->getCalcFieldIgnorePattern();
+
         foreach ($table->rowsType as $rowType) {
             // Look at row_event for this table
             switch ($rowType) {
-                // If root
+                #-------------------------------------------------------------------
+                # ROOT Table - this case should only occur for non-recursive calls,
+                # since a root table can't be a child of another table
+                #-------------------------------------------------------------------
                 case RowsType::ROOT:
-                    $this->createRowAndRecurse($table, $records, $foreignKey, $suffix, $rowType);
+                    #------------------------------------------------------------------------
+                    # Root tables are for fields that have a 1:1 mapping with the record ID,
+                    # so stop processing once a record for the record ID being processed is
+                    # found that has at least some data for the root table.
+                    # For the child tables, which, in general, have a m:1 relationship
+                    # with the record ID, process all records for this record ID.
+                    #------------------------------------------------------------------------
+                    $rootRecordFound = false;
+                    foreach ($records as $record) {
+                        $primaryKey =
+                            $table->createRow($record, $foreignKey, $suffix, $rowType, $calcFieldIgnorePattern);
+
+                        # If row creation succeeded:
+                        if ($primaryKey) {
+                            if (!$rootRecordFound) {
+                                $rootRecordFound = true;
+                                foreach ($table->getChildren() as $childTable) {
+                                    $this->transform($childTable, $records, $primaryKey, $suffix);
+                                }
+                                if ($table->isRecordIdTable()) {
+                                    # If this is a record ID table stop processing; don't store multiple rows
+                                    break;
+                                }
+                            } else {
+                                # A record with values for the root table was already found,
+                                # so there are multiple values per record ID for at least one
+                                # field in the root table.
+                                if (!array_key_exists($tableName, $this->rootTablesWithMultiValues)) {
+                                    # Only print warning message once for each table
+                                    $message = 'WARNING: ROOT table "'.$tableName.'" has fields'
+                                        .' that have multiple values per record ID in REDCap.'
+                                        .' ROOT tables are intended for fields that only have'
+                                        .' one value per record ID.';
+                                    $this->logger->log($message);
+                                    $this->rootTablesWithMultiValues[$tableName] = true;
+                                }
+                            }
+                        }
+                    }
                     break;
 
-                // If events
+                // If events or repeatable forms or repeating events
                 case RowsType::BY_EVENTS:
-                    // Foreach Record (i.e., foreach event)
-                    foreach ($records as $record) {
-                        $this->createRowAndRecurse($table, array($record), $foreignKey, $suffix, $rowType);
-                    }
-                    break;
-
-                // If repeatable forms
                 case RowsType::BY_REPEATING_INSTRUMENTS:
-                    // Foreach Record (i.e., foreach repeatable form)
-                    foreach ($records as $record) {
-                        $this->createRowAndRecurse($table, array($record), $foreignKey, $suffix, $rowType);
-                    }
-                    break;
-
-                // If repeatable events
                 case RowsType::BY_REPEATING_EVENTS:
-                    // Foreach Record (i.e., foreach repeatable event)
+                    // Foreach Record (i.e., foreach event or repeatable form or repeatable event)
                     foreach ($records as $record) {
-                        $this->createRowAndRecurse($table, array($record), $foreignKey, $suffix, $rowType);
+                        $primaryKey =
+                            $table->createRow($record, $foreignKey, $suffix, $rowType, $calcFieldIgnorePattern);
+
+                        if ($primaryKey) {
+                            foreach ($table->getChildren() as $childTable) {
+                                $this->transform($childTable, array($record), $primaryKey, $suffix);
+                            }
+                        }
                     }
                     break;
 
@@ -461,7 +507,19 @@ class RedCapEtl
                 case RowsType::BY_SUFFIXES:
                     // Foreach Suffix
                     foreach ($table->rowsSuffixes as $newSuffix) {
-                        $this->createRowAndRecurse($table, $records, $foreignKey, $suffix.$newSuffix, $rowType);
+                        $primaryKey = $table->createRow(
+                            $records[0],
+                            $foreignKey,
+                            $suffix.$newSuffix,
+                            $rowType,
+                            $calcFieldIgnorePattern
+                        );
+
+                        if ($primaryKey) {
+                            foreach ($table->getChildren() as $childTable) {
+                                $this->transform($childTable, $records, $primaryKey, $suffix.$newSuffix);
+                            }
+                        }
                     }
                     break;
 
@@ -471,13 +529,19 @@ class RedCapEtl
                     foreach ($records as $record) {
                         // Foreach Suffix
                         foreach ($table->rowsSuffixes as $newSuffix) {
-                            $this->createRowAndRecurse(
-                                $table,
-                                array($record),
+                            $primaryKey = $table->createRow(
+                                $record,
                                 $foreignKey,
                                 $suffix.$newSuffix,
-                                $rowType
+                                $rowType,
+                                $calcFieldIgnorePattern
                             );
+
+                            if ($primaryKey) {
+                                foreach ($table->getChildren() as $childTable) {
+                                    $this->transform($childTable, array($record), $primaryKey, $suffix.$newSuffix);
+                                }
+                            }
                         }
                     }
                     break;
@@ -485,24 +549,6 @@ class RedCapEtl
         }
     }
 
-
-    /**
-     * See 'transform' function for explanation of variables.
-     */
-    protected function createRowAndRecurse($table, $records, $foreignKey, $suffix, $rowType)
-    {
-        // Create Row using 1st Record
-        $calcFieldIgnorePattern = $this->configuration->getCalcFieldIgnorePattern();
-        $primaryKey = $table->createRow($records[0], $foreignKey, $suffix, $rowType, $calcFieldIgnorePattern);
-
-        // If primary key generated, recurse for child tables
-        if ($primaryKey) {
-            // Foreach child table
-            foreach ($table->getChildren() as $childTable) {
-                $this->transform($childTable, $records, $primaryKey, $suffix);
-            }
-        }
-    }
 
 
     /**

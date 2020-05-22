@@ -106,17 +106,21 @@ class EtlConfigsPage
      *
      * @param string $configName the name of the config to delete.
      */
-    public static function deleteConfiguration($session, $configName)
+    public static function deleteConfiguration($session, $configName, $ifExists = false)
     {
         $page = $session->getPage();
 
         # Find the table row where the first element matches the config name, and then get the
         # 7th column element and click it
         $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[6]");
-        $element->click();
+        if ($ifExists && !isset($element)) {
+            ;
+        } else {
+            $element->click();
 
-        # Handle confirmation dialog
-        $page->pressButton("Delete configuration");
+            # Handle confirmation dialog
+            $page->pressButton("Delete configuration");
+        }
     }
 
     public static function deleteConfigurationIfExists($session, $configName)
