@@ -35,7 +35,8 @@ try {
 
     $adminConfig = $module->getAdminConfig();
 
-    $servers = $module->getServers();
+    #$servers = $module->getServers();
+    $servers   = $module->getUserAllowedServersBasedOnAccessLevel(USERID);
 
     $selfUrl   = $module->getUrl('web/run.php');
     $listUrl   = $module->getUrl('web/index.php');

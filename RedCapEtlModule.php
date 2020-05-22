@@ -436,46 +436,74 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
-    public function getPrivateServers()
+    public function getServersViaAccessLevels($specificLevel = 'none')
     {
         #get server names
-        $privateServers = array();
+        $servers = array();
         $allServers = $this->settings->getServers();
 
-        #loop through the server names to get ones with an access level set to private
+        #loop through the server names to get their access levels
         foreach ($allServers as $serverName) {
+
            #get the server configurations for the server name
            $serverConfig=$this->settings->getServerConfig($serverName);
 
-           #if the server has private level access, add it to the array of private servers
-           $private = $serverConfig->getAccessLevel() == 'private' ;
-           if ($private) {
-              $privateServers[] = $serverName;
-           } 
+           #if the server has the access level specified,
+           #add it to the array of servers
+           $accessLevel = $serverConfig->getAccessLevel();
+           if ($specificLevel === 'none') {
+              $servers[] = $serverName;
+           } else {
+               if ($accessLevel === $specificLevel) {
+                   $servers[] = $serverName;
+               } 
+           }
         }
-        #print "<br /><br />privateServers object is: <br />";
-        #print_r($privateServers);
-
-        return $privateServers;
+        #print "<br /><br />specificLevel is: $specificLevel<br />";
+        #print "<br /><br />servers object is: <br />";
+        #print '<pre>'; print_r($servers); print '</pre>'."<br />";
+        return $servers;
     }
 
-    public function setUserServerNames($username, $userServerNames)
+    public function getUserAllowedServersBasedOnAccessLevel($username = USERID)
+    {  
+       $servers = array();
+
+       #if this is a REDCap admin, then return all servers
+       if ($this->isSuperUser($username)) {
+           $servers = $this->getServersViaAccessLevels('none');
+
+       } else {
+
+           #add servers with public access
+           $servers=$this->getServersViaAccessLevels('public');
+
+           #add the private servers that the user is allowed to access
+           $userPrivateServers = array();
+           $userPrivateServers = $this->settings->getUserPrivateServerNames($username);
+           $servers = array_merge($servers, $userPrivateServers);
+       }
+
+       return $servers;
+    }
+
+    public function setUserPrivateServerNames($username = USERID, $userServerNames)
     {
-        $this->settings->setUserServerNames($username, $userServerNames);
+        $this->settings->setUserPrivateServerNames($username, $userServerNames);
         $details = 'Allowable private servers modified for user '.$username;
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
 
     }
 
-    public function processUserPrivateServers($username, $userServerNames, $privateServers)
+    public function processUserPrivateServers($username = USERID, $userServerNames, $privateServers)
     {
         $this->settings->processUserPrivateServers($username, $userServerNames, $privateServers);
     }
 
-    public function getUserServerNames($username = USERID,$privateServers)
+    public function getUserPrivateServerNames($username = USERID,$privateServers)
     {        
         $userServerNames = array();
-        $userServers = $this->settings->getUserServerNames($username);
+        $userServers = $this->settings->getUserPrivateServerNames($username);
 
         foreach ($userServers as $serverName) {
            #if the user-assigned server stills have private access, then keep it
@@ -484,7 +512,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
            } 
         }
         if ($userServerNames != $userServers) {
-           $this->settings->setUserServerNames($username, $userServerNames);
+           $this->settings->setUserPrivateServerNames($username, $userServerNames);
         }
 
         return $userServerNames;
