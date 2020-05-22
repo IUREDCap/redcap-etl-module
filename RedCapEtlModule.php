@@ -442,25 +442,61 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $privateServers = array();
         $allServers = $this->settings->getServers();
 
-        #get the user access-levels (do this later, after you figure out how to save them)
-
         #loop through the server names to get ones with an access level set to private
         foreach ($allServers as $serverName) {
            #get the server configurations for the server name
-            $serverConfig=$this->settings->getServerConfig($serverName);
+           $serverConfig=$this->settings->getServerConfig($serverName);
 
            #if the server has private level access, add it to the array of private servers
-            $private = $serverConfig->getAccessLevel() == 'private' ;
-           #if ($private) {
+           $private = $serverConfig->getAccessLevel() == 'private' ;
+           if ($private) {
               $privateServers[] = $serverName;
-           #}
-  
-           #while looping, check if the user has the server specified in the user access levels
+           } 
         }
-        #print PHP_EOL ."<br /><br />privateServers object is: <br />";
+        #print "<br /><br />privateServers object is: <br />";
         #print_r($privateServers);
 
         return $privateServers;
+    }
+
+    public function setUserServerNames($username, $userServerNames)
+    {
+        $this->settings->setUserServerNames($username, $userServerNames);
+        $details = 'Allowable private servers modified for user '.$username;
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
+
+    }
+
+    public function processUserPrivateServers($username, $userServerNames, $privateServers)
+    {
+        $this->settings->processUserPrivateServers($username, $userServerNames, $privateServers);
+    }
+
+    public function getUserServerNames($username = USERID,$privateServers)
+    {        
+        $userServerNames = array();
+        $userServers = $this->settings->getUserServerNames($username);
+
+        foreach ($userServers as $serverName) {
+           #if the user-assigned server stills have private access, then keep it
+           if (in_array($serverName, $privateServers)) {
+              $userServerNames[] = $serverName;
+           } 
+        }
+        if ($userServerNames != $userServers) {
+           $this->settings->setUserServerNames($username, $userServerNames);
+        }
+
+        return $userServerNames;
+    }
+
+    public function getPrivateServerUsers($serverName) {
+        return $this->settings->getPrivateServerUsers($serverName);
+    }
+
+    public function processPrivateServerUsers($serverName, $removeUsernames)
+    {
+        $this->settings->processPrivateServerUsers($serverName, $removeUsernames);
     }
 
     #-------------------------------------------------------------------

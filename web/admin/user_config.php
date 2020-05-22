@@ -54,6 +54,7 @@ try {
             $usersUrl = $module->getUrl($urlValue);
             header('Location: '.$usersUrl);
         } else {
+            $privateServers = $module->getPrivateServers();
             if (strcasecmp($submitValue, 'Save') === 0) {
                 $checkbox = $_POST['checkbox'];
                 $userEtlProjects = array();
@@ -62,8 +63,17 @@ try {
                         array_push($userEtlProjects, (int) $projectId);
                     }
                 }
+                
+                $accessCheckbox = $_POST['accessCheckbox'];
+                $userServerNames = array();
+                if (is_array($accessCheckbox) && !empty($accessCheckbox)) {
+                    foreach (array_keys($accessCheckbox) as $serverName) {
+                        array_push($userServerNames, $serverName);
+                    }
+                }
                 $module->addUser($username);
                 $module->setUserEtlProjects($username, $userEtlProjects);
+                $module->processUserPrivateServers($username, $userServerNames, $privateServers);
                 $success = 'User '.$username.' saved.';
                 $url = $module->getUrl(RedCapEtlModule::USERS_PAGE.'?success='.Filter::escapeForUrlParameter($success));
                 header('Location: '.$url);
@@ -71,7 +81,8 @@ try {
             $db = new RedCapDb();
             $userProjects = $db->getUserProjects($username);
             $userEtlProjects = $module->getUserEtlProjects($username);
-            $privateServers = $module->getPrivateServers();
+            #$privateServers = $module->getPrivateServers($username);
+            $userServerNames = $module->getUserServerNames($username, $privateServers);
         }
     }
 } catch (Exception $exception) {
@@ -217,11 +228,10 @@ $(function() {
             }
             
             $checked = '';
-            #fill this in later, after you figure out how to save a selected user
-            #if (!empty($userEtlProjects) && in_array($projectId, $userEtlProjects)) {
-            #    $checked = ' checked ';
-            #}
-            echo '<td style="text-align: center;"><input type="checkbox" name="checkbox['.$serverName.']" '
+            if (!empty($userServerNames) && in_array($serverName, $userServerNames)) {
+                $checked = ' checked ';
+            }
+            echo '<td style="text-align: center;"><input type="checkbox" name="accessCheckbox['.$serverName.']" '
                 .$checked.'></td>'."\n";
             echo '<td style="text-align: left">'.$serverName."</td>\n";
             echo "</tr>\n";
@@ -230,7 +240,11 @@ $(function() {
         ?>
     </tbody>
 </table>
-
+<?php
+if (empty($privateServers)) {
+   echo '<p>No servers currently have private access.</p>';
+}
+?>
 <hr />
 
 <?php

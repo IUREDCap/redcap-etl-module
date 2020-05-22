@@ -84,6 +84,14 @@ if (strcasecmp($submit, 'Save') === 0) {
             $serverConfig->set(Filter::stripTagsArrayRecursive($_POST));
             $serverConfig->validate();
             $module->setServerConfig($serverConfig);
+            $removeUserCheckbox = $_POST['removeUserCheckbox'];
+            $removeUsernames = array();
+            if (is_array($removeUserCheckbox) && !empty($removeUserCheckbox)) {
+               foreach (array_keys($removeUserCheckbox) as $username) {
+                  array_push($removeUsernames, $username);
+               }
+            }
+            $module->processPrivateServerUsers($serverName, $removeUsernames);
             header('Location: '.$serversUrl);
         } catch (Exception $exception) {
             $error = 'ERROR: '.$exception->getMessage();
@@ -103,7 +111,14 @@ if (strcasecmp($submit, 'Save') === 0) {
         $serverConfig->set(Filter::stripTagsArrayRecursive($_POST));
         $serverConfig->validate();
         $module->setServerConfig($serverConfig);
-       #header('Location: '.$serversUrl);
+        #if the access-level was changed from private to something else, 
+        #then remove any allowed-users for this server so that they won't
+        #immediately have access again if the access-level for the server
+        #should go back to private in the future
+        if ($accessSet !== 'private') {
+            $removeUsernames = $module->getPrivateServerUsers($serverName);
+            $module->processPrivateServerUsers($serverName, $removeUsernames);
+        }
     } catch (Exception $exception) {
         $error = 'ERROR: '.$exception->getMessage();
     }
@@ -206,37 +221,7 @@ $(function() {
         }
     });
 });
-
-//$(function() {
-//$("#accessLevelId").change(function() {
-//alert('access level change');
-//    $('#scForm').submit();
-//});
-//});
 </script>
-
-<script type='text/javascript'>
-function myFunction() {
-   document.getElementById('scForm').submit();
-}
-
-function SubmitForm() {
-   var oForm = document.getElementById('scForm');
-   if (oForm) {
-      oForm.submit();
-   }
-   else {
-var sDebugInfo = "found " + document.forms.length + " forms: \n";
-for (var i = 0; i < document.forms.length; i++) {
-    var curForm = document.forms[i];
-    sDebugInfo += "name: " + curForm.name + ", id: " + curForm.id;
-    sDebugInfo += "\n";
-}
-alert(sDebugInfo);
-      
-   }
-}
- </script>
 
 <?php
 #----------------------------------------------------
@@ -254,6 +239,9 @@ if (!empty($serverName)) {
     $access = $accessLevel;
     if (empty($accessLevel)) {
         $access = 'public';
+    }
+    if ($access === 'private') {
+       $privateUsers = $module->getPrivateServerUsers($serverName);
     }
 ?>
 <form name="scForm" id="scFormId" action=<?php echo $selfUrl;?> method="post">
@@ -290,17 +278,37 @@ if (!empty($serverName)) {
 
         <?php
            $usersRowStyle = '';
-        if ($accessLevel != 'private') {
-            $usersRowStyle = ' style="display: none;" ';
-        }
+           $privateUsersStyle = '';
+           if ($accessLevel != 'private') {
+              $usersRowStyle = ' style="display: none;" ';
+           } else {
+              if (!$privateUsers) {
+                 $privateUsersStyle = ' style="display: none;" ';
+              }
+           }
         ?>
 
         <tr> 
-           <div id="usersRow" name="usersRow" <?php echo $usersRowStyle; ?> >   
-              <a href='<?php echo $configureUserUrl ?>'>Add User Access</a>
-           </div>
+           <fieldset id="usersRow" name="usersRow" <?php echo $usersRowStyle; ?>>
+              <legend>Users Currently Granted Access</legend>
+              <div id="privateUsers" name="privateUsers" <?php echo $privateUsersStyle; ?>>
+                 Remove<br />
+                 <?php
+                    foreach ($privateUsers as $username) {
+                       echo '<input type="checkbox" name="removeUserCheckbox['.$username.']" '
+                          .'style="vertical-align: middle; margin: 0px 10px 0px 25px;"' .">\n";
+                       echo '<label for="'.$username.'">'.$username."</label>\n<br />";
+                    }
+                 ?>
+              </div>
+
+              <div>
+                 <a href='<?php echo $configureUserUrl ?>'>Add User Access</a>
+                 <br />
+              </div>
+           </fieldset>
         </tr>
-   </table>
+     </table>
   </fieldset> 
 
   <!-- SERVER CONNECTION SETTINGS -->
