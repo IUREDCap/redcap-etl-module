@@ -56,6 +56,7 @@ class Configuration implements \JsonSerializable
     const LABEL_VIEW_SUFFIX = 'label_view_suffix';
     
     const POST_PROCESSING_SQL = 'post_processing_sql';
+    const PRE_PROCESSING_SQL  = 'pre_processing_sql';
     const PRINT_LOGGING = 'print_logging';
     const PROJECT_ID = 'project_id';
     
@@ -397,7 +398,11 @@ class Configuration implements \JsonSerializable
             }
         }
         
-        $dbType = $properties[self::DB_TYPE];
+        $dbType = null;
+        if (array_key_exists(self::DB_TYPE, $properties)) {
+            $dbType = $properties[self::DB_TYPE];
+        }
+    
         if (empty($dbType)) {
             # Originally, this property didn't exists, because the only database
             # type was MySQL, so older data will not have this, and it needs
@@ -525,7 +530,19 @@ class Configuration implements \JsonSerializable
             $rules = preg_split("/\r\n|\n|\r/", $rulesText);
             $properties[self::TRANSFORM_RULES_TEXT] = $rules;
         }
-        
+
+        # Convert the pre-processing SQL from text to
+        # an array of strings
+        if (array_key_exists(self::PRE_PROCESSING_SQL, $properties)) {
+            $sqlText = $properties[self::PRE_PROCESSING_SQL];
+            if (!isset($sqlText) || empty(trim($sqlText))) {
+                unset($properties[self::PRE_PROCESSING_SQL]);
+            } else {
+                $sql = preg_split("/\r\n|\n|\r/", $sqlText);
+                $properties[self::PRE_PROCESSING_SQL] = $sql;
+            }
+        }
+
         # Convert the post-processing SQL from text to
         # an array of strings
         if (array_key_exists(self::POST_PROCESSING_SQL, $properties)) {

@@ -373,7 +373,13 @@ echo $buffer;
                     .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
                     ;
                 return false;
-            }); 
+            });
+            $('#pre-processing-sql-help-link').click(function () {
+                $('#pre-processing-sql-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 400})
+                    .dialog('widget').position({my: 'left top', at: 'right+10 top', of: $(this)})
+                    ;
+                return false;
+            });  
             $('#post-processing-sql-help-link').click(function () {
                 $('#post-processing-sql-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 400})
                     .dialog('widget').position({my: 'left top', at: 'right+10 top', of: $(this)})
@@ -1052,6 +1058,36 @@ Configuration form
         </fieldset>
 
         <fieldset class="config-nested">
+        <legend>Pre-Processing SQL</legend>        
+        <table>
+            <tbody>          
+                
+                <!-- PRE-PROCESSING SQL -->
+                <tr>
+                    <td style="padding-right: 1em;">SQL</td>
+                    <td>
+                        <?php
+                        $sql = $properties[Configuration::PRE_PROCESSING_SQL];
+                        $sqlName = Configuration::PRE_PROCESSING_SQL;
+                        ?>
+                        <textarea rows="10" cols="70"
+                            style="margin-top: 4px; margin-bottom: 4px;"
+                            name="<?php echo $sqlName;?>"><?php echo Filter::escapeForHtml($sql);?></textarea>
+                    </td>                   
+                    <td>
+                        <a href="#" id="pre-processing-sql-help-link" class="etl-help"
+                           style="margin-left: 2em;">?</a>                      
+                        <div id="pre-processing-sql-help" title="Pre-Processing SQL" style="display: none;">
+                            <?php echo Help::getHelpWithPageLink('pre-processing-sql', $module); ?>
+                        </div>                         
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        </fieldset>
+                   
+        <fieldset class="config-nested">
         <legend>Post-Processing SQL</legend>        
         <table>
             <tbody>          
@@ -1067,7 +1103,7 @@ Configuration form
                         <textarea rows="10" cols="70"
                             style="margin-top: 4px; margin-bottom: 4px;"
                             name="<?php echo $sqlName;?>"><?php echo Filter::escapeForHtml($sql);?></textarea>
-                    </td>
+                    </td>                   
                     <td>
                         <a href="#" id="post-processing-sql-help-link" class="etl-help"
                            style="margin-left: 2em;">?</a>                      
@@ -1081,7 +1117,8 @@ Configuration form
         </table>
         </fieldset>
     </fieldset>
-    
+
+
     <fieldset class="config">
     <table style="width: 50%; margin: 0 auto;">
         <tr>

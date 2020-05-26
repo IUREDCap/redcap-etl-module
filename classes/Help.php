@@ -144,6 +144,17 @@ class Help
             ."<li>CREATE VIEW</li>"
             ."</ul>"
         ,
+        'pre-processing-sql' =>
+            "<p>The pre-processing SQL field is used to specify SQL commands that you want"
+            ." REDCap-ETL to run on the load database"
+            ." before the ETL process starts."
+            ." </p>"
+            ." <p>Pre-processing is intended for SQL commands that update the database, and any"
+            ." select commands entered will not generate output."
+            ." Note that the table name prefix (if any) will NOT be added automatically to "
+            ." pre-processing SQL commands, so if you are using a table prefix, you will"
+            ." need to manually add it to table names in these commands.</p>"
+        ,
         'post-processing-sql' =>
             "<p>The post-processing SQL field is used to specify SQL commands that you want"
             ." REDCap-ETL to run on the load database"
