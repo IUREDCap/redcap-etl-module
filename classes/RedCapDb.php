@@ -98,13 +98,16 @@ class RedCapDb
 
     /**
      * Gets all the ETL configuration settings.
+     *
+     * @return array array of maps that contain keys 'project_id' and 'value'. The
+     *     'value' key value contains the configuration data in JSON format.
      */
-    public function getEtlConfigurationSettings($module)
+    public function getEtlConfigurationsSettings($module)
     {
         $dirName = $module->getModuleDirectoryName();
 
         $etlConfigs = array();
-        $sql = "select rems.* "
+        $sql = "select rems.project_id, rems.value "
             ." from redcap_external_modules rem, redcap_external_module_settings rems "
             ." where rem.external_module_id = rems.external_module_id "
             ." and '".Filter::escapeForMySql($dirName)."' like concat(rem.directory_prefix, '%') "
@@ -112,7 +115,7 @@ class RedCapDb
             ;
         $queryResult = db_query($sql);
         while ($row = db_fetch_assoc($queryResult)) {
-            $etlConfigs[] = $row['value'];
+            $etlConfigs[] = $row;
         }
         return $etlConfigs;
     }
