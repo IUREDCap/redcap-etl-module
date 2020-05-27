@@ -560,19 +560,42 @@ class RedCapEtl
      */
     protected function createLoadTables()
     {
-        // foreach table, replace it with an empty table
-        $tables = $this->schema->getTables();
-        foreach ($tables as $table) {
+        #-------------------------------------------------------------
+        # Get the tables in top-down order, so that each parent table
+        # will always come before its child tables
+        #-------------------------------------------------------------
+        $tables = $this->schema->getTablesTopDown();
+
+        #---------------------------------------------------------------------
+        # Drop tables in the reverse order (bottom-up), so that child tables
+        # will always be dropped before their parent table. And drop
+        # the label view (if any) for a table before dropping the table
+        #---------------------------------------------------------------------
+        foreach (array_reverse($tables) as $table) {
             if ($table->usesLookup === true) {
                 $ifExists = true;
                 $this->dbcon->dropLabelView($table, $ifExists);
             }
 
-            $this->dbcon->replaceTable($table);
+            $ifExists = true;
+            $this->dbcon->dropTable($table, $ifExists);
+        }
+
+        #------------------------------------------------------
+        # Create the tables in the order they were defined
+        #------------------------------------------------------
+        foreach ($tables as $table) {
+            $ifExists = false;
+            $this->dbcon->createTable($table, $ifExists);
+            // $this->dbcon->addPrimaryKeyConstraint($table);
 
             $msg = "Created table '".$table->name."'";
 
-            // If this table uses the Lookup table, create a view
+            #--------------------------------------------------------------------------
+            # If this table uses the Lookup table (i.e., has multiple-choice values),
+            # Create a view of the table that has multiple-choice labels instead of
+            # multiple-choice values.
+            #--------------------------------------------------------------------------
             if ($table->usesLookup === true) {
                 $this->dbcon->replaceLookupView($table, $this->schema->getLookupTable());
                 $msg .= '; Lookup table created';
@@ -585,6 +608,34 @@ class RedCapEtl
             $lookupTable = $this->schema->getLookupTable();
             $this->dbcon->replaceTable($lookupTable);
             $this->loadTableRows($lookupTable);
+        }
+    }
+
+    /**
+     * Creates primary and foreign keys for the database tables if they
+     * have been specified (note: unsupported for CSV and SQLite).
+     */
+    protected function createDatabaseKeys()
+    {
+        #-------------------------------------------------------------
+        # Get the tables in top-down order, so that each parent table
+        # will always come before its child tables
+        #-------------------------------------------------------------
+        $tables = $this->schema->getTablesTopDown();
+
+        #------------------------------------------------------
+        # Create tables
+        #------------------------------------------------------
+        if ($this->configuration->getDbPrimaryKeys()) {
+            foreach ($tables as $table) {
+                $this->dbcon->addPrimaryKeyConstraint($table);
+            }
+        }
+
+        if ($this->configuration->getDbForeignKeys()) {
+            foreach ($tables as $table) {
+                $this->dbcon->addForeignKeyConstraint($table);
+            }
         }
     }
 
@@ -690,38 +741,66 @@ class RedCapEtl
         $this->logJobInfo();
         $this->log("Starting processing.");
 
+        # Parse the transformation rules
         list($parseStatus, $result) = $this->processTransformationRules();
-
         if ($parseStatus === SchemaGenerator::PARSE_ERROR) {
             $message = "Transformation rules not parsed. Processing stopped.";
             throw new EtlException($message, EtlException::INPUT_ERROR);
-        } else {
-            $this->createLoadTables();
-            $numberOfRecordIds = $this->extractTransformLoad();
-                
-            #----------------------------------------
-            # Post-processing SQL
-            #----------------------------------------
-            try {
-                $sql = $this->configuration->getPostProcessingSql();
-                if (!empty($sql)) {
-                    $this->dbcon->processQueries($sql);
-                }
-
-                $sqlFile = $this->configuration->getPostProcessingSqlFile();
-                if (!empty($sqlFile)) {
-                    $this->dbcon->processQueryFile($sqlFile);
-                }
-            } catch (\Exception $exception) {
-                $message = 'Post-processing SQL error: '.$exception->getMessage();
-                throw new EtlException($message, EtlException::INPUT_ERROR);
-            }
-
-            $this->log(self::PROCESSING_COMPLETE);
-            $this->logger->logEmailSummary();
         }
 
+        $this->runPreProcessingSql();
+
+        # Create the database tables where the extracted and
+        # transformed data from REDCap will be loaded
+        $this->createLoadTables();
+
+        # ETL
+        $numberOfRecordIds = $this->extractTransformLoad();
+
+        $this->createDatabaseKeys(); // create primary and foreign keys, if configured
+
+        $this->runPostProcessingSql();
+                
+        $this->log(self::PROCESSING_COMPLETE);
+        $this->logger->logEmailSummary();
+
         return $numberOfRecordIds;
+    }
+
+    protected function runPreProcessingSql()
+    {
+        try {
+            $sql = $this->configuration->getPreProcessingSql();
+            if (!empty($sql)) {
+                $this->dbcon->processQueries($sql);
+            }
+
+            $sqlFile = $this->configuration->getPreProcessingSqlFile();
+            if (!empty($sqlFile)) {
+                $this->dbcon->processQueryFile($sqlFile);
+            }
+        } catch (\Exception $exception) {
+            $message = 'Pre-processing SQL error: '.$exception->getMessage();
+            throw new EtlException($message, EtlException::INPUT_ERROR);
+        }
+    }
+
+    protected function runPostProcessingSql()
+    {
+        try {
+            $sql = $this->configuration->getPostProcessingSql();
+            if (!empty($sql)) {
+                $this->dbcon->processQueries($sql);
+            }
+
+            $sqlFile = $this->configuration->getPostProcessingSqlFile();
+            if (!empty($sqlFile)) {
+                $this->dbcon->processQueryFile($sqlFile);
+            }
+        } catch (\Exception $exception) {
+            $message = 'Post-processing SQL error: '.$exception->getMessage();
+            throw new EtlException($message, EtlException::INPUT_ERROR);
+        }
     }
 
 
