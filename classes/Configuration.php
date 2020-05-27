@@ -35,6 +35,9 @@ class Configuration implements \JsonSerializable
     const DB_LOG_TABLE       = 'db_log_table';
     const DB_EVENT_LOG_TABLE = 'db_event_log_table';
     
+    # External moodule specific property names that are not in REDCap-ETL.
+    # The values for these properties are combined to form REDCap-ETL's
+    # DB_CONNECTION property.
     const DB_TYPE = 'db_type';
     const DB_HOST = 'db_host';
     const DB_PORT = 'db_port';
@@ -47,6 +50,10 @@ class Configuration implements \JsonSerializable
     
     const DB_SSL        = 'db_ssl';
     const DB_SSL_VERIFY = 'db_ssl_verify';
+
+    const DB_PRIMARY_KEYS = 'db_primary_keys';
+    const DB_FOREIGN_KEYS = 'db_foreign_keys';
+
     const CA_CERT_FILE  = 'ca_cert_file';
     
     const BATCH_SIZE = 'batch_size';
@@ -76,10 +83,24 @@ class Configuration implements \JsonSerializable
     private $name;
     private $username;
     private $projectId;
-    private $properties;
+    
+    private $properties; // map from property names to property values
+    private $booleanProperties;  // array of boolean property names
 
     public function __construct($name, $username = USERID, $projectId = PROJECT_ID)
     {
+        $this->booleanProperties = [
+            self::DB_LOGGING,
+            self::DB_PRIMARY_KEYS,
+            self::DB_FOREIGN_KEYS,
+            self::DB_SSL,
+            self::DB_SSL_VERIFY,
+            self::EMAIL_ERRORS,
+            self::EMAIL_SUMMARY,
+            self::PRINT_LOGGING,
+            self::SSL_VERIFY
+        ];
+                
         self::validateName($name);
         
         $this->name      = $name;
@@ -116,6 +137,9 @@ class Configuration implements \JsonSerializable
         $this->properties[self::EMAIL_SUMMARY] = false;
 
         $this->properties[self::DB_TYPE] = \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_MYSQL;
+
+        $this->properties[self::DB_PRIMARY_KEYS] = true;
+        $this->properties[self::DB_FOREIGN_KEYS] = true;
     }
 
     /**
@@ -173,7 +197,11 @@ class Configuration implements \JsonSerializable
         if (empty($this->getProperty(self::DB_PASSWORD))) {
             throw new \Exception('No database password was specified in configuration.');
         }
-        
+
+        if ($this->getProperty(self::DB_FOREIGN_KEYS) && !$this->getProperty(self::DB_PRIMARY_KEYS)) {
+            throw new \Exception('Database foreign keys specified without database primary keys being specified.');
+        }
+
         if ($this->getProperty(self::EMAIL_ERRORS) || $this->getProperty(self::EMAIL_SUMMARY)) {
             if (empty($this->getProperty(self::EMAIL_TO_LIST))) {
                 throw new \Exception(
@@ -360,14 +388,14 @@ class Configuration implements \JsonSerializable
 
     public function set($properties)
     {
-        $flags = [self::DB_LOGGING, self::EMAIL_ERRORS, self::EMAIL_SUMMARY, self::SSL_VERIFY];
+
         
         #------------------------------------------------
         # Set values
         #------------------------------------------------
         foreach (self::getPropertyNames() as $name) {
             if (array_key_exists($name, $properties)) {
-                if (in_array($name, $flags)) {
+                if (in_array($name, $this->booleanProperties)) {
                     #------------------------------------------
                     # If this is a flag (boolean) property
                     #------------------------------------------
@@ -392,7 +420,7 @@ class Configuration implements \JsonSerializable
                     }
                 }
             } else {
-                if (in_array($name, $flags)) {
+                if (in_array($name, $this->booleanProperties)) {
                     $this->properties[$name] = false;
                 }
             }

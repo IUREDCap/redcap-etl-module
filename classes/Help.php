@@ -44,6 +44,14 @@ class Help
             ." For very large projects, using a large batch size may cause"
             ." system memory limits to be exceeded and the ETL process to fail.</p>"
         ,
+        'database-keys' =>
+            "<p>"
+            ."Selecting database primary keys indicates that primary key constraints will be generated for"
+            ." the tables that are created by the ETL process. Selecting foreign keys will cause foreign keys"
+            ." to be generated for child tables that reference their parent tables. Foreign keys can only"
+            ." be selected when primary keys have been selected also."
+            ."</p>"
+        ,
         'database-logging' =>
             "<p>"
             ."Enabling database logging will log ETL job information to you load database."

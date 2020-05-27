@@ -942,7 +942,36 @@ Configuration form
                         </div>
                     </td>
                 </tr>
+     
+                <!-- PRIMARY KEYS -->
+                <tr>
+                    <td style="padding-right: 1em;">Primary Keys</td>
+                    <td>
+                        <?php
+                        $checked = '';
+                        if ($properties[Configuration::DB_PRIMARY_KEYS]) {
+                            $checked = ' checked ';
+                        }
+                        ?>
+                        <input type="checkbox" name="<?php echo Configuration::DB_PRIMARY_KEYS;?>" value="true"
+                            <?php echo $checked;?> style="vertical-align: middle; margin: 0;">                    
+                    </td>
+                </tr>
 
+                <!-- FOREIGN KEYS -->
+                <tr>
+                    <td style="padding-right: 1em;">Foreign Keys</td>
+                    <td>
+                        <?php
+                        $checked = '';
+                        if ($properties[Configuration::DB_FOREIGN_KEYS]) {
+                            $checked = ' checked ';
+                        }
+                        ?>
+                        <input type="checkbox" name="<?php echo Configuration::DB_FOREIGN_KEYS;?>" value="true"
+                            <?php echo $checked;?> style="vertical-align: middle; margin: 0;">                    
+                    </td>
+                </tr>
             </tbody>
         </table>
         </fieldset>
