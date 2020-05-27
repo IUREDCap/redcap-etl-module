@@ -70,7 +70,7 @@ if (!empty($serverName)) {
 $testOutput = '';
 
 $accessSet = Filter::sanitizeString($_POST['accessLevel']);
-
+#$previousAccessLevel = $serverConfig->getAccessLevel();
 
 #------------------------------------
 # Router
@@ -112,12 +112,18 @@ if (strcasecmp($submit, 'Save') === 0) {
         $serverConfig->validate();
         $module->setServerConfig($serverConfig);
         #if the access-level was changed from private to something else,
-        #then remove any allowed-users for this server so that they won't
-        #immediately have access again if the access-level for the server
+        #then check to see if the user indicated to remove all of the 
+        #allowed-users for this server, for example, so that those users
+        #can't have access again if the access-level for the server
         #should go back to private in the future
         if ($accessSet !== 'private') {
-            $removeUsernames = $module->getPrivateServerUsers($serverName);
-            $module->processPrivateServerUsers($serverName, $removeUsernames);
+            #this request value is set in a javascript function based on what
+            #the user clicks on a js confirm prompt.
+            $deleteUsers = $_REQUEST["deletePrivateAccessUsers"] === 'true' ? true : false;
+            if ($deleteUsers) {
+                $removeUsernames = $module->getPrivateServerUsers($serverName);
+                $module->processPrivateServerUsers($serverName, $removeUsernames);
+            }
         }
     } catch (Exception $exception) {
         $error = 'ERROR: '.$exception->getMessage();
@@ -244,6 +250,32 @@ if (!empty($serverName)) {
         $privateUsers = $module->getPrivateServerUsers($serverName);
     }
 ?>
+
+<script>
+$(function() {
+     $("#accessLevelId").change(function() {
+         var newLevel = $(this).val();
+         var previousLevel = '<?php echo($accessLevel); ?>';
+
+         if (newLevel !== 'private' && previousLevel === 'private') {
+             var privateUsernames = '<?php echo json_encode($privateUsers); ?>';
+
+             if (privateUsernames !== '[]' && privateUsernames !== 'null') {
+                 var m1 = 'To delete the associated list of allowable users, click OK. ';
+                 var m2 = 'To keep the list, click CANCEL.';
+                 var deleteUsers =
+                     document.getElementById("deletePrivateAccessUsers");
+                 deleteUsers.value = confirm(m1 + m2);
+             }  
+         }
+
+         //submit form
+         scFormId.submit();
+     });
+});
+</script>
+
+
 <form name="scForm" id="scFormId" action=<?php echo $selfUrl;?> method="post">
   <input type="hidden" name="serverName"
       value="<?php echo Filter::escapeForHtmlAttribute($serverConfig->getName());?>">
@@ -262,7 +294,8 @@ if (!empty($serverName)) {
      <legend>Access Level Settings</legend>
      <table> 
         <tr>
-           <select onchange="scFormId.submit()" name="accessLevel" id="accessLevelId">
+            <!--<select onchange="scFormId.submit()" name="accessLevel" id="accessLevelId"> -->
+            <select name="accessLevel" id="accessLevelId">
                 <?php
                 foreach ($accessLevels as $value) {
                     if (strcmp($value, $access) === 0) {
@@ -287,7 +320,7 @@ if (!empty($serverName)) {
             }
         }
         ?>
-
+        
         <tr> 
            <fieldset id="usersRow" name="usersRow" <?php echo $usersRowStyle; ?>>
               <legend>Users Currently Granted Access</legend>
@@ -306,6 +339,9 @@ if (!empty($serverName)) {
                  <a href='<?php echo $configureUserUrl ?>'>Add User Access</a>
                  <br />
               </div>
+
+              <input type="hidden" id="deletePrivateAccessUsers" name="deletePrivateAccessUsers" />
+
            </fieldset>
         </tr>
      </table>
@@ -345,7 +381,7 @@ if (!empty($serverName)) {
                         }
                         ?>
                         style="vertical-align: middle; margin: 0;">
-                        <span style="vertical-align: top; margin-right: 8px;">Password3333</span>
+                        <span style="vertical-align: top; margin-right: 8px;">Password</span>
                     </td>
                 </tr>
     
