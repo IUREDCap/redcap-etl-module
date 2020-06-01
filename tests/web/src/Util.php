@@ -116,6 +116,22 @@ class Util
         }
     }
     
+    public static function isSelectedTab($session, $tab)
+    {
+        $page = $session->getPage();
+        $element = $page->find('css', '#sub-nav');
+
+        $link = $element->findLink($tab);
+        if (empty($link)) {
+            throw new \Exception("Tab {$tab} not found.");
+        }
+        
+        if (!$link->getParent()->hasClass('active')) {
+            throw new \Exception("Tab {$tab} is not selected.");
+        }
+    }
+    
+    
     /**
      * Checks that the specified table headers exist on the current page.
      *
