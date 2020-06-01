@@ -20,6 +20,22 @@ use Behat\Behat\Context\SnippetAcceptingContext;
 class Util
 {
     /**
+     * Gets a web browser sessions. This can be useful for interacting with
+     * a web browser outside of the context of a scenario.
+     */
+    public static function getSession()
+    {
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
+        $baseUrl = $testConfig->getRedCap()['base_url'];
+
+        $driver = new \DMore\ChromeDriver\ChromeDriver('http://localhost:9222', null, $baseUrl);
+        $session = new \Behat\Mink\Session($driver);
+        $session->start();
+
+        return $session;
+    }
+
+    /**
      * Logs in to REDCap as the test user.
      */
     public static function loginAsUser($session)
