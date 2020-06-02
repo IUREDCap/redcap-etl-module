@@ -1087,7 +1087,9 @@ Configuration form
         </fieldset>
 
         <fieldset class="config-nested">
-        <legend>Pre-Processing SQL</legend>        
+        <legend>
+            <label for="<?php echo Configuration::PRE_PROCESSING_SQL;?>">Pre-Processing SQL</label>
+        </legend>        
         <table>
             <tbody>          
                 
@@ -1101,6 +1103,7 @@ Configuration form
                         ?>
                         <textarea rows="10" cols="70"
                             style="margin-top: 4px; margin-bottom: 4px;"
+                            id="<?php echo $sqlName;?>"
                             name="<?php echo $sqlName;?>"><?php echo Filter::escapeForHtml($sql);?></textarea>
                     </td>                   
                     <td>
@@ -1117,7 +1120,9 @@ Configuration form
         </fieldset>
                    
         <fieldset class="config-nested">
-        <legend>Post-Processing SQL</legend>        
+        <legend>
+            <label for="<?php echo Configuration::POST_PROCESSING_SQL;?>">Post-Processing SQL</label>
+        </legend>        
         <table>
             <tbody>          
                 
@@ -1131,6 +1136,7 @@ Configuration form
                         ?>
                         <textarea rows="10" cols="70"
                             style="margin-top: 4px; margin-bottom: 4px;"
+                            id="<?php echo $sqlName;?>"
                             name="<?php echo $sqlName;?>"><?php echo Filter::escapeForHtml($sql);?></textarea>
                     </td>                   
                     <td>

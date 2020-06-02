@@ -29,6 +29,14 @@ I need to be able to create, copy, rename and delete configurations
     Then I should see "Extract Settings"
     And I should see "Table"
 
+  Scenario: Set pre and post-processing SQL
+    When I follow configuration "behat-config-test"
+    And I fill in "Pre-Processing SQL" with "CREATE TABLE IF NOT EXISTS pre_test (i int);"
+    And I fill in "Post-Processing SQL" with "CREATE TABLE IF NOT EXISTS post_test (j int);"
+    And I press "Save"
+    Then the "Pre-Processing SQL" field should contain "CREATE TABLE IF NOT EXISTS pre_test (i int);"
+    Then the "Post-Processing SQL" field should contain "CREATE TABLE IF NOT EXISTS post_test (j int);"
+
   Scenario: Save and exit configuration
     When I follow configuration "behat-config-test"
     And I press "Save and Exit"
