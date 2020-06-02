@@ -320,6 +320,16 @@ echo $buffer;
     // Help dialog events
     $(document).ready(function() {
         $( function() {
+            
+            $('#db_primary_keys').click(function () {
+                if (this.checked) {
+                    $("#db_foreign_keys").prop("disabled", false);
+                } else {
+                    $("#db_foreign_keys").prop("checked", false);
+                    $("#db_foreign_keys").prop("disabled", true);
+                }
+            });
+            
             $('#auto-generate-rules-help-link').click(function () {
                 $('#auto-generate-rules-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
                     .dialog('widget').position({my: 'left top', at: 'right+20 top+56', of: $(this)})
@@ -368,6 +378,12 @@ echo $buffer;
                     ;
                 return false;
             });
+            $('#database-keys-help-link').click(function () {
+                $('#database-keys-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });            
             $('#load-settings-help-link').click(function () {
                 $('#load-settings-help').dialog({dialogClass: 'redcap-etl-help', width: 500, maxHeight: 440})
                     .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
@@ -942,6 +958,10 @@ Configuration form
                         </div>
                     </td>
                 </tr>
+                
+                <tr>
+                    <td>&nbsp;</td>
+                </tr>
      
                 <!-- PRIMARY KEYS -->
                 <tr>
@@ -953,8 +973,13 @@ Configuration form
                             $checked = ' checked ';
                         }
                         ?>
-                        <input type="checkbox" name="<?php echo Configuration::DB_PRIMARY_KEYS;?>" value="true"
-                            <?php echo $checked;?> style="vertical-align: middle; margin: 0;">                    
+                        <input type="checkbox" name="<?php echo Configuration::DB_PRIMARY_KEYS;?>"
+                            id="db_primary_keys" value="true"
+                            <?php echo $checked;?> style="vertical-align: middle; margin: 0;">    
+                        <a href="#" id="database-keys-help-link" class="etl-help" style="margin-left: 1em;">?</a>
+                        <div id="database-keys-help" title="Database Keys" style="display: none;">
+                            <?php echo Help::getHelpWithPageLink('database-keys', $module); ?>
+                        </div>
                     </td>
                 </tr>
 
@@ -968,7 +993,8 @@ Configuration form
                             $checked = ' checked ';
                         }
                         ?>
-                        <input type="checkbox" name="<?php echo Configuration::DB_FOREIGN_KEYS;?>" value="true"
+                        <input type="checkbox" name="<?php echo Configuration::DB_FOREIGN_KEYS;?>"
+                            id="db_foreign_keys" value="true"
                             <?php echo $checked;?> style="vertical-align: middle; margin: 0;">                    
                     </td>
                 </tr>
