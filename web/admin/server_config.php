@@ -112,7 +112,7 @@ if (strcasecmp($submit, 'Save') === 0) {
         $serverConfig->validate();
         $module->setServerConfig($serverConfig);
         #if the access-level was changed from private to something else,
-        #then check to see if the user indicated to remove all of the 
+        #then check to see if the user indicated to remove all of the
         #allowed-users for this server, for example, so that those users
         #can't have access again if the access-level for the server
         #should go back to private in the future
@@ -330,7 +330,7 @@ $(function() {
                     foreach ($privateUsers as $username) {
                         echo '<input type="checkbox" name="removeUserCheckbox['.$username.']" '
                           .'style="vertical-align: middle; margin: 0px 10px 0px 25px;"' .">\n";
-                        echo '<label for="'.$username.'">'.$username."</label>\n<br />";
+                        echo '<label for="removeUserCheckbox['.$username.']">'.$username."</label>\n<br />";
                     }
                     ?>
               </div>

@@ -194,7 +194,7 @@ $(function () {
     #--------------------------------------------------------------
     # Server selection
     #--------------------------------------------------------------
-    echo '<select name="server">'."\n";
+    echo '<select name="server" id="serverId">'."\n";
     echo '<option value=""></option>'."\n";
 
     #if ($adminConfig->getAllowEmbeddedServer()) {

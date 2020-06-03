@@ -149,7 +149,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
         on
         <?php
         
-        echo '<select name="server">'."\n";
+        echo '<select name="server" id="serverId">'."\n";
             
         foreach ($servers as $serverName) {
             $serverConfig = $module->getServerConfig($serverName);
