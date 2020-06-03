@@ -85,19 +85,17 @@ class Configuration implements \JsonSerializable
     private $projectId;
     
     private $properties; // map from property names to property values
-    private $booleanProperties;  // array of boolean property names
+    private $booleanUserProperties;  // array of boolean property names that are
+                                    // set in the external module user interface
 
     public function __construct($name, $username = USERID, $projectId = PROJECT_ID)
     {
-        $this->booleanProperties = [
+        $this->booleanUserProperties = [
             self::DB_LOGGING,
             self::DB_PRIMARY_KEYS,
             self::DB_FOREIGN_KEYS,
-            self::DB_SSL,
-            self::DB_SSL_VERIFY,
             self::EMAIL_ERRORS,
             self::EMAIL_SUMMARY,
-            self::PRINT_LOGGING,
             self::SSL_VERIFY
         ];
                 
@@ -395,7 +393,7 @@ class Configuration implements \JsonSerializable
         #------------------------------------------------
         foreach (self::getPropertyNames() as $name) {
             if (array_key_exists($name, $properties)) {
-                if (in_array($name, $this->booleanProperties)) {
+                if (in_array($name, $this->booleanUserProperties)) {
                     #------------------------------------------
                     # If this is a flag (boolean) property
                     #------------------------------------------
@@ -420,7 +418,7 @@ class Configuration implements \JsonSerializable
                     }
                 }
             } else {
-                if (in_array($name, $this->booleanProperties)) {
+                if (in_array($name, $this->booleanUserProperties)) {
                     $this->properties[$name] = false;
                 }
             }
