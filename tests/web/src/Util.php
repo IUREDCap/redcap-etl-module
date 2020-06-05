@@ -14,6 +14,8 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Behat\Context\SnippetAcceptingContext;
 
+use WebDriver\Exception\NoAlertOpenError;
+
 /**
  * Utility class that has helpful methods.
  */
@@ -289,6 +291,41 @@ class Util
             throw new \Exception(sprintf('The "%s" "%s" found on the page for "%s"', $item, $seeError, $username));
         }
     }
+
+    /**
+     * Changes the access level on the configuration page for the server
+     *
+     * @param string $serverName the name of the server to delete.
+     */
+    public static function chooseAccessLevel($session, $newLevel)
+    {
+        $page = $session->getPage();
+        $accessLevel = $page->findById("accessLevelId");
+        $privateUsersExist = false;
+   
+        # If the current access level is private then check to see if any users were
+        # assigned. (If there are users assigned, the word "Remove" will appear next
+        # to theier usernames.)
+        if ($accessLevel->getValue() === 'private') {
+            $usersRow = $page->findById("usersRow")->getText();
+            $privateUsersExist = strpos($usersRow, 'Remove');
+        }
+        print "privateUsersExist is $privateUsersExist\n";
+
+
+        print "changing select to $newLevel\n";
+        # change to new access level
+        $accessLevel->selectOption($newLevel);
+        sleep(3);
+
+        # Handle confirmation dialog
+        if ($privateUsersExist) {
+            #The message in the confirm box starts with the words "To delete"
+            $confirmBox = $page->find('xpath', "//*[contains(text(), 'To delete')]");
+            $confirmBox->pressButton("OK");
+        }
+    }
+
     /**
      * @param string $tagName - The name of the tag, eg. 'script', 'style'
      * @param string $content

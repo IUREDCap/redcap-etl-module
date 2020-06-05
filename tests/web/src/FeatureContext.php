@@ -568,6 +568,16 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @When I choose :textA as the access level
+     */
+    public function iChooseAsTheAccessLevel($textA)
+    {
+        $session = $this->getSession();
+        Util::chooseAccessLevel($session, $textA);
+    }
+
+
+    /**
      * @Then I :textA see a/an :textB item for the user
      */
     public function iSeeAnItemForTheUser($textA, $textB)
@@ -581,7 +591,7 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
 
 
     /**
-     * @When I confirm the popup
+     * @When I confirm the popup [nal WIP: was in the process of trying to get this to work]
      */
     #public function iConfirmThePopup()
     #{
