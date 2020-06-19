@@ -573,7 +573,17 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     public function iChooseAsTheAccessLevel($textA)
     {
         $session = $this->getSession();
-        Util::chooseAccessLevel($session, $textA);
+        Util::chooseAccessLevel($session, $textA, null);
+    }
+
+
+    /**
+     * @When I choose :textA as the access level and click :textB
+     */
+    public function iChooseAsTheAccessLevelAndClick($textA, $textB)
+    {
+        $session = $this->getSession();
+        Util::chooseAccessLevel($session, $textA, $textB);
     }
 
 

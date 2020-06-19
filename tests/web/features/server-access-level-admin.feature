@@ -16,7 +16,7 @@ Feature: Server access level management
     When I follow "ETL Servers"
     And I follow server "(embedded server)"
     And I select "admin" from "accessLevel"
-    And I wait for 2 seconds
+    And I wait for 5 seconds
     Then the "#accessLevelId option:selected" element should contain "admin"
     And I should not see "Users Currently Granted Access"
 
@@ -27,7 +27,7 @@ Feature: Server access level management
     When I follow "ETL Servers"
     And I follow server "(embedded server)"
     And I select "public" from "accessLevel"
-    And I wait for 2 seconds
+    And I wait for 5 seconds
     Then the "#accessLevelId option:selected" element should contain "public"
     But I should not see "Users Currently Granted Access"
 
@@ -38,7 +38,7 @@ Feature: Server access level management
     When I follow "ETL Servers"
     And I follow server "(embedded server)"
     And I select "private" from "accessLevel"
-    And I wait for 2 seconds
+    And I wait for 5 seconds
     Then the "#accessLevelId option:selected" element should contain "private"
     And I should see "Users Currently Granted Access"
     And I should see "Add User Access"
@@ -108,3 +108,46 @@ Feature: Server access level management
     And I follow server "(embedded server)"
     Then I "should not" see a "remove user checkbox" item for the user
 
+ Scenario: Change the access level from private with users assigned to admin and do not delete the users list
+    When I follow "ETL Servers"
+    And I follow server "(embedded server)"
+    And I choose "private" as the access level
+    And I follow "Add User Access"
+    And I follow "List"
+    And I click on the user
+    And I check "accessCheckbox[(embedded server)]"
+    And I press "Save"
+    And I wait for 2 seconds
+    And I follow "ETL Servers"
+    And I follow server "(embedded server)" 
+    And I choose "admin" as the access level and click "Save list"
+    And I wait for 5 seconds
+    Then the "#accessLevelId option:selected" element should contain "admin"
+    And I "should not" see a "remove user checkbox" item for the user
+
+    When I choose "private" as the access level
+    Then I should see "Users Currently Granted Access"
+    And I should see "Add User Access"
+    And I "should" see a "remove user checkbox" item for the user
+
+ Scenario: Change the access level from private with users assigned to public and delete the users list
+    When I follow "ETL Servers"
+    And I follow server "(embedded server)"
+    And I choose "private" as the access level
+    And I follow "Add User Access"
+    And I follow "List"
+    And I click on the user
+    And I check "accessCheckbox[(embedded server)]"
+    And I press "Save"
+    And I wait for 2 seconds
+    And I follow "ETL Servers"
+    And I follow server "(embedded server)" 
+    And I choose "admin" as the access level and click "Delete list"
+    And I wait for 5 seconds
+    Then the "#accessLevelId option:selected" element should contain "admin"
+    And I "should not" see a "remove user checkbox" item for the user
+
+    When I choose "private" as the access level
+    Then I should see "Users Currently Granted Access"
+    And I should see "Add User Access"
+    But I "should not" see a "remove user checkbox" item for the user

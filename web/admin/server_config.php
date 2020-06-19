@@ -252,6 +252,38 @@ if (!empty($serverName)) {
 ?>
 
 <script>
+$(document).ready(function(){
+    $("#delete-userlist-dialog").dialog({
+            autoOpen : false,
+            resizable : false,
+            modal : true,
+            height: 220,
+            width: 400,
+            title: 'Delete Private-Access User List',
+            buttons: [{
+                text: 'Delete list',
+                icons: {
+                           primary: "ui-icon-check"
+                       },
+                click: function() {
+                           var deleteUsers =
+                               document.getElementById("deletePrivateAccessUsers");
+                           deleteUsers.value = true;
+                           /*submit form */
+                           scFormId.submit();
+                       }},{
+                text: 'Save list',
+		icons: {
+			   primary: "ui-icon-cancel"
+		       },
+                click: function() {
+                           /*submit form */
+                           scFormId.submit();
+                       }
+            }]
+        });
+});
+
 $(function() {
      $("#accessLevelId").change(function() {
          var newLevel = $(this).val();
@@ -259,18 +291,16 @@ $(function() {
 
          if (newLevel !== 'private' && previousLevel === 'private') {
              var privateUsernames = '<?php echo json_encode($privateUsers); ?>';
-
              if (privateUsernames !== '[]' && privateUsernames !== 'null') {
-                 var m1 = 'To delete the associated list of allowable users, click OK. ';
-                 var m2 = 'To keep the list, click CANCEL.';
-                 var deleteUsers =
-                     document.getElementById("deletePrivateAccessUsers");
-                 deleteUsers.value = confirm(m1 + m2);
-             }  
+                $("#delete-userlist-dialog").dialog("open");
+             } else {
+                //submit form
+                 scFormId.submit();
+             }
+         } else {
+             //submit form
+             scFormId.submit();
          }
-
-         //submit form
-         scFormId.submit();
      });
 });
 </script>
@@ -340,7 +370,7 @@ $(function() {
                  <br />
               </div>
 
-              <input type="hidden" id="deletePrivateAccessUsers" name="deletePrivateAccessUsers" />
+             <input type="hidden" id="deletePrivateAccessUsers" name="deletePrivateAccessUsers" />
 
            </fieldset>
         </tr>
@@ -586,5 +616,16 @@ $(function() {
 <?php
 }
 ?>
+
+
+<?php
+#--------------------------------------
+# Delete user list dialog
+#--------------------------------------
+?>
+<div id="delete-userlist-dialog" style="display: none;">
+    Do you want to delete the list of allowed users for the private-level access? 
+</div>
+
 
 <?php require_once APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>

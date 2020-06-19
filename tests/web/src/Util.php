@@ -292,12 +292,7 @@ class Util
         }
     }
 
-    /**
-     * Changes the access level on the configuration page for the server
-     *
-     * @param string $serverName the name of the server to delete.
-     */
-    public static function chooseAccessLevel($session, $newLevel)
+    public static function chooseAccessLevel($session, $newLevel, $privateLevelButton)
     {
         $page = $session->getPage();
         $accessLevel = $page->findById("accessLevelId");
@@ -305,24 +300,24 @@ class Util
    
         # If the current access level is private then check to see if any users were
         # assigned. (If there are users assigned, the word "Remove" will appear next
-        # to theier usernames.)
-        if ($accessLevel->getValue() === 'private') {
+        # to their usernames.)
+        if ($accessLevel->getValue() === 'private' && $newLevel !== 'private') {
             $usersRow = $page->findById("usersRow")->getText();
             $privateUsersExist = strpos($usersRow, 'Remove');
         }
-        print "privateUsersExist is $privateUsersExist\n";
 
-
-        print "changing select to $newLevel\n";
-        # change to new access level
-        $accessLevel->selectOption($newLevel);
-        sleep(3);
-
-        # Handle confirmation dialog
         if ($privateUsersExist) {
-            #The message in the confirm box starts with the words "To delete"
-            $confirmBox = $page->find('xpath', "//*[contains(text(), 'To delete')]");
-            $confirmBox->pressButton("OK");
+            $page = $session->getPage();
+
+            #Change the access level
+            $accessLevel->selectOption($newLevel);
+
+            # Handle confirmation dialog
+            $page->pressButton($privateLevelButton);
+
+        } else {
+            $accessLevel->selectOption($newLevel);
+            sleep(2);
         }
     }
 
