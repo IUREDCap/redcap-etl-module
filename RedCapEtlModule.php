@@ -477,7 +477,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     
     public function isSuperUser()
     {
-        return SUPER_USER;
+        $isSuperUser = false;
+        if (defined('SUPER_USER') && SUPER_USER) {
+            $isSuperUser = true;
+        }
+        return $isSuperUser;
     }
 
     /**
@@ -1188,7 +1192,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function checkAdminPagePermission()
     {
-        if (!SUPER_USER) {
+        if ((defined('SUPER_USER') && !SUPER_USER) || !defined('SUPER_USER')) {
             exit("Only super users can access this page!");
         } elseif (!Csrf::isValidRequest()) {
             exit(
