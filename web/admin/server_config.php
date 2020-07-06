@@ -273,9 +273,9 @@ $(document).ready(function(){
                            scFormId.submit();
                        }},{
                 text: 'Save list',
-		icons: {
-			   primary: "ui-icon-cancel"
-		       },
+        icons: {
+               primary: "ui-icon-cancel"
+               },
                 click: function() {
                            /*submit form */
                            scFormId.submit();

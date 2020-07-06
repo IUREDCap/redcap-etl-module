@@ -113,16 +113,26 @@ The REDCap-ETL external module needs at least one REDCap-ETL server to function.
     </li>
 </ol>
 
-<p> You will be able to select an access level for each server. A server's access level identifies which users are allowed to access the server. When a user goes to run or schedule an ETL job, only those servers to which they have permissions will be displayed. There are three server access-level options:
+<p> You will be able to select an access level for each server.
+A server's access level identifies which users are allowed to access the server.
+When a user goes to run or schedule an ETL job, only those servers to which they
+have permissions will be displayed. There are three server access-level options:
 <ol>
     <li><span style="font-weight: bold;">public</span>
         - the server is open to any user. This is the default value.
     </li>
     <li><span style="font-weight: bold;">private</span>
-        - only specified users are allowed access to the server. You will be able to add users to a list of permitted users, as well as remove them from the list. If a server has a private access-level and a list of permitted users and you later change that access level to some other value, you will be prompted regarding whether you want the assigned list of users to be permanently deleted.
+        - only specified users are allowed access to the server.
+        You will be able to add users to a list of permitted users,
+        as well as remove them from the list. If a server has a private access-level
+        and a list of permitted users and you later change that access level to some
+        other value, you will be prompted regarding whether you want the assigned list
+        of users to be permanently deleted.
     </li>
     <li><span style="font-weight: bold;">admin</span>
-        - only REDCap administrators can run the server. You needn't specify any users for this access level. Any administrator will be able to run the server.
+        - only REDCap administrators can run the server.
+        You needn't specify any users for this access level.
+        Any administrator will be able to run the server.
     </li>
 </ol>
 <hr />
