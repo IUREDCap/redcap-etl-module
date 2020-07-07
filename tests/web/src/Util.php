@@ -22,6 +22,22 @@ use WebDriver\Exception\NoAlertOpenError;
 class Util
 {
     /**
+     * Gets a web browser sessions. This can be useful for interacting with
+     * a web browser outside of the context of a scenario.
+     */
+    public static function getSession()
+    {
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
+        $baseUrl = $testConfig->getRedCap()['base_url'];
+
+        $driver = new \DMore\ChromeDriver\ChromeDriver('http://localhost:9222', null, $baseUrl);
+        $session = new \Behat\Mink\Session($driver);
+        $session->start();
+
+        return $session;
+    }
+
+    /**
      * Logs in to REDCap as the test user.
      */
     public static function loginAsUser($session)
@@ -117,6 +133,22 @@ class Util
             }
         }
     }
+    
+    public static function isSelectedTab($session, $tab)
+    {
+        $page = $session->getPage();
+        $element = $page->find('css', '#sub-nav');
+
+        $link = $element->findLink($tab);
+        if (empty($link)) {
+            throw new \Exception("Tab {$tab} not found.");
+        }
+        
+        if (!$link->getParent()->hasClass('active')) {
+            throw new \Exception("Tab {$tab} is not selected.");
+        }
+    }
+    
     
     /**
      * Checks that the specified table headers exist on the current page.

@@ -33,6 +33,9 @@ class Configuration
     const DEFAULT_DB_SSL             = true;
     const DEFAULT_DB_SSL_VERIFY      = false;
 
+    const DEFAULT_DB_PRIMARY_KEYS    = true;
+    const DEFAULT_DB_FOREIGN_KEYS    = true;
+
     const DEFAULT_DB_LOGGING         = true;
     const DEFAULT_DB_LOG_TABLE       = 'etl_log';
     const DEFAULT_DB_EVENT_LOG_TABLE = 'etl_event_log';
@@ -76,6 +79,9 @@ class Configuration
     private $dbSsl;
     private $dbSslVerify;
 
+    private $dbPrimaryKeys;
+    private $dbForeignKeys;
+
     private $dbLogging;
     private $dbLogTable;
     private $dbEventLogTable;
@@ -92,8 +98,11 @@ class Configuration
     private $labelViewSuffix;
     private $lookupTableName;
 
+    private $preProcessingSql;
+    private $preProcessingSqlFile;
     private $postProcessingSql;
     private $postProcessingSqlFile;
+    
     private $projectId;
     private $printLogging;
     private $redcapApiUrl;
@@ -396,6 +405,27 @@ class Configuration
             }
         }
 
+        #---------------------------------------------
+        # Get the pre-processing SQL (if any)
+        #---------------------------------------------
+        $this->preProcessingSql = null;
+        if (array_key_exists(ConfigProperties::PRE_PROCESSING_SQL, $this->properties)) {
+            $sql = $this->properties[ConfigProperties::PRE_PROCESSING_SQL];
+            if (!empty($sql)) {
+                $this->preProcessingSql = $sql;
+            }
+        }
+
+        #---------------------------------------------
+        # Get the pre-processing SQL file (if any)
+        #---------------------------------------------
+        $this->preProcessingSqlFile = null;
+        if (array_key_exists(ConfigProperties::PRE_PROCESSING_SQL_FILE, $this->properties)) {
+            $file = $this->properties[ConfigProperties::PRE_PROCESSING_SQL_FILE];
+            if (!empty($file)) {
+                $this->preProcessingSqlFile = $this->processFile($file, $fileShouldExist = false);
+            }
+        }
 
         #---------------------------------------------
         # Get the post-processing SQL (if any)
@@ -631,6 +661,35 @@ class Configuration
                 }
                 $this->dbSslVerify  = true;
             }
+        }
+
+        #-----------------------------------------
+        # Process the database primary keys flag
+        #-----------------------------------------
+        $this->dbPrimaryKeys = self::DEFAULT_DB_PRIMARY_KEYS;
+        if (array_key_exists(ConfigProperties::DB_PRIMARY_KEYS, $this->properties)) {
+            $primaryKeys = $this->properties[ConfigProperties::DB_PRIMARY_KEYS];
+            if ($primaryKeys === false|| strcasecmp($primaryKeys, 'false') === 0
+                || $primaryKeys === '0' || $primaryKeys === 0) {
+                $this->dbPrimaryKeys  = false;
+            }
+        }
+
+        #-----------------------------------------
+        # Process the database foreign keys flag
+        #-----------------------------------------
+        $this->dbForeignKeys = self::DEFAULT_DB_FOREIGN_KEYS;
+        if (array_key_exists(ConfigProperties::DB_FOREIGN_KEYS, $this->properties)) {
+            $foreignKeys = $this->properties[ConfigProperties::DB_FOREIGN_KEYS];
+            if ($foreignKeys === false|| strcasecmp($foreignKeys, 'false') === 0
+                || $foreignKeys === '0' || $foreignKeys == 0) {
+                $this->dbForeignKeys  = false;
+            }
+        }
+
+        if ($this->dbForeignKeys && !$this->dbPrimaryKeys) {
+            $message = 'The configuration was set to generate foreign keys in the database, but not primary keys.';
+            throw new EtlException($message, EtlException::INPUT_ERROR);
         }
 
         return true;
@@ -1015,6 +1074,16 @@ class Configuration
         return $this->dbSslVerify;
     }
 
+    public function getDbPrimaryKeys()
+    {
+        return $this->dbPrimaryKeys;
+    }
+
+    public function getDbForeignKeys()
+    {
+        return $this->dbForeignKeys;
+    }
+
     public function getDbLogging()
     {
         return $this->dbLogging;
@@ -1103,6 +1172,16 @@ class Configuration
     public function getLookupTableName()
     {
         return $this->lookupTableName;
+    }
+
+    public function getPreProcessingSql()
+    {
+        return $this->preProcessingSql;
+    }
+
+    public function getPreProcessingSqlFile()
+    {
+        return $this->preProcessingSqlFile;
     }
 
     public function getPostProcessingSql()

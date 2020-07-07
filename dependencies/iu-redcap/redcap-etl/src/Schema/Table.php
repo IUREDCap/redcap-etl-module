@@ -107,6 +107,18 @@ class Table
         return $field;
     }
 
+    /**
+     * Indicates if the table is a child table (i.e., is NOT a root table).
+     */
+    public function isChildTable()
+    {
+        $isChild = false;
+        if (isset($this->parent) && $this->parent instanceof Table) {
+            $isChild = true;
+        }
+        return $isChild;
+    }
+
 
     public function setForeign($parentTable)
     {
@@ -203,6 +215,20 @@ class Table
     public function getChildren()
     {
          return($this->children);
+    }
+
+    /**
+     * @return array list of descendant tables in depth first order.
+     */
+    public function getDescendantsDepthFirst()
+    {
+        $descendants = array();
+        foreach ($this->children as $child) {
+            array_push($descendants, $child);
+            $childDescendants = $child->getDescendantsDepthFirst();
+            $descendants = array_merge($descendants, $childDescendants);
+        }
+        return $descendants;
     }
 
     public function nextPrimaryKey()

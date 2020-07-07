@@ -350,12 +350,35 @@ class Settings
         $setting = $this->module->getProjectSetting($key, $projectId);
         $configValues = json_decode($setting, true);
         if (isset($configValues) && is_array($configValues)) {
+            $projectIdUpdated = false;
+
+            if (!empty($projectId) && $configValues['projectId'] !== $projectId) {
+                #-------------------------------------------------------------------------
+                # if the project ID in the stored configuration is wrong (i.e., it
+                # doesn't match the current user's project ID) reset it, and clear
+                # the API token, API token user and cron schedule. This can happen
+                # when a REDCap project that has ETL configurations is copied (the
+                # project IDs stored in the configurations are not updated with the
+                # copy).
+                #-------------------------------------------------------------------------
+                $configValues['projectId'] = $projectId;
+                $configValues['properties'][Configuration::DATA_SOURCE_API_TOKEN] = '';
+                $configValues['properties'][Configuration::API_TOKEN_USERNAME]    = '';
+                $configValues['properties'][Configuration::CRON_SCHEDULE]         = '';
+                $projectIdUpdated = true;
+            }
+
             $configuration = new Configuration(
                 $configValues['name'],
                 $configValues['username'],
                 $configValues['projectId']
             );
             $configuration->set($configValues['properties']);
+
+            if ($projectIdUpdated) {
+                # If the project ID was updated, then save the updated configuration
+                $this->setConfiguration($configuration, $username, $projectId);
+            }
         }
         return $configuration;
     }
@@ -600,14 +623,16 @@ class Settings
         }
 
         # Get all ETL configuration settings
-        $etlConfigSettings = $this->db->getEtlConfigurationSettings($this->module);
-        foreach ($etlConfigSettings as $configJson) {
+        $allEtlConfigSettings = $this->db->getEtlConfigurationsSettings($this->module);
+        foreach ($allEtlConfigSettings as $etlConfigSettings) {
+            $projectId  = $etlConfigSettings['project_id'];
+            $configJson = $etlConfigSettings['value'];
+
             $configValues = json_decode($configJson, true);
             $config = null;
             if (isset($configValues) && is_array($configValues)) {
                 $configName = $configValues['name'];
                 $username   = $configValues['username'];
-                $projectId  = $configValues['projectId'];
                 
                 $config = new Configuration(
                     $configName,
@@ -659,14 +684,17 @@ class Settings
         $cronJobs = array();
                 
         # Get all ETL configuration settings
-        $etlConfigSettings = $this->db->getEtlConfigurationSettings($this->module);
-        foreach ($etlConfigSettings as $configJson) {
+        $allEtlConfigSettings = $this->db->getEtlConfigurationsSettings($this->module);
+
+        foreach ($allEtlConfigSettings as $etlConfigSettings) {
+            $projectId  = $etlConfigSettings['project_id'];
+            $configJson = $etlConfigSettings['value'];
+
             $configValues = json_decode($configJson, true);
             $config = null;
             if (isset($configValues) && is_array($configValues)) {
                 $configName = $configValues['name'];
                 $username   = $configValues['username'];
-                $projectId  = $configValues['projectId'];
                 
                 $config = new Configuration(
                     $configName,

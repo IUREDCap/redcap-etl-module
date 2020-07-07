@@ -320,6 +320,16 @@ echo $buffer;
     // Help dialog events
     $(document).ready(function() {
         $( function() {
+            
+            $('#db_primary_keys').click(function () {
+                if (this.checked) {
+                    $("#db_foreign_keys").prop("disabled", false);
+                } else {
+                    $("#db_foreign_keys").prop("checked", false);
+                    $("#db_foreign_keys").prop("disabled", true);
+                }
+            });
+            
             $('#auto-generate-rules-help-link').click(function () {
                 $('#auto-generate-rules-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
                     .dialog('widget').position({my: 'left top', at: 'right+20 top+56', of: $(this)})
@@ -368,12 +378,24 @@ echo $buffer;
                     ;
                 return false;
             });
+            $('#database-keys-help-link').click(function () {
+                $('#database-keys-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });            
             $('#load-settings-help-link').click(function () {
                 $('#load-settings-help').dialog({dialogClass: 'redcap-etl-help', width: 500, maxHeight: 440})
                     .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
                     ;
                 return false;
-            }); 
+            });
+            $('#pre-processing-sql-help-link').click(function () {
+                $('#pre-processing-sql-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 400})
+                    .dialog('widget').position({my: 'left top', at: 'right+10 top', of: $(this)})
+                    ;
+                return false;
+            });  
             $('#post-processing-sql-help-link').click(function () {
                 $('#post-processing-sql-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 400})
                     .dialog('widget').position({my: 'left top', at: 'right+10 top', of: $(this)})
@@ -936,7 +958,46 @@ Configuration form
                         </div>
                     </td>
                 </tr>
+                
+                <tr>
+                    <td>&nbsp;</td>
+                </tr>
+     
+                <!-- PRIMARY KEYS -->
+                <tr>
+                    <td style="padding-right: 1em;">Primary Keys</td>
+                    <td>
+                        <?php
+                        $checked = '';
+                        if ($properties[Configuration::DB_PRIMARY_KEYS]) {
+                            $checked = ' checked ';
+                        }
+                        ?>
+                        <input type="checkbox" name="<?php echo Configuration::DB_PRIMARY_KEYS;?>"
+                            id="db_primary_keys" value="true"
+                            <?php echo $checked;?> style="vertical-align: middle; margin: 0;">    
+                        <a href="#" id="database-keys-help-link" class="etl-help" style="margin-left: 1em;">?</a>
+                        <div id="database-keys-help" title="Database Keys" style="display: none;">
+                            <?php echo Help::getHelpWithPageLink('database-keys', $module); ?>
+                        </div>
+                    </td>
+                </tr>
 
+                <!-- FOREIGN KEYS -->
+                <tr>
+                    <td style="padding-right: 1em;">Foreign Keys</td>
+                    <td>
+                        <?php
+                        $checked = '';
+                        if ($properties[Configuration::DB_FOREIGN_KEYS]) {
+                            $checked = ' checked ';
+                        }
+                        ?>
+                        <input type="checkbox" name="<?php echo Configuration::DB_FOREIGN_KEYS;?>"
+                            id="db_foreign_keys" value="true"
+                            <?php echo $checked;?> style="vertical-align: middle; margin: 0;">                    
+                    </td>
+                </tr>
             </tbody>
         </table>
         </fieldset>
@@ -1052,7 +1113,42 @@ Configuration form
         </fieldset>
 
         <fieldset class="config-nested">
-        <legend>Post-Processing SQL</legend>        
+        <legend>
+            <label for="<?php echo Configuration::PRE_PROCESSING_SQL;?>">Pre-Processing SQL</label>
+        </legend>        
+        <table>
+            <tbody>          
+                
+                <!-- PRE-PROCESSING SQL -->
+                <tr>
+                    <td style="padding-right: 1em;">SQL</td>
+                    <td>
+                        <?php
+                        $sql = $properties[Configuration::PRE_PROCESSING_SQL];
+                        $sqlName = Configuration::PRE_PROCESSING_SQL;
+                        ?>
+                        <textarea rows="10" cols="70"
+                            style="margin-top: 4px; margin-bottom: 4px;"
+                            id="<?php echo $sqlName;?>"
+                            name="<?php echo $sqlName;?>"><?php echo Filter::escapeForHtml($sql);?></textarea>
+                    </td>                   
+                    <td>
+                        <a href="#" id="pre-processing-sql-help-link" class="etl-help"
+                           style="margin-left: 2em;">?</a>                      
+                        <div id="pre-processing-sql-help" title="Pre-Processing SQL" style="display: none;">
+                            <?php echo Help::getHelpWithPageLink('pre-processing-sql', $module); ?>
+                        </div>                         
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+        </fieldset>
+                   
+        <fieldset class="config-nested">
+        <legend>
+            <label for="<?php echo Configuration::POST_PROCESSING_SQL;?>">Post-Processing SQL</label>
+        </legend>        
         <table>
             <tbody>          
                 
@@ -1066,8 +1162,9 @@ Configuration form
                         ?>
                         <textarea rows="10" cols="70"
                             style="margin-top: 4px; margin-bottom: 4px;"
+                            id="<?php echo $sqlName;?>"
                             name="<?php echo $sqlName;?>"><?php echo Filter::escapeForHtml($sql);?></textarea>
-                    </td>
+                    </td>                   
                     <td>
                         <a href="#" id="post-processing-sql-help-link" class="etl-help"
                            style="margin-left: 2em;">?</a>                      
@@ -1081,7 +1178,8 @@ Configuration form
         </table>
         </fieldset>
     </fieldset>
-    
+
+
     <fieldset class="config">
     <table style="width: 50%; margin: 0 auto;">
         <tr>

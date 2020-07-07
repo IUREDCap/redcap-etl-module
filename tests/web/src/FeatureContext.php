@@ -77,7 +77,6 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     {
         $session = $this->getSession();
         $session->reset();
-        #print_r(get_class_methods($session));
 
         $scenario = $event->getScenario();
         $tags = $scenario->getTags();
@@ -168,10 +167,21 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
             # trim standard character plus quotes
             $tabs[$i] = trim($tabs[$i], " \t\n\r\0\x0B\"");
         }
-        #print_r($tabs);
 
         $session = $this->getSession();
         Util::checkTabs($session, $tabs);
+    }
+    
+    
+    /**
+     * @Then /^tab ("([^"]*)") should be selected$/
+     */
+    public function tabShouldBeSelected($tab)
+    {
+        $tab = trim($tab, " \t\n\r\0\x0B\"");
+
+        $session = $this->getSession();
+        Util::isSelectedTab($session, $tab);
     }
 
     /**
@@ -184,7 +194,6 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
             # trim standard character plus quotes
             $tabs[$i] = trim($tabs[$i], " \t\n\r\0\x0B\"");
         }
-        #print_r($tabs);
 
         $session = $this->getSession();
         $shouldFind = false;
