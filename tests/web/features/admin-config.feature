@@ -39,9 +39,9 @@ Feature: Admin Config
     And I follow "REDCap-ETL"
 
     # Check the tabs:
-    Then I should see "ETL Configurations" in the "#sub-nav" element
-    And I should see tabs "Configure", "User Manual", "Configure", "User Manual"
+    And I should see tabs "ETL Configurations", "Configure", "User Manual", "Configure", "User Manual"
     But I should not see tabs "Run", "Schedule"
+    And tab "ETL Configurations" should be selected
 
   Scenario: Check "allow on demand" and "allow cron"
     When I access the admin interface

@@ -163,4 +163,32 @@ class ConfigurationTest extends TestCase
         $this->assertTrue($exceptionCaught, 'Invalid batch size caught');
         $this->assertContains('positive integer', $message, 'Invalid batch size message');
     }
+    
+    public function testDatabaseProperties()
+    {
+        $preSql  = 'DROP TABLE test;';
+        $postSql = 'CREATE TABLE test (i int);';
+        $properties = [
+            Configuration::DB_TYPE => \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_MYSQL,
+            Configuration::DB_HOST => 'localhost',
+            Configuration::DB_PORT => '',
+            Configuration::DB_NAME => 'test',
+            Configuration::DB_USERNAME => 'etl_user',
+            Configuration::DB_PASSWORD => 'etl_password',
+            Configuration::PRE_PROCESSING_SQL  => $preSql,
+            Configuration::POST_PROCESSING_SQL => $postSql
+        ];
+         
+        $configuration = new Configuration('test');
+        $configuration->set($properties);
+        
+        $dbConnection = $configuration->getProperty(Configuration::DB_CONNECTION);
+        $this->assertEquals('MySQL:localhost:etl_user:etl_password:test', $dbConnection, 'DB connection test');
+        
+        $configPreSql = $configuration->getProperty(Configuration::PRE_PROCESSING_SQL, 'Pre-Processing SQL test');
+        $this->assertEquals($preSql, $configPreSql, 'Pre-SQL test');
+ 
+        $configPostSql = $configuration->getProperty(Configuration::POST_PROCESSING_SQL, 'Post-Processing SQL test');
+        $this->assertEquals($postSql, $configPostSql, 'Post-SQL test');
+    }
 }
