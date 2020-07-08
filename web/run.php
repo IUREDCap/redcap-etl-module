@@ -48,7 +48,8 @@ try {
     if (empty($server)) {
         $server = $_SESSION['server'];
     } else {
-        $_SESSION['server'] = $server;
+        #$_SESSION['server'] = $server;
+        $error = 'ERROR: No SERVER specified.';
     }
 
     #-------------------------
@@ -150,10 +151,9 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
         <?php
         
         echo '<select name="server" id="serverId">'."\n";
-            
+        echo '<option value=""></option>'."\n";
         foreach ($servers as $serverName) {
             $serverConfig = $module->getServerConfig($serverName);
-            
             if (isset($serverConfig) && $serverConfig->getIsActive()) {
                 $selected = '';
                 if ($serverName === $server) {

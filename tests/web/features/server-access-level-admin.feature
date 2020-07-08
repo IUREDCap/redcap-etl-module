@@ -12,31 +12,40 @@ Feature: Server access level management
     Given I am on "/"
     When I access the admin interface
 
-   Scenario: Set the access level to admin
+  Scenario: Set the access level to admin
     When I follow "ETL Servers"
-    And I follow server "(embedded server)"
+    And I delete server "local-server"
+    And I wait for 1 seconds
+    And I fill in "server-name" with "local-server"
+    And I press "Add Server"
+    And I wait for 1 seconds
+    And I follow server "local-server"
+    And I configure server "local"
+    And I wait for 1 seconds
+    And I follow "ETL Servers"
+    And I follow server "local-server"
     And I select "admin" from "accessLevel"
     And I wait for 5 seconds
     Then the "#accessLevelId option:selected" element should contain "admin"
     And I should not see "Users Currently Granted Access"
 
     When I follow "ETL Servers"
-    Then I should see "(embedded server)" followed by "admin"
+    Then I should see "local-server" followed by "admin"
 
   Scenario: Set the access level to public
     When I follow "ETL Servers"
-    And I follow server "(embedded server)"
+    And I follow server "local-server"
     And I select "public" from "accessLevel"
     And I wait for 5 seconds
     Then the "#accessLevelId option:selected" element should contain "public"
     But I should not see "Users Currently Granted Access"
 
     When I follow "ETL Servers"
-    Then I should see "(embedded server)" followed by "public"
+    Then I should see "local-server" followed by "public"
 
   Scenario: Set the access level to private
     When I follow "ETL Servers"
-    And I follow server "(embedded server)"
+    And I follow server "local-server"
     And I select "private" from "accessLevel"
     And I wait for 5 seconds
     Then the "#accessLevelId option:selected" element should contain "private"

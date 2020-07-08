@@ -45,8 +45,11 @@ Feature: Server access level management
     #create a private server with no assigned users
     And I follow "ETL Servers"
     And I delete server "private-test"
-    And I follow "ETL Servers"
-    And I copy server "local-server" to "private-test"
+    And I wait for 1 seconds
+    And I follow "List"
+    Then I should not see "private-test"
+
+    When I copy server "local-server" to "private-test"
     And I follow "ETL Servers"
     And I follow server "private-test"
     And I select "private" from "accessLevel"
