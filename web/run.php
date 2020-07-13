@@ -48,8 +48,7 @@ try {
     if (empty($server)) {
         $server = $_SESSION['server'];
     } else {
-        #$_SESSION['server'] = $server;
-        $error = 'ERROR: No SERVER specified.';
+        $_SESSION['server'] = $server;
     }
 
     #-------------------------
@@ -102,6 +101,8 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 <?php
 #print '<pre>'; print_r($configuration); print '</pre>'."\n";
 #print '<pre>'; print_r($servers); print '</pre>'."\n";
+#print "<hr/>server: {$server}<br/>\n";
+#print '<pre>'; print_r($_POST); print '</pre>'."\n";
 ?>
 
 <?php

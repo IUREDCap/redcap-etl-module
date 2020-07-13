@@ -54,6 +54,7 @@ I need to be able to create, copy, rename and delete configurations
   Scenario: Run configuration
     When I follow "Run"
     And I select "behat-config-test" from "configName"
+    And I select "(embedded server)" from "server"
     And I press "Run"
     Then I should see "Configuration:"
     And I should see "Created table"
