@@ -65,7 +65,7 @@ I need to be able to create, copy, rename and delete configurations
     And I press "Run"
     Then I should see "Configuration:"
     And I should see "Created table"
-    #And I should see "Number of record_ids found: 100"
+    And I should see "Number of record_ids found: 100"
     And I should see "Processing complete."
     But I should not see "Error:"
 
