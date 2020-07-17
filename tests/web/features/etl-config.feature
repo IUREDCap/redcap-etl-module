@@ -11,13 +11,6 @@ I need to be able to create, copy, rename and delete configurations
 
   Background:
     Given I am on "/"
-
-    When I access the admin interface
-    And I follow "ETL Servers"
-    And I follow server "(embedded server)"
-    And I select "public" from "accessLevel"
-    And I log out
- 
     And I am logged in as user
     When I follow "My Projects"
     When I select the test project

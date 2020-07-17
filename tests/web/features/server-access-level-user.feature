@@ -95,3 +95,15 @@ Feature: Server access level management
     And the "#serverId" element should contain "admin-test"
     And the "#serverId" element should contain "private-test"
 
+
+ Scenario: Change the access level from private with users assigned to public and delete the users list
+    When I access the admin interface
+    And I follow "ETL Servers"
+    And I follow server "(embedded server)"
+    And I choose "public" as the access level and click "Delete list"
+    And I press "Save"
+    And I wait for 5 seconds
+    When I follow "ETL Servers"
+    And I follow server "(embedded server)"
+    Then the "#accessLevelId option:selected" element should contain "public"
+
