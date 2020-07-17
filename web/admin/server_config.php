@@ -314,7 +314,7 @@ $(function() {
   <table style="margin-bottom: 12px;">
     <tr>
       <td style="font-weight: bold; padding-right: 6px;">Active:</td>
-      <td><input type="checkbox" name="isActive" value="checked" <?php echo $activeChecked; ?> ></td>
+      <td><input type="checkbox" id="isActive" name="isActive" value="checked" <?php echo $activeChecked; ?> ></td>
     </tr>
   </table>
   
