@@ -14,6 +14,7 @@ use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use DMore\ChromeDriver\ChromeDriver;
 
+use IU\RedCapEtlModule\WebTests\AdminConfigPage;
 use IU\RedCapEtlModule\WebTests\EtlServerConfigPage;
 use IU\RedCapEtlModule\WebTests\EtlServersPage;
 use IU\RedCapEtlModule\WebTests\FeatureContext;
@@ -122,6 +123,32 @@ if (preg_match("/REDCap-ETL Admin/", $text) === 1) {
     exit(1);
 }
 
+
+#----------------------------------------
+# Check admin config page settings
+#----------------------------------------
+$page->clickLink("Config");
+$cronJobsAllowed = AdminConfigPage::areCronJobsAllowed($session);
+print "Cron jobs allowed: ";
+if ($cronJobsAllowed) {
+    print "OK\n";
+} else {
+    print "ERROR\n";
+    exit(1);
+}
+
+$onDemandJobsAllowed = AdminConfigPage::areOnDemandJobsAllowed($session);
+print "On demand jobs allowed: ";
+if ($onDemandJobsAllowed) {
+    print "OK\n";
+} else {
+    print "ERROR\n";
+    exit(1);
+}
+
+#----------------------------------------
+# Check embedded server settings
+#----------------------------------------
 $page->clickLink("ETL Servers");
 
 EtlServersPage::followServer($session, "(embedded server)");
