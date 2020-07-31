@@ -124,5 +124,6 @@ Each behat feature file should leave the system in the initial test status after
 * The user account and test project in the test configuration file should still exist
 * The test project should be configured so that the tests user can run REDCap-ETL on it
 * The admin account in the test configuration file should still exist
+* The admin configuration should be set so that both cron and on-demand jobs are allowed
 * The embedded server should be active and have an access level of "public"
 

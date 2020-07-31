@@ -48,6 +48,36 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         $filePath = $feature->getFile();
         $fileName = pathinfo($filePath, PATHINFO_FILENAME);
         self::$featureFileName = $fileName;
+
+        $session = Util::getSession();
+        Util::logInAsAdminAndAccessRedCapEtl($session);
+
+        #-------------------------------------------
+        # Admin config initialization
+        #-------------------------------------------
+        print "Initializing admin config\n";
+        $page = $session->getPage();
+        $page->clickLink('Config');
+        $page->checkField('allowOnDemand');
+        $page->checkField('allowCron');
+        for ($day = 0; $day <= 6; $day++) {
+            for ($hour = 0; $hour <= 23; $hour++) {
+                $page->checkField("allowedCronTimes[{$day}][{$hour}]");
+            }
+        }
+        $page->pressButton('Save');
+
+        #----------------------------------------
+        # ETL server configuration
+        #----------------------------------------
+        print "Initializing etl servers\n";
+        $page->clickLink('ETL Servers');
+        EtlServersPage::followServer($session, '(embedded server)');
+        $page = $session->getPage();
+        $page->checkField('isActive');
+        $page->selectFieldOption('accessLevel', 'public');
+
+        Util::logout($session);
     }
 
     /** @AfterFeature */
