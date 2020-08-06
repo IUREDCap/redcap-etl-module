@@ -91,9 +91,14 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
      */
     public function setUpBeforeScenario()
     {
+        echo "Feature file name :'".(self::$featureFileName)."'\n";
+
         $cookieName  = 'code-coverage-id';
         $cookieValue = 'web-test';
         $this->getSession()->setCookie($cookieName, $cookieValue);
+
+        $this->getSession()->setCookie($cookieName, $cookieValue);
+
         echo "Cookie '{$cookieName}' set to '{$cookieValue}'\n";
 
         $this->setMinkParameter('base_url', $this->baseUrl);
