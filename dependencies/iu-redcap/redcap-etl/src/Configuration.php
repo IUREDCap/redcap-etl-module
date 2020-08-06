@@ -347,12 +347,12 @@ class Configuration
             $sslVerify = $this->properties[ConfigProperties::SSL_VERIFY];
             if (strcasecmp($sslVerify, 'false') === 0 || $sslVerify === '0' || $sslVerify === 0) {
                 $this->sslVerify = false;
-            } elseif (!isset($sslVerify) || $sslVerify === ''
-                    || strcasecmp($sslVerify, 'true') === 0 || $sslVerify === '1' || $sslVerify === 1) {
+            } elseif (!isset($sslVerify) || $sslVerify === '' || $sslVerify === '1'
+                || strcasecmp($sslVerify, 'true') === 0
+                || $sslVerify === 1 || $sslVerify === true) {
                 $this->sslVerify = true;
             } else {
-                $message = 'Unrecognized value "'.$sslVerify.'" for '
-                    .ConfigProperties::SSL_VERIFY
+                $message = 'Unrecognized value "'.$sslVerify.'" for '.ConfigProperties::SSL_VERIFY
                     .' property; a true or false value should be specified.';
                 throw new EtlException($message, EtlException::INPUT_ERROR);
             }
@@ -373,8 +373,9 @@ class Configuration
 
             if (strcasecmp($countCheck, 'false') === 0 || $countCheck === '0' || $countCheck === '') {
                 $this->extractedRecordCountCheck = false;
-            } elseif (!isset($countCheck)
-                    || strcasecmp($countCheck, 'true') === 0 || $countCheck === '1') {
+            } elseif (!isset($countCheck) || $countCheck === true
+                || strcasecmp($countCheck, 'true') === 0
+                || $countCheck === 1 || $countCheck === '1') {
                 $this->extractedRecordCountCheck = true;
             } else {
                 $message = 'Unrecognized value "'.$countCheck.'" for '
@@ -731,6 +732,14 @@ class Configuration
                     }
                 }
 
+                if (array_key_exists(ConfigProperties::PRE_PROCESSING_SQL, $properties)) {
+                    $sql = $properties[ConfigProperties::PRE_PROCESSING_SQL];
+                    if (is_array($sql)) {
+                        $sql = implode("\n", $sql);
+                        $properties[ConfigProperties::PRE_PROCESSING_SQL] = $sql;
+                    }
+                }
+
                 if (array_key_exists(ConfigProperties::POST_PROCESSING_SQL, $properties)) {
                     $sql = $properties[ConfigProperties::POST_PROCESSING_SQL];
                     if (is_array($sql)) {
@@ -952,11 +961,6 @@ class Configuration
     public function getPropertiesFile()
     {
         return $this->propertiesFile;
-    }
-
-    private function setPropertiesFile($file)
-    {
-        $this->propertiesFile = $file;
     }
 
     public function getProperties()
