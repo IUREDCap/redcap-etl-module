@@ -14,6 +14,8 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Behat\Context\SnippetAcceptingContext;
 
+use WebDriver\Exception\NoAlertOpenError;
+
 /**
  * Utility class that has helpful methods.
  */
@@ -249,5 +251,130 @@ class Util
     {
         $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
         $baseUrl  = $testConfig->getRedCap()['base_url'];
+    }
+
+    public static function findTextFollowedByText($session, $textA, $textB)
+    {
+        $content = $session->getPage()->getContent();
+
+        // Get rid of stuff between script tags
+        $content = self::removeContentBetweenTags('script', $content);
+
+        // ...and stuff between style tags
+        $content = self::removeContentBetweenTags('style', $content);
+
+        $content = preg_replace('/<[^>]+>/', ' ',$content);
+
+        // Replace line breaks and tabs with a single space character
+        $content = preg_replace('/[\n\r\t]+/', ' ',$content);
+
+        $content = preg_replace('/ {2,}/', ' ',$content);
+
+        if (strpos($content,$textA) === false) {
+            throw new \Exception(sprintf('"%s" was not found in the page', $textA));
+        }
+
+        $seeking = $textA . ' ' . $textB;
+        if (strpos($content,$textA . ' ' . $textB) === false) {
+            throw new \Exception(sprintf('"%s" was not found in the page', $seeking));
+        }
+
+    }
+
+   public static function findSomethingForTheUser($session, $username, $see, $item)
+    {
+        $page = $session->getPage();
+        $throwError = false;
+
+        if ($see === "should") {
+            $seeError = "was not";
+            if ($item === 'link') {
+                if (!$page->findLink($username)) {
+                    $throwError = true;
+                }
+            } elseif ($item === 'remove user checkbox') {
+                $checkboxName = 'removeUserCheckbox['.$username.']';
+                if (!$page->find('named', array('id_or_name', $checkboxName))) {
+                    $throwError = true;
+                }
+            } else {
+                $throwError = true;
+            }
+
+        } else if ($see === "should not") {
+            $seeError = "was";
+            if ($item === 'link') {
+                if ($page->findLink($username)) {
+                    $throwError = true;
+                }
+            } elseif ($item === 'remove user checkbox') {
+                $checkboxName = 'removeUserCheckbox['.$username.']';
+                if ($page->find('named', array('id_or_name', $checkboxName))) {
+                    $throwError = true;
+                }
+            } else {
+                $throwError = true;
+            }
+        } else {
+                $throwError = true;
+        }
+
+        if ($throwError) {
+            throw new \Exception(sprintf('The "%s" "%s" found on the page for "%s"', $item, $seeError, $username));
+        }
+    }
+
+    public static function chooseAccessLevel($session, $newLevel, $privateLevelButton)
+    {
+        $page = $session->getPage();
+        $accessLevel = $page->findById("accessLevelId");
+        $privateUsersExist = false;
+   
+        # If the current access level is private then check to see if any users were
+        # assigned. (If there are users assigned, the word "Remove" will appear next
+        # to their usernames.)
+        if ($accessLevel->getValue() === 'private' && $newLevel !== 'private') {
+            $usersRow = $page->findById("usersRow")->getText();
+            $privateUsersExist = strpos($usersRow, 'Remove');
+        }
+
+        if ($privateUsersExist) {
+            $page = $session->getPage();
+
+            #Change the access level
+            $accessLevel->selectOption($newLevel);
+
+            # Handle confirmation dialog
+            $page->pressButton($privateLevelButton);
+
+        } else {
+            $accessLevel->selectOption($newLevel);
+            sleep(2);
+        }
+    }
+
+    /**
+     * @param string $tagName - The name of the tag, eg. 'script', 'style'
+     * @param string $content
+     *
+     * @return string
+     */
+    private function removeContentBetweenTags($tagName,$content)
+    {
+        $parts = explode('<' . $tagName, $content);
+
+        $keepers = [];
+
+        // We always want to keep the first part
+        $keepers[] = $parts[0];
+
+        foreach ($parts as $part) {
+            $subparts = explode('</' . $tagName . '>', $part);
+            if (count($subparts) > 1) {
+                $keepers[] = $subparts[1];
+            }
+        }
+
+        return implode('', $keepers);
     }
 }

@@ -113,7 +113,7 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
 
 <table class="dataTable">
   <thead>
-    <tr> <th>Server Name</th> <th>Active</th> </th><th>Configure</th>
+    <tr> <th>Server Name</th> <th>Active</th> </th><th>Access</th><th>Configure</th>
     <th>Copy</th> <th>Rename</th> </th><th>Delete</th> </th></tr>
   </thead>
   <tbody>
@@ -140,6 +140,17 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
         } else {
             echo '<img src="'.APP_PATH_IMAGES.'cross.png" alt="No">';
         }
+        echo "</td>\n";
+
+        #-------------------------------
+        # Access Level
+        #-------------------------------
+        $accessLevel = $serverConfig->getAccessLevel();
+        if (empty($accessLevel)) {
+            $accessLevel = 'public';
+        }
+        echo '<td style="text-align:center;">';
+        echo $accessLevel;
         echo "</td>\n";
 
         #-------------------------------

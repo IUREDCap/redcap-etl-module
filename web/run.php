@@ -35,7 +35,8 @@ try {
 
     $adminConfig = $module->getAdminConfig();
 
-    $servers = $module->getServers();
+    #$servers = $module->getServers();
+    $servers   = $module->getUserAllowedServersBasedOnAccessLevel(USERID);
 
     $selfUrl   = $module->getUrl('web/run.php');
     $listUrl   = $module->getUrl('web/index.php');
@@ -100,6 +101,8 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 <?php
 #print '<pre>'; print_r($configuration); print '</pre>'."\n";
 #print '<pre>'; print_r($servers); print '</pre>'."\n";
+#print "<hr/>server: {$server}<br/>\n";
+#print '<pre>'; print_r($_POST); print '</pre>'."\n";
 ?>
 
 <?php
@@ -148,11 +151,10 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
         on
         <?php
         
-        echo '<select name="server">'."\n";
-            
+        echo '<select name="server" id="serverId">'."\n";
+        echo '<option value=""></option>'."\n";
         foreach ($servers as $serverName) {
             $serverConfig = $module->getServerConfig($serverName);
-            
             if (isset($serverConfig) && $serverConfig->getIsActive()) {
                 $selected = '';
                 if ($serverName === $server) {

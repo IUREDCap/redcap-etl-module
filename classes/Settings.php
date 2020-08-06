@@ -17,6 +17,8 @@ class Settings
     const LAST_RUN_TIME_KEY        = 'last-run-time'; // for storing day and time of last run
 
     const USER_PROJECTS_KEY_PREFIX = 'user-projects:';  // appdend with username to make key
+    const USER_SERVERS_KEY_PREFIX  = 'user-servers:';
+    const PRIVATE_SERVER_USERS_KEY_PREFIX  = 'private-server-users:';
     
     const VERSION_KEY = 'version';
     
@@ -96,12 +98,155 @@ class Settings
         # Remove the user's ETL project permissions
         $key = self::USER_PROJECTS_KEY_PREFIX . $username;
         $this->module->removeSystemSetting($key);
-                
+
+        # Remove the user's access to private servers
+        $key = self::USER_SERVERS_KEY_PREFIX . $username;
+        $this->module->removeSystemSetting($key);
+
+        # Remove this user from any private-server list of allowed users
+        $assignedPrivateServers = $this->getUserPrivateServerNames($username);
+        foreach ($assignedPrivateServers as $serverName) {
+            $this->removeUserFromPrivateServer($username, $serverName);
+        }
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
     }
-    
+
+    #----------------------------------------------------------
+    # User allowable-servers methods
+    #----------------------------------------------------------
+    public function processUserPrivateServers($username, $userPrivateServerNames, $serversToCheck, $transaction = true)
+    {
+        $commit = true;
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+
+        ###UPDATE THE USER-LIST FOR SERVERS THAT THIS USER IS NO LONGER ALLOWED TO ACCESS
+        if (!$serversToCheck) {
+           #servers that this user was allowed to access before any changes were made
+            $serversToCheck = $this->getUserPrivateServerNames($username);
+        }
+
+        #For each of the servers-to-check, see if access is still allowed for this user
+        foreach ($serversToCheck as $serverName) {
+           #if this server is not in the list of allowed servers for this user
+           #then remove the username from the allowed-user list for the server if it's there
+            if (!in_array($serverName, $userPrivateServerNames)) {
+                $this->removeUserFromPrivateServer($username, $serverName);
+            }
+        }
+
+
+        ###UPDATE THE USER-LIST FOR SERVERS THAT THIS USER IS ALLOWED TO ACCESS
+        foreach ($userPrivateServerNames as $serverName) {
+            $privateServerUsers = $this->getPrivateServerUsers($serverName);
+            if (!in_array($username, $privateServerUsers)) {
+                $privateServerUsers[] = $username;
+                $this->setPrivateServerUsers($serverName, $privateServerUsers);
+            }
+        }
+
+
+        ###UPDATE THE SERVER-LIST OF ALLOWED SERVERS FOR THIS USER
+        $this->setUserPrivateServerNames($username, $userPrivateServerNames);
+
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+    }
+
+    public function processPrivateServerUsers(
+        $serverName,
+        $removeUsernames,
+        $transaction = true
+    ) {
+        if ($removeUsernames) {
+            # find out who is currently allowed to access this server
+            $currentUsernames = $this->getPrivateServerUsers($serverName);
+
+            $commit = true;
+            if ($transaction) {
+                $this->db->startTransaction();
+            }
+
+            # loop through the users to remove
+            foreach ($removeUsernames as $username) {
+                # get the server-list for this user
+                $userPrivateServerNames = $this->getUserPrivateServerNames($username);
+
+                if (($serverKey=array_search($serverName, $userPrivateServerNames)) !== false) {
+                    #remove this server from this user's list of allowed servers
+                    unset($userPrivateServerNames[$serverKey]);
+
+                    #update the server-list for this user
+                    $this->setUserPrivateServerNames($username, $userPrivateServerNames);
+                }
+
+                #remove this user from this server's list of allowed users
+                if (($userKey=array_search($username, $currentUsernames)) !== false) {
+                    unset($currentUsernames[$userKey]);
+                }
+            }
+        
+            #update the user-list for this server
+            $this->setPrivateServerUsers($serverName, $currentUsernames);
+
+            if ($transaction) {
+                $this->db->endTransaction($commit);
+            }
+        }
+    }
+
+    public function removeUserFromPrivateServer($username, $serverName)
+    {
+        #get the current allowed-users for this server
+        $privateServerUsers = $this->getPrivateServerUsers($serverName);
+
+        #find the username in the array, remove it, and save the updated user list
+        if (($key=array_search($username, $privateServerUsers)) !== false) {
+            unset($privateServerUsers[$key]);
+            $this->setPrivateServerUsers($serverName, $privateServerUsers);
+        }
+    }
+
+    public function setPrivateServerUsers($serverName, $usernames)
+    {
+        $key = self::PRIVATE_SERVER_USERS_KEY_PREFIX . $serverName;
+        $json = json_encode($usernames);
+        $this->module->setSystemSetting($key, $json);
+    }
+
+    public function getPrivateServerUsers($serverName)
+    {
+        $key = self::PRIVATE_SERVER_USERS_KEY_PREFIX . $serverName;
+        $json = $this->module->getSystemSetting($key);
+        $usernames = json_decode($json, true);
+        return $usernames;
+    }
+
+   /**
+     * Sets the servers to which a user has permission to use ETL.
+     *
+     * @param array $serverNames an array of REDCap server names
+     *     for which the user has ETL permission.
+     */
+    public function setUserPrivateServerNames($username, $serverNames)
+    {
+        $key = self::USER_SERVERS_KEY_PREFIX . $username;
+        $json = json_encode($serverNames);
+        $this->module->setSystemSetting($key, $json);
+    }
+
+    public function getUserPrivateServerNames($username = USERID)
+    {
+        $key = self::USER_SERVERS_KEY_PREFIX . $username;
+        $json = $this->module->getSystemSetting($key);
+        $userPrivateServerNames = json_decode($json, true);
+        return $userPrivateServerNames;
+    }
     
     #----------------------------------------------------------
     # ProjectInfo settings methods

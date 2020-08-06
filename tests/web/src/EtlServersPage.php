@@ -24,8 +24,8 @@ class EtlServersPage
         $page = $session->getPage();
 
         # Find the table row where the first element matches the server name, and then get the
-        # 3rd column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[2]");
+        # 4th column element and click it
+        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[3]");
         $element->click();
     }
 
@@ -39,6 +39,12 @@ class EtlServersPage
 
         if ($serverConfig['active'] === 'true' || $serverConfig['active'] === '1') {
             $page->checkField('isActive');
+        }
+
+        if ($serverConfig['server_address']) {
+            $page->selectFieldOption('accessLevel', $serverConfig['access_level']);
+        } else {
+            $page->selectFieldOption('accessLevel', 'public');
         }
 
         $page->fillField('serverAddress', $serverConfig['server_address']);
@@ -81,8 +87,8 @@ class EtlServersPage
         $page = $session->getPage();
 
         # Find the table row where the first element matches the server name, and then get the
-        # 4th column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[3]");
+        # 5th column element and click it
+        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[4]");
         $element->click();
 
         # Handle confirmation dialog
@@ -95,8 +101,8 @@ class EtlServersPage
         $page = $session->getPage();
 
         # Find the table row where the first element matches the server name, and then get the
-        # 5th column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[4]");
+        # 6th column element and click it
+        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[5]");
         $element->click();
 
         # Handle confirmation dialog
@@ -115,8 +121,8 @@ class EtlServersPage
         $page = $session->getPage();
 
         # Find the table row where the first element matches the server name, and then get the
-        # 6th column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[5]");
+        # 7th column element and click it
+        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[6]");
 
         if (isset($element)) {
             $element->click();

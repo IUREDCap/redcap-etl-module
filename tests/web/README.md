@@ -71,7 +71,13 @@ Or, in headless mode (this runs faster, but you won't see the browser running):
 Running the tests
 ----------------------
 
-You can use the following commands in the top-level web tests directory (tests/web) to run the web tests:
+There are some web tests that use phpunit, and they can be run using the following
+command in the top-level web tests directory (web/tests):
+
+    ./vendor/bin/phpunit
+
+Most of the web tests use behat. You can use the following commands in the top-level
+web tests directory (tests/web) to run the behat web tests:
 
     ./vendor/bin/behat
     ./vendor/bin/behat -f progress      # just prints summary of results
@@ -106,7 +112,19 @@ Similarly, you can also add manual test coverage data by setting the 'code-cover
 Other commands
 ----------------------
 
-See the definition expressions:
+See the definition expressions for behat:
 
     ./vendor/bin/behat -dl
+
+
+Test writing guidelines
+----------------------------
+
+Each behat feature file should leave the system in the initial test status after it completes, including:
+
+* The user account and test project in the test configuration file should still exist
+* The test project should be configured so that the tests user can run REDCap-ETL on it
+* The admin account in the test configuration file should still exist
+* The admin configuration should be set so that both cron and on-demand jobs are allowed
+* The embedded server should be active and have an access level of "public"
 

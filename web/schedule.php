@@ -36,7 +36,8 @@ try {
 
     $adminConfig = $module->getAdminConfig();
 
-    $servers = $module->getServers();
+    #$servers = $module->getServers();
+    $servers   = $module->getUserAllowedServersBasedOnAccessLevel(USERID);
 
     $selfUrl = $module->getUrl('web/schedule.php');
     $listUrl = $module->getUrl('web/index.php');
@@ -193,7 +194,7 @@ $(function () {
     #--------------------------------------------------------------
     # Server selection
     #--------------------------------------------------------------
-    echo '<select name="server">'."\n";
+    echo '<select name="server" id="serverId">'."\n";
     echo '<option value=""></option>'."\n";
 
     #if ($adminConfig->getAllowEmbeddedServer()) {

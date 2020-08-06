@@ -168,7 +168,10 @@ There are 2 options for logging the results of your ETL processes, and they can 
 <h4 style="font-weight: bold;">Running REDCap-ETL</h4>
 
 <p>
-There are 2 basic ways to run REDCap-ETL:
+You will be able to run a REDCap-ETL configuration on the ETL servers to which
+you have been granted access. A REDCap-ETL adminstrator sets the access-level
+permissions for the ETL servers. Once you have permissions to a server, there
+are 2 basic ways to run REDCap-ETL:
 </p>
 <div style="max-width: 800px;">
 <ol>
@@ -180,7 +183,8 @@ There are 2 basic ways to run REDCap-ETL:
     ?>
     - You can run an ETL process on demand
     by going to the <strong>Run</strong>
-    tab, selecting an ETL server and an ETL configuration, and clicking on the <strong>Run</strong>
+    tab. The servers for which you have permissions will be displayed in a drop-down box.
+    Select an ETL server, as well as an ETL configuration, and click the <strong>Run</strong>
     button.
     </li>
     <li><strong>Scheduled</strong>
@@ -191,7 +195,9 @@ There are 2 basic ways to run REDCap-ETL:
     ?>
     - You can use the <strong>Schedule</strong> tab to schedule an ETL
     job to run at specified times each week. For a given configuration, you can specify one hour per
-    day of the week for the job to run.
+    day of the week for the job to run.The servers for which you have
+    permissions will be displayed in a drop-down box. Select a server,
+    specify the day(s) and time(s), and click the <strong>Save</strong> button.
     </li>
 </ol>
 </div>

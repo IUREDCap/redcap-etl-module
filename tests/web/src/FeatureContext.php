@@ -48,6 +48,36 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         $filePath = $feature->getFile();
         $fileName = pathinfo($filePath, PATHINFO_FILENAME);
         self::$featureFileName = $fileName;
+
+        $session = Util::getSession();
+        Util::logInAsAdminAndAccessRedCapEtl($session);
+
+        #-------------------------------------------
+        # Admin config initialization
+        #-------------------------------------------
+        print "Initializing admin config\n";
+        $page = $session->getPage();
+        $page->clickLink('Config');
+        $page->checkField('allowOnDemand');
+        $page->checkField('allowCron');
+        for ($day = 0; $day <= 6; $day++) {
+            for ($hour = 0; $hour <= 23; $hour++) {
+                $page->checkField("allowedCronTimes[{$day}][{$hour}]");
+            }
+        }
+        $page->pressButton('Save');
+
+        #----------------------------------------
+        # ETL server configuration
+        #----------------------------------------
+        print "Initializing etl servers\n";
+        $page->clickLink('ETL Servers');
+        EtlServersPage::followServer($session, '(embedded server)');
+        $page = $session->getPage();
+        $page->checkField('isActive');
+        $page->selectFieldOption('accessLevel', 'public');
+
+        Util::logout($session);
     }
 
     /** @AfterFeature */
@@ -529,10 +559,91 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
      */
     public function iRunTheCronProcess()
     {
+
         # WORK IN PROGRESS
         # Need to do 2 things: reset the last cron runtime, so the process will run
         # Access the cron script (can access through http)
         $session = $this->getSession();
         Util::mailinator($session, $emailPrefix);
     }
+
+    /**
+     * @Then I should see :textA followed by :textB
+     */
+    public function iShouldSeeFollowedBy($textA, $textB)
+    {
+        $session = $this->getSession();
+        Util::findTextFollowedByText($session, $textA, $textB);
+    }
+
+    /**
+     * @When /^I click on the user$/
+     */
+    public function iClickOnTheUser()
+    {
+        $user = $this->testConfig->getUser();
+        $username = $user['username'];
+
+        $session = $this->getSession();
+        $page = $session->getPage();
+
+        $page->clickLink($username);
+    }
+
+    /**
+     * @When /^I check the box to remove the user$/
+     */
+    public function iCheckTheBoxToRemoveTheUser()
+    {
+        $user = $this->testConfig->getUser();
+        $username = $user['username'];
+
+        $session = $this->getSession();
+        $page = $session->getPage();
+
+        $checkboxName = 'removeUserCheckbox['.$username.']';
+
+        $page->checkField($checkboxName);
+    }
+
+    /**
+     * @When I choose :textA as the access level
+     */
+    public function iChooseAsTheAccessLevel($textA)
+    {
+        $session = $this->getSession();
+        Util::chooseAccessLevel($session, $textA, null);
+    }
+
+
+    /**
+     * @When I choose :textA as the access level and click :textB
+     */
+    public function iChooseAsTheAccessLevelAndClick($textA, $textB)
+    {
+        $session = $this->getSession();
+        Util::chooseAccessLevel($session, $textA, $textB);
+    }
+
+
+    /**
+     * @Then I :textA see a/an :textB item for the user
+     */
+    public function iSeeAnItemForTheUser($textA, $textB)
+    {
+        $user = $this->testConfig->getUser();
+        $username = $user['username'];
+
+        $session = $this->getSession();
+        Util::findSomethingForTheUser($session, $username, $textA, $textB);
+    }
+
+
+    /**
+     * @When I confirm the popup [nal WIP: was in the process of trying to get this to work]
+     */
+    #public function iConfirmThePopup()
+    #{
+    #    $this->getSession()->getDriver()->getWebDriverSession()->accept_alert();
+    #}
 }

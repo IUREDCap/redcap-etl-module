@@ -54,6 +54,8 @@ try {
             $usersUrl = $module->getUrl($urlValue);
             header('Location: '.$usersUrl);
         } else {
+            #$privateServers = $module->getPrivateServers();
+            $privateServers = $module->getServersViaAccessLevels('private');
             if (strcasecmp($submitValue, 'Save') === 0) {
                 $checkbox = $_POST['checkbox'];
                 $userEtlProjects = array();
@@ -62,8 +64,17 @@ try {
                         array_push($userEtlProjects, (int) $projectId);
                     }
                 }
+                
+                $accessCheckbox = $_POST['accessCheckbox'];
+                $userPrivateServerNames = array();
+                if (is_array($accessCheckbox) && !empty($accessCheckbox)) {
+                    foreach (array_keys($accessCheckbox) as $serverName) {
+                        array_push($userPrivateServerNames, $serverName);
+                    }
+                }
                 $module->addUser($username);
                 $module->setUserEtlProjects($username, $userEtlProjects);
+                $module->processUserPrivateServers($username, $userPrivateServerNames, $privateServers);
                 $success = 'User '.$username.' saved.';
                 $url = $module->getUrl(RedCapEtlModule::USERS_PAGE.'?success='.Filter::escapeForUrlParameter($success));
                 header('Location: '.$url);
@@ -71,6 +82,7 @@ try {
             $db = new RedCapDb();
             $userProjects = $db->getUserProjects($username);
             $userEtlProjects = $module->getUserEtlProjects($username);
+            $userPrivateServerNames = $module->getUserPrivateServerNames($username, $privateServers);
         }
     }
 } catch (Exception $exception) {
@@ -140,7 +152,7 @@ $(function() {
 
 <?php
 if (!empty($username)) {
-    echo "<p>Projects for user ".Filter::escapeForHtml($userLabel)."</p>\n";
+    echo "<p>Server private-level access for user ".Filter::escapeForHtml($userLabel)."</p>\n";
 ?>
 
 <?php
@@ -201,6 +213,43 @@ $(function() {
 ?>
 <form action="<?php echo $selfUrl;?>" method="post">
 <input type="hidden" name="username" value="<?php echo Filter::escapeForHtmlAttribute($username);?>">
+<table class="user-projects">
+    <thead>
+        <tr> <th>Access?</th> </th><th>Server with Private Access Level</th></tr>
+    </thead>
+    <tbody>
+        <?php
+        $row = 1;
+        foreach ($privateServers as $serverName) {
+            if ($row % 2 == 0) {
+                echo '<tr class="even-row">'."\n";
+            } else {
+                echo '<tr class="odd-row">'."\n";
+            }
+            
+            $checked = '';
+            if (!empty($userPrivateServerNames) && in_array($serverName, $userPrivateServerNames)) {
+                $checked = ' checked ';
+            }
+            echo '<td style="text-align: center;"><input type="checkbox" name="accessCheckbox['.$serverName.']" '
+                .$checked.'></td>'."\n";
+            echo '<td style="text-align: left">'.$serverName."</td>\n";
+            echo "</tr>\n";
+            $row++;
+        }
+        ?>
+    </tbody>
+</table>
+<?php
+if (empty($privateServers)) {
+    echo '<p>No servers currently have private access.</p>';
+}
+?>
+<hr />
+
+<?php
+   echo "<p>Projects for user ".Filter::escapeForHtml($userLabel)."</p>\n";
+?>
 <table class="user-projects">
     <thead>
         <tr> <th>ETL Access?</th> </th><th>PID</th> <th>Project</th> <th>ETL Configurations</th> </tr>

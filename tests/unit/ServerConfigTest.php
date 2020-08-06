@@ -75,4 +75,20 @@ class ServerConfigTest extends TestCase
         }
         $this->assertTrue($exceptionCaught, 'Inactive server exception test');
     }
+
+    public function testAccessLevel()
+    {
+        $serverConfig = new ServerConfig('test');
+
+        # accessLevel should have a default setting of public
+        $accessLevel = $serverConfig->getAccessLevel();
+        $expected = 'public';
+        $this->assertEquals($expected, $accessLevel, 'Default accessLevel test');
+
+        # should be able to assign an valid access level
+        $newAccessLevel = 'admin';
+        $serverConfig->setAccessLevel($newAccessLevel);
+        $accessLevel = $serverConfig->getAccessLevel();
+        $this->assertEquals($newAccessLevel, $accessLevel, 'Assign accessLevel test');
+    }
 }
