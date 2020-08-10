@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "e3001fbbcda4a781631c4980e2bf11cb",
+    "content-hash": "9fd86ccf24be38fe7f7494aef3886397",
     "packages": [
         {
             "name": "iu-redcap/phpcap",
@@ -50,16 +50,16 @@
         },
         {
             "name": "iu-redcap/redcap-etl",
-            "version": "1.5.2",
+            "version": "1.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/redcap-etl.git",
-                "reference": "df835bbfb6d48e238b174cbb26f39fd604d4cb7d"
+                "reference": "55b05358fbba9d588ddf142da1503b0cf96f0562"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/df835bbfb6d48e238b174cbb26f39fd604d4cb7d",
-                "reference": "df835bbfb6d48e238b174cbb26f39fd604d4cb7d",
+                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/55b05358fbba9d588ddf142da1503b0cf96f0562",
+                "reference": "55b05358fbba9d588ddf142da1503b0cf96f0562",
                 "shasum": ""
             },
             "require": {
@@ -90,7 +90,7 @@
                 "etl",
                 "redcap"
             ],
-            "time": "2020-08-06T17:48:51+00:00"
+            "time": "2020-08-10T18:13:46+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
