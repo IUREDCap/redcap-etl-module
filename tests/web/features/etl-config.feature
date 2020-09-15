@@ -56,6 +56,7 @@ I need to be able to create, copy, rename and delete configurations
     And I select "behat-config-test" from "configName"
     And I select "(embedded server)" from "server"
     And I press "Run"
+    And I wait for 4 seconds
     Then I should see "Configuration:"
     And I should see "Created table"
     And I should see "Number of record_ids found: 100"
