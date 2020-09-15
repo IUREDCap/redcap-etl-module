@@ -16,6 +16,7 @@ Feature: Admin Help Customization
     And I follow "Help Edit"
     And I follow "Edit"
     And I select "E-mail To List" from "Help Topic"
+    And I wait for 2 seconds
     Then I should see "A comma-separated list of e-mail addresses"
 
   Scenario: Try to save help with no help topic selected

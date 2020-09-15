@@ -372,6 +372,13 @@ echo $buffer;
                     ;
                 return false;
             });
+            $('#ignore-empty-incomplete-forms-help-link').click(function () {
+                $('#ignore-empty-incomplete-forms-help')
+                    .dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });
             $('#label-view-suffix-help-link').click(function () {
                 $('#label-view-suffix-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
                     .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
@@ -912,7 +919,7 @@ Configuration form
         <legend>Processing Settings</legend>
         <table>
             <tbody style="padding: 20px;">    
-            <!-- BATCH SIZE -->
+                <!-- BATCH SIZE -->
                 <tr>
                     <td>Batch size</td>
                     <td><input type="text" name="<?php echo Configuration::BATCH_SIZE;?>"
@@ -923,9 +930,29 @@ Configuration form
                         </div>
                     </td>
                 </tr>
-     
-     
-    </tbody>
+                
+                <!-- IGNORE EMPTY INCOMPLETE FORMS -->
+                <tr>
+                    <td>Ignore empty <br/> incomplete forms &nbsp; </td>
+                    <td>
+                        <?php
+                        $checked = '';
+                        if ($properties[Configuration::IGNORE_EMPTY_INCOMPLETE_FORMS]) {
+                            $checked = ' checked ';
+                        }
+                        ?>
+                        <input type="checkbox" name="<?php echo Configuration::IGNORE_EMPTY_INCOMPLETE_FORMS;?>"
+                            id="<?php echo Configuration::IGNORE_EMPTY_INCOMPLETE_FORMS;?>" value="true"
+                            <?php echo $checked;?> style="vertical-align: middle; margin: 0;">    
+                        <a href="#" id="ignore-empty-incomplete-forms-help-link"
+                           class="etl-help" style="margin-left: 1em;">?</a>
+                        <div id="ignore-empty-incomplete-forms-help"
+                             title="Ignore Empty Incomplete Forms" style="display: none;">
+                            <?php echo Help::getHelpWithPageLink('ignore-empty-incomplete-forms', $module); ?>
+                        </div>
+                    </td>                    
+                </tr>
+            </tbody>
         </table>
                 <fieldset class="config-nested">
                 <legend>Database Tables</legend>

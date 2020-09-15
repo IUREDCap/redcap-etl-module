@@ -55,6 +55,8 @@ class Configuration implements \JsonSerializable
     const DB_FOREIGN_KEYS = 'db_foreign_keys';
 
     const CA_CERT_FILE  = 'ca_cert_file';
+
+    const IGNORE_EMPTY_INCOMPLETE_FORMS = 'ignore_empty_incomplete_forms';
     
     const BATCH_SIZE = 'batch_size';
 
@@ -96,6 +98,7 @@ class Configuration implements \JsonSerializable
             self::DB_FOREIGN_KEYS,
             self::EMAIL_ERRORS,
             self::EMAIL_SUMMARY,
+            self::IGNORE_EMPTY_INCOMPLETE_FORMS,
             self::SSL_VERIFY
         ];
                 
@@ -124,6 +127,8 @@ class Configuration implements \JsonSerializable
         $this->properties[self::TRANSFORM_RULES_SOURCE] = '1';
         
         $this->properties[self::TABLE_PREFIX] = '';
+
+        $this->properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS] = false;
         
         $this->properties[self::LABEL_VIEW_SUFFIX] = \IU\REDCapETL\Configuration::DEFAULT_LABEL_VIEW_SUFFIX;
                 

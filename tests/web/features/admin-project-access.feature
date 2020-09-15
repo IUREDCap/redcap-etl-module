@@ -19,6 +19,7 @@ Feature: Admin-Interface
     And I select the test project
     And I go to new window in 7 seconds
     And I follow "REDCap-ETL"
+    And I wait for 4 seconds
     Then I should see "ETL Configurations"
     And I go to old window
 

@@ -28,6 +28,12 @@ class StatusTest extends TestCase
         ));
 
         self::$session = self::$mink->getSession('browser');
+
+        $cookieName  = 'code-coverage-id';
+        $cookieValue = 'web-test';
+
+        self::$session->visit($baseUrl);
+        self::$session->setCookie($cookieName, $cookieValue);
     }
 
     public function testUserSetup()

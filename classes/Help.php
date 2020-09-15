@@ -120,6 +120,19 @@ class Help
             ." need to request an API token with export rights."
             ."</p>"
         ,
+        'ignore-empty-incomplete-forms' =>
+            "<p>"
+            ."REDCap is inconsistent in how it handles forms that have not been edited."
+            ." For unedited forms, the form complete field may have a value of blank or zero."
+            ." While a blank value appears to always indicate a form has not yet been edited,"
+            ." a zero value could occur for both edited and unedited forms."
+            ." By default this configuration property is turned off, and this causes REDCap-ETL to store"
+            ." rows in the database for empty forms with a form complete value of zero"
+            ." (i.e., incomplete). "
+            ." If this property is checked, then empty incomplete forms will be ignored, and"
+            ." no row will be stored in the database for them."
+            ."</p>"
+        ,
         'label-view-suffix' =>
             "<p>"
             ."REDCap-ETL generates tables that have choice <em>values</em> for multiple choice fields in REDCap."
