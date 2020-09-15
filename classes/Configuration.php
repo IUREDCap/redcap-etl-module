@@ -553,7 +553,15 @@ class Configuration implements \JsonSerializable
                 $properties[self::SSL_VERIFY] = 'false';
             }
         }
-               
+ 
+        if (is_bool($properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS])) {
+            if ($properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS]) {
+                $properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS] = 'true';
+            } else {
+                $properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS] = 'false';
+            }
+        }
+ 
         # Convert the transformation rules from text to
         # an array of strings
         if (array_key_exists(self::TRANSFORM_RULES_TEXT, $properties)) {
