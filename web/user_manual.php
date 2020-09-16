@@ -169,7 +169,7 @@ There are 2 options for logging the results of your ETL processes, and they can 
 
 <p>
 You will be able to run a REDCap-ETL configuration on the ETL servers to which
-you have been granted access. A REDCap-ETL adminstrator sets the access-level
+you have been granted access. A REDCap-ETL administrator sets the access-level
 permissions for the ETL servers. Once you have permissions to a server, there
 are 2 basic ways to run REDCap-ETL:
 </p>
