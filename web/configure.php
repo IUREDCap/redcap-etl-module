@@ -194,18 +194,45 @@ try {
                 return;
             } elseif (strcasecmp($submitValue, 'Auto-Generate') === 0) {
                 $formCompleteFields = false;
-                if (array_key_exists('formCompleteFields', $_POST)) {
+#print "\n\n_POST is \n\n";
+#print_r ($_POST);
+#print "\n\n";
+                if (array_key_exists('autogen_include_complete_fields', $_POST)) {
                     $formCompleteFields = true;
                 }
                 
                 $dagFields = false;
-                if (array_key_exists('dagFields', $_POST)) {
+                if (array_key_exists('autogen_include_dag_fields', $_POST)) {
                     $dagFields = true;
                 }
                 
                 $fileFields = false;
-                if (array_key_exists('fileFields', $_POST)) {
+                if (array_key_exists('autogen_include_file_fields', $_POST)) {
                     $fileFields = true;
+                }
+
+                $surveyFields = false;
+                if (array_key_exists('autogen_include_survey_fields', $_POST)) {
+                    $surveyFields = true;
+                }
+
+                $notesFields = false;
+                if (array_key_exists('autogen_remove_notes_fields', $_POST)) {
+                    $notesFields = true;
+                }
+
+                $identifierFields = false;
+                if (array_key_exists('autogen_remove_identifier_fields', $_POST)) {
+                    $identifierFields = true;
+                }
+
+                $nonRepeatingFields = false;
+                $nonRepeatingFieldsTable = '';
+                if (array_key_exists('autogen_non_repeating_fields_table', $_POST)) {
+                    $nonRepeatingFieldsTable = $_POST['autogen_non_repeating_fields_table'];
+                    if (!empty($nonRepeatingFieldsTable)) {
+                        $nonRepeatingFields = true;
+                    }
                 }
                                 
                 $apiUrl    = $configuration->getProperty(Configuration::REDCAP_API_URL);
@@ -264,7 +291,18 @@ try {
                     #}
                 
                     $rulesGenerator = new \IU\REDCapETL\RulesGenerator();
-                    $rulesText = $rulesGenerator->generate($dataProject, $formCompleteFields, $dagFields, $fileFields);
+
+                    $rulesText = $rulesGenerator->generate(
+                        $dataProject,
+                        $formCompleteFields,
+                        $dagFields,
+                        $fileFields,
+                        $surveyFields,
+                        $notesFields,
+                        $identifierFields,
+                        $nonRepeatingFields,
+                        $nonRepeatingFieldsTable
+                    );
                     $properties[Configuration::TRANSFORM_RULES_TEXT] = $rulesText;
                     #print "$rulesText\n";
                 }
@@ -725,13 +763,13 @@ Configuration form
                         $rules = $properties[Configuration::TRANSFORM_RULES_TEXT];
                         $rulesName = Configuration::TRANSFORM_RULES_TEXT;
                         ?>
-                        <textarea rows="15" cols="70"
+                        <textarea rows="27" cols="70"
                             style="margin-top: 4px; margin-bottom: 4px;"
                             name="<?php echo $rulesName;?>"><?php echo Filter::escapeForHtml($rules);?></textarea>
                     </td>
                     <td>
                         <div>
-                            Include:
+                            <b>AUTO-GENERATE TRANSFORMATION RULES</b>
                             <a href="#" id="auto-generate-rules-help-link"
                                 class="etl-help" style="margin-left: 10px; float: right;">?</a>
                             <div id="auto-generate-rules-help" title="Auto-Generate Transformation Rules"
@@ -739,32 +777,99 @@ Configuration form
                                 <?php echo Help::getHelpWithPageLink('auto-generate-rules', $module); ?>
                             </div>
                             <br />
-                            <input type="checkbox" name="dagFields" 
-                                <?php
-                                if ($dagFields) {
-                                    echo 'checked';
-                                }
-                                ?>
-                            >
+                            <br />
+                            Include:<br />
+
+                            <?php
+                            $checked = '';
+                            if ($properties[Configuration::AUTOGEN_INCLUDE_DAG_FIELDS]) {
+                                $checked = ' checked ';
+                            }
+                            ?>
+                            <input type="checkbox" 
+                             name="<?php echo Configuration::AUTOGEN_INCLUDE_DAG_FIELDS;?>"
+
+                                <?php echo $checked;?> 
+                              style="vertical-align: middle; margin: 0;">                    
                             Data Access Group Fields <br/>
-                            
-                            <input type="checkbox" name="fileFields" 
-                                <?php
-                                if ($fileFields) {
-                                    echo 'checked';
-                                }
-                                ?>
-                            >
+
+
+                            <?php
+                            $checked = '';
+                            if ($properties[Configuration::AUTOGEN_INCLUDE_FILE_FIELDS]) {
+                                $checked = ' checked ';
+                            }
+                            ?>                            
+                            <input type="checkbox" 
+                             name="<?php echo Configuration::AUTOGEN_INCLUDE_FILE_FIELDS;?>"
+                              value="true"
+                                <?php echo $checked;?> 
+                              style="vertical-align: middle; margin: 0;">                    
                             File Fields <br/>
                             
-                            <input type="checkbox" name="formCompleteFields" 
-                                <?php
-                                if ($formCompleteFields) {
-                                    echo 'checked';
-                                }
-                                ?>
-                            >
+                            <?php
+                            $checked = '';
+                            if ($properties[Configuration::AUTOGEN_INCLUDE_COMPLETE_FIELDS]) {
+                                $checked = ' checked ';
+                            }
+                            ?>
+                            <input type="checkbox" 
+                             name="<?php echo Configuration::AUTOGEN_INCLUDE_COMPLETE_FIELDS;?>"
+                              value="true"
+                                <?php echo $checked;?> 
+                              style="vertical-align: middle; margin: 0;">                    
                             Form Complete Fields <br/>
+
+                            <?php
+                            $checked = '';
+                            if ($properties[Configuration::AUTOGEN_INCLUDE_SURVEY_FIELDS]) {
+                                $checked = ' checked ';
+                            }
+                            ?>
+                            <input type="checkbox" 
+                             name="<?php echo Configuration::AUTOGEN_INCLUDE_SURVEY_FIELDS;?>"
+                              value="true"
+                                <?php echo $checked;?> 
+                              style="vertical-align: middle; margin: 0;">                    
+                            Survey Fields <br/>
+
+                            <br />
+                            Remove: <br />
+                            <?php
+                            $checked = '';
+                            if ($properties[Configuration::AUTOGEN_REMOVE_NOTES_FIELDS]) {
+                                $checked = ' checked ';
+                            }
+                            ?>
+                            <input type="checkbox" 
+                             name="<?php echo Configuration::AUTOGEN_REMOVE_NOTES_FIELDS;?>"
+                              value="true"
+                                <?php echo $checked;?> 
+                              style="vertical-align: middle; margin: 0;">                    
+                            Notes Fields <br/>
+
+                            
+                            <?php
+                            $checked = '';
+                            if ($properties[Configuration::AUTOGEN_REMOVE_IDENTIFIER_FIELDS]) {
+                                $checked = ' checked ';
+                            }
+                            ?>
+                            <input type="checkbox" 
+                             name="<?php echo Configuration::AUTOGEN_REMOVE_IDENTIFIER_FIELDS;?>"
+                              value="true"
+                                <?php echo $checked;?> 
+                              style="vertical-align: middle; margin: 0;">                    
+                            Identifier Fields <br/>
+
+
+                            <br />
+                         (Non longitudinal studies only) If you want to combine all non-repeating fields into one table, enter the table name to use:<br />
+                            <input type="text" name="<?php echo Configuration::AUTOGEN_NON_REPEATING_FIELDS_TABLE;?>"
+                            value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::AUTOGEN_NON_REPEATING_FIELDS_TABLE])?>">
+<br />                           
+
+
                             <input type="submit" name="submitValue" value="Auto-Generate">
                         </div>
                         <hr style="margin: 7px 0px;"/>

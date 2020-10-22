@@ -35,7 +35,7 @@ class Configuration implements \JsonSerializable
     const DB_LOG_TABLE       = 'db_log_table';
     const DB_EVENT_LOG_TABLE = 'db_event_log_table';
     
-    # External moodule specific property names that are not in REDCap-ETL.
+    # External module specific property names that are not in REDCap-ETL.
     # The values for these properties are combined to form REDCap-ETL's
     # DB_CONNECTION property.
     const DB_TYPE = 'db_type';
@@ -81,6 +81,15 @@ class Configuration implements \JsonSerializable
 
     const CRON_SERVER   = 'cron_server';
     const CRON_SCHEDULE = 'cron_schedule';
+
+    const AUTOGEN_INCLUDE_COMPLETE_FIELDS = 'autogen_include_complete_fields';
+    const AUTOGEN_INCLUDE_DAG_FIELDS = 'autogen_include_dag_fields';
+    const AUTOGEN_INCLUDE_FILE_FIELDS = 'autogen_include_file_fields';
+    const AUTOGEN_INCLUDE_SURVEY_FIELDS = 'autogen_include_survey_fields';
+    const AUTOGEN_REMOVE_NOTES_FIELDS = 'autogen_remove_notes_fields';
+    const AUTOGEN_REMOVE_IDENTIFIER_FIELDS = 'autogen_remove_identifier_fields';
+    const AUTOGEN_COMBINE_NON_REPEATING_FIELDS = 'autogen_combine_non_repeating_fields';
+    const AUTOGEN_NON_REPEATING_FIELDS_TABLE = 'autogen_non_repeating_fields_table';
     
     private $name;
     private $username;
@@ -99,7 +108,14 @@ class Configuration implements \JsonSerializable
             self::EMAIL_ERRORS,
             self::EMAIL_SUMMARY,
             self::IGNORE_EMPTY_INCOMPLETE_FORMS,
-            self::SSL_VERIFY
+            self::SSL_VERIFY,
+            self::AUTOGEN_INCLUDE_COMPLETE_FIELDS,
+            self::AUTOGEN_INCLUDE_DAG_FIELDS,
+            self::AUTOGEN_INCLUDE_FILE_FIELDS,
+            self::AUTOGEN_INCLUDE_SURVEY_FIELDS,
+            self::AUTOGEN_REMOVE_NOTES_FIELDS,
+            self::AUTOGEN_REMOVE_IDENTIFIER_FIELDS,
+            self::AUTOGEN_COMBINE_NON_REPEATING_FIELDS
         ];
                 
         self::validateName($name);
@@ -143,6 +159,15 @@ class Configuration implements \JsonSerializable
 
         $this->properties[self::DB_PRIMARY_KEYS] = true;
         $this->properties[self::DB_FOREIGN_KEYS] = true;
+
+        $this->properties[AUTOGEN_INCLUDE_COMPLETE_FIELDS] = false;
+        $this->properties[AUTOGEN_INCLUDE_DAG_FIELDS] = false;
+        $this->properties[AUTOGEN_INCLUDE_FILE_FIELDS] = false;
+        $this->properties[AUTOGEN_INCLUDE_SURVEY_FIELDS] = false;
+        $this->properties[AUTOGEN_REMOVE_NOTES_FIELDS] = false;
+        $this->properties[AUTOGEN_REMOVE_IDENTIFIER_FIELDS] = false;
+        $this->properties[AUTOGEN_COMBINE_NON_REPEATING_FIELDS] = false;
+        $this->properties[AUTOGEN_NON_REPEATING_FIELDS_TABLE] = '';
     }
 
     /**
