@@ -28,17 +28,25 @@ One-time initial setup:
     * the project has no ETL configurations
     * the project has an API token with export permission
 
-4. Install Composer if you don't already have it, and run the following command in the tests/web directory:
+5. Create a REDCap-ETL enabled project for the non-admin user where:
+
+     * the title of the project is unique
+     * the project is created by importing the REDCap-ETL [Repeating Forms](https://github.com/IUREDCap/redcap-etl/blob/master/tests/projects/RepeatingForms.REDCap.xml) project file
+    * the project is approved for REDCap-ETL use (by the non-admin user)
+    * the project has no ETL configurations
+    * the project has an API token with export permission
+
+6. Install Composer if you don't already have it, and run the following command in the tests/web directory:
 
     composer install
 
-5. Run the following command in the top-level web tests directory:
+7. Run the following command in the top-level web tests directory:
 
     cp config-example.ini config.ini
 
-6. Edit the config.ini file created above, and enter appropriate values for properties
+8. Edit the config.ini file created above, and enter appropriate values for properties
 
-7. If you want to collect test coverage data, make sure that the tests/web/coverage-data/ directory can be written to by your REDCap web server.
+9. If you want to collect test coverage data, make sure that the tests/web/coverage-data/ directory can be written to by your REDCap web server.
     The REDCap web server has to have permission to write to this directory for code coverage
     data to be collected.
 

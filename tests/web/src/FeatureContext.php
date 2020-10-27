@@ -646,6 +646,32 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         Util::findSomethingForTheUser($session, $username, $textA, $textB);
     }
 
+    /**
+     * @When /^I select the forms project$/
+     */
+    public function iSelectTheFormsProject()
+    {
+        $session = $this->getSession();
+        Util::selectFormsProject($session);
+    }
+
+    /**
+     * @When I specify the auto-gen :arg1 options for :arg2
+     */
+    public function iSpecifyTheAutoGenOptionsFor($arg1, $arg2)
+    {
+        $session = $this->getSession();
+        EtlConfigsPage::configureAutoGen($session, $arg2, $arg1);
+    }
+
+    /**
+     * @Then I :textA see this text :textB
+     */
+    public function iShouldSeeThisText($textA, $textB)
+    {
+        $session = $this->getSession();
+        Util::findThisText($session, $textA, $textB);
+    }
 
     /**
      * @When I confirm the popup [nal WIP: was in the process of trying to get this to work]

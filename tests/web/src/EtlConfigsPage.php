@@ -138,4 +138,64 @@ class EtlConfigsPage
             $page->pressButton("Delete configuration");
         }
     }
+
+    public static function configureAutoGen($session, $configName, $option)
+    {
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
+
+        $etlConfig = $testConfig->getEtlConfig($configName);
+
+        $include_complete_fields = false;
+        $include_dag_fields = false;
+        $include_file_fields = false;
+        $include_survey_fields = false;
+        $remove_notes_fields = false;
+        $remove_identifier_fields  = false;
+        $non_repeating_fields_table = null;
+
+        $page = $session->getPage();
+
+        $page->selectFieldOption('api_token_username', $etlConfig['api_token_username']);
+
+        if ($option === "include") {
+            $include_complete_fields = true;
+            $include_dag_fields = true;
+            $include_file_fields = true;
+            $include_survey_fields = false;
+        }
+
+        if ($option === "remove") {
+            $remove_notes_fields = true;
+            $remove_identifier_fields = true;
+        }
+
+        if ($option === "nonrepeating table") {
+            $non_repeating_fields_table = 'merged';
+        }
+
+        if ($include_complete_fields) {
+            $page->checkField('autogen_include_complete_fields');
+        }
+        if ($include_file_fields) {
+            $page->checkField('autogen_include_file_fields');
+        }
+        if ($include_survey_fields) {
+            $page->checkField('autogen_include_survey_fields');
+        }
+        if ($include_dag_fields) {
+            $page->checkField('autogen_include_dag_fields');
+        }
+        if ($remove_notes_fields) {
+            $page->checkField('autogen_remove_notes_fields');
+        }
+        if ($remove_identifier_fields) {
+            $page->checkField('autogen_remove_identifier_fields');
+        }
+        if (!empty($non_repeating_fields_table)) {
+            $page->fillField('autogen_non_repeating_fields_table'
+                , $non_repeating_fields_table);
+        }
+
+        $page->pressButton('Auto-Generate');
+   }
 }

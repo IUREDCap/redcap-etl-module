@@ -274,11 +274,12 @@ class Util
             throw new \Exception(sprintf('"%s" was not found in the page', $textA));
         }
 
-        $seeking = $textA . ' ' . $textB;
-        if (strpos($content,$textA . ' ' . $textB) === false) {
-            throw new \Exception(sprintf('"%s" was not found in the page', $seeking));
+        if ($textB) {
+            $seeking = $textA . ' ' . $textB;
+            if (strpos($content,$textA . ' ' . $textB) === false) {
+                throw new \Exception(sprintf('"%s" was not found in the page', $seeking));
+            }
         }
-
     }
 
    public static function findSomethingForTheUser($session, $username, $see, $item)
@@ -376,5 +377,50 @@ class Util
         }
 
         return implode('', $keepers);
+    }
+
+    public static function selectFormsProject($session)
+    {
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
+        $testProjectTitle = $testConfig->getUser()['forms_project_title'];
+
+        $page = $session->getPage();
+
+        $page->clickLink($testProjectTitle);
+    }
+
+    public static function findThisText($session, $see, $textA)
+    {
+        $content = $session->getPage()->getContent();
+
+        // Get rid of stuff between script tags
+        $content = self::removeContentBetweenTags('script', $content);
+
+        // ...and stuff between style tags
+        $content = self::removeContentBetweenTags('style', $content);
+
+        $content = preg_replace('/<[^>]+>/', ' ',$content);
+
+        // Replace line breaks and tabs with a single space character
+        $content = preg_replace('/[\n\r\t]+/', ' ',$content);
+
+        $content = preg_replace('/ {2,}/', ' ',$content);
+
+        $seeError = "was not";
+        if ($see === "should not") {
+            $seeError = "was";
+        }
+
+        if ($see === 'should') {
+            if (strpos($content,$textA) === false) {
+               throw new \Exception(sprintf('"%s" was not found in the page', $textA));
+            }
+        } elseif ($see === 'should not') {
+            if (strpos($content,$textA) === true) {
+               throw new \Exception(sprintf('"%s" was found in the page', $textA));
+            }
+        } else {
+            throw new \Exception(sprintf('"%s" option is unrecognized', $see));
+        }
     }
 }

@@ -1,0 +1,74 @@
+#-------------------------------------------------------
+# Copyright (C) 2019 The Trustees of Indiana University
+# SPDX-License-Identifier: BSD-3-Clause
+#-------------------------------------------------------
+
+Feature: User-Interface
+In order to use REDCap-ETL
+As a non-admin user
+I need to be able to autogenerate the transformation rules
+
+  Background:
+    Given I am on "/"
+    And I am logged in as user
+    When I follow "My Projects"
+    And I select the forms project
+    And I follow "REDCap-ETL"
+    And I wait for 1 seconds
+
+  Scenario: Create configuration
+    When I fill in "configurationName" with "behat-config-test"
+    And I press "Add"
+    Then I should see "behat-config-test"
+    But I should not see "Error:"
+
+  Scenario: Configure configuration that has no auto-gen options specified
+    When I follow configuration "behat-config-test"
+    And I configure configuration "behat"
+    And I press "Save"
+    And I log out
+    And I wait for 1 seconds
+    And I am on "/"
+    And I am logged in as user
+    And I follow "My Projects"
+    And I select the forms project
+    And I follow "REDCap-ETL"
+    And I follow configuration "behat-config-test"
+    Then I should see "Transform Settings"
+    And I "should" see this text "TABLE,registration,registration_id,ROOT"
+
+  Scenario: Configure configuration that has the include auto-gen options specified 
+    When I follow "My Projects"
+    And I select the forms project
+    And I follow "REDCap-ETL"
+    And I follow configuration "behat-config-test"
+    And I specify the auto-gen "include" options for "behat"
+    Then I "should" see this text "redcap_data_access_group"
+    And I "should" see this text "registration_complete"
+    And I "should" see this text "consent_form"
+
+  Scenario: Configure configuration that has the remove auto-gen options specified
+    When I follow "My Projects"
+    And I select the forms project
+    And I follow "REDCap-ETL"
+    And I follow configuration "behat-config-test"
+    And I specify the auto-gen "remove" options for "behat"
+    Then I "should not" see this text "first_name"
+    And I "should not" see this text "email"
+    And I "should not" see this text "address"
+    And I "should not" see this text "comments"
+
+  Scenario: Configure configuration that has nonrepeating-table auto-gen options specified 
+    When I follow "My Projects"
+    And I select the forms project
+    And I follow "REDCap-ETL"
+    And I follow configuration "behat-config-test"
+    And I specify the auto-gen "nonrepeating table" options for "behat"
+    Then I "should" see this text "TABLE,merged,merged_id,ROOT"
+    And I "should" see this text "TABLE,weight,merged,REPEATING_INSTRUMENTS"
+    And I "should not" see this text "TABLE,emergency,emergency_id,ROOT"
+
+ Scenario: Cleanup by delete configuration
+    When I follow "ETL Configurations"
+    And I delete configuration "behat-config-test"
+
