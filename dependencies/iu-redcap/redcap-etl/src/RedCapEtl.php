@@ -233,13 +233,22 @@ class RedCapEtl
     public function processTransformationRules()
     {
         $rulesText = '';
-
+        
         #-----------------------------------------------------------------------------
         # If auto-generated rules were specified, generate the rules,
         # otherwise, get the from the configuration
         #-----------------------------------------------------------------------------
         if ($this->configuration->getTransformRulesSource() === Configuration::TRANSFORM_RULES_DEFAULT) {
-            $rulesText = $this->autoGenerateRules();
+            $rulesText = $this->autoGenerateRules(
+                $this->configuration->getAutogenIncludeCompleteFields(),
+                $this->configuration->getAutogenIncludeDagFields(),
+                $this->configuration->getAutogenIncludeFileFields(),
+                $this->configuration->getAutogenIncludeSurveyFields(),
+                $this->configuration->getAutogenRemoveNotesFields(),
+                $this->configuration->getAutogenRemoveIdentifierFields(),
+                $this->configuration->getAutogenCombineNonRepeatingFields(),
+                $this->configuration->getAutogenNonRepeatingFieldsTable()
+            );
         } else {
             $rulesText = $this->configuration->getTransformationRules();
         }
@@ -267,8 +276,16 @@ class RedCapEtl
      *
      * @return string the rules text
      */
-    public function autoGenerateRules($addFormCompleteFields = false, $addDagFields = false, $addFileFields = false)
-    {
+    public function autoGenerateRules(
+        $addFormCompleteFields = false,
+        $addDagFields = false,
+        $addFileFields = false,
+        $addSurveyFields = false,
+        $removeNotesFields = false,
+        $removeIdentifierFields = false,
+        $combineNonRepeatingFields = false,
+        $nonRepeatingFieldsTable = ''
+    ) {
         if (!isset($this->dataProject)) {
             $message = 'No data project was found.';
             throw new EtlException($message, EtlException::INPUT_ERROR);
@@ -279,7 +296,12 @@ class RedCapEtl
             $this->dataProject,
             $addFormCompleteFields,
             $addDagFields,
-            $addFileFields
+            $addFileFields,
+            $addSurveyFields,
+            $removeNotesFields,
+            $removeIdentifierFields,
+            $combineNonRepeatingFields,
+            $nonRepeatingFieldsTable
         );
         return $rulesText;
     }
