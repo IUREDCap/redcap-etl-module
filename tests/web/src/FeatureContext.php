@@ -537,19 +537,22 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
-     * @When /^I check test project access$/
+     * @When /^I check test and forms projects access$/
      */
-    public function iCheckTestProjectAccess()
+    public function iCheckTestAndFormsProjectsAccess()
     {
         $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
         $userConfig = $testConfig->getUser();
-        $testProjectTitle = $userConfig['test_project_title'];
+        $testProjectTitle  = $userConfig['test_project_title'];
+        $formsProjectTitle = $userConfig['forms_project_title'];
 
         $session = $this->getSession();
         $page = $session->getPage();
 
         $element = $page->find("xpath", "//tr[contains(td[3],'".$testProjectTitle."')]/td[1]/input[@type='checkbox']");
+        $element->click();
 
+        $element = $page->find("xpath", "//tr[contains(td[3],'".$formsProjectTitle."')]/td[1]/input[@type='checkbox']");
         $element->click();
     }
 

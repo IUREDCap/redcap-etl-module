@@ -42,6 +42,6 @@ Feature: Admin User Management
     When I follow "Users"
     And I follow "Search"
     And I search for user
-    And I check test project access
+    And I check test and forms projects access
     And I press "Save"
 
