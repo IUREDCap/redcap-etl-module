@@ -160,14 +160,14 @@ class Configuration implements \JsonSerializable
         $this->properties[self::DB_PRIMARY_KEYS] = true;
         $this->properties[self::DB_FOREIGN_KEYS] = true;
 
-        $this->properties[AUTOGEN_INCLUDE_COMPLETE_FIELDS] = false;
-        $this->properties[AUTOGEN_INCLUDE_DAG_FIELDS] = false;
-        $this->properties[AUTOGEN_INCLUDE_FILE_FIELDS] = false;
-        $this->properties[AUTOGEN_INCLUDE_SURVEY_FIELDS] = false;
-        $this->properties[AUTOGEN_REMOVE_NOTES_FIELDS] = false;
-        $this->properties[AUTOGEN_REMOVE_IDENTIFIER_FIELDS] = false;
-        $this->properties[AUTOGEN_COMBINE_NON_REPEATING_FIELDS] = false;
-        $this->properties[AUTOGEN_NON_REPEATING_FIELDS_TABLE] = '';
+        $this->properties[self::AUTOGEN_INCLUDE_COMPLETE_FIELDS] = false;
+        $this->properties[self::AUTOGEN_INCLUDE_DAG_FIELDS] = false;
+        $this->properties[self::AUTOGEN_INCLUDE_FILE_FIELDS] = false;
+        $this->properties[self::AUTOGEN_INCLUDE_SURVEY_FIELDS] = false;
+        $this->properties[self::AUTOGEN_REMOVE_NOTES_FIELDS] = false;
+        $this->properties[self::AUTOGEN_REMOVE_IDENTIFIER_FIELDS] = false;
+        $this->properties[self::AUTOGEN_COMBINE_NON_REPEATING_FIELDS] = false;
+        $this->properties[self::AUTOGEN_NON_REPEATING_FIELDS_TABLE] = '';
     }
 
     /**
