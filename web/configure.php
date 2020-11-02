@@ -864,10 +864,15 @@ Configuration form
 
 
                             <br />
-                         (Non longitudinal studies only) If you want to combine all non-repeating fields into one table, enter the table name to use:<br />
+                         (Non longitudinal studies only) If you want to combine all non-repeating
+                         fields into one table, enter the table name to use:<br />
                             <input type="text" name="<?php echo Configuration::AUTOGEN_NON_REPEATING_FIELDS_TABLE;?>"
-                            value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::AUTOGEN_NON_REPEATING_FIELDS_TABLE])?>">
-<br />                           
+                            value="<?php
+                                   echo Filter::escapeForHtmlAttribute(
+                                       $properties[Configuration::AUTOGEN_NON_REPEATING_FIELDS_TABLE]
+                                   );
+                                    ?>">
+                        <br />                           
 
 
                             <input type="submit" name="submitValue" value="Auto-Generate">
