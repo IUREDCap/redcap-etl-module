@@ -95,6 +95,15 @@ try {
             if (!isset($_POST[Configuration::API_TOKEN_USERNAME])) {
                 $_POST[Configuration::API_TOKEN_USERNAME] = '';
             }
+
+            if ($_POST[Configuration::AUTOGEN_BEFORE_RUN]) {
+                $_POST[Configuration::TRANSFORM_RULES_SOURCE] = 3;
+            } else {
+                if (!empty($_POST[Configuration::TRANSFORM_RULES_TEXT])) {
+                    $_POST[Configuration::TRANSFORM_RULES_SOURCE] = 1;
+                }
+            }
+
             $configuration->set(Filter::stripTagsArrayRecursive($_POST));
             
             # If this is NOT a remote REDCap configuration, set SSL certificate verification
@@ -574,10 +583,10 @@ Configuration form
     
     <input type="hidden" name="<?php echo Configuration::CONFIG_API_TOKEN; ?>"
            value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::CONFIG_API_TOKEN]); ?>" />
-           
+    
     <input type="hidden" name="<?php echo Configuration::TRANSFORM_RULES_SOURCE; ?>"
            value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::TRANSFORM_RULES_SOURCE]); ?>" />
-         
+     
     <!--<div style="padding: 10px; border: 1px solid #ccc; background-color: #f0f0f0;"> -->
 
     <fieldset class="config">
@@ -763,7 +772,7 @@ Configuration form
                         $rules = $properties[Configuration::TRANSFORM_RULES_TEXT];
                         $rulesName = Configuration::TRANSFORM_RULES_TEXT;
                         ?>
-                        <textarea rows="27" cols="70"
+                        <textarea rows="30" cols="70"
                             style="margin-top: 4px; margin-bottom: 4px;"
                             name="<?php echo $rulesName;?>"><?php echo Filter::escapeForHtml($rules);?></textarea>
                     </td>
@@ -864,19 +873,48 @@ Configuration form
 
 
                             <br />
-                         (Non longitudinal studies only) If you want to combine all non-repeating
-                         fields into one table, enter the table name to use:<br />
+                            Non-repeating fields (Non-longitudinal studies only)<br />
+
+                            <?php
+                            $checked = '';
+                            if ($properties[Configuration::AUTOGEN_COMBINE_NON_REPEATING_FIELDS]) {
+                                $checked = ' checked ';
+                            }
+                            ?>
+                            <input type="checkbox" 
+                             name="<?php echo Configuration::AUTOGEN_COMBINE_NON_REPEATING_FIELDS;?>"
+                              value="true"
+                                <?php echo $checked;?> 
+                              style="vertical-align: middle; margin: 0;">                    
+                            Combine all non-repeating fields into one table<br/>
+
+                            Table name to use:<br />
                             <input type="text" name="<?php echo Configuration::AUTOGEN_NON_REPEATING_FIELDS_TABLE;?>"
                             value="<?php
                                    echo Filter::escapeForHtmlAttribute(
                                        $properties[Configuration::AUTOGEN_NON_REPEATING_FIELDS_TABLE]
                                    );
                                     ?>">
-                        <br />                           
-
-
-                            <input type="submit" name="submitValue" value="Auto-Generate">
+                        <br /><br />                          
+                        <input type="submit" name="submitValue" value="Auto-Generate">
                         </div>
+
+
+                        <br />
+                        <?php
+                            $checked = '';
+                        if ($properties[Configuration::AUTOGEN_BEFORE_RUN]) {
+                            $checked = ' checked ';
+                        }
+                        ?>
+                        <input type="checkbox" 
+                            name="<?php echo Configuration::AUTOGEN_BEFORE_RUN;?>"
+                            value="true"
+                            <?php echo $checked;?> 
+                            style="vertical-align: middle; margin 0;">
+                        Auto-generate new rules before each run <br/>
+                        
+
                         <hr style="margin: 7px 0px;"/>
                         <div>
                             <button type="submit" value="Upload CSV file"
@@ -885,6 +923,7 @@ Configuration form
                             </button>
                             <input type="file" name="uploadCsvFile" id="uploadCsvFile" style="display: inline;">
                         </div>
+
                         <hr style="margin: 7px 0px;"/>
                         <div>
                             <button type="submit" value="Download CSV file" name="submitValue">
