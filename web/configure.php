@@ -161,8 +161,25 @@ try {
         
         # Reset properties, since they may have been modified above
         $properties = $configuration->getProperties();
-        
-        
+       
+        #----------------------------------------------
+        # Check non-repeating fields options
+        #----------------------------------------------
+        $nonRepeatingFields = false;
+        if (array_key_exists('autogen_combine_non_repeating_fields', $_POST)) {
+            $nonRepeatingFields = true;
+        }
+
+        $nonRepeatingFieldsTable = '';
+        if (array_key_exists('autogen_non_repeating_fields_table', $_POST)) {
+            $nonRepeatingFieldsTable =
+                trim($_POST['autogen_non_repeating_fields_table']);
+        }
+
+        if ($nonRepeatingFields && empty($nonRepeatingFieldsTable)) {
+            $error = 'ERROR: In AUTO-GENERATE TRANSFORMATION RULES, no table name specified for combined table.';
+        }
+
         #------------------------------------------------------
         # Process Actions
         #------------------------------------------------------
@@ -206,6 +223,7 @@ try {
 #print "\n\n_POST is \n\n";
 #print_r ($_POST);
 #print "\n\n";
+
                 if (array_key_exists('autogen_include_complete_fields', $_POST)) {
                     $formCompleteFields = true;
                 }
@@ -235,15 +253,10 @@ try {
                     $identifierFields = true;
                 }
 
-                $nonRepeatingFields = false;
-                $nonRepeatingFieldsTable = '';
-                if (array_key_exists('autogen_non_repeating_fields_table', $_POST)) {
-                    $nonRepeatingFieldsTable = $_POST['autogen_non_repeating_fields_table'];
-                    if (!empty($nonRepeatingFieldsTable)) {
-                        $nonRepeatingFields = true;
-                    }
-                }
-                                
+                #$nonRepeatingFields was specified earlier in this code
+
+                #$nonRepeatingFieldsTable was specified earlier in this code
+
                 $apiUrl    = $configuration->getProperty(Configuration::REDCAP_API_URL);
                 $dataToken = $configuration->getProperty(Configuration::DATA_SOURCE_API_TOKEN);
 
@@ -251,6 +264,9 @@ try {
                     $error = 'ERROR: No REDCap API URL specified.';
                 } elseif (empty($dataToken)) {
                     $error = 'ERROR: No data source API token information specified.';
+                } elseif ($nonRepeatingFields && empty($nonRepeatingFieldsTable)) {
+                    $error = 'ERROR: In AUTO-GENERATE TRANSFORMATION RULES, ';
+                    $error .= 'no table name specified for combined table.';
                 } else {
                     $existingRulesText = $properties[Configuration::TRANSFORM_RULES_TEXT];
                     $areExistingRules = false;

@@ -670,7 +670,7 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     /**
      * @Then I :textA see this text :textB
      */
-    public function iShouldSeeThisText($textA, $textB)
+    public function iSeeThisText($textA, $textB)
     {
         $session = $this->getSession();
         Util::findThisText($session, $textA, $textB);

@@ -151,6 +151,7 @@ class EtlConfigsPage
         $include_survey_fields = false;
         $remove_notes_fields = false;
         $remove_identifier_fields  = false;
+        $combine_non_repeating_fields = false;
         $non_repeating_fields_table = null;
 
         $page = $session->getPage();
@@ -163,13 +164,19 @@ class EtlConfigsPage
             $include_file_fields = true;
             $include_survey_fields = false;
         }
-
         if ($option === "remove") {
             $remove_notes_fields = true;
             $remove_identifier_fields = true;
         }
-
-        if ($option === "nonrepeating table") {
+        if ($option === "nonrepeating fields and table") {
+            $combine_non_repeating_fields = true;
+            $non_repeating_fields_table = 'merged';
+        }
+        if ($option === "combined nonrepeating checkbox only") {
+            $combine_non_repeating_fields = true;
+            $non_repeating_fields_table = null;
+        }
+        if ($option === "nonrepeating table name only") {
             $non_repeating_fields_table = 'merged';
         }
 
@@ -190,6 +197,11 @@ class EtlConfigsPage
         }
         if ($remove_identifier_fields) {
             $page->checkField('autogen_remove_identifier_fields');
+        }
+        if ($combine_non_repeating_fields) {
+            $page->checkField('autogen_combine_non_repeating_fields');
+        } else {
+            $page->uncheckField('autogen_combine_non_repeating_fields');
         }
         if (!empty($non_repeating_fields_table)) {
             $page->fillField('autogen_non_repeating_fields_table'
