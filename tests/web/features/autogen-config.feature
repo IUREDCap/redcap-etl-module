@@ -88,7 +88,7 @@ I need to be able to autogenerate the transformation rules
     But I should not see "ERROR: In AUTO-GENERATE TRANSFORMATION RULES"
     And I "should not" see this text "TABLE,merged,merged_id,ROOT"
 
-  Scenario: Configure configuration for automatically auto-generate rules before each ETL Run 
+  Scenario: Configure configuration to automatically auto-generate rules before each ETL run and then run ETL 
     When I follow configuration "behat-config-test"
     And I configure configuration "behat"
     And I check "autogen_before_run"
@@ -122,7 +122,7 @@ I need to be able to autogenerate the transformation rules
     Then I should see "Processing complete"
     And I should see "Created table 'testtable'"
     And I should see "Created table 'weight'"
-    But I should not see "basic_information"
+    But I should not see "Created table 'registration'"
 
  Scenario: Cleanup by delete configuration
     When I follow "ETL Configurations"
