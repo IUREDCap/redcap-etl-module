@@ -88,7 +88,6 @@ class Configuration implements \JsonSerializable
     const AUTOGEN_INCLUDE_SURVEY_FIELDS = 'autogen_include_survey_fields';
     const AUTOGEN_REMOVE_NOTES_FIELDS = 'autogen_remove_notes_fields';
     const AUTOGEN_REMOVE_IDENTIFIER_FIELDS = 'autogen_remove_identifier_fields';
-    const AUTOGEN_BEFORE_RUN = 'autogen_before_run';
     const AUTOGEN_COMBINE_NON_REPEATING_FIELDS = 'autogen_combine_non_repeating_fields';
     const AUTOGEN_NON_REPEATING_FIELDS_TABLE = 'autogen_non_repeating_fields_table';
     
@@ -116,7 +115,6 @@ class Configuration implements \JsonSerializable
             self::AUTOGEN_INCLUDE_SURVEY_FIELDS,
             self::AUTOGEN_REMOVE_NOTES_FIELDS,
             self::AUTOGEN_REMOVE_IDENTIFIER_FIELDS,
-            self::AUTOGEN_BEFORE_RUN,
             self::AUTOGEN_COMBINE_NON_REPEATING_FIELDS
         ];
                 
@@ -168,7 +166,6 @@ class Configuration implements \JsonSerializable
         $this->properties[self::AUTOGEN_INCLUDE_SURVEY_FIELDS] = false;
         $this->properties[self::AUTOGEN_REMOVE_NOTES_FIELDS] = false;
         $this->properties[self::AUTOGEN_REMOVE_IDENTIFIER_FIELDS] = false;
-        $this->properties[self::AUTOGEN_BEFORE_RUN] = false;
         $this->properties[self::AUTOGEN_COMBINE_NON_REPEATING_FIELDS] = false;
         $this->properties[self::AUTOGEN_NON_REPEATING_FIELDS_TABLE] = '';
     }

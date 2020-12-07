@@ -96,7 +96,7 @@ try {
                 $_POST[Configuration::API_TOKEN_USERNAME] = '';
             }
 
-            if ($_POST[Configuration::AUTOGEN_BEFORE_RUN]) {
+            if ($_POST['autogen_before_run']) {
                 $_POST[Configuration::TRANSFORM_RULES_SOURCE] = 3;
             } else {
                 if (!empty($_POST[Configuration::TRANSFORM_RULES_TEXT])) {
@@ -919,12 +919,12 @@ Configuration form
                         <br />
                         <?php
                             $checked = '';
-                        if ($properties[Configuration::AUTOGEN_BEFORE_RUN]) {
+                        if ($properties[Configuration::TRANSFORM_RULES_SOURCE] == 3) {
                             $checked = ' checked ';
                         }
                         ?>
                         <input type="checkbox" 
-                            name="<?php echo Configuration::AUTOGEN_BEFORE_RUN;?>"
+                            name="autogen_before_run"
                             value="true"
                             <?php echo $checked;?> 
                             style="vertical-align: middle; margin 0;">
