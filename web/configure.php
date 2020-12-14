@@ -395,7 +395,7 @@ echo $buffer;
             
             $('#auto-generate-rules-help-link').click(function () {
                 $('#auto-generate-rules-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
-                    .dialog('widget').position({my: 'left top', at: 'right+20 top+56', of: $(this)})
+                    .dialog('widget').position({my: 'left top', at: 'right+370 top-140', of: $(this)})
                     ;
                 return false;
             });
