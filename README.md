@@ -52,4 +52,10 @@ To use REDCap-ETL on a project, you need the following:
     * CREATE
     * DROP
     * CREATE VIEW
+* **REDCap Server PHP Database Extensions**.
+    If you use a database other than MySQL to load your extracted and transformed data, the appropriate
+    PHP extension(s) for the database will need to be enabled in the version of PHP used by your
+    REDCap server (assuming you are using the default "embedded" REDCap-ETL server that comes with the
+    REDCap-ETL external module). For example, for PostgreSQL, the pgsql extension will need to be
+    enabled in PHP.
 
