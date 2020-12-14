@@ -182,9 +182,13 @@ class Configuration implements \JsonSerializable
         if (empty($this->getProperty(self::API_TOKEN_USERNAME))) {
             throw new \Exception('No API token specified in configuration.');
         }
-        
-        if (empty($this->getProperty(self::TRANSFORM_RULES_TEXT))) {
-            throw new \Exception('No transformation rules were specified in configuration.');
+
+        $rulesSource = $this->getProperty(self::TRANSFORM_RULES_SOURCE);
+        if ($rulesSource != \IU\REDCapETL\Configuration::TRANSFORM_RULES_DEFAULT) {
+            # If the rules source is not (dynamic) auto-generation, make sure that rules have beem specified
+            if (empty($this->getProperty(self::TRANSFORM_RULES_TEXT))) {
+                throw new \Exception('No transformation rules were specified in configuration.');
+            }
         }
         
         if (empty($this->getProperty(self::DB_TYPE))) {
