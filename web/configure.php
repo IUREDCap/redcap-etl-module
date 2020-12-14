@@ -173,7 +173,7 @@ try {
         $nonRepeatingFieldsTable = '';
         if (array_key_exists('autogen_non_repeating_fields_table', $_POST)) {
             $nonRepeatingFieldsTable =
-                trim($_POST['autogen_non_repeating_fields_table']);
+                Filter::sanitizeLabel(trim($_POST['autogen_non_repeating_fields_table']));
         }
 
         if ($nonRepeatingFields && empty($nonRepeatingFieldsTable)) {
