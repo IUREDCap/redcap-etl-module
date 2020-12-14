@@ -48,7 +48,7 @@ class Help
             ."</p>"
             ."<p>"
             ."<b>Remove the following fields</b> from the rules that are generated:"
-            ." notes and identfier. If you select <em>notes</em>, all fields that"
+            ." notes and identifier. If you select <em>notes</em>, all fields that"
             ." have a 'Notes Box' field type will be removed. If you select"
             ." <em>identifier</em>, all fields that have been flagged in REDCap"
             ." as an identifier will be removed."
