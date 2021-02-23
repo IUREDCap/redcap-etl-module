@@ -12,7 +12,7 @@ $htmlPage = new HtmlPage();
 $htmlPage->PrintHeaderExt();
 ?>
 <div style="text-align:right;float:right;">
-    <img src="<?php echo APP_PATH_IMAGES."redcap-logo.png"; ?>" alt="REDCap"/>
+    <img src="<?php echo APP_PATH_IMAGES . "redcap-logo.png"; ?>" alt="REDCap"/>
 </div>
 <?php // phpcs:disable ?>
 <h1>REDCap-ETL Transformation Rules</h1>

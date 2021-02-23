@@ -10,7 +10,7 @@
 $module->checkAdminPagePermission();
 
 
-require_once __DIR__.'/../../dependencies/autoload.php';
+require_once __DIR__ . '/../../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\RedCapDb;
 

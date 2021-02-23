@@ -177,7 +177,7 @@ class Settings
                 # get the server-list for this user
                 $userPrivateServerNames = $this->getUserPrivateServerNames($username);
 
-                if (($serverKey=array_search($serverName, $userPrivateServerNames)) !== false) {
+                if (($serverKey = array_search($serverName, $userPrivateServerNames)) !== false) {
                     #remove this server from this user's list of allowed servers
                     unset($userPrivateServerNames[$serverKey]);
 
@@ -186,7 +186,7 @@ class Settings
                 }
 
                 #remove this user from this server's list of allowed users
-                if (($userKey=array_search($username, $currentUsernames)) !== false) {
+                if (($userKey = array_search($username, $currentUsernames)) !== false) {
                     unset($currentUsernames[$userKey]);
                 }
             }
@@ -206,7 +206,7 @@ class Settings
         $privateServerUsers = $this->getPrivateServerUsers($serverName);
 
         #find the username in the array, remove it, and save the updated user list
-        if (($key=array_search($username, $privateServerUsers)) !== false) {
+        if (($key = array_search($username, $privateServerUsers)) !== false) {
             unset($privateServerUsers[$key]);
             $this->setPrivateServerUsers($serverName, $privateServerUsers);
         }
@@ -330,7 +330,7 @@ class Settings
         
     public function getConfigurationKey($name)
     {
-        $key = self::ETL_CONFIG_KEY.$name;
+        $key = self::ETL_CONFIG_KEY . $name;
         return $key;
     }
 
@@ -424,8 +424,8 @@ class Settings
         $configuration = $this->getConfiguration($configName, $projectId);
         if (empty($configuration)) {
             $commit = false;
-            $errorMessage = 'Configuration "'.$configName.'" not found for user '
-                .$username.' and project ID '.$projectId.'.';
+            $errorMessage = 'Configuration "' . $configName . '" not found for user '
+                . $username . ' and project ID ' . $projectId . '.';
         }
         $configuration->setProperty(Configuration::CRON_SERVER, $server);
         $configuration->setProperty(Configuration::CRON_SCHEDULE, $schedule);
@@ -477,7 +477,7 @@ class Settings
             $key = $this->getConfigurationKey($name);
             $configuration = $this->module->getProjectSetting($key);
             if (isset($configuration)) {
-                throw new \Exception('Configuration "'.$name.'" already exists.');
+                throw new \Exception('Configuration "' . $name . '" already exists.');
             }
 
             $configuration = new Configuration($name);
@@ -777,7 +777,7 @@ class Settings
             $message = 'No server name specified.';
             throw new \Exception($message);
         } elseif ($this->serverConfigExists($serverName)) {
-            $message = 'Server "'.$serverName.'" already exists.';
+            $message = 'Server "' . $serverName . '" already exists.';
             throw new \Exception($message);
         }
         
@@ -929,7 +929,7 @@ class Settings
                     $this->setServerConfig($serverConfig);
                 }
             } else {
-                $message = 'Server "'.$serverName.'" not found.';
+                $message = 'Server "' . $serverName . '" not found.';
                 throw new \Exception($message);
             }
         } else {
@@ -1024,7 +1024,7 @@ class Settings
 
     public function setLastRunTime($date, $hour, $minutes)
     {
-        $lastRunTime = $date.','.$hour.','.$minutes;
+        $lastRunTime = $date . ',' . $hour . ',' . $minutes;
         $this->module->setSystemSetting(self::LAST_RUN_TIME_KEY, $lastRunTime);
     }
     

@@ -154,7 +154,7 @@ class Filter
         $text = preg_replace('/<\s*a\s+([^>]*$)/i', '<a>$1', $text);
 
         # Remove non-allowed tags
-        $allowedTagsString = '<'.implode('><', self::$allowedHelpTags).'>';
+        $allowedTagsString = '<' . implode('><', self::$allowedHelpTags) . '>';
         $text = strip_tags($text, $allowedTagsString);
 
         return $text;
@@ -176,7 +176,7 @@ class Filter
             } else {
                 $tagString .= ', ';
             }
-            $tagString .= '<'.$tag.'>';
+            $tagString .= '<' . $tag . '>';
         }
         return $tagString;
     }

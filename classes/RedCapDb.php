@@ -19,13 +19,13 @@ class RedCapDb
     {
         $users = array();
         $sql = "select ui_id as id, "
-            ." concat(username, ' (', user_firstname, ' ', user_lastname, ') - ', user_email) as value, username "
-            ." from redcap_user_information "
-            ." where user_suspended_time is null and "
-            ."     (username like '%".Filter::escapeForMysql($term)."%' "
-            ."     or user_firstname like '%".Filter::escapeForMysql($term)."%'"
-            ."     or user_lastname like '%".Filter::escapeForMysql($term)."%'"
-            ."     or user_email like '%".Filter::escapeForMysql($term)."%'".")";
+            . " concat(username, ' (', user_firstname, ' ', user_lastname, ') - ', user_email) as value, username "
+            . " from redcap_user_information "
+            . " where user_suspended_time is null and "
+            . "     (username like '%" . Filter::escapeForMysql($term) . "%' "
+            . "     or user_firstname like '%" . Filter::escapeForMysql($term) . "%'"
+            . "     or user_lastname like '%" . Filter::escapeForMysql($term) . "%'"
+            . "     or user_email like '%" . Filter::escapeForMysql($term) . "%'" . ")";
 
         $result = db_query($sql);
         while ($row = db_fetch_assoc($result)) {
@@ -47,10 +47,10 @@ class RedCapDb
     {
         $projects = array();
         $sql = "select u.username, p.project_id, p.app_title, "
-            ." if(u.api_token is null, 0, 1) as has_api_token, u.api_export "
-            ." from redcap_projects p, redcap_user_rights u "
-            ." where u.username = '".Filter::escapeForMysql($username)."' "
-            ." and p.project_id = u.project_id and p.date_deleted is null"     // @codeCoverageIgnore
+            . " if(u.api_token is null, 0, 1) as has_api_token, u.api_export "
+            . " from redcap_projects p, redcap_user_rights u "
+            . " where u.username = '" . Filter::escapeForMysql($username) . "' "
+            . " and p.project_id = u.project_id and p.date_deleted is null"     // @codeCoverageIgnore
             ;
 
         $result = db_query($sql);
@@ -80,11 +80,11 @@ class RedCapDb
         $isImport = false;
         
         $sql = "select username, api_token from redcap_user_rights "
-            ." where project_id = ".((int) $projectId)." "
-            ." and api_export = 1 "                          // @codeCoverageIgnore
-            ." and api_token is not null "                   // @codeCoverageIgnore
-            ." and data_export_tool = ".((int) $exportRight) // @codeCoverageIgnore
-            ." and group_id is null"                         // @codeCoverageIgnore
+            . " where project_id = " . ((int) $projectId) . " "
+            . " and api_export = 1 "                            // @codeCoverageIgnore
+            . " and api_token is not null "                     // @codeCoverageIgnore
+            . " and data_export_tool = " . ((int) $exportRight) // @codeCoverageIgnore
+            . " and group_id is null"                           // @codeCoverageIgnore
             ;
         
         $queryResult = db_query($sql);
@@ -108,10 +108,10 @@ class RedCapDb
 
         $etlConfigs = array();
         $sql = "select rems.project_id, rems.value "
-            ." from redcap_external_modules rem, redcap_external_module_settings rems "
-            ." where rem.external_module_id = rems.external_module_id "
-            ." and '".Filter::escapeForMySql($dirName)."' like concat(rem.directory_prefix, '%') "
-            ." and `key` like 'configuration:%'" // @codeCoverageIgnore
+            . " from redcap_external_modules rem, redcap_external_module_settings rems "
+            . " where rem.external_module_id = rems.external_module_id "
+            . " and '" . Filter::escapeForMySql($dirName) . "' like concat(rem.directory_prefix, '%') "
+            . " and `key` like 'configuration:%'" // @codeCoverageIgnore
             ;
         $queryResult = db_query($sql);
         while ($row = db_fetch_assoc($queryResult)) {

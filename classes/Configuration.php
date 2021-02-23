@@ -210,7 +210,7 @@ class Configuration implements \JsonSerializable
                     throw new \Exception($message);
                 }
             } else {
-                throw new \Exception('Unrecognized database type "'.$dbType.'" specified.');
+                throw new \Exception('Unrecognized database type "' . $dbType . '" specified.');
             }
         }
 
@@ -238,7 +238,7 @@ class Configuration implements \JsonSerializable
             if (empty($this->getProperty(self::EMAIL_TO_LIST))) {
                 throw new \Exception(
                     'E-mailing of errors and/or summary specified in configuration,'
-                    .' but no e-mail to list address was provided.'
+                    . ' but no e-mail to list address was provided.'
                 );
             }
         }
@@ -285,9 +285,9 @@ class Configuration implements \JsonSerializable
         if (empty($name)) {
             throw new \Exception('No configuration name specified.');
         } elseif (!is_string($name)) {
-            throw new \Exception('Configuration name is not a string; has type: '.gettype($name).'.');
+            throw new \Exception('Configuration name is not a string; has type: ' . gettype($name) . '.');
         } elseif (preg_match('/([^a-zA-Z0-9_\- .])/', $name, $matches) === 1) {
-            $errorMessage = 'Invalid character in configuration name: '.$matches[0];
+            $errorMessage = 'Invalid character in configuration name: ' . $matches[0];
             throw new \Exception($errorMessage);
         }
         return true;
@@ -297,7 +297,7 @@ class Configuration implements \JsonSerializable
     {
         if (!empty($url)) {
             if (!Filter::isUrl($url)) {
-                $message = 'The REDCap API URL specified "'.$url.'" is not a valid URL.';
+                $message = 'The REDCap API URL specified "' . $url . '" is not a valid URL.';
                 throw new \Exception($message);
             }
         }
@@ -310,12 +310,12 @@ class Configuration implements \JsonSerializable
         if (!empty($apiToken)) {
             if (!ctype_xdigit($apiToken)) {   # ctype_xdigit - check token for hexidecimal
                 $message = 'The REDCap API token has an invalid format.'
-                    .' It should only contain numbers and the letters A, B, C, D, E and F.';
+                    . ' It should only contain numbers and the letters A, B, C, D, E and F.';
                 throw new \Exception($message);
             } elseif (strlen($apiToken) != 32) { # check token for correct length
                 $message = 'The REDCap API token has an invalid format.'
-                    .' It has a length of '.strlen($apiToken).' characters, but should have a length of'
-                    .' 32.';
+                    . ' It has a length of ' . strlen($apiToken)
+                    . ' characters, but should have a length of' . ' 32.';
                 throw new \Exception($message);
             } // @codeCoverageIgnore
         }
@@ -327,7 +327,7 @@ class Configuration implements \JsonSerializable
         if (ctype_digit($batchSize) && intval($batchSize) > 0) {
             ; // OK
         } else {
-            $message = 'The batch size "'.$batchSize.'" needs to be a positive integer.';
+            $message = 'The batch size "' . $batchSize . '" needs to be a positive integer.';
             throw new \Exception($message);
         }
         return true;
@@ -342,9 +342,10 @@ class Configuration implements \JsonSerializable
         } elseif (preg_match('/^[_$a-zA-Z][_$a-zA-Z0-9]*$/', $tablePrefix, $matches) === 1) {
             ; // OK
         } else {
-             $errorMessage = 'Invalid table name prefix "'.$tablePrefix.'". Table name prefixes need to start with'
-                 .' a letter (a-z or A-Z), underscore, or dollar sign, that is followed by zero or more'
-                 .' of the same characters and/or digits (0-9)';
+            $errorMessage = 'Invalid table name prefix "' . $tablePrefix . '". '
+                . 'Table name prefixes need to start with'
+                . ' a letter (a-z or A-Z), underscore, or dollar sign, that is followed by zero or more'
+                . ' of the same characters and/or digits (0-9)';
             throw new \Exception($errorMessage);
         }
         return true;
@@ -359,8 +360,8 @@ class Configuration implements \JsonSerializable
         } elseif (preg_match('/^[_$a-zA-Z][_a-zA-Z0-9]*$/', $suffix, $matches) === 1) {
             ; // OK
         } else {
-             $errorMessage = 'Invalid label view suffix "'.$suffix.'". Label view suffixes need to contain'
-                 .' only letters (a-z or A-Z), underscores, or digits (0-9)';
+             $errorMessage = 'Invalid label view suffix "' . $suffix . '". Label view suffixes need to contain'
+                 . ' only letters (a-z or A-Z), underscores, or digits (0-9)';
             throw new \Exception($errorMessage);
         }
         return true;
@@ -382,11 +383,11 @@ class Configuration implements \JsonSerializable
                 }
         
                 if (count($invalidEmails) === 1) {
-                    throw new \Exception('The following to e-mail is invalid: '.$invalidEmails[0]);
+                    throw new \Exception('The following to e-mail is invalid: ' . $invalidEmails[0]);
                 } elseif (count($invalidEmails) > 1) {
-                    $message = 'The following to e-mails are invalid: '.$invalidEmails[0];
+                    $message = 'The following to e-mails are invalid: ' . $invalidEmails[0];
                     for ($i = 1; $i < count($invalidEmails); $i++) {
-                        $message .= ', '.$invalidEmails[$i];
+                        $message .= ', ' . $invalidEmails[$i];
                     }
                     throw new \Exception($message);
                 }
@@ -439,7 +440,7 @@ class Configuration implements \JsonSerializable
                     }
                 } else {
                     # If this is a non-boolean property
-                    @$testMode = file_exists(__DIR__.'/../test-config.ini');
+                    @$testMode = file_exists(__DIR__ . '/../test-config.ini');
                     if ($name === Configuration::REDCAP_API_URL && (!isset($testMode) || !$testMode)) {
                         #---------------------------------------------------------------
                         # If this is the REDCap API URL property, set it to the API URL

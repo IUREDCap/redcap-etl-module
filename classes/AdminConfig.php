@@ -164,7 +164,7 @@ class AdminConfig implements \JsonSerializable
         }
         
         if ($startTime < 10) {
-            $startTime = "&nbsp;".$startTime;
+            $startTime = "&nbsp;" . $startTime;
         }
 
         if ($endTime < 12 || $endTime == 24) {
@@ -178,7 +178,7 @@ class AdminConfig implements \JsonSerializable
         }
             
         if ($endTime < 10) {
-            $endTime = "&nbsp;".$endTime;
+            $endTime = "&nbsp;" . $endTime;
         }
         
         $label = "{$startTime}{$startTimeSuffix}&nbsp;-&nbsp;{$endTime}{$endTimeSuffix}";
@@ -220,7 +220,7 @@ class AdminConfig implements \JsonSerializable
 
             $end .= $endSuffix;
 
-            $labels[$i] = $start.' - '.$end;
+            $labels[$i] = $start . ' - ' . $end;
         }
         return $labels;
     }

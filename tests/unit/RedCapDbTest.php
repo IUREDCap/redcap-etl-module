@@ -31,7 +31,7 @@ class RedCapDbTest extends TestCase
             $db->endTransaction($commit);
         } catch (\Exception $exception) {
             $exceptionCaught = true;
-            print $exception->getMessage()."\n";
+            print $exception->getMessage() . "\n";
         }
         # Test that if a commit causes an exception,
         # the endTransaction method does NOT throw an exception

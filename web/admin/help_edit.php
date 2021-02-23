@@ -11,7 +11,7 @@
 #---------------------------------------------
 $module->checkAdminPagePermission();
 
-require_once __DIR__.'/../../dependencies/autoload.php';
+require_once __DIR__ . '/../../dependencies/autoload.php';
 
 use \IU\REDCapETL\Version;
 
@@ -64,7 +64,7 @@ try {
         $customHelp  = Help::getCustomHelp($topic, $module);
     }
 } catch (Exception $exception) {
-    $error = 'ERROR: '.$exception->getMessage();
+    $error = 'ERROR: ' . $exception->getMessage();
 }
     
 ?>
@@ -79,8 +79,8 @@ ob_start();
 require_once APP_PATH_DOCROOT . 'ControlCenter/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    " . $link . "\n</head>", $buffer);
 echo $buffer;
 ?>
 
@@ -109,8 +109,8 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
             if (strcasecmp($selectTopic, $topic) === 0) {
                 $selected = "selected";
             }
-            echo '    <option value="'.Filter::escapeForHtml($selectTopic).'" '.$selected.'>'
-                .Filter::escapeForHtml(Help::getTitle($selectTopic)).'</option>'."\n";
+            echo '    <option value="' . Filter::escapeForHtml($selectTopic) . '" ' . $selected . '>'
+                . Filter::escapeForHtml(Help::getTitle($selectTopic)) . '</option>' . "\n";
         }
         ?>
     </select>
@@ -199,7 +199,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
 </form>
 
 
-<div id="previewDialog" title="<?php echo 'Preiview: '.$topic; ?>" style="display: none;">
+<div id="previewDialog" title="<?php echo 'Preiview: ' . $topic; ?>" style="display: none;">
     <?php echo Help::getHelp($topic, $module); ?>
 </div>
 

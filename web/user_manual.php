@@ -6,7 +6,7 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
-require_once __DIR__.'/../dependencies/autoload.php';
+require_once __DIR__ . '/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Authorization;
@@ -27,7 +27,7 @@ try {
     #--------------------------------------------------------------
     if (!Authorization::hasEtlProjectPagePermission($module)) {
         $requestAccessUrl = $module->getUrl('web/request_access.php');
-        header('Location: '.$requestAccessUrl);
+        header('Location: ' . $requestAccessUrl);
     }
 
     $adminConfig = $module->getAdminConfig();
@@ -37,7 +37,7 @@ try {
 
     $redcapEtlImage = $module->getUrl('resources/redcap-etl.png');
 } catch (Exception $exception) {
-    $error = 'ERROR: '.$exception->getMessage();
+    $error = 'ERROR: ' . $exception->getMessage();
 }
 
 
@@ -48,8 +48,8 @@ ob_start();
 require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    " . $link . "\n</head>", $buffer);
 echo $buffer;
 ?>
 

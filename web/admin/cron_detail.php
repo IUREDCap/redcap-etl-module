@@ -12,7 +12,7 @@
 $module->checkAdminPagePermission();
 
 
-require_once __DIR__.'/../../dependencies/autoload.php';
+require_once __DIR__ . '/../../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Csrf;
@@ -70,8 +70,8 @@ ob_start();
 require_once APP_PATH_DOCROOT . 'ControlCenter/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    " . $link . "\n</head>", $buffer);
 echo $buffer;
 ?>
 
@@ -99,9 +99,9 @@ $times = $adminConfig->getTimeLabels();
     <?php
     foreach ($days as $value => $label) {
         if (strcmp($value, $selectedDay) === 0) {
-            echo '<option value="'.$value.'" selected>'.$label."</option>\n";
+            echo '<option value="' . $value . '" selected>' . $label . "</option>\n";
         } else {
-            echo '<option value="'.$value.'">'.$label."</option>\n";
+            echo '<option value="' . $value . '">' . $label . "</option>\n";
         }
     }
     ?>
@@ -112,9 +112,9 @@ $times = $adminConfig->getTimeLabels();
     <?php
     foreach ($times as $value => $label) {
         if (strcmp($value, $selectedTime) === 0) {
-            echo '<option value="'.$value.'" selected>'.$label."</option>\n";
+            echo '<option value="' . $value . '" selected>' . $label . "</option>\n";
         } else {
-            echo '<option value="'.$value.'">'.$label."</option>\n";
+            echo '<option value="' . $value . '">' . $label . "</option>\n";
         }
     }
     ?>
@@ -131,28 +131,28 @@ $times = $adminConfig->getTimeLabels();
         $row = 1;
         foreach ($cronJobs as $cronJob) {
             $server = $cronJob['server'];
-            $serverUrl = $serverConfigUrl.'&serverName='.Filter::escapeForUrlParameter($server);
+            $serverUrl = $serverConfigUrl . '&serverName=' . Filter::escapeForUrlParameter($server);
             #$username  = $cronJob['username'];
             $projectId = $cronJob['projectId'];
             $config    = $cronJob['config'];
-            $userConfigUrl = $userUrl.'&username='.Filter::escapeForUrlParameter($username);
+            $userConfigUrl = $userUrl . '&username=' . Filter::escapeForUrlParameter($username);
             
             $configUrl = $module->getURL(
                 RedCapEtlModule::USER_ETL_CONFIG_PAGE
-                .'?pid='.Filter::escapeForUrlParameter($projectId)
-                .'&configName='.Filter::escapeForUrlParameter($config)
+                . '?pid=' . Filter::escapeForUrlParameter($projectId)
+                . '&configName=' . Filter::escapeForUrlParameter($config)
             );
 
             if ($row % 2 === 0) {
-                echo '<tr class="even">'."\n";
+                echo '<tr class="even">' . "\n";
             } else {
-                echo '<tr class="odd">'."\n";
+                echo '<tr class="odd">' . "\n";
             }
-            echo "<td>".'<a href="'.APP_PATH_WEBROOT.'index.php?pid='.(int)$projectId.'">'
-                .(int)$projectId.'</a>'."</td>\n";
-            echo "<td>".'<a href="'.$configUrl.'">'.Filter::escapeForHtml($config).'</a>'."</td>\n";
+            echo "<td>" . '<a href="' . APP_PATH_WEBROOT . 'index.php?pid=' . (int)$projectId . '">'
+                . (int)$projectId . '</a>' . "</td>\n";
+            echo "<td>" . '<a href="' . $configUrl . '">' . Filter::escapeForHtml($config) . '</a>' . "</td>\n";
             
-            echo "<td>".'<a href="'.$serverUrl.'">'.Filter::escapeForHtml($server).'</a>'."</td>\n";
+            echo "<td>" . '<a href="' . $serverUrl . '">' . Filter::escapeForHtml($server) . '</a>' . "</td>\n";
             
             echo "</tr>\n";
             $row++;
@@ -184,7 +184,7 @@ $('#popup').dialog({
         $('#popup').load(
             "<?php echo $module->getURL(
                 "config_dialog.php?config={$config}&username={$username}"
-                ."&projectId={$projectId}"
+                . "&projectId={$projectId}"
             ) ?>",
             function() {}
         );

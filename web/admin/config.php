@@ -11,7 +11,7 @@
 #---------------------------------------------
 $module->checkAdminPagePermission();
 
-require_once __DIR__.'/../../dependencies/autoload.php';
+require_once __DIR__ . '/../../dependencies/autoload.php';
 
 use \IU\REDCapETL\Version;
 
@@ -36,7 +36,7 @@ try {
         $success = "Admin configuration saved.";
     }
 } catch (Exception $exception) {
-    $error = 'ERROR: '.$exception->getMessage();
+    $error = 'ERROR: ' . $exception->getMessage();
 }
     
 ?>
@@ -51,8 +51,8 @@ ob_start();
 require_once APP_PATH_DOCROOT . 'ControlCenter/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    " . $link . "\n</head>", $buffer);
 echo $buffer;
 ?>
 
@@ -121,7 +121,7 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
         $hour    = $cronTime[1];
         $minutes = $cronTime[2];
         if (strlen($hour) === 1) {
-            $hour = '0'.$hour;
+            $hour = '0' . $hour;
         }
         $cronTime = "{$date} {$hour}:{$minutes}";
     }
@@ -143,7 +143,7 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
           <th>&nbsp;</th>
             <?php
             foreach (AdminConfig::DAY_LABELS as $dayLabel) {
-                echo '<th class="day">'.$dayLabel."</th>\n";
+                echo '<th class="day">' . $dayLabel . "</th>\n";
             }
             ?>
         </tr>
@@ -158,36 +158,37 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     $row = 1;
     foreach (range(0, 23) as $time) {
         if ($row % 2 === 0) {
-            echo '<tr class="even-row">'."\n";
+            echo '<tr class="even-row">' . "\n";
         } else {
-            echo '<tr>'."\n";
+            echo '<tr>' . "\n";
         }
         $row++;
         $label = $adminConfig->getHtmlTimeLabel($time);
-    ?>
+        ?>
+
         <td class="time-range"><?php echo $label;?></td>
         
         <?php
         foreach (range(0, 6) as $day) {
-            $name = AdminConfig::ALLOWED_CRON_TIMES.'['.$day.']['.$time.']';
+            $name = AdminConfig::ALLOWED_CRON_TIMES . '[' . $day . '][' . $time . ']';
             $count = count($cronJobs[$day][$time]);
             
-            $jobsUrl = $cronInfoUrl.'&selectedDay='.$day.'&selectedTime='.$time;
+            $jobsUrl = $cronInfoUrl . '&selectedDay=' . $day . '&selectedTime=' . $time;
 
             $checked = '';
             if ($adminConfig->isAllowedCronTime($day, $time)) {
                 $checked = ' checked ';
             }
-            echo '<td class="day" style="position: relative;">'."\n";
-            echo '<input type="checkbox" name="'.$name.'" '.$checked.'>';
+            echo '<td class="day" style="position: relative;">' . "\n";
+            echo '<input type="checkbox" name="' . $name . '" ' . $checked . '>';
             if ($count > 0) {
-                echo '<a href="'.$jobsUrl.'" style="position: absolute; top: 1px; right: 4px;">'.$count.'</a>';
+                echo '<a href="' . $jobsUrl . '" style="position: absolute; top: 1px; right: 4px;">' . $count . '</a>';
             }
-            echo '</td>'."\n";
+            echo '</td>' . "\n";
         }
         ?>
       </tr>
-    <?php
+        <?php
     }
     ?>
     </tbody>

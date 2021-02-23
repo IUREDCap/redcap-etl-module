@@ -12,7 +12,7 @@
 $module->checkAdminPagePermission();
 
 
-require_once __DIR__.'/../../dependencies/autoload.php';
+require_once __DIR__ . '/../../dependencies/autoload.php';
 
 use \IU\REDCapETL\Version;
 
@@ -33,7 +33,7 @@ $etlServersUrl  = $module->getUrl(RedCapEtlModule::SERVERS_PAGE);
 $etlServerConfigUrl = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
 
 $embeddedServerConfigUrl =
-    $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE.'?serverName='.ServerConfig::EMBEDDED_SERVER_NAME);
+    $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE . '?serverName=' . ServerConfig::EMBEDDED_SERVER_NAME);
 
 $logUrl = $module->getUrl(RedCapEtlModule::LOG_PAGE);
 
@@ -54,8 +54,8 @@ ob_start();
 require_once APP_PATH_DOCROOT . 'ControlCenter/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    " . $link . "\n</head>", $buffer);
 echo $buffer;
 ?>
 

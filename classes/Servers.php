@@ -31,7 +31,7 @@ class Servers implements \JsonSerializable
     public function addServer($name)
     {
         if (array_key_exists($name, $this->servers)) {
-            throw new \Exception('Server "'.$name.'" already exists.');
+            throw new \Exception('Server "' . $name . '" already exists.');
         }
         ServerConfig::validateName($name);
         $this->servers[$name] = 1;

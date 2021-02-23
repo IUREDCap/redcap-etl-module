@@ -40,18 +40,18 @@ class StatusTest extends TestCase
     {
         $username = self::$testConfig->getUser()['username'];
         $testProjectTitle = self::$testConfig->getUser()['test_project_title'];
-        #print "\n";
-        #print "User username: \"{$username}\"\n";
-        #print "Test Project: \"{$testProjectTitle}\"\n";
 
         Util::loginAsUser(self::$session);
         $page = self::$session->getPage();
         $text = $page->getText();
 
-        // Check that the test user is set up
+        # Check that the test user is set up
         $this->assertRegExp("/Logged in as {$username}/", $text); 
 
-        // Check that test REDCap ETL project is set up correctly
+        # Make sure you are on the REDCap "My Projects" page
+        $page->clickLink('My Projects');
+
+        # Check that test REDCap ETL project is set up correctly
         Util::selectTestProject(self::$session);
         $page = self::$session->getPage();
         $page->clickLink('REDCap-ETL');

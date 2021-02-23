@@ -6,7 +6,7 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
-require_once __DIR__.'/../dependencies/autoload.php';
+require_once __DIR__ . '/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\Authorization;
@@ -70,16 +70,16 @@ $projectId = $module->getProjectId();
 
 if ($accessError === RedCapEtlModule::CSRF_ERROR) {
     echo 'You do not have permission to perform that operation. Your session'
-        .' may have expired. Please make sure that you are logged in and '
-        .' try again.';
+        . ' may have expired. Please make sure that you are logged in and '
+        . ' try again.';
 } elseif ($accessError === RedCapEtlModule::USER_RIGHTS_ERROR) {
     echo 'You do not have permission to use REDCap-ETL'
-        .' for this project. You need to have:'
-        .' <ul>'
-        .' <li>REDCap user right "Project Design and Setup"</li>'
-        .' <li>REDCap data export user right of "Full Data Set"</li>'
-        .' <li>No data access group (i.e., you can access all records)</li>.'
-        .' </ul>';
+        . ' for this project. You need to have:'
+        . ' <ul>'
+        . ' <li>REDCap user right "Project Design and Setup"</li>'
+        . ' <li>REDCap data export user right of "Full Data Set"</li>'
+        . ' <li>No data access group (i.e., you can access all records)</li>.'
+        . ' </ul>';
 } elseif ($accessError === RedCapEtlModule::NO_CONFIGURATION_PERMISSION) {
     echo 'You do not have permission to access the specified configuration.';
 } elseif ($accessError === RedCapEtlModule::NO_ETL_PROJECT_PERMISSION) {
@@ -90,17 +90,17 @@ if ($accessError === RedCapEtlModule::CSRF_ERROR) {
     #--------------------------------------------------------------------
 
     echo "<p>You don't currently have permission to use REDCap-ETL for this project."
-        ." To request access, click on the button below\n";
+        . " To request access, click on the button below\n";
 
-    echo '<div style="padding-top:15px; padding-bottom:15px;">'."\n";
+    echo '<div style="padding-top:15px; padding-bottom:15px;">' . "\n";
 
-    echo '<form action="'.$selfUrl.'" method="post">'."\n";
+    echo '<form action="' . $selfUrl . '" method="post">' . "\n";
     echo '    <input type="submit" name="submitValue" id="requestButton" '
-        .' value="Request ETL access for this project" '
-        .' onclick="$(\'#requestButton\').css(\'cursor\', \'progress\'); $(\'body\').css(\'cursor\', \'progress\');" >'
+        . ' value="Request ETL access for this project" '
+        . ' onclick="$(\'#requestButton\').css(\'cursor\', \'progress\'); $(\'body\').css(\'cursor\', \'progress\');" >'
         ;
 
-    echo '    <?php Csrf::generateFormToken(); ?>'."\n";
+    echo '    <?php Csrf::generateFormToken(); ?>' . "\n";
     echo "</form>\n";
 
 
@@ -116,9 +116,9 @@ if ($accessError === RedCapEtlModule::CSRF_ERROR) {
 } elseif ($submitValue === $requestLabel) {
     if (empty($requestError)) {
         echo 'Request for REDCap-ETL access for project "'
-            .Filter::escapeForHtml(REDCap::getProjectTitle()).'" sent.';
+            . Filter::escapeForHtml(REDCap::getProjectTitle()) . '" sent.';
     } else {
-        echo "Request for REDCap-ETL failed: ".Filter::escapeForHtml($requestError);
+        echo "Request for REDCap-ETL failed: " . Filter::escapeForHtml($requestError);
     }
 } else {
     echo 'An unknown access error occurred.';
