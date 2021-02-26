@@ -423,4 +423,28 @@ class Util
             throw new \Exception(sprintf('"%s" option is unrecognized', $see));
         }
     }
+
+
+    /**
+     * Follow a link that goes to a new window.
+     *
+     * @param string $link the link that goes to a new window.
+     */
+    public function goToNewWindow($session, $link)
+    {
+        # Save the current window names
+        $windowNames = $session->getWindowNames();
+
+        # Follow the link (which should create a new window name)
+        $page = $session->getPage();
+        $page->clickLink($link);
+        sleep(2); // Give some time for new window to open
+
+        # See what window name was added (this should be the new window)
+        $newWindowNames = $session->getWindowNames();
+        $windowNamesDiff = array_diff($newWindowNames, $windowNames);
+        $newWindowName = array_shift($windowNamesDiff); // There should be only 1 element in the diff
+
+        $session->switchToWindow($newWindowName);
+    }
 }

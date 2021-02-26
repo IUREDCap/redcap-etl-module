@@ -313,45 +313,11 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
 
 
     /**
-     * @When /^I go to new window in (\d+) seconds$/
-     */
-    public function iGoToNewWindow($seconds)
-    {
-        sleep($seconds);  // Need time for new window to open
-        $windowNames = $this->getSession()->getWindowNames();
-        $numWindows  = count($windowNames);
-
-        $currentWindowName  = $this->getSession()->getWindowName();
-        $currentWindowIndex = array_search($currentWindowName, $windowNames);
-
-        if (isset($currentWindowIndex) && $numWindows > $currentWindowIndex + 1) {
-            $this->getSession()->switchToWindow($windowNames[$currentWindowIndex + 1]);
-            #$this->getSession()->reset();
-        }
-    }
-
-    /**
      * @When /^I wait for (\d+) seconds$/
      */
     public function iWaitForSeconds($seconds)
     {
         sleep($seconds);
-    }
-
-    /**
-     * @When /^I go to old window$/
-     */
-    public function iGoToOldWindow()
-    {
-        $windowNames = $this->getSession()->getWindowNames();
-
-        $currentWindowName  = $this->getSession()->getWindowName();
-        $currentWindowIndex = array_search($currentWindowName, $windowNames);
-
-        if (isset($currentWindowIndex) && $currentWindowIndex > 0) {
-            $this->getSession()->switchToWindow($windowNames[$currentWindowIndex - 1]);
-            $this->getSession()->restart();
-        }
     }
 
     /**
@@ -394,7 +360,7 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     /**
      * @When /^I log in as admin and access REDCap-ETL$/
      */
-    public function i()
+    public function iLogInAsAdminAndAccessRedCapEtl()
     {
         $session = $this->getSession();
         Util::logInAsAdminAndAccessRedCapEtl($session);
@@ -416,6 +382,28 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     {
         $session = $this->getSession();
         Util::selectTestProject($session);
+    }
+
+    /**
+     * @When /^I select the test project in new window$/
+     */
+    public function iSelectTheTestProjectInNewWindow()
+    {
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
+        $testProjectTitle = $testConfig->getUser()['test_project_title'];
+
+        $session = $this->getSession();
+
+        Util::goToNewWindow($session, $testProjectTitle);
+    }
+
+    /**
+     * @When /^I follow "([^"]*)" to new window$/
+     */
+    public function iFollowLinkToNewWindow($link)
+    {
+        $session = $this->getSession();
+        Util::goToNewWindow($session, $link);
     }
 
     /**
