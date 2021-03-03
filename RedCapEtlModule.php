@@ -30,6 +30,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const LOG_PAGE           = 'web/admin/log.php';
             
     const USER_ETL_CONFIG_PAGE  = 'web/configure.php';
+
+    const WORKFLOWS_PAGE     = 'web/workflows.php';
     
     # REDCap event log constants
     const RUN_LOG_ACTION    = 'REDCap-ETL Export';
@@ -1050,6 +1052,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $listLabel = '<span class="fas fa-list"></span>'
            .' ETL Configurations';
 
+        
         $configUrl = $this->getUrl('web/configure.php');
         $configLabel = '<span style="color: #808080;" class="fas fa-cog"></span>'
            .' Configure';
@@ -1063,10 +1066,15 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $runLabel = '<span style="color: #008000;" class="fas fa-play-circle"></span>'
            .' Run';
 
+        $workflowsUrl = $this->getUrl('web/workflows.php');
+        $workflowsLabel = '<span style="color: #808080;" class="fas fa-list"></span>'
+           .' Workflows';
+
         $userManualUrl = $this->getUrl('web/user_manual.php');
         $userManualLabel =
             '<i class="fas fa-book"></i>'
             .' User Manual';
+
 
         $adminConfig = $this->getAdminConfig();
         
@@ -1077,6 +1085,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         
         $userEtlProjects = $this->getUserEtlProjects(USERID);
         
+        $tabs[$workflowsUrl] = $workflowsLabel;
+
         if (Authorization::hasEtlProjectPagePermission($this)) {
             $tabs[$configUrl]   = $configLabel;
     
@@ -1087,7 +1097,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             if ($adminConfig->getAllowCron()) {
                 $tabs[$scheduleUrl] = $scheduleLabel;
             }
-            
+                      
             $tabs[$userManualUrl] = $userManualLabel;
         }
         
@@ -1287,5 +1297,151 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 ." Please make sure you are logged in and try again."
             );
         }
+    }
+
+    public function addWorkflow($workflowName, $username = USERID, $projectId = PROJECT_ID)
+    {
+        $dataExportRight = $this->getDataExportRight();
+        $this->settings->addWorkflow($workflowName, $username, $projectId, $dataExportRight);
+        $details = 'REDCap-ETL workflow "'.$workflowName.'" created.';
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
+    }
+
+    public function getWorkflow($workflowName, $removeMetadata = null)
+    {
+         return $this->settings->getWorkflow($workflowName, $removeMetadata);
+    }
+
+    public function getWorkflowStatus($workflowName)
+    {
+         return $this->settings->getWorkflowStatus($workflowName);
+    }
+
+    public function getProjectAvailableWorkflows($projectId = PROJECT_ID)
+    {
+         return $this->settings->getProjectAvailableWorkflows();
+    }
+
+    /**
+     * Marks a workflow as 'removed'. Does not delete the workflow from the Workflows array.
+     */
+    public function removeWorkflow($workflowName, $username = USERID)
+    {
+#        if (Authorization::hasEtlConfigNamePermission($this, $configName, PROJECT_ID)) {
+            $this->settings->removeWorkflow($workflowName, $username);
+            $details = 'REDCap-ETL workflow "'.$workflowName.'" marked as removed by user '.$username.'.';
+            \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
+#        } else {
+#            throw new \Exception('You do not have permission to remove workflow "'.$workflowName.'".');
+#        }
+    }
+
+    public function renameWorkflow($workflowName, $newWorkflowName, $username = USERID)
+    {
+#        if (Authorization::hasEtlConfigNamePermission($this, $configName, PROJECT_ID)) {
+            $this->settings->renameWorkflow($workflowName, $newWorkflowName, $username);
+            $details = 'REDCap-ETL workflow "'.$workflowName.'" renamed to "'.
+                $newWorkflowName.'" by user '.$username.', project ID '.PROJECT_ID.'.';
+            \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
+#        } else {
+#            throw new \Exception('You do not have permission to rename workflow "'.$workflowName.'".');
+#        }
+    }
+
+    public function copyWorkflow($fromWorkflowName, $toWorkflowName, $username = USERID)
+    {
+#        if (Authorization::hasEtlConfigNamePermission($this, $configName, PROJECT_ID)) {
+            $this->settings->copyWorkflow($fromWorkflowName, $toWorkflowName, $username);
+            $details = 'REDCap-ETL workflow "'.$fromWorkflowName.'" copied to "'.
+                $toWorkflowName.'" by user '.$username.', project ID '.PROJECT_ID.'.';
+            \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
+#        } else {
+#            throw new \Exception('You do not have permission to rename workflow "'.$workflowName.'".');
+#        }
+    }
+
+    public function addProjectToWorkflow($workflowName, $project, $username = USERID)
+    {
+         return $this->settings->addProjectToWorkflow($workflowName, $project, $username);
+    }
+
+    public function deleteTaskfromWorkflow($workflowName, $deleteTaskKey, $projectId, $username = USERID)
+    {
+#       if (Authorization::hasEtlConfigNamePermission($this, $configName, PROJECT_ID)) {
+
+            $this->settings->deleteTaskFromWorkflow($workflowName, $deleteTaskKey, $username);
+            $details = 'Task # ' .$deleteTaskKey .' (Project Id ' .$projectId
+                .') deleted from REDCap-ETL workflow "'.$workflowName
+                .'" by user '.$username.'.';
+            \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
+#       } else {
+#            throw new \Exception('You do not have permission to delete project ## from workflow "'.$workflowName.'".');
+#       }
+    }
+
+    public function moveWorkflowTask($workflowName, $direction, $moveTaskKey)
+    {
+        $this->settings->moveWorkflowTask($workflowName, $direction, $moveTaskKey);
+    }
+
+    public function getEtlGlobalParametersList()
+    {
+        $this->settings->getEtlGlobalParametersList();
+    }
+
+    public function renameWorkflowTask(
+        $workflowName,
+        $renameTaskKey,
+        $renameNewTaskName,
+        $renameProjectId,
+        $username
+    ) {
+#        if (Authorization::hasEtlConfigNamePermission($this, $configName, PROJECT_ID)) {
+        $this->settings->renameWorkflowTask($workflowName, $renameTaskKey, $renameNewTaskName, $renameProjectId, $username);
+            $details = 'REDCap-ETL workflow "'.$workflowName.
+                       '", project ID "'.$renameProjectId.
+                       '", task key "'.$renameTaskKey.
+                       '" renamed to "'.$newWorkflowName.'" by user '.$username;
+            \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
+#        } else {
+#            throw new \Exception('You do not have permission to rename workflow "'.$workflowName.'".');
+#        }
+    }
+
+    public function assignWorkflowTaskEtlConfig(
+        $workflowName,
+        $etlProjectId,
+        $etlTaskKey,
+        $etlConfig,
+        $username
+    ) {
+    #    if (Authorization::hasEtlConfigNamePermission($this, $configName, PROJECT_ID)) {
+        $this->settings->assignWorkflowTaskEtlConfig($workflowName, $etlProjectId, $etlTaskKey, $etlConfig, $username);
+            $details = 'REDCap-ETL workflow "'.$workflowName.
+                       '", project ID "'.$etlProjectId.
+                       '", task key "'.$etlTaskKey.
+                       '" was assigned ETL config "'.$etConfig.'" by user '.$username;
+            \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
+#        } else {
+#            throw new \Exception('You do not have permission to rename workflow "'.$workflowName.'".');
+#        }
+    }
+
+    public function updateWorkflowTasks(
+        $workflowName,
+        $taskNumbers,
+        $taskNames,
+        $projectEtlConfigs,
+        $username = USERID
+    ) {
+#        if (Authorization::hasEtlConfigNamePermission($this, $configName, PROJECT_ID)) {
+            $this->settings->updateWorkflowTasks($workflowName, $taskNumbers, $taskNames, $projectEtlConfigs, $username);
+
+            #$details = 'REDCap-ETL workflow "'.$workflowName.'" renamed to "'.
+            #    $newWorkflowName.'" by user '.$username.', project ID '.PROJECT_ID.'.';
+            #\REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
+#        } else {
+#            throw new \Exception('You do not have permission to rename workflow "'.$workflowName.'".');
+#        }
     }
 }

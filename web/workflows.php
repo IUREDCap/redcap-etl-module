@@ -8,11 +8,18 @@
 
 require_once __DIR__.'/../dependencies/autoload.php';
 
+use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Configuration;
-use IU\RedCapEtlModule\Workflow;
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
+use IU\RedCapEtlModule\RedCapEtlModule;
+use IU\RedCapEtlModule\ServerConfig;
+
+$error   = '';
+$warning = '';
+$success = '';
+$removeWorkflowName =  '';
 
 try {
     #-----------------------------------------------------------
@@ -21,70 +28,73 @@ try {
     $module->checkUserPagePermission(USERID);
 
     #-----------------------------------------------------------------
-    # Process form submissions (configuration add/copy/delete/rename)
+    # Process form submissions (workflow add/copy/remove/rename)
     #-----------------------------------------------------------------
     $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
-    if (strcasecmp($submitValue, 'add') === 0) {
+    if (strcasecmp($submitValue, 'Add') === 0) {
         #--------------------------------------
-        # Add configuration
+        # Add workflow
         #--------------------------------------
-        if (!array_key_exists('configurationName', $_POST) || empty($_POST['configurationName'])) {
-            $error = 'ERROR: No configuration name was specified.';
+        if (!array_key_exists('workflowName', $_POST) || empty($_POST['workflowName'])) {
+            $error = 'ERROR: No workflow name was specified.';
         } else {
-            $configurationName = Filter::stripTags($_POST['configurationName']);
+            $workflowName = Filter::stripTags($_POST['workflowName']);
             
-            # Want to make sure config name is validated before it is used
-            Configuration::validateName($configurationName);
+            # Want to make sure workflow name is validated before it is used
+            Configuration::validateName($workflowName);
             
-            # Add configuration; an exception should be thrown if the configuration
+            # Add workflow; an exception should be thrown if the workflow
             # already exists
-            $module->addConfiguration($configurationName);
+            $module->addWorkflow($workflowName);
         }
     } elseif (strcasecmp($submitValue, 'copy') === 0) {
         #--------------------------------------------
-        # Copy configuration
+        # Copy workflow
         #--------------------------------------------
-        $copyFromConfigName = Filter::stripTags($_POST['copyFromConfigName']);
-        $copyToConfigName   = Filter::stripTags($_POST['copyToConfigName']);
-        if (!empty($copyFromConfigName) && !empty($copyToConfigName)) {
+        $copyFromWorkflowName = Filter::stripTags($_POST['copyFromWorkflowName']);
+        $copyToWorkflowName   = Filter::stripTags($_POST['copyToWorkflowName']);
+        if (!empty($copyFromWorkflowName) && !empty($copyToWorkflowName)) {
             # Want to make sure config names are validated before it is used
-            Configuration::validateName($copyFromConfigName);
-            Configuration::validateName($copyToConfigName);
+            Configuration::validateName($copyFromWorkflowName);
+            Configuration::validateName($copyToWorkflowName);
                         
-            $module->copyConfiguration($copyFromConfigName, $copyToConfigName);
+            $module->copyWorkflow($copyFromWorkflowName, $copyToWorkflowName);
         }
-    } elseif (strcasecmp($submitValue, 'delete') === 0) {
+    } elseif (strcasecmp($submitValue, 'remove') === 0) {
         #---------------------------------------------
-        # Delete configuration
+        # Remove workflow
         #---------------------------------------------
-        $deleteConfigName = Filter::stripTags($_POST['deleteConfigName']);
-        if (!empty($deleteConfigName)) {
-            # Want to make sure config name is validated before it is used
-            Configuration::validateName($deleteConfigName);
+        $removeWorkflowName = Filter::stripTags($_POST['removeWorkflowName']);
+        if (!empty($removeWorkflowName)) {
+            # Want to make sure workflow name is validated before it is used
+            Configuration::validateName($removeWorkflowName);
             
-            $module->removeConfiguration($deleteConfigName);
+            $module->removeWorkflow($removeWorkflowName);
         }
     } elseif (strcasecmp($submitValue, 'rename') === 0) {
         #----------------------------------------------
-        # Rename configuration
+        # Rename workflow
         #----------------------------------------------
-        $renameConfigName    = Filter::stripTags($_POST['renameConfigName']);
-        $renameNewConfigName = Filter::stripTags($_POST['renameNewConfigName']);
-        if (!empty($renameConfigName) && !empty($renameNewConfigName)) {
-            # Want to make sure config names are validated before it is used
-            Configuration::validateName($renameConfigName);
-            Configuration::validateName($renameNewConfigName);
+        $renameWorkflowName    = Filter::stripTags($_POST['renameWorkflowName']);
+        $renameNewWorkflowName = Filter::stripTags($_POST['renameNewWorkflowName']);
+        if (!empty($renameWorkflowName) && !empty($renameNewWorkflowName)) {
+            # Want to make sure names are validated before it is used
+            Configuration::validateName($renameWorkflowName);
+            Configuration::validateName($renameNewWorkflowName);
             
-            $module->renameConfiguration($renameConfigName, $renameNewConfigName);
+            $module->renameWorkflow($renameWorkflowName, $renameNewWorkflowName);
         }
     }
 } catch (\Exception $exception) {
     $error = 'ERROR: '.$exception->getMessage();
 }
 
-#---------------------------------------------
-# Add custom files to head section of page
-#---------------------------------------------
+?>
+
+<?php
+#--------------------------------------------
+# Include REDCap's project page header
+#--------------------------------------------
 ob_start();
 require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 $buffer = ob_get_clean();
@@ -94,55 +104,44 @@ $buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
 echo $buffer;
 ?>
 
-<div class="projhdr">
-<img style="margin-right: 7px;" alt="" src="<?php echo APP_PATH_IMAGES ?>database_table.png">REDCap-ETL
+<div class="projhdr"> <!--h4 style="color:#800000;margin:0 0 10px;"> -->
+<img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>database_table.png" alt="">REDCap-ETL
 </div>
-
 
 <?php
 
-$configurationNames = $module->getConfigurationNames();
+$workflowNames = $module->getProjectAvailableWorkflows();
+$adminConfig   = $module->getAdminConfig();
 
-$adminConfig = $module->getAdminConfig();
-
-$selfUrl     = $module->getUrl('web/index.php');
-$configUrl   = $module->getUrl("web/configure.php");
-$configUrl   = $module->getUrl("web/etl_configure.php");
-$testUrl     = $module->getUrl("web/test.php");
-$scheduleUrl = $module->getUrl("web/schedule.php");
-$runUrl      = $module->getUrl("web/run.php");
+$selfUrl       = $module->getUrl('web/workflows.php');
+$configUrl     = $module->getUrl("web/workflow_configuration.php");
+$testUrl       = $module->getUrl("web/test.php");
+$scheduleUrl   = $module->getUrl("web/schedule.php");
+$runUrl        = $module->getUrl("web/run.php");
 
 $userEtlProjects = $module->getUserEtlProjects();
 $projectId = $module->getProjectId();
-
-?>
-
-<?php
-
 $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
-        
 ?>
+
 
 <?php
 #------------------------------------------------------------
-# Add configuration form
+# Add workflows form
 #------------------------------------------------------------
 ?>
 <form action="<?=$selfUrl;?>" method="post" style="margin-bottom: 12px;">
-    <label for="configurationName">REDCap-ETL configuration name:</label>
-    <input name="configurationName" id="configurationName" type="text" size="40" />
+    <label for="workflowName">REDCap-ETL Workflow name:</label>
+    <input name="workflowName" id="workflowName" type="text" size="40" />
     <input type="submit" name="submitValue" value="Add" />
     <?php Csrf::generateFormToken(); ?>
 </form>
-
-
 
 <table class="dataTable">
 <thead>
 <tr class="hrd">
 
-    <th>Configuration Name</th>
-    <!-- <th>Data Export</th> -->
+    <th>Workflow Name</th>
     <th>Configure</th>
     <!-- <th>Test</th> -->
     <?php
@@ -157,7 +156,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     ?>
     <th>Copy</th>
     <th>Rename</th>
-    <th>Delete</th>
+    <th>Remove</th>
 
 </tr>
 </thead>
@@ -166,113 +165,100 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 <tbody>
 <?php
 
-#----------------------------------------------------------
-# Displays rows of table of user's ETL configurations
-#----------------------------------------------------------
+#--------------------------------------------------------------
+# Displays rows of table of workflows that contain the project
+#--------------------------------------------------------------
 $row = 1;
-foreach ($configurationNames as $configurationName) {
+foreach ($workflowNames as $workflowName) {
     if ($row % 2 === 0) {
         echo '<tr class="even">'."\n";
     } else {
         echo '<tr class="odd">'."\n";
     }
     
-    $configureUrl = $configUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
+    $configureUrl = $configUrl.'&workflowName='.Filter::escapeForUrlParameter($workflowName);
+    /**
     $testingUrl = $testUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
     $runConfigurationUrl = $runUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
     $scheduleConfigUrl = $scheduleUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
 
     $configuration = $module->getConfiguration($configurationName);
     $exportRight = $module->getConfigurationExportRight($configuration);
-    #$exportRightLabel = $module->getExportRightLabel($exportRight);
-    
-    echo "<td>".Filter::escapeForHtml($configurationName)."</td>\n";
-    #echo "<td>".Filter::escapeForHtml($exportRightLabel)."</td>\n";
+    **/
+    echo "<td>".Filter::escapeForHtml($workflowName)."</td>\n";
     
     #-------------------------------------------------------------------------------------
-    # CONFIGURE BUTTON - disable if user does not have permission to access configuration
+    # CONFIGURE BUTTON - disable if user does not have permission to access the project
     #-------------------------------------------------------------------------------------
-    if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
+    #if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
-            .'<a href="'.$configureUrl.'" id="'.Filter::escapeForHtmlAttribute('configure-'.$configurationName).'">'
+            .'<a href="'.$configureUrl.'" id="'.Filter::escapeForHtmlAttribute('configure-'.$workflowName).'">'
             .'<img alt="CONFIG" src="'.APP_PATH_IMAGES.'gear.png"></a>'
             ."</td>\n";
-    } else {
+    /**} else {
         echo '<td style="text-align:center;">'
             .'<img src="'.APP_PATH_IMAGES.'gear.png" alt="CONFIG" class="disabled">'
             ."</td>\n";
-    }
+    }**/
     
-    #-------------------------------------------------------------------------------------
-    # TEST BUTTON - disable if user does not have permission to access configuration
-    #-------------------------------------------------------------------------------------
-    #if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
-    #    echo '<td style="text-align:center;">'
-    #        .'<a href="'.$testingUrl.'"><img alt="TEST" src="'.APP_PATH_IMAGES.'wrench.png"></a>'
-    #        ."</td>\n";
-    #} else {
-    #    echo '<td style="text-align:center;">'
-    #        .'<img src="'.APP_PATH_IMAGES.'gear.png" alt="TEST" class="disabled">'
-    #        ."</td>\n";
-    #}
     
     #--------------------------------------------------------------------------------------
     # RUN BUTTON - display if running on demand allowed, but disable if user does not have
     # the needed data export permission to access the configuration
     #--------------------------------------------------------------------------------------
-    if ($adminConfig->getAllowOnDemand()) {
-        if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
+    #if ($adminConfig->getAllowOnDemand()) {
+    #    if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
             echo '<td style="text-align:center;">'
                 .'<a href="'.$runConfigurationUrl.'"><img src="'.APP_PATH_IMAGES.'application_go.png" alt="RUN"></a>'
                 ."</td>\n";
-        } else {
+     /**   } else {
             echo '<td style="text-align:center;">'
                 .'<img src="'.APP_PATH_IMAGES.'application_go.png"  alt="RUN" class="disabled">'
                 ."</td>\n";
         }
-    }
+    }**/
 
     #--------------------------------------------------------------------------------------
     # SHEDULE BUTTON - display if ETL cron jobs allowed, but disable if user does not have
     # the needed data export permission to access the configuration
     #--------------------------------------------------------------------------------------
-    if ($adminConfig->getAllowCron()) {
-        if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
+    #if ($adminConfig->getAllowCron()) {
+    #    if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
             echo '<td style="text-align:center;">'
                 .'<a href="'.$scheduleConfigUrl.'"><img src="'.APP_PATH_IMAGES.'clock_frame.png" alt="SCHEDULE"></a>'
                 ."</td>\n";
-        } else {
+    /**    } else {
             echo '<td style="text-align:center;">'
                 .'<img src="'.APP_PATH_IMAGES.'clock_frame.png" alt="SCHEDULE" class="disabled">'
                 ."</td>\n";
         }
-    }
+    }**/
 
     #-----------------------------------------------------------
     # COPY BUTTON - disable if user does not have the needed
-    # data export permission to access the configuration
+    # data export permission to access the project
     #-----------------------------------------------------------
-    if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
+    #if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
             .'<input type="image" src="'.APP_PATH_IMAGES.'page_copy.png" alt="COPY"'
             .' class="copyConfig" style="cursor: pointer;"'
-            .' id="copyConfig'.$row.'"/>'
+            .' id="copyWorkflow'.$row.'"/>'
             ."</td>\n";
-    } else {
+    /** } else {
         echo '<td style="text-align:center;">'
             .'<img src="'.APP_PATH_IMAGES.'page_copy.png" alt="COPY" class="disabled" />'
             ."</td>\n";
-    }
+    }**/
     
     #-----------------------------------------------------------
     # RENAME BUTTON - disable if user does not have the needed
-    # data export permission to access the configuration
+    # data export permission to access the project
     #-----------------------------------------------------------
     if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
             .'<input type="image" src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME"'
             .' class="renameConfig" style="cursor: pointer;"'
-            .' id="renameConfig'.$row.'"/>'
+            .' id="renameWorkflow'.$row.'"/>'
             ."</td>\n";
     } else {
         echo '<td style="text-align:center;">'
@@ -281,18 +267,18 @@ foreach ($configurationNames as $configurationName) {
     }
 
     #-----------------------------------------------------------
-    # DELETE BUTTON - disable if user does not have the needed
-    # data export permission to access the configuration
+    # REMOVE BUTTON - disable if user does not have the needed
+    # data export permission to access the project
     #-----------------------------------------------------------
     if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
-            .'<input type="image" src="'.APP_PATH_IMAGES.'delete.png" alt="DELETE"'
+            .'<input type="image" src="'.APP_PATH_IMAGES.'delete.png" alt="REMOVE"'
             .' class="deleteConfig" style="cursor: pointer;"'
-            .' id="deleteConfig'.$row.'"/>'
+            .' id="removeWorkflow'.$row.'"/>'
             ."</td>\n";
     } else {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'delete.png" alt="DELETE" class="disabled" />'
+            .'<img src="'.APP_PATH_IMAGES.'delete.png" alt="REMOVE" class="disabled" />'
             ."</td>\n";
     }
     
@@ -303,10 +289,12 @@ foreach ($configurationNames as $configurationName) {
 ?>
 </tbody>
 </table>
+<!-- ******************************-->
+<br />
 
 <?php
 #--------------------------------------
-# Copy config dialog
+# Copy workflow dialog
 #--------------------------------------
 ?>
 <script>
@@ -318,43 +306,43 @@ $(function() {
         modal: true,
         buttons: {
             Cancel: function() {$(this).dialog("close");},
-            "Copy configuration": function() {copyForm.submit(); $(this).dialog("close");}
+            "Copy workflow": function() {copyForm.submit(); $(this).dialog("close");}
         },
-        title: "Copy configuration"
+        title: "Copy workflow"
     });
     
     <?php
-    # Set up click event handlers for the Copy Configuration  buttons
+    # Set up click event handlers for the Copy Workflow buttons
     $row = 1;
-    foreach ($configurationNames as $configurationName) {
-        echo '$("#copyConfig'.$row.'").click({fromConfig: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($configurationName)
-            .'"}, copyConfig);'."\n";
+    foreach ($workflowNames as $workflowName) {
+        echo '$("#copyWorkflow'.$row.'").click({fromWorkflow: "'
+            .Filter::escapeForJavaScriptInDoubleQuotes($workflowName)
+            .'"}, copyWorkflow);'."\n";
         $row++;
     }
     ?>
     
-    function copyConfig(event) {
-        var configName = event.data.fromConfig;
-        $("#configToCopy").text('"'+configName+'"');
-        $('#copyFromConfigName').val(configName);
+    function copyWorkflow(event) {
+        var workflowName = event.data.fromWorkflow;
+        $("#workflowToCopy").text('"'+workflowName+'"');
+        $('#copyFromWorkflowName').val(workflowName);
         $("#copyForm").dialog("open");
     }
 });
 </script>
 <div id="copyDialog"
-    title="Configuration Copy"
+    title="Workflow Copy"
     style="display: none;"
     >
     <form id="copyForm" action="<?php echo $selfUrl;?>" method="post">
-    To copy the configuration <span id="configToCopy" style="font-weight: bold;"></span>,
-    enter the name of the new configuration below, and click on the
-    <span style="font-weight: bold;">Copy configuration</span> button.
+    To copy the workflow <span id="workflowToCopy" style="font-weight: bold;"></span>,
+    enter the name of the new workflow below, and click on the
+    <span style="font-weight: bold;">Copy workflow</span> button.
     <p>
-    <span style="font-weight: bold;">New configuration name:</span>
-    <input type="text" name="copyToConfigName" id="copyToConfigName">
+    <span style="font-weight: bold;">New workflow name:</span>
+    <input type="text" name="copyToWorkflowName" id="copyToWorkflowName">
     </p>
-    <input type="hidden" name="copyFromConfigName" id="copyFromConfigName" value="">
+    <input type="hidden" name="copyFromWorkflowName" id="copyFromWorkflowName" value="">
     <input type="hidden" name="submitValue" value="copy">
     <?php Csrf::generateFormToken(); ?>
     </form>
@@ -362,12 +350,12 @@ $(function() {
 
 <?php
 #--------------------------------------
-# Rename config dialog
+# Rename workflow dialog
 #--------------------------------------
 ?>
 <script>
 $(function() {
-    // Rename ETL configuration form
+    // Rename workflow form
     renameForm = $("#renameForm").dialog({
         autoOpen: false,
         height: 220,
@@ -375,43 +363,43 @@ $(function() {
         modal: true,
         buttons: {
             Cancel: function() {$(this).dialog("close");},
-            "Rename configuration": function() {renameForm.submit();}
+            "Rename Workflow": function() {renameForm.submit();}
         },
-        title: "Rename configuration"
+        title: "Rename Workflow"
     });
 
     <?php
-    # Set up click event handlers for the Rename Configuration  buttons
+    # Set up click event handlers for the Rename Workflow buttons
     $row = 1;
-    foreach ($configurationNames as $configurationName) {
-        echo '$("#renameConfig'.$row.'").click({configName: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($configurationName)
-            .'"}, renameConfig);'."\n";
+    foreach ($workflowNames as $workflowName) {
+        echo '$("#renameWorkflow'.$row.'").click({workflowName: "'
+            .Filter::escapeForJavaScriptInDoubleQuotes($workflowName)
+            .'"}, renameWorkflow);'."\n";
         $row++;
     }
     ?>
     
-    function renameConfig(event) {
-        var configName = event.data.configName;
-        $("#configToRename").text('"'+configName+'"');
-        $('#renameConfigName').val(configName);
+    function renameWorkflow(event) {
+        var workflowName = event.data.workflowName;
+        $("#workflowToRename").text('"'+workflowName+'"');
+        $('#renameWorkflowName').val(workflowName);
         $("#renameForm").dialog("open");
     }
 });
 </script>
 <div id="renameDialog"
-    title="Configuration Rename"
+    title="Workflow Rename"
     style="display: none;"
     >
     <form id="renameForm" action="<?php echo $selfUrl;?>" method="post">
-    To rename the configuration <span id="configToRename" style="font-weight: bold;"></span>,
-    enter the new name for the new configuration below, and click on the
-    <span style="font-weight: bold;">Rename configuration</span> button.
+    To rename the workflow <span id="workflowToRename" style="font-weight: bold;"></span>,
+    enter the new name for the new workflow below, and click on the
+    <span style="font-weight: bold;">Rename workflow</span> button.
     <p>
-    <span style="font-weight: bold;">New configuration name:</span>
-    <input type="text" name="renameNewConfigName" id="renameNewConfigName">
+    <span style="font-weight: bold;">New workflow name:</span>
+    <input type="text" name="renameNewWorkflowName" id="renameNewWorkflowName">
     </p>
-    <input type="hidden" name="renameConfigName" id="renameConfigName" value="">
+    <input type="hidden" name="renameWorkflowName" id="renameWorkflowName" value="">
     <input type="hidden" name="submitValue" value="rename">
     <?php Csrf::generateFormToken(); ?>
     </form>
@@ -420,52 +408,52 @@ $(function() {
 
 <?php
 #--------------------------------------
-# Delete config dialog
+# Remove workflow dialog
 #--------------------------------------
 ?>
 <script>
 $(function() {
-    // Delete ETL configuration form
-    deleteForm = $("#deleteForm").dialog({
+    // Remove ETL workflow form
+    removeForm = $("#removeForm").dialog({
         autoOpen: false,
         height: 170,
         width: 400,
         modal: true,
         buttons: {
             Cancel: function() {$(this).dialog("close");},
-            "Delete configuration": function() {deleteForm.submit();}
+            "Remove workflow": function() {removeForm.submit();}
         },
-        title: "Delete configuration"
+        title: "Remove Workflow"
     });
   
     <?php
-    # Set up click event handlers for the Delete Configuration  buttons
+    # Set up click event handlers for the Remove Workflow buttons
     $row = 1;
-    foreach ($configurationNames as $configurationName) {
-        echo '$("#deleteConfig'.$row.'").click({configName: "'
-           .Filter::escapeForJavaScriptInDoubleQuotes($configurationName)
-           .'"}, deleteConfig);'."\n";
+    foreach ($workflowNames as $workflowName) {
+        echo '$("#removeWorkflow'.$row.'").click({workflowName: "'
+           .Filter::escapeForJavaScriptInDoubleQuotes($workflowName)
+           .'"}, removeWorkflow);'."\n";
         $row++;
     }
     ?>
     
-    function deleteConfig(event) {
-        var configName = event.data.configName;
-        $("#configToDelete").text('"'+configName+'"');
-        $('#deleteConfigName').val(configName);
-        $("#deleteForm").dialog("open");
+    function removeWorkflow(event) {
+        var workflowName = event.data.workflowName;
+        $("#workflowToRemove").text('"'+workflowName+'"');
+        $('#removeWorkflowName').val(workflowName);
+        $("#removeForm").dialog("open");
     }
 });
 </script>
-<div id="deleteDialog"
-    title="Configuration Delete"
+<div id="removeDialog"
+    title="Workflow Remove"
     style="display: none;"
     >
-    <form id="deleteForm" action="<?php echo $selfUrl;?>" method="post">
-    To delete the ETL configuration <span id="configToDelete" style="font-weight: bold;"></span>,
-    click on the <span style="font-weight: bold;">Delete configuration</span> button.
-    <input type="hidden" name="deleteConfigName" id="deleteConfigName" value="">
-    <input type="hidden" name="submitValue" value="delete">
+    <form id="removeForm" action="<?php echo $selfUrl;?>" method="post">
+    To remove the Workflow configuration <span id="workflowToRemove" style="font-weight: bold;"></span>,
+    click on the <span style="font-weight: bold;">Remove workflow</span> button.
+    <input type="hidden" name="removeWorkflowName" id="removeWorkflowName" value="">
+    <input type="hidden" name="submitValue" value="remove">
     <?php Csrf::generateFormToken(); ?>
     </form>
 </div>

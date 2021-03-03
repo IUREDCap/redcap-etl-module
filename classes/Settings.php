@@ -16,10 +16,12 @@ class Settings
     const USER_LIST_KEY            = 'user-list';
     const LAST_RUN_TIME_KEY        = 'last-run-time'; // for storing day and time of last run
 
-    const USER_PROJECTS_KEY_PREFIX = 'user-projects:';  // appdend with username to make key
+    const USER_PROJECTS_KEY_PREFIX = 'user-projects:';  // append with username to make key
     const USER_SERVERS_KEY_PREFIX  = 'user-servers:';
     const PRIVATE_SERVER_USERS_KEY_PREFIX  = 'private-server-users:';
     
+    const WORKFLOWS_KEY               = 'workflows';
+
     const VERSION_KEY = 'version';
     
     const CONFIG_SESSION_KEY = 'redcap-etl-config';
@@ -1066,5 +1068,409 @@ class Settings
     {
         $key = Help::HELP_TEXT_PREFIX . $topic;
         $this->module->setSystemSetting($key, $help);
+    }
+
+    #-------------------------------------------------------------------
+    # Workflow methods
+    #-------------------------------------------------------------------
+
+    public function addWorkflow(
+        $workflowName,
+        $username = USERID,
+        $projectId = PROJECT_ID,
+        $dataExportRight = 0,
+        $transaction = true
+    ) {
+        $commit = true;
+        $message = '';
+
+        $workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+#$key = self::WORKFLOWS_KEY;
+#$this->module->removeSystemSetting($key);
+
+        if (empty($workflowName)) {
+            $message = 'When adding new workflow, no workflow name specified.';
+            throw new \Exception($message);
+        } elseif ($workflows->workflowExists($workflowName)) {
+            $message = 'Workflow "'.$workflowName.'" already exists.';
+            throw new \Exception($message);
+        }
+
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+
+        $workflows->createWorkflow($workflowName, $username);
+        $workflows->addProjectToWorkflow($workflowName, $projectId, null);
+        $json = $workflows->toJson();
+
+        $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+      
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+    }
+
+    public function addProjectToWorkflow(
+        $workflowName,
+        $project,
+        $username = USERID
+    ) {
+        $message = '';
+
+        $workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+
+        $projectId = $project['project_id'];
+
+        $workflows->addProjectToWorkflow($workflowName, $projectId, $username);
+        $json = $workflows->toJson();
+
+        $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+    }
+
+    public function deleteTaskFromWorkflow(
+        $workflowName,
+        $taskKey,
+        $username = USERID
+    ) {
+        $workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+
+        $workflows->deleteTaskFromWorkflow($workflowName, $taskKey, $username);
+        $json = $workflows->toJson();
+
+        $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+    }
+
+    public function getWorkflow($workflowName, $removeMetadata = null)
+    {
+        $workflows = new Workflow();
+        $key = self::WORKFLOWS_KEY;
+        $json = $this->module->getSystemSetting($key);
+        $workflows->fromJson($json);
+
+        return $workflows->getWorkflow($workflowName, $removeMetadata);
+    }
+
+    public function getWorkflowStatus($workflowName)
+    {
+        $workflows = new Workflow();
+        $key = self::WORKFLOWS_KEY;
+        $json = $this->module->getSystemSetting($key);
+        $workflows->fromJson($json);
+
+        return $workflows->getWorkflowStatus($workflowName);
+    }
+
+    public function getProjectAvailableWorkflows(
+        $projectId = PROJECT_ID
+    ) {
+        $workflowsObject = new Workflow();
+        $key = self::WORKFLOWS_KEY;
+        $json = $this->module->getSystemSetting($key);
+        $workflowsObject->fromJson($json);
+        $workflows = $workflowsObject->getWorkflows();
+
+        $projectWorkflows = array();
+        foreach ($workflows as $workflowName => $workflow) {
+            if ($workflow['metadata']['workflowStatus'] !== 'Removed') {
+                if (in_array($projectId, array_column($workflow, 'projectId'))) {
+                    $projectWorkflows[] = $workflowName;
+                }
+            }
+        }
+
+        return $projectWorkflows;
+    }
+
+    public function removeWorkflow($workflowName, $username, $transaction = true)
+    {
+        $commit = true;
+
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        $workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+
+        # Change the workflow status to 'removed'
+        $workflows->removeWorkflow($workflowName, $username);
+
+        $json = $workflows->toJson();
+
+        $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+    }
+
+    public function deleteWorkflow($workflowName, $dataExportRight = 0, $transaction = true)
+    {
+# Check for admin?? (dataExportRight)?
+        $commit = true;
+
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        $workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+
+        $workflows->deleteWorkflow($workflowName);
+
+        $json = $workflows->toJson();
+
+        $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+    }
+
+    public function copyWorkflow($fromWorkflowName, $toWorkflowName, $username, $toExportRight = null, $transaction = true)
+    {
+
+        if ($fromWorkflowName == $toWorkflowName) {
+            $message = 'The new workflow name must be different from the existing workflow name.';
+            throw new \Exception($message);
+        }
+
+        $commit = true;
+        
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+
+        $workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+
+        $workflows->copyWorkflow($fromWorkflowName, $toWorkflowName, $username);
+
+        $json = $workflows->toJson();
+        $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+    }
+
+    public function renameWorkflow($workflowName, $newWorkflowName, $username, $transaction = true)
+    {
+        $commit = true;
+        
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+        
+        try {
+            $this->copyWorkflow($workflowName, $newWorkflowName, $username, null, false);
+            $this->deleteWorkflow($workflowName, false);
+        } catch (\Exception $exception) {
+            $commit = false;
+            $this->db->endTransaction($commit);
+            throw $exception;
+        }
+        
+        if ($transaction) {
+            $this->db->endTransaction($commit);
+        }
+    }
+
+    public function moveWorkflowTask($workflowName, $direction, $moveTaskKey)
+    {
+        $message = 'In moving workflow task, ';
+        if (empty($workflowName)) {
+            $message .= 'no workflow name was specified.';
+            throw new \Exception($message);
+        } elseif (empty($direction)) {
+            $message .= 'there was no specification to move the task up or down.';
+            throw new \Exception($message);
+        } elseif (empty($moveTaskKey) && $moveTaskKey != 0) {
+            $message .= 'no project/task was specified.';
+            throw new \Exception($message);
+        }
+
+        $workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+        $tasks = $workflows->getWorkflow($workflowName, true);
+        $keys = array_keys($tasks);
+        $keysIndex = array_search($moveTaskKey, $keys);
+        $numberOfTasks = count($tasks);
+
+        if ($direction === 'up') {
+            if ($keysIndex === 0) {
+               #assign the sequence for the task being moved to be the last in the sequence
+                $tasks[$moveTaskKey]['taskSequenceNumber'] = $numberOfTasks;
+
+               #assign the sequence for the task being displaced
+               #$switchTaskKey = key(array_slice($tasks, -1, 1, true));
+
+               #move all of the others sequences down by one
+                foreach ($tasks as $key => $task) {
+                    if ($key != $moveTaskKey) {
+                        --$tasks[$key]['taskSequenceNumber'];
+                    }
+                }
+            } else {
+               #assign the sequence for the task being moved
+                --$tasks[$moveTaskKey]['taskSequenceNumber'];
+
+               #assign the sequence for the task being displaced
+                $switchPosition = $keysIndex - 1;
+                if (isset($keys[$switchPosition])) {
+                    $switchTaskKey = $keys[$switchPosition];
+                    ++$tasks[$switchTaskKey]['taskSequenceNumber'];
+                }
+            }
+        } elseif ($direction === 'down') {
+            $lastIndex = $numberOfTasks - 1;
+            if ($keysIndex === $lastIndex) {
+               #assign the sequence for the task being moved to be the first in the sequence
+                $tasks[$moveTaskKey]['taskSequenceNumber'] = 1;
+
+               #move all of the others sequences up by one
+                foreach ($tasks as $key => $task) {
+                    if ($key != $moveTaskKey) {
+                        ++$tasks[$key]['taskSequenceNumber'];
+                    }
+                }
+            } else {
+               #assign the sequence for the task being moved
+                ++$tasks[$moveTaskKey]['taskSequenceNumber'];
+
+               #assign the sequence for the task being displaced
+                $switchPosition = $keysIndex + 1;
+                if (isset($keys[$switchPosition])) {
+                    $switchTaskKey = $keys[$switchPosition];
+                    --$tasks[$switchTaskKey]['taskSequenceNumber'];
+                }
+            }
+        }
+
+        #make sure the task sequences in sequential order
+        $workflows->sequenceWorkflow($workflowName, $tasks, $username);
+
+        $json = $workflows->toJson();
+        $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+    }
+
+    public function renameWorkflowTask(
+        $workflowName,
+        $taskKey,
+        $newTaskName,
+        $projectId,
+        $username
+    ) {
+        $workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+
+        $workflows->renameWorkflowTask($workflowName, $taskKey, $newTaskName, $projectId, $username);
+        $json = $workflows->toJson();
+
+        $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+    }
+
+    public function assignWorkflowTaskEtlConfig(
+        $workflowName,
+        $projectId,
+        $taskKey,
+        $etlConfig,
+        $username
+    ) {
+        $workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+
+        $workflows->assignWorkflowTaskEtlConfig($workflowName, $projectId, $taskKey, $etlConfig, $username);
+        $json = $workflows->toJson();
+
+        $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+    }
+
+    public function updateWorkflowTasks(
+        $workflowName,
+        $incomingTaskNames,
+        $incomingProjectEtlConfigs,
+        $username
+    ) {
+#delete this?
+        $message = 'In updatinging workflow tasks, ';
+        if (empty($workflowName)) {
+            $message .= 'no workflow name was specified.';
+            throw new \Exception($message);
+        }
+               
+        $workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+        $tasks = $workflows->getWorkflow($workflowName, true);
+
+        $commit = true;
+        $this->db->startTransaction();
+
+        foreach ($tasks as $key => $task) {
+            $projectId = $task['projectId'];
+
+            #task names
+            if ($incomingTaskNames[$key] !== $task['taskName']) {
+                if (empty(trim($incomingTaskNames[$key]))) {
+                    $tasks[$key]['taskName'] = "Task for Project Id $projectId";
+                } else {
+                    $tasks[$key]['taskName'] = $incomingTaskNames[$key];
+                }
+            }
+
+            #project ETL configurations
+            if ($incomingProjectEtlConfigs[$key] !== $task['projectEtlConfig']) {
+                $tasks[$key]['projectEtlConfig'] = $incomingProjectEtlConfigs[$key];
+            }
+        }
+
+        #workflow status
+        $emptyEtlConfig = in_array(null, $incomingProjectEtlConfigs, true)
+            || in_array('', $incomingProjectEtlConfigs, true);
+        $workflowStatus = null;
+        if (!$emptyEtlConfig) {
+            $workflowStatus = 'Ready';
+        }
+
+        $workflows->updateWorkflow($workflowName, $tasks, $workflowStatus, $username);
+        $json = $workflows->toJson();
+
+        $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+
+        $this->db->endTransaction($commit);
+    }
+
+    public function setWorkflows($name, $workflow)
+    {
+        $key = self::WORKFLOWS_KEY_PREFIX . $name;
+        $json = json_encode($workflow);
+        print "=== SSSSS.Y    in Settings.php, setWorkflows, ABOUT TO WRITE JSON, json for all workflows is : ";
+        print_r($json);
+
+        $this->module->setSystemSetting($key, $json);
+    }
+
+    public function setProjectWorkflows($workflows, $projectId = PROJECT_ID)
+    {
+        $key = self::PROJECT_WORKFLOWS_KEY_PREFIX . $projectId;
+        $json = json_encode($workflows);
+        print "====SSSSS.Y    in Settings.php, setProjectWorkflows, ABOUT TO WRITE JSON, json for all workflows is : ";
+        print_r($json);
+
+        $this->module->setSystemSetting($key, $json);
     }
 }
