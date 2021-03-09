@@ -20,8 +20,16 @@ use IU\RedCapEtlModule\ServerConfig;
 $error   = '';
 $warning = '';
 $success = '';
+
+$newTaskKey = null;
+$addProjectId = null;
+
 $deleteTaskKey = null;
 $deleteProjectId = null;
+
+$renameTaskKey = null;
+$renameProjectId = null;
+$renameNewTaskName = null;
 
 $propertiesProjectId = null;
 $configureTaskKey = null;
@@ -29,21 +37,14 @@ $globalProperties = array();
 
 $moveTaskKey = null;
 
+$etlConfig = null;
+$etlTaskKey = null;
+$etlProjectId = null;
+
 $username = USERID;
 $superUser = SUPER_USER;
 
 $workflowName = Filter::escapeForHtml($_GET['workflowName']);
-
-#Get the workflow's current task (project) list
-$tasks = '';
-$taskProjectIds = '';
-if (!empty($workflowName)) {
-    $workflowStatus = $module->getWorkflowStatus($workflowName);
-    $tasks = $module->getWorkflow($workflowName, true);
-    $taskProjectIds = array_keys($tasks);
-    $allowableSequenceNumbers = range(1, count($taskProjectIds));
-}
-$allowableSequenceNumbers = range(1, count($taskProjectIds));
 
 #Get projects that this user has access to
 $db = new RedCapDb();
@@ -55,15 +56,15 @@ array_unshift($availableUserProjects, '');
 #    $exportRight = $module->getConfigurationExportRight($configuration);
 #Authorization::hasEtlConfigurationPermission($module, $configuration)
 
-#you are here, cleaning up code (namine -- task vs project, streamlining functions, etc., then permissions, then global parameters, then run, schedule for both workflow and etl)
+#you are here, cleaning up code (streamlining functions, etc., then permissions, then global parameters, then run, schedule for both workflow and etl)
 
-$adminConfig  = $module->getAdminConfig();
+#$adminConfig  = $module->getAdminConfig();
 
-$parentUrl    = $module->getUrl('web/workflows.php');
 $selfUrl      = $module->getUrl('web/workflow_configuration.php')
                    .'&workflowName='.Filter::escapeForUrlParameter($workflowName);
-$configureUrl = $module->getUrl("web/configure.php");
 $globalPropertiesUrl = $module->getUrl("web/workflow_global_properties.php");
+$workflowsUrl = $module->getUrl("web/workflows.php");
+$configureUrl = $module->getUrl("web/configure.php");
 #$testUrl     = $module->getUrl("web/test.php");
 #$scheduleUrl = $module->getUrl("web/schedule.php");
 #$runUrl      = $module->getUrl("web/run.php");
@@ -78,18 +79,17 @@ try {
     # Process form submissions
     #-----------------------------------------------------------------
     $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
-    $moveTaskKey = Filter::stripTags($_POST['moveTaskKey']);
 
     if (strcasecmp($submitValue, 'add') === 0) {
         #--------------------------------------
-        # Add project
+        # Add task
         #--------------------------------------
-        if (!array_key_exists('newProject', $_POST) || empty($_POST['newProject'])) {
+        if (!array_key_exists('newTask', $_POST) || empty($_POST['newTask'])) {
             $error = 'ERROR: No project was selected.';
         } else {
-            $projectKey = Filter::stripTags($_POST['newProject']);
-            $project = $availableUserProjects[$projectKey];
-            $module->addProjectToWorkflow($workflowName, $project, $username);
+            $newTaskKey = Filter::stripTags($_POST['newTask']);
+            $addProjectId = $availableUserProjects[$newTaskKey];
+            $module->addProjectToWorkflow($workflowName, $addProjectId, $username);
         }
     } elseif ((strcasecmp($submitValue, 'up') === 0) || (strcasecmp($submitValue, 'down') === 0)) {
         #----------------------------------------------
@@ -101,10 +101,11 @@ try {
         }
     } elseif (strcasecmp($submitValue, 'delete') === 0) {
         #----------------------------------------------
-        # Delete project
+        # Delete task
         #----------------------------------------------
         if (empty($warning) && empty($error)) {
             $deleteTaskKey = $_POST['deleteTaskKey'];
+            $deleteProjectId = $_POST['deleteProjectId'];
             if (isset($deleteTaskKey)) {
                 $module->deleteTaskfromWorkflow($workflowName, $deleteTaskKey, $deleteProjectId, $username);
             }
@@ -157,11 +158,10 @@ try {
     $error = 'ERROR: '.$exception->getMessage();
 }
 
-#Get the workflow's updated tasks (project) list
+#Get the workflow's updated tasks list
 $workflowStatus = $module->getWorkflowStatus($workflowName);
 $tasks = $module->getWorkflow($workflowName, true);
 $taskProjectIds = array_column($tasks, 'projectId');
-$allowableSequenceNumbers = range(1, count($taskProjectIds));
 ?>
 
 <?php
@@ -209,18 +209,7 @@ console.log("IN FUNCTION");
 </div>
 
 <?php
-
 $adminConfig  = $module->getAdminConfig();
-
-$parentUrl    = $module->getUrl('web/workflows.php');
-$selfUrl      = $module->getUrl('web/workflow_configuration.php')
-                   .'&workflowName='.Filter::escapeForUrlParameter($workflowName);
-$configureUrl = $module->getUrl("web/configure.php");
-$globalPropertiesUrl = $module->getUrl("web/workflow_global_properties.php");
-#$testUrl     = $module->getUrl("web/test.php");
-#$scheduleUrl = $module->getUrl("web/schedule.php");
-#$runUrl      = $module->getUrl("web/run.php");
-
 $module->renderProjectPageContentHeader($configureUrl, $error, $warning, $success);
 ?>
 
@@ -237,13 +226,14 @@ $module->renderProjectPageContentHeader($configureUrl, $error, $warning, $succes
 
 <?php
 #------------------------------------------------------------
-# Add project form
+# Add-task form
 #------------------------------------------------------------
 if (!empty($availableUserProjects)) {
 ?>
-<form action="<?php echo $selfUrl;?>" method="post" style="margin-bottom: 12px;" name="addProjectForm" id="addProjectForm">
-    <label for="newProject">REDCap project:</label>
-    <select name="newProject" id="newProject"> 
+    <form action="<?php echo $selfUrl;?>" method="post" style="margin-bottom: 12px;" name="addTaskForm" id="addTaskForm">
+
+    <label for="newTask">REDCap project:</label>
+    <select name="newTask" id="newTask">
     <?php
     foreach ($availableUserProjects as $key => $userProject) {
         if ($userProject) {
@@ -284,9 +274,9 @@ if (!empty($availableUserProjects)) {
                 echo "<th></th>";
             }
             ?>
-            <th>PID</th><th>Project</th><th>Task Name</th>
+            <th>Task Name</th><th>PID</th><th>Project</th>
             <th>Project ETL Config</th><th>Rename<br/>Task</th>
-            <th>Specify<br/>ETL Config</th><th>Global<br/>Properties</th><th>Delete<br/>Project</th>
+            <th>Specify<br/>ETL Config</th><th>Global<br/>Properties</th><th>Delete<br/>Task</th>
         </tr>
     </thead>
     <tbody>
@@ -310,7 +300,7 @@ if (!empty($availableUserProjects)) {
 
             $taskName = $task['taskName'];
             $projectEtlConfig = $task['projectEtlConfig'];
-            $projectEtlConfig = $projectEtlConfig ? $projectEtlConfig : "No ETL configurations yet";
+            $projectEtlConfig = $projectEtlConfig ? $projectEtlConfig : "None specified";
             
             if ($row % 2 == 0) {
                 echo '<tr class="even-row">'."\n";
@@ -329,9 +319,9 @@ if (!empty($availableUserProjects)) {
                     echo "</td>\n";
             }
 
+            echo "<td>".Filter::escapeForHtml($taskName)."</td>\n";
             echo "<td>".Filter::escapeForHtml($projectId)."</td>\n";
             echo "<td>".Filter::escapeForHtml($projectName)."</td>\n";
-            echo "<td>".Filter::escapeForHtml($taskName)."</td>\n";
             echo "<td>".Filter::escapeForHtml($projectEtlConfig)."</td>\n";
 
             $selectDisabled = "";
@@ -406,7 +396,7 @@ if (!empty($availableUserProjects)) {
                 echo '<td style="text-align:center;">'
                     .'<input type="image" src="'.APP_PATH_IMAGES.'delete.png" alt="DELETE"'
                     .' class="deleteConfig" style="cursor: pointer;"'
-                    .' id="deleteProject'.$row
+                    .' id="deleteTask'.$row
                     .'"/>'
                     ."</td>\n";
             } else {
@@ -624,7 +614,7 @@ $(function() {
             }))
         }
 
-        $("#taskEtlConfig").text('"'+projectId+'"');
+        $("#taskEtlPid").text('"'+projectId+'"');
         $('#etlProjectId').val(projectId);
         $('#etlTaskKey').val(key);
         $("#etlConfigForm").dialog("open");
@@ -638,7 +628,7 @@ $(function() {
 
     <form id="etlConfigForm" action="<?php echo $selfUrl;?>" method="post">
     To specify an ETL configuration for this task, select one of the ETL configurations for Project ID 
-    <span id="taskEtlConfig" style="font-weight: bold;"></span>, and click on the
+    <span id="taskEtlPid" style="font-weight: bold;"></span>, and click on the
     <span style="font-weight: bold;">Specify ETL</span> button. 
     <p>
     <span style="font-weight: bold;">ETL Configurations:</span>
@@ -655,12 +645,12 @@ $(function() {
 
 <?php
 #--------------------------------------
-# Delete workflow project dialog
+# Delete workflow task dialog
 #--------------------------------------
 ?>
 <script>
 $(function() {
-    // Delete workflow project form
+    // Delete workflow task form
     deleteForm = $("#deleteForm").dialog({
         autoOpen: false,
         height: 170,
@@ -668,26 +658,26 @@ $(function() {
         modal: true,
         buttons: {
             Cancel: function() {$(this).dialog("close");},
-            "Delete project": function() {deleteForm.submit();}
+            "Delete task": function() {deleteForm.submit();}
         },
-        title: "Delete Project"
+        title: "Delete Task"
     });
   
     <?php
-    # Set up click event handlers for the Delete Project buttons
+    # Set up click event handlers for the Delete Task buttons
     $row = 1;
     foreach ($tasks as $key => $task) {
         $projectId = $task['projectId'];
-        echo '$("#deleteProject'.$row.'").click({key: "'
+        echo '$("#deleteTask'.$row.'").click({key: "'
             .Filter::escapeForJavaScriptInDoubleQuotes($key)
             .'", projectId: "'
             .Filter::escapeForJavaScriptInDoubleQuotes($projectId)
-            .'"}, deleteProject);'."\n";
+            .'"}, deleteTask);'."\n";
         $row++;
     }
     ?>
     
-    function deleteProject(event) {
+    function deleteTask(event) {
         var key = event.data.key;
         var projectId = event.data.projectId;
         event.preventDefault();
@@ -699,11 +689,11 @@ $(function() {
 });
 </script>
 <div id="deleteDialog"
-    title="Project Delete"
+    title="Task Delete"
     style="display: none;"
     >
     <form id="deleteForm" action="<?php echo $selfUrl;?>" method="post">
-    To delete Project Id <span id="projectToDelete" style="font-weight: bold;"></span>,
+    To delete this task for Project Id <span id="projectToDelete" style="font-weight: bold;"></span>,
     click on the <span style="font-weight: bold;">Delete project</span> button.
     <input type="hidden" name="deleteTaskKey" id="deleteTaskKey" value="">
     <input type="hidden" name="deleteProjectId" id="deleteProjectId" value="">
