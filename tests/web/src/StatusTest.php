@@ -18,7 +18,7 @@ class StatusTest extends TestCase
     private static $mink;
     private static $session;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
         $baseUrl = self::$testConfig->getRedCap()['base_url'];
@@ -46,7 +46,7 @@ class StatusTest extends TestCase
         $text = $page->getText();
 
         # Check that the test user is set up
-        $this->assertRegExp("/Logged in as {$username}/", $text); 
+        $this->assertMatchesRegularExpression("/Logged in as {$username}/", $text); 
 
         # Make sure you are on the REDCap "My Projects" page
         $page->clickLink('My Projects');
@@ -56,7 +56,7 @@ class StatusTest extends TestCase
         $page = self::$session->getPage();
         $page->clickLink('REDCap-ETL');
         $text = $page->getText();
-        $this->assertRegExp("/ETL Configurations/", $text); 
+        $this->assertMatchesRegularExpression("/ETL Configurations/", $text); 
 
         // Test logout
         $page->clickLink('Log out');
@@ -75,10 +75,10 @@ class StatusTest extends TestCase
         $page->clickLink('REDCap-ETL');
 
         $text = $page->getText();
-        $this->assertRegExp("/REDCap-ETL Admin/", $text);
+        $this->assertMatchesRegularExpression("/REDCap-ETL Admin/", $text);
 
         $page->clickLink("ETL Servers");
         $text = $page->getText();
-        $this->assertRegExp("/\(embedded server\)(\s)*public/", $text);
+        $this->assertMatchesRegularExpression("/\(embedded server\)(\s)*public/", $text);
     }
 }
