@@ -48,6 +48,7 @@ class RedCapDb
         $projects = array();
         $sql = "select u.username, p.project_id, p.app_title, "
             ." if(u.api_token is null, 0, 1) as has_api_token, u.api_export "
+            .", u.data_export_tool "
             ." from redcap_projects p, redcap_user_rights u "
             ." where u.username = '".Filter::escapeForMysql($username)."' "
             ." and p.project_id = u.project_id and p.date_deleted is null"     // @codeCoverageIgnore
@@ -118,6 +119,23 @@ class RedCapDb
             $etlConfigs[] = $row;
         }
         return $etlConfigs;
+    }
+
+    /**
+     * Retrieves the a project's name
+     */
+    public function getProjectName($projectId)
+    {
+        $projectName = array();
+        $sql = "select p.app_title "
+            ." from redcap_projects p "
+            ." where project_id = ".((int) $projectId)." "
+            ;
+
+        $queryResult = db_query($sql);
+        $projectName = db_fetch_assoc($queryResult);
+
+       return $projectName['app_title'];
     }
 
     /**

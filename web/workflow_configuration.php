@@ -8,14 +8,10 @@
 
 require_once __DIR__.'/../dependencies/autoload.php';
 
-use IU\RedCapEtlModule\AdminConfig;
-use IU\RedCapEtlModule\Authorization;
-use IU\RedCapEtlModule\Configuration;
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
-use IU\RedCapEtlModule\ServerConfig;
 
 $error   = '';
 $warning = '';
@@ -48,21 +44,11 @@ $workflowName = Filter::escapeForHtml($_GET['workflowName']);
 
 #Get projects that this user has access to
 $db = new RedCapDb();
-$userProjects = $db->getUserProjects($username);
-$availableUserProjects = $userProjects;
+$availableUserProjects = $db->getUserProjects($username);
 array_unshift($availableUserProjects, '');
-
-#$configuration = $module->getConfiguration($configurationName);
-#    $exportRight = $module->getConfigurationExportRight($configuration);
-#Authorization::hasEtlConfigurationPermission($module, $configuration)
-
-#you are here, cleaning up code (streamlining functions, etc., then permissions, then global parameters, then run, schedule for both workflow and etl)
-
-#$adminConfig  = $module->getAdminConfig();
 
 $selfUrl      = $module->getUrl('web/workflow_configuration.php')
                    .'&workflowName='.Filter::escapeForUrlParameter($workflowName);
-$globalPropertiesUrl = $module->getUrl("web/workflow_global_properties.php");
 $workflowsUrl = $module->getUrl("web/workflows.php");
 $configureUrl = $module->getUrl("web/configure.php");
 #$testUrl     = $module->getUrl("web/test.php");
@@ -115,6 +101,10 @@ try {
             #----------------------------------------------
             # Update properties
             #----------------------------------------------
+            $configureTaskKey = $_POST['configureTaskKey'];
+            $globalPropertiesUrl = $module->getUrl('web/workflow_global_properties.php')
+               .'&workflowName='.Filter::escapeForUrlParameter($workflowName)
+               .'&taskKey='.Filter::escapeForUrlParameter($configureTaskKey);
             header('Location: '.$globalPropertiesUrl);
             exit();
         }
@@ -126,14 +116,15 @@ try {
             $etlConfig = $_POST['projectEtlConfigSelect'];
             $etlTaskKey = $_POST['etlTaskKey'];
             $etlProjectId = $_POST['etlProjectId'];
-
-            $module->assignWorkflowTaskEtlConfig(
-                $workflowName,
-                $etlProjectId,
-                $etlTaskKey,
-                $etlConfig,
-                $username
-            );
+            if (isset($etlTaskKey)) {
+                $module->assignWorkflowTaskEtlConfig(
+                    $workflowName,
+                    $etlProjectId,
+                    $etlTaskKey,
+                    $etlConfig,
+                    $username
+                );
+            }
         }
     } elseif (strcasecmp($submitValue, 'rename') === 0) {
         if (empty($warning) && empty($error)) {
@@ -158,8 +149,17 @@ try {
     $error = 'ERROR: '.$exception->getMessage();
 }
 
-#Get the workflow's updated tasks list
+$selfUrl      = $module->getUrl('web/workflow_configuration.php')
+                   .'&workflowName='.Filter::escapeForUrlParameter($workflowName);
+$globalPropertiesUrl = $module->getUrl('web/workflow_global_properties.php')
+                   .'&workflowName='.Filter::escapeForUrlParameter($workflowName)
+                   .'&taskKey='.Filter::escapeForUrlParameter($configureTaskKey);
+$workflowsUrl = $module->getUrl("web/workflows.php");
+$configureUrl = $module->getUrl("web/configure.php");
+
 $workflowStatus = $module->getWorkflowStatus($workflowName);
+
+#Get the workflow's updated tasks list
 $tasks = $module->getWorkflow($workflowName, true);
 $taskProjectIds = array_column($tasks, 'projectId');
 ?>
@@ -209,7 +209,6 @@ console.log("IN FUNCTION");
 </div>
 
 <?php
-$adminConfig  = $module->getAdminConfig();
 $module->renderProjectPageContentHeader($configureUrl, $error, $warning, $success);
 ?>
 
@@ -284,24 +283,29 @@ if (!empty($availableUserProjects)) {
         $row = 1;
         foreach ($tasks as $taskKey => $task) {
             $projectId = $task['projectId'];
-            $pKey = array_search($projectId, array_column($userProjects, 'project_id'));
-            $noAccess = !($pKey > 0);
-            if ($superUser) {
-                $noAccess = false;
-            }
-            $hasApiExportPermission = (isset($pKey) && ($userProjects[$pKey]['api_export'] == 1 ? true : false))
-                    || $superUser;
-
-            if ($noAccess) {
-                $projectName = "{Project $projectId}";
-            } else {
-                $projectName = $userProjects[$pKey]['app_title'];
-            }
-
+            if (empty($projectId)) { $projectId = "No project Id"; }
             $taskName = $task['taskName'];
-            $projectEtlConfig = $task['projectEtlConfig'];
-            $projectEtlConfig = $projectEtlConfig ? $projectEtlConfig : "None specified";
-            
+            $pKey = array_search($projectId, array_column($availableUserProjects, 'project_id'));
+            $isAssignedUser = false;
+            $hasPermissionToExport = false;
+            $projectName = null;
+
+            if ($pKey || $pKey === 0) {
+                $isAssignedUser = true;
+                $hasPermissionToExport = $availableUserProjects[$pKey]['data_export_tool'] == 1 ? true : false;
+				$projectName = $availableUserProjects[$pKey]['app_title'] ;
+                $projectEtlConfig = $task['projectEtlConfig'] ? $task['projectEtlConfig'] : "None specified";
+            } else {
+				$projectName = "(You are not a listed user on this project)";
+                $projectEtlConfig = null;
+			} 
+
+            if ($superUser) { 
+				$hasPermissionToExport = true; 
+                $projectName = $projectName ? $projectName : $db->getProjectName($projectId);
+                $projectEtlConfig = $task['projectEtlConfig'] ? $task['projectEtlConfig'] : "None specified";
+			}
+
             if ($row % 2 == 0) {
                 echo '<tr class="even-row">'."\n";
             } else {
@@ -324,23 +328,11 @@ if (!empty($availableUserProjects)) {
             echo "<td>".Filter::escapeForHtml($projectName)."</td>\n";
             echo "<td>".Filter::escapeForHtml($projectEtlConfig)."</td>\n";
 
-            $selectDisabled = "";
-            if (!$hasApiExportPermission) {
-                $selectDisabled = "disabled";
-            }
-            if (!isset($pKey)) {
-                $selectDisabled = "disabled";
-            }
-            if ($pKey || $pKey === 0) {
-            } else {
-                $selectDisabled = "disabled";
-            }
-
             #-----------------------------------------------------------
             # RENAME TASK BUTTON - disable if user does not have the needed
             # data export permission to access the project
             #-----------------------------------------------------------
-            if ($hasApiExportPermission && (!$noAccess)) {
+            if ($hasPermissionToExport) {
                 echo '<td style="text-align:center;">'
                     .'<input type="image" src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME TASK"'
                     .' style="cursor: pointer;"'
@@ -357,8 +349,8 @@ if (!empty($availableUserProjects)) {
             # SPECIFY ETL CONFIG BUTTON - disable if user does not have the needed
             # data export permission to access the project
             #-----------------------------------------------------------
-            $values = $module->getAccessibleConfigurationNames($projectId);
-            if ($hasApiExportPermission && (!$noAccess)) {
+            if ($hasPermissionToExport) {
+                $values = $module->getAccessibleConfigurationNames($projectId);
                 echo '<td style="text-align:center;">'
                     .'<input type="image" src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME TASK"'
                     .' style="cursor: pointer;"'
@@ -375,7 +367,7 @@ if (!empty($availableUserProjects)) {
             # GLOBAL PROPERTIES BUTTON - disable if user does not have the needed
             # data export permission to access the project
             #-----------------------------------------------------------
-            if ($hasApiExportPermission && (!$noAccess)) {
+            if ($hasPermissionToExport) {
                 echo '<td style="text-align:center;">'
                     .'<input type="image" src="'.APP_PATH_IMAGES.'gear.png" alt="ETL GLOBAL PROPERTIES"'
                     .' style="cursor: pointer;"'
@@ -392,7 +384,7 @@ if (!empty($availableUserProjects)) {
             # DELETE BUTTON - disable if user does not have the needed
             # data export permission to access the project
             #-----------------------------------------------------------
-            if ($hasApiExportPermission && (!$noAccess)) {
+            if ($hasPermissionToExport) {
                 echo '<td style="text-align:center;">'
                     .'<input type="image" src="'.APP_PATH_IMAGES.'delete.png" alt="DELETE"'
                     .' class="deleteConfig" style="cursor: pointer;"'
@@ -717,7 +709,7 @@ $(function() {
         modal: true,
         buttons: {
             Cancel: function() {$(this).dialog("close");},
-            "Assign Property": function() {globalProperiesForm.submit();}
+            "Assign Global Properties": function() {globalProperiesForm.submit();}
         },
         title: "ETL Global Properties"
     });
