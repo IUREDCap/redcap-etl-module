@@ -27,6 +27,8 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
 
     private static $featureFileName;
 
+    private $previousWindowName;
+
     /**
      * Initializes context.
      *
@@ -99,7 +101,6 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         $session = $this->getSession();
         #print_r($session);
 
-
         $this->setMinkParameter('base_url', $this->baseUrl);
         echo "Base URL set to: ".$this->baseUrl;
 
@@ -156,6 +157,18 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     {
         $session = $this->getSession();
         Util::loginAsUser($session);
+    }
+
+    /**
+     * @Then /^I go to previous window$/
+     */
+    public function iGoToPreviousWindow()
+    {
+        if (!empty($this->previousWindowName)) {
+            print "*** SWITCH TO PREVIOUS WINDOW {$this->previousWindowName}\n";
+            $this->getSession()->switchToWindow($this->previousWindowName);
+            $this->previousWindowName = '';
+        }
     }
 
     /**
@@ -394,6 +407,7 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
 
         $session = $this->getSession();
 
+        $this->previousWindowName = $session->getWindowName();
         Util::goToNewWindow($session, $testProjectTitle);
     }
 
@@ -403,6 +417,7 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     public function iFollowLinkToNewWindow($link)
     {
         $session = $this->getSession();
+        $this->previousWindowName = $session->getWindowName();
         Util::goToNewWindow($session, $link);
     }
 

@@ -429,6 +429,8 @@ class Util
      * Follow a link that goes to a new window.
      *
      * @param string $link the link that goes to a new window.
+     *
+     * @return string the name of the new window
      */
     public function goToNewWindow($session, $link)
     {
@@ -446,5 +448,7 @@ class Util
         $newWindowName = array_shift($windowNamesDiff); // There should be only 1 element in the diff
 
         $session->switchToWindow($newWindowName);
+
+        return $newWindowName;
     }
 }
