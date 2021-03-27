@@ -72,4 +72,36 @@ class FilterTest extends TestCase
 
         $this->assertEquals($expectedPost, $filteredPost, 'Array test');
     }
+
+    public function testSanitizeHelp1()
+    {
+        $html = '<h1 onmouseover=alert("xss")>test</h1>';
+        $filteredHtml = Filter::sanitizeHelp($html);
+        $expectedHtml = '<h1>test</h1>';
+        $this->assertEquals($expectedHtml, $filteredHtml, 'Sanitized HTML test');
+    }
+
+    public function testSanitizeHelp2()
+    {
+        $html = '<tr onmouseover=alert("xss")/>';
+        $filteredHtml = Filter::sanitizeHelp($html);
+        $expectedHtml = '<tr/>';
+        $this->assertEquals($expectedHtml, $filteredHtml, 'Sanitized HTML test');
+    }
+
+    public function testSanitizeHelpRemoveIllegalTags()
+    {
+        $html = '<h1>Test</h1><script></script>';
+        $filteredHtml = Filter::sanitizeHelp($html);
+        $expectedHtml = '<h1>Test</h1>';
+        $this->assertEquals($expectedHtml, $filteredHtml, 'Sanitized HTML test');
+    }
+
+    public function testSanitizeHelpLegal()
+    {
+        $html = '<h1>Test1</h1><ul><li>item 1</li><li>item 2</li></ul><a href="http://localhost">local host</a>';
+        $filteredHtml = Filter::sanitizeHelp($html);
+        $expectedHtml = $html;
+        $this->assertEquals($expectedHtml, $filteredHtml, 'Sanitized HTML test');
+    }
 }

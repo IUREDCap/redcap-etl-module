@@ -143,7 +143,7 @@ class Filter
         # Remove all attributes of allowed tags, except for the "a" tag
         foreach (self::$allowedHelpTags as $tag) {
             if ($tag !== 'a') {
-                #$text = preg_replace('/<\s*'.$tag.'[^(>|\/>)]*/', '<'.$tag, $text);
+                $text = preg_replace("/<{$tag}\s+[^>]*?(\/?)>/", '<' . $tag . '$1>', $text);
             }
         }
 

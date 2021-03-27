@@ -1,37 +1,32 @@
+<?xml version="1.0"?>
 <!-- =================================================
 Copyright (C) 2019 The Trustees of Indiana University
 SPDX-License-Identifier: BSD-3-Clause
 ================================================== -->
-
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/6.3/phpunit.xsd"
-    bootstrap="vendor/autoload.php">
-
-    <testsuites>
-        <testsuite name="unit">
-            <file>tests/unit/AdminConfigTest.php</file>
-            <file>tests/unit/AuthorizationTest.php</file>
-            <file>tests/unit/ConfigurationTest.php</file>
-            <file>tests/unit/CsrfTest.php</file>
-            <file>tests/unit/FilterTest.php</file>
-            <file>tests/unit/HelpTest.php</file>
-            <file>tests/unit/ModuleLogTest.php</file>
-            <file>tests/unit/ProjectInfoTest.php</file>
-            <file>tests/unit/RedCapDbTest.php</file>
-            <file>tests/unit/SettingsTest.php</file>
-            <file>tests/unit/ServerConfigTest.php</file>
-            <file>tests/unit/ServersTest.php</file>
-            <file>tests/unit/UserListTest.php</file>
-        </testsuite>
-    </testsuites>
-
-  <filter>
-    <whitelist>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" bootstrap="vendor/autoload.php">
+  <coverage>
+    <include>
       <directory suffix=".php">classes</directory>
-      <exclude>
-        <file>classes/EtlExtRedCapProject.php</file>
-      </exclude>
-    </whitelist>
-  </filter>
-
+    </include>
+    <exclude>
+      <file>classes/EtlExtRedCapProject.php</file>
+    </exclude>
+  </coverage>
+  <testsuites>
+    <testsuite name="unit">
+      <file>tests/unit/AdminConfigTest.php</file>
+      <file>tests/unit/AuthorizationTest.php</file>
+      <file>tests/unit/ConfigurationTest.php</file>
+      <file>tests/unit/CsrfTest.php</file>
+      <file>tests/unit/FilterTest.php</file>
+      <file>tests/unit/HelpTest.php</file>
+      <file>tests/unit/ModuleLogTest.php</file>
+      <file>tests/unit/ProjectInfoTest.php</file>
+      <file>tests/unit/RedCapDbTest.php</file>
+      <file>tests/unit/SettingsTest.php</file>
+      <file>tests/unit/ServerConfigTest.php</file>
+      <file>tests/unit/ServersTest.php</file>
+      <file>tests/unit/UserListTest.php</file>
+    </testsuite>
+  </testsuites>
 </phpunit>
