@@ -125,6 +125,7 @@ class Filter
     }
     
     /**
+     * Sanitizes custom help messages.
      * Removes all tags except allowed tags, and removes all tag
      * attributes except for the "href" attribute that have the
      * form href="http..." for the "a" tag.
@@ -137,26 +138,29 @@ class Filter
         # Remove trailing space from tags
         $text = preg_replace('/\s+>/', '>', $text);
                 
-        # Close nested tag, for example, change <a <a> => <a> <a>
-        $text = preg_replace('/<\s*([a-zA-Z]+)([^<>]*<)/', '<${1}>${2}', $text);
+        # Close nested tags, for example, change "<a <a>" => "<a> <a>"
+        $text = preg_replace('/<\s*([a-z][a-z0-9]*)([^<>]*<)/i', '<${1}>${2}', $text);
 
-        # Remove all attributes of allowed tags, except for the "a" tag
-        foreach (self::$allowedHelpTags as $tag) {
-            if ($tag !== 'a') {
-                $text = preg_replace("/<{$tag}\s+[^>]*?(\/?)>/", '<' . $tag . '$1>', $text);
-            }
-        }
-
-        # Remove a tag attributes that are not href with the form href="http..."
-        $text = preg_replace('/<\s*a\s+(href="(http[^"]*)"|([^>]*))\s*>/i', '<a href="$2">', $text);
-
-        # terminate non-terminated a tags, e.g.: <a this is a test
-        $text = preg_replace('/<\s*a\s+([^>]*$)/i', '<a>$1', $text);
+        # Terminate non-terminated a tags, e.g.: "<a this is a test" => "<a> this is a test"
+        $text = preg_replace('/<\s*[a-z][a-z0-9]*\s+([^>]*$)/i', '<a>$1', $text);
 
         # Remove non-allowed tags
         $allowedTagsString = '<' . implode('><', self::$allowedHelpTags) . '>';
         $text = strip_tags($text, $allowedTagsString);
 
+        # Remove all attributes of allowed tags, except for the "a" tag
+        foreach (self::$allowedHelpTags as $tag) {
+            if ($tag !== 'a') {
+                $text = preg_replace("/<{$tag}\s+[^>]*?(\/?)>/i", '<' . $tag . '$1>', $text);
+            }
+        }
+
+        # Remove "a" tag attributes that are not href with the form href="http..."
+        $tempTag = 'a__TEMP_FILTER__';
+        $text = preg_replace('/<' . $tempTag . '\s+/', '<a ', $text);  # Make sure there are no temp tags
+        $text = preg_replace('/<a\s+[^>]*(href="http[^"]*")[^>]*>/i', '<' . $tempTag . ' $1>', $text);
+        $text = preg_replace('/<a\s+[^>]*>/i', '<a>', $text);
+        $text = preg_replace('/<' . $tempTag . '\s+/', '<a ', $text);
         return $text;
     }
     

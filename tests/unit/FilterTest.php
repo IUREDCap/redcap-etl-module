@@ -73,33 +73,40 @@ class FilterTest extends TestCase
         $this->assertEquals($expectedPost, $filteredPost, 'Array test');
     }
 
-    public function testSanitizeHelp1()
+    public function testSanitizeHelpIllegalAttribute1()
     {
-        $html = '<h1 onmouseover=alert("xss")>test</h1>';
+        $html = '<h1 onmouseover=alert("xss") onclick=alert("xss")>test</h1>';
         $filteredHtml = Filter::sanitizeHelp($html);
         $expectedHtml = '<h1>test</h1>';
         $this->assertEquals($expectedHtml, $filteredHtml, 'Sanitized HTML test');
     }
 
-    public function testSanitizeHelp2()
+    public function testSanitizeHelpIllegalAttribute2()
     {
-        $html = '<tr onmouseover=alert("xss")/>';
+        $html = '<tr onmouseover=alert("xss")/>'
+            . ' <a onclick=alert("xss") href="http://localhost" onmouseover=alert("xss")>localhost</a>';
         $filteredHtml = Filter::sanitizeHelp($html);
-        $expectedHtml = '<tr/>';
+        $expectedHtml = '<tr/> <a href="http://localhost">localhost</a>';
         $this->assertEquals($expectedHtml, $filteredHtml, 'Sanitized HTML test');
     }
 
     public function testSanitizeHelpRemoveIllegalTags()
     {
-        $html = '<h1>Test</h1><script></script>';
+        $html = '<h1>Test</h1><script></script><iframe></iframe>< nonexistant />';
         $filteredHtml = Filter::sanitizeHelp($html);
         $expectedHtml = '<h1>Test</h1>';
         $this->assertEquals($expectedHtml, $filteredHtml, 'Sanitized HTML test');
     }
 
-    public function testSanitizeHelpLegal()
+    public function testSanitizeHelpLegalTags()
     {
-        $html = '<h1>Test1</h1><ul><li>item 1</li><li>item 2</li></ul><a href="http://localhost">local host</a>';
+        $html = '<h1>Test1</h1>'
+            . '<ul><li>item 1</li><li>item 2</li></ul>'
+            . '<ol><li>item 1</li><li>item 2</li></ol>'
+            . '<p>Test paragraph <b>bold</b> <em>emphasized</em> <i>italics</i></p>'
+            . '<a href="http://localhost">local host</a>'
+            . '<blockquote>Test block quote</blockquote>'
+            ;
         $filteredHtml = Filter::sanitizeHelp($html);
         $expectedHtml = $html;
         $this->assertEquals($expectedHtml, $filteredHtml, 'Sanitized HTML test');
