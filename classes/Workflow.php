@@ -38,6 +38,7 @@ class Workflow implements \JsonSerializable
     {
         $this->workflows[$workflowName] = array();
         $this->workflows[$workflowName]["metadata"] = array();
+        $this->workflows[$workflowName]["properties"] = array();
 
         $now = new \DateTime();
         $now->format('Y-m-d H:i:s');
@@ -50,8 +51,9 @@ class Workflow implements \JsonSerializable
     public function getWorkflow($workflowName, $removeMetadata = null)
     {
         $workflow = $this->workflows[$workflowName];
+        unset($workflow["properties"]);
         if ($removeMetadata) {
-            unset($workflow['metadata']);
+            unset($workflow["metadata"]);
         }
 
         return $workflow;
@@ -138,7 +140,6 @@ class Workflow implements \JsonSerializable
             $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
         }
     }
-
 
     /**
      * Adds a project/task to the workflow. The key for the project/task is the project ID.
@@ -387,6 +388,38 @@ class Workflow implements \JsonSerializable
         }
     }
 
+    public function getWorkflowGlobalProperties($workflowName)
+    {
+#print "==================wwwwwwwwwwwwwwwwwww00000000, 393 workflow.php, getWorkflowGlobalProperties, workflow: $workflowName, is ";
+#print_r($this->workflows[$workflowName]);
+#print "==================wwwwwwwwwwwwwwwwww00000000, 395 workflow.php, getWorkflowGlobalProperties, properties is ";
+#print_r($this->workflows[$workflowName]["properties"]);
+				
+        return $this->workflows[$workflowName]["properties"];
+    }
+
+    public function setGlobalProperties($workflowName, $properties, $username)
+    {
+       $message = 'When settting workflow global properties, ';
+        if (empty($workflowName)) {
+            $message .= 'no workflow name was specified.';
+            throw new \Exception($message);
+        }
+
+        $this->workflows[$workflowName]["properties"] = $properties;
+print "==================wwwwwwwwwwwwwwwwww1111111111111111 workflow.php, setWorkflowGlobalProperties, workflow: $workflowName, is ";
+print_r($this->workflows[$workflowName]);
+
+        #workflow metadata
+        if ($username) {
+            $this->workflows[$workflowName]["metadata"]["updatedBy"] = $username;
+            $now = new \DateTime();
+            $now->format('Y-m-d H:i:s');
+            $now->getTimestamp();
+            $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
+        }
+    }
+    
     public function getProjects($username)
     {
 #delete?

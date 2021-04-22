@@ -26,21 +26,13 @@ $error   = '';
 $parseResult = '';
 
 $workflowName = Filter::escapeForHtml($_GET['workflowName']);
-$taskKey = Filter::escapeForHtml($_GET['taskKey']);
 $workflowStatus = $module->getWorkflowStatus($workflowName);
 
 try {
     #-----------------------------------------------------------
     # Check that the user has permission to access this page
-    # and get the configuration if one was specified
     #-----------------------------------------------------------
-    $configCheck = true;
-    $configuration = $module->checkUserPagePermission(USERID, $configCheck);
-    $configName = '';
-    if (!empty($configuration)) {
-        $configName = $configuration->getName();
-        $properties = $configuration->getProperties();
-    }
+    $module->checkUserPagePermission(USERID);
 
     #-------------------------------------------------------------------
     # Check for test mode (which should only be used for development)
@@ -59,25 +51,24 @@ try {
     }
 
     $selfUrl = $module->getUrl('web/workflow_global_properties.php')
-                   .'&workflowName='.Filter::escapeForUrlParameter($workflowName)
-                   .'&taskKey='.Filter::escapeForUrlParameter($taskKey);
+                   .'&workflowName='.Filter::escapeForUrlParameter($workflowName);
     $workflowUrl = $module->getUrl('web/workflow_configuration.php')
                        .'&workflowName='.Filter::escapeForUrlParameter($workflowName);
-    $workflowsUrl = $module->getUrl("web/workflows.php");
-
-    $configureUrl = $module->getUrl("web/configure.php");
-    $generateRulesUrl = $module->getUrl('web/generate_rules.php');
+    $workflowsUrl = $module->getUrl('web/workflows.php');
+    $configureUrl = $module->getUrl('web/configure.php');
 
     $adminConfig = $module->getAdminConfig();
 
 
-    /** @var array configurations property map from property name to value */
+    $configuration = $module->getWorkflowGlobalConfiguration($workflowName);
+
     $properties = array();
+    $properties = $module->getWorkflowGlobalProperties($workflowName);
 
     $redCapDb = new RedCapDb();
 
-    #if (!empty($configuration)) {
-    if (true) {
+    $isWorkflow = true;
+    if (!empty($configuration)) {
         #-------------------------
         # Get the submit value
         #-------------------------
@@ -90,12 +81,12 @@ try {
         # update the configuration properties with the POST values
         #---------------------------------------------------------------
         if (!empty($submitValue) && strcasecmp($submitValue, 'Cancel')) {
-            #$configuration->set(Filter::stripTagsArrayRecursive($_POST));
+            $configuration->set(Filter::stripTagsArrayRecursive($_POST), $isWorkflow);
+            # Reset properties, since they may have been modified above
+            $initialize = false;
+            $properties = $configuration->getGlobalProperties($initialize);
         }
         
-        # Reset properties, since they may have been modified above
-        #$properties = $configuration->getProperties();
-       
         #------------------------------------------------------
         # Process Actions
         #------------------------------------------------------
@@ -104,12 +95,12 @@ try {
                 header('Location: '.$workflowUrl);
             } elseif (strcasecmp($submitValue, 'Save') === 0) {
                 if (empty($warning) && empty($error)) {
-                    $configuration->validate();
-                    $module->setConfiguration($configuration);  // Save configuration to database
+                    $configuration->validate($isWorkflow);
+                    $module->setWorkflowGlobalProperties($workflowName, $properties, USERID);  // Save configuration to database
                 }
             } elseif (strcasecmp($submitValue, 'Save and Exit') === 0) {
                 if (empty($warning) && empty($error)) {
-                    $configuration->validate();
+                    $configuration->validate($isWorkflow);
                     $module->setConfiguration($configuration);  // Save configuration to database
                     $location = 'Location: '.$listUrl;
                     header($location);
@@ -275,6 +266,9 @@ $module->renderProjectPageContentHeader($configureUrl, $error, $warning, $succes
         <?php echo $workflowStatus ?>
      </div>
 </div>
+    <div>
+     <span style="font-weight: bold;">WORKFLOW GLOBAL PROPERTIES</span>
+    </div>
 
 
 <?php
@@ -282,34 +276,36 @@ $module->renderProjectPageContentHeader($configureUrl, $error, $warning, $succes
 # Configuration selection form
 #-------------------------------------
 ?>
-<form action="<?php echo $selfUrl;?>" method="post" 
+<!-- <form action="<?php echo $selfUrl;?>" method="post" 
       style="padding: 4px; margin-bottom: 0px; border: 1px solid #ccc; background-color: #ccc;">
     <span style="font-weight: bold;">ETL Global Properties for Task:</span>
-    <select name="configName" onchange="this.form.submit()">
+    <select name="taskKey" onchange="this.form.submit()">
+-->
     <?php
-    $tasks = $module->getWorkflow($workflowName, true);
-    array_unshift($values, '');
-    foreach ($tasks as $key => $task) {
-        $taskName = $key."-".$task['taskName'];
-        if (strcmp($key, $taskKey) === 0) {
-            echo '<option value="'.Filter::escapeForHtmlAttribute($key).'" selected>'
-                .Filter::escapeForHtml($taskName)."</option>\n";
-        } else {
-            echo '<option value="'.Filter::escapeForHtmlAttribute($key).'">'
-                .Filter::escapeForHtml($taskName)."</option>\n";
-        }
-    }
+#    $tasks = $module->getWorkflow($workflowName, true);
+#    array_unshift($values, '');
+ #   foreach ($tasks as $key => $task) {
+  #      $value = $key."-".$task['taskName'];
+   #     if (strcmp($key, $taskKey) === 0) {
+    #        echo '<option value="'.Filter::escapeForHtmlAttribute($key).'" selected>'
+     #           .Filter::escapeForHtml($value)."</option>\n";
+      #  } else {
+       #     echo '<option value="'.Filter::escapeForHtmlAttribute($key).'">'
+        #        .Filter::escapeForHtml($value)."</option>\n";
+        #}
+    #}
     ?>
-    </select>
+   <!-- </select> -->
     <?php Csrf::generateFormToken(); ?>
 </form>
 
 
 <?php
-#if (empty($configuration)) {
+#if ($taskKey!==0 && $taskKey!=='0' && empty($taskKey) {
 if (2==3) {
     ; // Don't display any page content
 } else {
+ 
 ?>
 
 <!-- ====================================
@@ -318,8 +314,8 @@ Configuration form
 <form action="<?php echo $selfUrl;?>" method="post"
     enctype="multipart/form-data" style="margin-top: 17px;" autocomplete="off">
 
-    <input type="hidden" name="configName"
-        value="<?php echo Filter::escapeForHtmlAttribute($configName); ?>" />
+    <input type="hidden" name="taskKey"
+        value="<?php echo Filter::escapeForHtmlAttribute($taskKey); ?>" />
     
     <input type="hidden" name="<?php echo Configuration::CONFIG_API_TOKEN; ?>"
            value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::CONFIG_API_TOKEN]); ?>" />
@@ -339,11 +335,21 @@ Configuration form
                     <td>Database type</td>
                     <td>
                         <select name="<?php echo Configuration::DB_TYPE;?>">
+p
+                            <?php
+                            # No database type global property
+                            $selected = '';
+                            if (empty($properties)) {
+                                $selected = ' selected ';
+                            }
+                            ?>
+                            <option value=''></option>
+
                             <?php
                             # MySQL database type option
                             $dbType = DbConnectionFactory::DBTYPE_MYSQL;
                             $selected = '';
-                            if (empty($properties) || $properties[Configuration::DB_TYPE] === $dbType) {
+                            if ($properties[Configuration::DB_TYPE] === $dbType) {
                                 $selected = ' selected ';
                             }
                             ?>

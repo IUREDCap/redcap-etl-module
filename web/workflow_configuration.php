@@ -27,10 +27,6 @@ $renameTaskKey = null;
 $renameProjectId = null;
 $renameNewTaskName = null;
 
-$propertiesProjectId = null;
-$configureTaskKey = null;
-$globalProperties = array();
-
 $moveTaskKey = null;
 
 $etlConfig = null;
@@ -51,9 +47,8 @@ $selfUrl      = $module->getUrl('web/workflow_configuration.php')
                    .'&workflowName='.Filter::escapeForUrlParameter($workflowName);
 $workflowsUrl = $module->getUrl("web/workflows.php");
 $configureUrl = $module->getUrl("web/configure.php");
-#$testUrl     = $module->getUrl("web/test.php");
-#$scheduleUrl = $module->getUrl("web/schedule.php");
-#$runUrl      = $module->getUrl("web/run.php");
+$globalPropertiesUrl = $module->getUrl('web/workflow_global_properties.php')
+                   .'&workflowName='.Filter::escapeForUrlParameter($workflowName);
 
 try {
     #-----------------------------------------------------------
@@ -96,18 +91,17 @@ try {
                 $module->deleteTaskfromWorkflow($workflowName, $deleteTaskKey, $deleteProjectId, $username);
             }
         }
-    } elseif (strcasecmp($submitValue, 'properties') === 0) {
+    } elseif (strcasecmp($submitValue, 'Workflow Global Properties') === 0) {
         if (empty($warning) && empty($error)) {
             #----------------------------------------------
             # Update properties
             #----------------------------------------------
-            $configureTaskKey = $_POST['configureTaskKey'];
-            $globalPropertiesUrl = $module->getUrl('web/workflow_global_properties.php')
-               .'&workflowName='.Filter::escapeForUrlParameter($workflowName)
-               .'&taskKey='.Filter::escapeForUrlParameter($configureTaskKey);
+            #$globalPropertiesUrl = $module->getUrl('web/workflow_global_properties.php');
+            #$globalPropertiesUrl .= '&workflowName='.Filter::escapeForUrlParameter($workflowName);
             header('Location: '.$globalPropertiesUrl);
             exit();
         }
+        
     } elseif (strcasecmp($submitValue, 'etlConfig') === 0) {
         if (empty($warning) && empty($error)) {
             #----------------------------------------------
@@ -149,19 +143,13 @@ try {
     $error = 'ERROR: '.$exception->getMessage();
 }
 
-$selfUrl      = $module->getUrl('web/workflow_configuration.php')
-                   .'&workflowName='.Filter::escapeForUrlParameter($workflowName);
-$globalPropertiesUrl = $module->getUrl('web/workflow_global_properties.php')
-                   .'&workflowName='.Filter::escapeForUrlParameter($workflowName)
-                   .'&taskKey='.Filter::escapeForUrlParameter($configureTaskKey);
-$workflowsUrl = $module->getUrl("web/workflows.php");
-$configureUrl = $module->getUrl("web/configure.php");
-
 $workflowStatus = $module->getWorkflowStatus($workflowName);
 
 #Get the workflow's updated tasks list
 $tasks = $module->getWorkflow($workflowName, true);
 $taskProjectIds = array_column($tasks, 'projectId');
+#print "============ 172 in workflow_configuration.php, tasks is: ";
+#print_r($tasks);
 ?>
 
 <?php
@@ -176,33 +164,6 @@ $link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">
 $buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
 echo $buffer;
 ?>
-
-<!--
-<script>
-$(function() {
-    $(document).on("change", '#updateWorkflowForm', (function() {
-        alert('This works');
-    });
-});
-</script>
-
-
-$(function() {
-    $("#updateWorkflowForm").on("change", "input:checkbox", function(e){
-console.log("IN FUNCTION");
-        e.preventDefault();
-        document.getElementById("updateWorkflowForm").submit();
-    });
-});
-
-    $(document).ready(function() {
-        $("#updateWorkflowForm").on("change", "input:checkbox", function(){
-            $("#updateWorkflowForm").submit();
-        });
-    });
-</script>
--->
-
 
 <div class="projhdr"> <!--h4 style="color:#800000;margin:0 0 10px;"> -->
 <img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>database_table.png" alt="">REDCap-ETL
@@ -245,6 +206,10 @@ if (!empty($availableUserProjects)) {
     ?>
     </select>
     <input type="submit" name="submitValue" value="Add" />
+    <br />&nbsp;
+    <div>
+        <input type="submit" name="submitValue" value="Workflow Global Properties" />
+    </div>
     <?php Csrf::generateFormToken(); ?>
 </form>
 <?php } ?>
@@ -275,7 +240,7 @@ if (!empty($availableUserProjects)) {
             ?>
             <th>Task Name</th><th>PID</th><th>Project</th>
             <th>Project ETL Config</th><th>Rename<br/>Task</th>
-            <th>Specify<br/>ETL Config</th><th>Global<br/>Properties</th><th>Delete<br/>Task</th>
+            <th>Specify<br/>ETL Config</th><th>Delete<br/>Task</th>
         </tr>
     </thead>
     <tbody>
@@ -355,23 +320,6 @@ if (!empty($availableUserProjects)) {
                     .'<input type="image" src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME TASK"'
                     .' style="cursor: pointer;"'
                     .' id="specifyEtlConfig'.$row
-                    .'"/>'
-                    ."</td>\n";
-            } else {
-                echo '<td style="text-align:center;">'
-                    .'<img src="'.APP_PATH_IMAGES.'gear.png" alt="ETL GLOBAL VARIABLES" class="disabled" />'
-                    ."</td>";
-            }
-
-            #-----------------------------------------------------------
-            # GLOBAL PROPERTIES BUTTON - disable if user does not have the needed
-            # data export permission to access the project
-            #-----------------------------------------------------------
-            if ($hasPermissionToExport) {
-                echo '<td style="text-align:center;">'
-                    .'<input type="image" src="'.APP_PATH_IMAGES.'gear.png" alt="ETL GLOBAL PROPERTIES"'
-                    .' style="cursor: pointer;"'
-                    .' id="globalProperties'.$row
                     .'"/>'
                     ."</td>\n";
             } else {
@@ -690,66 +638,6 @@ $(function() {
     <input type="hidden" name="deleteTaskKey" id="deleteTaskKey" value="">
     <input type="hidden" name="deleteProjectId" id="deleteProjectId" value="">
     <input type="hidden" name="submitValue" value="delete">
-    <?php Csrf::generateFormToken(); ?>
-    </form>
-</div>
-
-<?php
-#--------------------------------------
-# Global properties dialog
-#--------------------------------------
-?>
-<script>
-$(function() {
-    // Task global properies form
-    globalProperiesForm = $("#globalProperiesForm").dialog({
-        autoOpen: false,
-        height: 225,
-        width: 500,
-        modal: true,
-        buttons: {
-            Cancel: function() {$(this).dialog("close");},
-            "Assign Global Properties": function() {globalProperiesForm.submit();}
-        },
-        title: "ETL Global Properties"
-    });
-  
-    <?php
-    # Set up click event handlers for the Global Properties buttons
-    $row = 1;
-    foreach ($tasks as $key => $task) {
-        $projectId = $task['projectId'];
-        echo '$("#globalProperties'.$row.'").click({key: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($key)
-            .'", projectId: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($projectId)
-            .'"}, addGlobalProperties);'."\n";
-        $row++;
-    }
-    ?>
-
-    function addGlobalProperties(event) {
-        event.preventDefault();
-        var key = event.data.key;
-        var projectId = event.data.projectId;
-        $("#propertiesForProject").text('"'+projectId+'"');
-        $("#propertiesProjectId").val(projectId);
-        $('#configureTaskKey').val(key);
-        $("#globalProperiesForm").dialog("open");
-    }
-});
-</script>
-
-<div id="propertiesDialog"
-    title="Global Properties"
-    style="display: none;"
-    >
-    <form id="globalProperiesForm" action="<?php echo $selfUrl;?>" method="post">
-    <div>Reminder: Any global properties you assign for a task will override those in the ETL configuration for that task. <br /><br />To continue to assign global ETL properties for Project Id <span id="propertiesForProject" style="font-weight: bold;"></span>, click on the <span style="font-weight: bold;">Assign Global Properties</span> button.
-    </div>
-    <input type="hidden" name="configureTaskKey" id="configureTaskKey" value="">
-    <input type="hidden" name="propertiesProjectId" id="propertiesProjectId" value="">
-    <input type="hidden" name="submitValue" value="properties">
     <?php Csrf::generateFormToken(); ?>
     </form>
 </div>

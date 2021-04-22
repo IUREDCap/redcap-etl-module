@@ -18,6 +18,7 @@ class ModuleLog
     const ETL_CRON_JOB    = 'ETL cron job';
     const ETL_RUN         = 'ETL run';
     const ETL_RUN_DETAILS = 'ETL run details';
+    const WORKFLOW_RUN    = 'workflow run';
 
     private $module;
 
@@ -341,4 +342,35 @@ class ModuleLog
         
         return $details;
     }
+
+    public function logWorkflowRun(
+        $username,
+        $isCronJob,
+        $workflowName,
+        $serverName,
+        $cronJobLogId = '',
+        $cronDay = null,
+        $cronHour = null
+    ) {
+        $logParams = [
+            'log_type'           => self::WORKFLOW_RUN,
+            'log_format_version' => self::LOG_FORMAT_VERSION,
+            'project_id'         => null,
+            'etl_username'       => $username,
+            'cron'               => $isCronJob,
+            'cron_job_log_id'    => $cronJobLogId,
+            'cron_day'           => $cronDay,
+            'cron_hour'          => $cronHour,
+            'config'             => 'Workflow '.$workflowName,
+            'etl_server'         => $serverName
+        ];
+
+        $logMessage = "Workflow run";
+
+        $logId = $this->module->log($logMessage, $logParams);
+        $this->lastEtlRunLogId = $logId;
+
+        return $logId;
+    }
+
 }

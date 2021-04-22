@@ -1111,6 +1111,7 @@ class Settings
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
+
     }
 
     public function addProjectToWorkflow(
@@ -1124,7 +1125,7 @@ class Settings
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
 
-        $projectId = $project['project_id'];
+        $projectId = $project["project_id"];
 
         $workflows->addProjectToWorkflow($workflowName, $projectId, $username);
         $json = $workflows->toJson();
@@ -1168,19 +1169,27 @@ class Settings
     }
 
     public function getProjectAvailableWorkflows(
-        $projectId = PROJECT_ID
+        $projectId = PROJECT_ID,
+        $excludeIncomplete = false
     ) {
         $workflowsObject = new Workflow();
         $key = self::WORKFLOWS_KEY;
         $json = $this->module->getSystemSetting($key);
         $workflowsObject->fromJson($json);
         $workflows = $workflowsObject->getWorkflows();
-
+#print "====================!!!!!!!!!!!!!!!!!!settings.php, getProjectAvailableWorkflows, exclude is $excludeIncomplete";
+#print_r($workflows);
         $projectWorkflows = array();
         foreach ($workflows as $workflowName => $workflow) {
             if ($workflow['metadata']['workflowStatus'] !== 'Removed') {
                 if (in_array($projectId, array_column($workflow, 'projectId'))) {
-                    $projectWorkflows[] = $workflowName;
+                    if ($excludeIncomplete) {
+                        if ($workflow['metadata']['workflowStatus'] !== 'Incomplete') {
+                            $projectWorkflows[] = $workflowName;
+					    }
+				    } else { 
+                        $projectWorkflows[] = $workflowName;
+                    }
                 }
             }
         }
@@ -1399,7 +1408,7 @@ class Settings
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
     }
 
-    public function updateWorkflowTasks(
+/*    public function updateWorkflowTasks(
         $workflowName,
         $incomingTaskNames,
         $incomingProjectEtlConfigs,
@@ -1452,10 +1461,51 @@ class Settings
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
 
         $this->db->endTransaction($commit);
-    }
+    }*/
 
-    public function setWorkflows($name, $workflow)
+    public function getWorkflowGlobalProperties($workflowName)
     {
+        $configuration = null;
+        $workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+        $properties = $workflows->getWorkflowGlobalProperties($workflowName);
+        return $properties;
+    }
+    
+    public function getWorkflowGlobalConfiguration($workflowName)
+    {
+        $workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+        $configValues = $workflows->getWorkflowGlobalProperties($workflowName);
+        $configuration = new Configuration($workflowName, null, null);
+
+        if ($configValues) {
+            $configuration->set($configValues, true);
+	    } else {
+            $initialize = true;
+            $configValues = $configuration->getGlobalProperties($initialize);
+            $isWorkflow = true;
+            $configuration->set($configValues, $isWorkflow);
+	    }		
+        return $configuration;
+    }
+    
+    public function setWorkflowGlobalProperties($workflowName, $properties, $username)
+    {
+		$workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+        $workflows->setGlobalProperties($workflowName, $properties, $username);
+        $json = json_encode($workflows);
+        $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+        
+    }
+    
+ /*   public function setWorkflows($name, $workflow)
+    {
+#delete this?
         $key = self::WORKFLOWS_KEY_PREFIX . $name;
         $json = json_encode($workflow);
         print "=== SSSSS.Y    in Settings.php, setWorkflows, ABOUT TO WRITE JSON, json for all workflows is : ";
@@ -1472,5 +1522,5 @@ class Settings
         print_r($json);
 
         $this->module->setSystemSetting($key, $json);
-    }
+    } */
 }

@@ -146,11 +146,11 @@ class Configuration implements \JsonSerializable
 
         $this->properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS] = false;
         
-        $this->properties[self::LABEL_VIEW_SUFFIX] = \IU\REDCapETL\Configuration::DEFAULT_LABEL_VIEW_SUFFIX;
+        $this->properties[self::LABEL_VIEW_SUFFIX] = \IU\REDCapETL\TaskConfig::DEFAULT_LABEL_VIEW_SUFFIX;
                 
         $this->properties[self::DB_LOGGING]         = true;
-        $this->properties[self::DB_LOG_TABLE]       = \IU\REDCapETL\Configuration::DEFAULT_DB_LOG_TABLE;
-        $this->properties[self::DB_EVENT_LOG_TABLE] = \IU\REDCapETL\Configuration::DEFAULT_DB_EVENT_LOG_TABLE;
+        $this->properties[self::DB_LOG_TABLE]       = \IU\REDCapETL\TaskConfig::DEFAULT_DB_LOG_TABLE;
+        $this->properties[self::DB_EVENT_LOG_TABLE] = \IU\REDCapETL\TaskConfig::DEFAULT_DB_EVENT_LOG_TABLE;
         
         $this->properties[self::EMAIL_ERRORS]  = false;
         $this->properties[self::EMAIL_SUMMARY] = false;
@@ -175,19 +175,21 @@ class Configuration implements \JsonSerializable
      * Users may save incomplete configurations, but they should be prevented from
      * trying to run or schedule one.
      */
-    public function validateForRunning()
+    public function validateForRunning($isWorkflow = false)
     {
-        $this->validate();
+        $this->validate($isWorkflow);
         
-        if (empty($this->getProperty(self::API_TOKEN_USERNAME))) {
-            throw new \Exception('No API token specified in configuration.');
-        }
+        if (!$isWorkflow) {
+            if (empty($this->getProperty(self::API_TOKEN_USERNAME))) {
+                throw new \Exception('No API token specified in configuration.');
+            }
 
-        $rulesSource = $this->getProperty(self::TRANSFORM_RULES_SOURCE);
-        if ($rulesSource != \IU\REDCapETL\Configuration::TRANSFORM_RULES_DEFAULT) {
-            # If the rules source is not (dynamic) auto-generation, make sure that rules have beem specified
-            if (empty($this->getProperty(self::TRANSFORM_RULES_TEXT))) {
-                throw new \Exception('No transformation rules were specified in configuration.');
+            $rulesSource = $this->getProperty(self::TRANSFORM_RULES_SOURCE);
+            if ($rulesSource != \IU\REDCapETL\TaskConfig::TRANSFORM_RULES_DEFAULT) {
+                # If the rules source is not (dynamic) auto-generation, make sure that rules have beem specified
+                if (empty($this->getProperty(self::TRANSFORM_RULES_TEXT))) {
+                    throw new \Exception('No transformation rules were specified in configuration.');
+                }
             }
         }
         
@@ -247,7 +249,7 @@ class Configuration implements \JsonSerializable
     /**
      * Validate the configuration.
      */
-    public function validate()
+    public function validate($isWorkflow = false)
     {
         self::validateName($this->name);
         
@@ -258,8 +260,10 @@ class Configuration implements \JsonSerializable
         self::validateApiToken($apiToken);
         
         $batchSize = $this->getProperty(self::BATCH_SIZE);
-        self::validateBatchSize($batchSize);
-        
+        if (!$isWorkflow || ($isWorkflow && !empty($batchSize))) {
+            self::validateBatchSize($batchSize);
+        }
+         
         $tablePrefix = $this->getProperty(self::TABLE_PREFIX);
         self::validateTablePrefix($tablePrefix);
         
@@ -418,9 +422,8 @@ class Configuration implements \JsonSerializable
         return $json;
     }
 
-    public function set($properties)
+    public function set($properties, $isWorkflow = false)
     {
-
         
         #------------------------------------------------
         # Set values
@@ -435,7 +438,15 @@ class Configuration implements \JsonSerializable
                     if ($value === true || $value === 'true' || $value === 'on') {
                         $this->properties[$name] = true;
                     } else {
-                        $this->properties[$name] = false;
+                        if ($isWorkflow) {
+                            if ($value === false || $value === 'false' || $value === 'off') {
+                                $this->properties[$name] = false;
+							} else {
+                                $this->properties[$name] = null;
+	                        }								
+                        } else {
+                            $this->properties[$name] = false;
+					    }
                     }
                 } else {
                     # If this is a non-boolean property
@@ -451,7 +462,7 @@ class Configuration implements \JsonSerializable
                         $this->properties[$name] = $properties[$name];
                     }
                 }
-            } else {
+            } else if (!$isWorkflow) {
                 if (in_array($name, $this->booleanUserProperties)) {
                     $this->properties[$name] = false;
                 }
@@ -463,10 +474,12 @@ class Configuration implements \JsonSerializable
             $dbType = $properties[self::DB_TYPE];
         }
     
-        if (empty($dbType)) {
+        if (empty($dbType) && !$isWorkflow) {
             # Originally, this property didn't exists, because the only database
             # type was MySQL, so older data will not have this, and it needs
             # to be set to the default value (MySQL).
+            # (Don't assign the default value to the workflow global parameter
+            # because it will override the db type for the task.)
             $dbType = \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_MYSQL;
         }
         
@@ -495,9 +508,11 @@ class Configuration implements \JsonSerializable
         if (!empty($dbPort)) {
             array_push($dbConnectionValues, $dbPort);
         }
-        
-        $dbConnection = \IU\REDCapETL\Database\DbConnection::createConnectionString($dbConnectionValues);
-        $this->properties[self::DB_CONNECTION] = $dbConnection;
+       
+        if (!$isWorkflow || ($isWorkflow && $dbType)) {
+            $dbConnection = \IU\REDCapETL\Database\DbConnection::createConnectionString($dbConnectionValues);
+            $this->properties[self::DB_CONNECTION] = $dbConnection;
+        }
     }
 
     public function getProperty($propertyName)
@@ -675,5 +690,75 @@ class Configuration implements \JsonSerializable
         $reflection = new \ReflectionClass(self::class);
         $properyNames = $reflection->getConstants();
         return $properyNames;
+    }
+    
+    public function getGlobalProperties($initialize = false)
+    {
+        $properties = $this->properties;
+
+        #---------------------------------------
+        # Remove properties that aren't used
+        # in Global Properties
+        #---------------------------------------
+        unset($properties[self::REDCAP_API_URL]);
+        unset($properties[self::SSL_VERIFY]);
+        unset($properties[self::DATA_EXPORT_RIGHT]);
+        unset($properties[self::DATA_SOURCE_API_TOKEN]);
+        unset($properties[self::API_TOKEN_USERNAME]);
+        unset($properties[self::TRANSFORM_RULES_FILE]);
+        unset($properties[self::TRANSFORM_RULES_TEXT]);
+        unset($properties[self::TRANSFORM_RULES_SOURCE]);
+        unset($properties[self::CONFIG_NAME]);
+        unset($properties[self::CONFIG_API_TOKEN]);
+        unset($properties[self::CONFIG_OWNER]);
+        unset($properties[self::AUTOGEN_INCLUDE_COMPLETE_FIELDS]);
+        unset($properties[self::AUTOGEN_INCLUDE_DAG_FIELDS]);
+        unset($properties[self::AUTOGEN_INCLUDE_FILE_FIELDS]);
+        unset($properties[self::AUTOGEN_INCLUDE_SURVEY_FIELDS]);
+        unset($properties[self::AUTOGEN_REMOVE_IDENTIFIER_FIELDS]);
+        unset($properties[self::AUTOGEN_REMOVE_NOTES_FIELDS]);
+        unset($properties[self::AUTOGEN_COMBINE_NON_REPEATING_FIELDS]);
+        unset($properties[self::AUTOGEN_NON_REPEATING_FIELDS_TABLE]);
+        unset($properties[self::PROJECT_ID]);
+                 
+        if ($initialize) {
+   	        #---------------------------------------
+            # Remove all default values
+            #---------------------------------------
+            $properties[self::CRON_JOB]   = null;
+            $properties[self::DB_LOGGING] = null;
+            $properties[self::DB_LOG_TABLE]  = null;
+            $properties[self::DB_EVENT_LOG_TABLE] = null;
+            $properties[self::DB_TYPE] = null;
+            $properties[self::DB_HOST] = null;
+            $properties[self::DB_PORT] = null;
+            $properties[self::DB_NAME] = null;
+            $properties[self::DB_SCHEMA] = null;
+            $properties[self::DB_USERNAME] = null;
+            $properties[self::DB_PASSWORD] = null;
+            $properties[self::DB_CONNECTION] = null;
+            $properties[self::DB_SSL] = null;
+            $properties[self::DB_SSL_VERIFY] = null;
+            $properties[self::DB_PRIMARY_KEYS] = null;
+            $properties[self::DB_FOREIGN_KEYS] = null;
+            $properties[self::CA_CERT_FILE] = null;
+            $properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS] = null;
+            $properties[self::BATCH_SIZE] = null;
+            $properties[self::TABLE_PREFIX] = null;
+            $properties[self::LABEL_VIEW_SUFFIX] = null;
+            $properties[self::POST_PROCESSING_SQL] = null;
+            $properties[self::PRE_PROCESSING_SQL] = null;
+            $properties[self::PRINT_LOGGING] = null;
+            $properties[self::LOG_FILE] = null;
+            $properties[self::EMAIL_ERRORS] = null;
+            $properties[self::EMAIL_SUMMARY] = null;
+            $properties[self::EMAIL_FROM_ADDRESS] = null;
+            $properties[self::EMAIL_SUBJECT] = null;
+            $properties[self::EMAIL_TO_LIST] = null;
+            $properties[self::CRON_SERVER] = null;
+            $properties[self::CRON_SCHEDULE] = null; 
+		}
+		
+        return $properties;
     }
 }

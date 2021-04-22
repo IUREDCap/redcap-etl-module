@@ -110,7 +110,7 @@ $configUrl   = $module->getUrl("web/configure.php");
 $configUrl   = $module->getUrl("web/etl_configure.php");
 $testUrl     = $module->getUrl("web/test.php");
 $scheduleUrl = $module->getUrl("web/schedule.php");
-$runUrl      = $module->getUrl("web/run.php");
+$runUrl      = $module->getUrl("web/etl_run.php");
 
 $userEtlProjects = $module->getUserEtlProjects();
 $projectId = $module->getProjectId();

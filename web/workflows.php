@@ -13,13 +13,19 @@ use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Configuration;
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
+use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
-use IU\RedCapEtlModule\ServerConfig;
 
 $error   = '';
 $warning = '';
 $success = '';
+
 $removeWorkflowName =  '';
+$copyFromWorkflowName = '';
+$copyToWorkflowName = '';
+$renameWorkflowName = '';
+$renameNewWorkflowName = '';
+$workflowName = '';
 
 try {
     #-----------------------------------------------------------
@@ -113,11 +119,11 @@ echo $buffer;
 $workflowNames = $module->getProjectAvailableWorkflows();
 $adminConfig   = $module->getAdminConfig();
 
-$selfUrl       = $module->getUrl('web/workflows.php');
+$selfUrl       = $module->getUrl("web/workflows.php");
 $configUrl     = $module->getUrl("web/workflow_configuration.php");
 $testUrl       = $module->getUrl("web/test.php");
 $scheduleUrl   = $module->getUrl("web/schedule.php");
-$runUrl        = $module->getUrl("web/run.php");
+$runUrl        = $module->getUrl("web/workflow_run.php");
 
 $userEtlProjects = $module->getUserEtlProjects();
 $projectId = $module->getProjectId();
@@ -164,6 +170,19 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
 <tbody>
 <?php
+#Determine if the user has permissions to export for this project
+$hasPermissionToExport = false;
+$superUser = SUPER_USER;
+if ($superUser) {
+	$hasPermissionToExport = true;
+} else {
+    $db = new RedCapDb();
+    $username = USERID;
+    $availableUserProjects = $db->getUserProjects($username);
+    $pid = Filter::escapeForHtmlAttribute($_GET["pid"]);
+    $pKey = array_search($pid, $availableUserProjects);
+    $hasPermissionToExport = $availableUserProjects[$pKey]['data_export_tool'] == 1 ? true : false;
+}
 
 #--------------------------------------------------------------
 # Displays rows of table of workflows that contain the project
@@ -177,84 +196,81 @@ foreach ($workflowNames as $workflowName) {
     }
     
     $configureUrl = $configUrl.'&workflowName='.Filter::escapeForUrlParameter($workflowName);
+    $runConfigurationUrl = $runUrl.'&workflowName='.Filter::escapeForUrlParameter($workflowName);
     /**
     $testingUrl = $testUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
-    $runConfigurationUrl = $runUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
     $scheduleConfigUrl = $scheduleUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
-
-    $configuration = $module->getConfiguration($configurationName);
-    $exportRight = $module->getConfigurationExportRight($configuration);
     **/
     echo "<td>".Filter::escapeForHtml($workflowName)."</td>\n";
     
     #-------------------------------------------------------------------------------------
     # CONFIGURE BUTTON - disable if user does not have permission to access the project
     #-------------------------------------------------------------------------------------
-    #if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
+    if ($hasPermissionToExport) {
         echo '<td style="text-align:center;">'
             .'<a href="'.$configureUrl.'" id="'.Filter::escapeForHtmlAttribute('configure-'.$workflowName).'">'
             .'<img alt="CONFIG" src="'.APP_PATH_IMAGES.'gear.png"></a>'
             ."</td>\n";
-    /**} else {
+    } else {
         echo '<td style="text-align:center;">'
             .'<img src="'.APP_PATH_IMAGES.'gear.png" alt="CONFIG" class="disabled">'
             ."</td>\n";
-    }**/
+    }
     
     
     #--------------------------------------------------------------------------------------
     # RUN BUTTON - display if running on demand allowed, but disable if user does not have
     # the needed data export permission to access the configuration
     #--------------------------------------------------------------------------------------
-    #if ($adminConfig->getAllowOnDemand()) {
-    #    if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
+    if ($adminConfig->getAllowOnDemand()) {
+        if ($hasPermissionToExport) {
             echo '<td style="text-align:center;">'
                 .'<a href="'.$runConfigurationUrl.'"><img src="'.APP_PATH_IMAGES.'application_go.png" alt="RUN"></a>'
                 ."</td>\n";
-     /**   } else {
+        } else {
             echo '<td style="text-align:center;">'
                 .'<img src="'.APP_PATH_IMAGES.'application_go.png"  alt="RUN" class="disabled">'
                 ."</td>\n";
         }
-    }**/
+    }
 
     #--------------------------------------------------------------------------------------
     # SHEDULE BUTTON - display if ETL cron jobs allowed, but disable if user does not have
     # the needed data export permission to access the configuration
     #--------------------------------------------------------------------------------------
-    #if ($adminConfig->getAllowCron()) {
-    #    if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
+    if ($adminConfig->getAllowCron()) {
+        if ($hasPermissionToExport) {
             echo '<td style="text-align:center;">'
                 .'<a href="'.$scheduleConfigUrl.'"><img src="'.APP_PATH_IMAGES.'clock_frame.png" alt="SCHEDULE"></a>'
                 ."</td>\n";
-    /**    } else {
+        } else {
             echo '<td style="text-align:center;">'
                 .'<img src="'.APP_PATH_IMAGES.'clock_frame.png" alt="SCHEDULE" class="disabled">'
                 ."</td>\n";
         }
-    }**/
+    }
 
     #-----------------------------------------------------------
     # COPY BUTTON - disable if user does not have the needed
     # data export permission to access the project
     #-----------------------------------------------------------
-    #if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
+    if ($hasPermissionToExport) {
         echo '<td style="text-align:center;">'
             .'<input type="image" src="'.APP_PATH_IMAGES.'page_copy.png" alt="COPY"'
             .' class="copyConfig" style="cursor: pointer;"'
             .' id="copyWorkflow'.$row.'"/>'
             ."</td>\n";
-    /** } else {
+     } else {
         echo '<td style="text-align:center;">'
             .'<img src="'.APP_PATH_IMAGES.'page_copy.png" alt="COPY" class="disabled" />'
             ."</td>\n";
-    }**/
+    }
     
     #-----------------------------------------------------------
     # RENAME BUTTON - disable if user does not have the needed
     # data export permission to access the project
     #-----------------------------------------------------------
-    if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
+    if ($hasPermissionToExport) {
         echo '<td style="text-align:center;">'
             .'<input type="image" src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME"'
             .' class="renameConfig" style="cursor: pointer;"'
@@ -270,7 +286,7 @@ foreach ($workflowNames as $workflowName) {
     # REMOVE BUTTON - disable if user does not have the needed
     # data export permission to access the project
     #-----------------------------------------------------------
-    if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
+    if ($hasPermissionToExport) {
         echo '<td style="text-align:center;">'
             .'<input type="image" src="'.APP_PATH_IMAGES.'delete.png" alt="REMOVE"'
             .' class="deleteConfig" style="cursor: pointer;"'
@@ -461,5 +477,4 @@ $(function() {
 
 
 <?php require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
-
 
