@@ -41,7 +41,7 @@ class RedCapEtlTest extends TestCase
 
         $this->assertNotNull($redCapEtl, 'Not null redCapEtl check');
 
-        $rulesText = $redCapEtl->getTransformationRulesText();
+        $rulesText = $redCapEtl->getTransformationRulesText(0);
         $this->assertNotNull($rulesText, 'Rules text not null check');
 
         $expectedRulesText = file_get_contents($rulesFile);
@@ -60,26 +60,14 @@ class RedCapEtlTest extends TestCase
         # Check to see if an error will be generated because of the missing
         # api token.
         $exceptionCaught = false;
-        $expectedMessage = "Could not get data project.";
-        $expectedCode = EtlException::PHPCAP_ERROR;
+        $expectedMessage = "No REDCap API URL was specified.";
+        $expectedCode = EtlException::INPUT_ERROR;
 
         try {
             $redCapEtl = new RedCapEtl(self::$logger, $configFile);
         } catch (EtlException $exception) {
             $exceptionCaught = true;
         }
-        
-        $expectedTimezone = 'Arctic/Longyearbyen';
-        $currentTimezone = null;
-        if (date_default_timezone_get()) {
-            $currentTimezone = date_default_timezone_get();
-        }
-          
-        $this->assertEquals(
-            $expectedTimezone,
-            $currentTimezone,
-            'RedCapEtlTest, testConstructRedCapObjectError timezone change check'
-        );
 
         $this->assertTrue(
             $exceptionCaught,
@@ -99,11 +87,34 @@ class RedCapEtlTest extends TestCase
         );
     }
 
-    /* This tests the exception condition of the autogenerateRules method
+    public function testTimezone()
+    {
+        $baseDir = __DIR__.'/../config';
+        $configFile = $baseDir.'/basic-demography.ini';
+        $properties = TaskConfig::getPropertiesFromFile($configFile);
+        $properties[ConfigProperties::TIMEZONE] = 'Arctic/Longyearbyen';
+
+        $redCapEtl = new RedCapEtl(self::$logger, $properties, null, $baseDir);
+
+        $expectedTimezone = 'Arctic/Longyearbyen';
+        $currentTimezone = null;
+        if (date_default_timezone_get()) {
+            $currentTimezone = date_default_timezone_get();
+        }
+          
+        $this->assertEquals(
+            $expectedTimezone,
+            $currentTimezone,
+            'RedCapEtlTest, testConstructRedCapObjectError timezone change check'
+        );
+    }
+
+    /**
+     * This tests the exception condition of the autogenerateRules method
      * by using PHPUnit Reflection to create the condition by setting
      * the RedCapEtl->dataProject object to null.
      */
-
+    /* NEEDS TO BE REWRITEN:
     public function testAutogenerateRulesException()
     {
         $configFile = __DIR__.'/../config/basic-demography.ini';
@@ -125,7 +136,7 @@ class RedCapEtlTest extends TestCase
         } catch (EtlException $exception) {
             $exceptionCaught = true;
         }
-        
+
         $this->assertTrue(
             $exceptionCaught,
             'RedCapEtlTest, testAutogenerateRulesException exception caught'
@@ -143,4 +154,5 @@ class RedCapEtlTest extends TestCase
             'RedCapEtlTest, testAutogenerateRulesException error message check'
         );
     }
+    */
 }

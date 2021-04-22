@@ -25,10 +25,9 @@ class DynamicRulesTest extends TestCase
 
         if (file_exists(self::CONFIG_FILE)) {
             self::$logger = new Logger('dynamic_rules_test');
-            self::$config = new Configuration(
-                self::$logger,
-                self::CONFIG_FILE
-            );
+            self::$config = new TaskConfig();
+            self::$config->set(self::$logger, self::CONFIG_FILE);
+
             #-----------------------------
             # Get the CSV directory
             #-----------------------------
@@ -81,7 +80,7 @@ class DynamicRulesTest extends TestCase
         try {
             $properties = self::$config->getProperties();
             $properties[ConfigProperties::DB_CONNECTION] = 'CSV:' . self::$csvDir;
-            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = Configuration::TRANSFORM_RULES_DEFAULT;
+            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = TaskConfig::TRANSFORM_RULES_DEFAULT;
             $properties[ConfigProperties::TRANSFORM_RULES_TEXT] = '';
 
             $properties[ConfigProperties::AUTOGEN_INCLUDE_COMPLETE_FIELDS] = 'false';
@@ -192,7 +191,7 @@ class DynamicRulesTest extends TestCase
         try {
             $properties = self::$config->getProperties();
             $properties[ConfigProperties::DB_CONNECTION] = 'CSV:' . self::$csvDir;
-            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = Configuration::TRANSFORM_RULES_DEFAULT;
+            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = TaskConfig::TRANSFORM_RULES_DEFAULT;
             $properties[ConfigProperties::TRANSFORM_RULES_TEXT] = '';
 
             $properties[ConfigProperties::AUTOGEN_INCLUDE_COMPLETE_FIELDS] = 'true';
@@ -306,7 +305,7 @@ class DynamicRulesTest extends TestCase
         try {
             $properties = self::$config->getProperties();
             $properties[ConfigProperties::DB_CONNECTION] = 'CSV:' . self::$csvDir;
-            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = Configuration::TRANSFORM_RULES_DEFAULT;
+            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = TaskConfig::TRANSFORM_RULES_DEFAULT;
             $properties[ConfigProperties::TRANSFORM_RULES_TEXT] = '';
 
             $properties[ConfigProperties::AUTOGEN_INCLUDE_COMPLETE_FIELDS] = 'false';
@@ -326,7 +325,7 @@ class DynamicRulesTest extends TestCase
 
         # Check registration form header to make sure data access group
         # column is there
-        $expected = '"registration_id","record_id","redcap_data_access_group",';
+        $expected = '"registration_id","redcap_data_source","record_id","redcap_data_access_group",';
         $expected .= '"registration_date","first_name","last_name",';
         $expected .= '"address","phone","email","dob","ethnicity",';
         $expected .= '"race___0","race___1","race___2","race___3","race___4",';
@@ -364,10 +363,9 @@ class DynamicRulesTest extends TestCase
 
         # Check weight form header to make sure data access group
         # column is there
-        $expectedWeightHeader = '"weight_id","registration_id","record_id",';
+        $expectedWeightHeader = '"weight_id","registration_id","redcap_data_source","record_id",';
         $expectedWeightHeader .= '"redcap_repeat_instrument",';
-        $expectedWeightHeader .=
-            '"redcap_repeat_instance","redcap_data_access_group",';
+        $expectedWeightHeader .= '"redcap_repeat_instance","redcap_data_access_group",';
         $expectedWeightHeader .= '"weight_time","weight_kg","height_m",';
         $expectedWeightHeader .= '"bmi","weekly_activity_level"';
         $expectedWeightHeader .= "\n";
@@ -387,7 +385,7 @@ class DynamicRulesTest extends TestCase
 
         # Check emergency form header to make sure data access group
         # column is there
-        $expectedEmergencyHeader = '"emergency_id","record_id",';
+        $expectedEmergencyHeader = '"emergency_id","redcap_data_source","record_id",';
         $expectedEmergencyHeader .= '"redcap_data_access_group","contact_name",';
         $expectedEmergencyHeader .= '"contact_address","contact_email",';
         $expectedEmergencyHeader .= '"contact_phone"';
@@ -414,7 +412,7 @@ class DynamicRulesTest extends TestCase
         try {
             $properties = self::$config->getProperties();
             $properties[ConfigProperties::DB_CONNECTION] = 'CSV:' . self::$csvDir;
-            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = Configuration::TRANSFORM_RULES_DEFAULT;
+            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = TaskConfig::TRANSFORM_RULES_DEFAULT;
             $properties[ConfigProperties::TRANSFORM_RULES_TEXT] = '';
 
             $properties[ConfigProperties::AUTOGEN_INCLUDE_COMPLETE_FIELDS] = 'false';
@@ -433,7 +431,7 @@ class DynamicRulesTest extends TestCase
         }
 
         # Check registration form to see if consent_form column is present
-        $expected = '"registration_id","record_id","registration_date",';
+        $expected = '"registration_id","redcap_data_source","record_id","registration_date",';
         $expected .= '"first_name","last_name","address","phone",';
         $expected .= '"email","dob","ethnicity","race___0","race___1",';
         $expected .= '"race___2","race___3","race___4","race___5",';
@@ -462,7 +460,7 @@ class DynamicRulesTest extends TestCase
         try {
             $properties = self::$config->getProperties();
             $properties[ConfigProperties::DB_CONNECTION] = 'CSV:' . self::$csvDir;
-            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = Configuration::TRANSFORM_RULES_DEFAULT;
+            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = TaskConfig::TRANSFORM_RULES_DEFAULT;
             $properties[ConfigProperties::TRANSFORM_RULES_TEXT] = '';
 
             $properties[ConfigProperties::AUTOGEN_INCLUDE_COMPLETE_FIELDS] = 'false';
@@ -482,7 +480,7 @@ class DynamicRulesTest extends TestCase
 
         # Check registration form to see if address and comments columns
         # not included (both are notes fields)
-        $expected = '"registration_id","record_id","registration_date",';
+        $expected = '"registration_id","redcap_data_source","record_id","registration_date",';
         $expected .= '"first_name","last_name","phone",';
         $expected .= '"email","dob","ethnicity","race___0","race___1",';
         $expected .= '"race___2","race___3","race___4","race___5",';
@@ -511,7 +509,7 @@ class DynamicRulesTest extends TestCase
         try {
             $properties = self::$config->getProperties();
             $properties[ConfigProperties::DB_CONNECTION] = 'CSV:' . self::$csvDir;
-            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = Configuration::TRANSFORM_RULES_DEFAULT;
+            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = TaskConfig::TRANSFORM_RULES_DEFAULT;
             $properties[ConfigProperties::TRANSFORM_RULES_TEXT] = '';
 
             $properties[ConfigProperties::AUTOGEN_INCLUDE_COMPLETE_FIELDS] = 'false';
@@ -530,7 +528,7 @@ class DynamicRulesTest extends TestCase
         }
 
         # Check registration form to see if all identifier fields have been removed
-        $expected = '"registration_id","record_id","registration_date",';
+        $expected = '"registration_id","redcap_data_source","record_id","registration_date",';
         $expected .= '"ethnicity","race___0","race___1",';
         $expected .= '"race___2","race___3","race___4","race___5",';
         $expected .= '"sex","physician_approval","diabetic",';
@@ -553,6 +551,8 @@ class DynamicRulesTest extends TestCase
 
     public function testCombineNonRepeatingFieldsException()
     {
+        self::deleteOldResultsFiles();
+
         $exceptionCaught = false;
         $expectedMessage = "Invalid autogen_non_repeating_fields_table property.";
         $expectedMessage .= " This property must have a value if the";
@@ -564,7 +564,7 @@ class DynamicRulesTest extends TestCase
         try {
             $properties = self::$config->getProperties();
             $properties[ConfigProperties::DB_CONNECTION] = 'CSV:' . self::$csvDir;
-            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = Configuration::TRANSFORM_RULES_DEFAULT;
+            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = TaskConfig::TRANSFORM_RULES_DEFAULT;
             $properties[ConfigProperties::TRANSFORM_RULES_TEXT] = '';
 
             $properties[ConfigProperties::AUTOGEN_INCLUDE_COMPLETE_FIELDS] = 'false';
@@ -607,7 +607,7 @@ class DynamicRulesTest extends TestCase
         try {
             $properties = self::$config->getProperties();
             $properties[ConfigProperties::DB_CONNECTION] = 'CSV:' . self::$csvDir;
-            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = Configuration::TRANSFORM_RULES_DEFAULT;
+            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = TaskConfig::TRANSFORM_RULES_DEFAULT;
             $properties[ConfigProperties::TRANSFORM_RULES_TEXT] = '';
 
             $properties[ConfigProperties::AUTOGEN_INCLUDE_COMPLETE_FIELDS] = 'false';
@@ -629,7 +629,7 @@ class DynamicRulesTest extends TestCase
         try {
             $properties = self::$config->getProperties();
             $properties[ConfigProperties::DB_CONNECTION] = 'CSV:' . self::$csvDir;
-            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = Configuration::TRANSFORM_RULES_DEFAULT;
+            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = TaskConfig::TRANSFORM_RULES_DEFAULT;
             $properties[ConfigProperties::TRANSFORM_RULES_TEXT] = '';
 
             $properties[ConfigProperties::AUTOGEN_INCLUDE_COMPLETE_FIELDS] = 'false';
@@ -648,7 +648,7 @@ class DynamicRulesTest extends TestCase
         }
 
         # Check file with all non-repeating fields in it
-        $expected = '"combine_non_repeating_id","record_id","registration_date",';
+        $expected = '"combine_non_repeating_id","redcap_data_source","record_id","registration_date",';
         $expected .= '"first_name","last_name","address","phone",';
         $expected .= '"email","dob","ethnicity","race___0","race___1",';
         $expected .= '"race___2","race___3","race___4","race___5",';

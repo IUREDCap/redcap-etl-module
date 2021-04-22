@@ -42,6 +42,14 @@ abstract class DbConnection
     }
 
     /**
+     * Gets a string identifer for the database. This is used for checking databases
+     * for equivalance, but will only work if database connection strings are
+     * specified consistently.
+     */
+    abstract public function getId();
+
+
+    /**
      * Drops the specified table from the database.
      *
      * @param IU\REDCapETL\Schema\Table $table table object corresponding
@@ -128,6 +136,22 @@ abstract class DbConnection
      */
     abstract public function processQueries($queries);
 
+    abstract public function getTableColumnNames($tableName);
+
+    /**
+     * Gets the all the data of the specified table.
+     *
+     * Note: currently this method is not used in ETL processing,
+     * and is not sutiable for very large tables.
+     * It is intended for use in testing and debugging.
+     *
+     * @param string $tableName the table name for which the data is to be retrieved.
+     *
+     * @return array an array where each element represents one row of data, and where a row is
+     *     represented as an associative array, where the keys are column names and the values
+     *     are the corresponding data values.
+     */
+    abstract public function getData($tableName, $orderByField = null);
 
     /**
      * Replaces the specified table in the database

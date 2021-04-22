@@ -7,6 +7,7 @@
 namespace IU\REDCapETL\Schema;
 
 use IU\REDCapETL\RedCapEtl;
+use IU\REDCapETL\KeyValueDb;
 
 /**
  * Table is used to store information about a relational table
@@ -14,18 +15,19 @@ use IU\REDCapETL\RedCapEtl;
 class Table
 {
     /** @var string the name of the table, including the table name prefix, if any. */
-    public $name;
+    private $name;
 
     /** @var string the table name prefix, if any */
-    public $namePrefix;
+    private $namePrefix;
 
     /** @var mixed the parent table if not a root table, or the primary key name, if it is a root table */
     public $parent = '';        // Table
 
-    /** @var Field field used as the primary key */
-    public $primary = '';
+    /** @var Field field used as the primary key. */
+    public $primary;
 
-    public $foreign = '';       // Field used as foreign key to parent
+    /** @var Field field used as foreign key to parent. */
+    public $foreign;
 
     protected $children = array();   // Child tables
 
@@ -35,10 +37,13 @@ class Table
                                            //   combined with any suffixes
                                            //   allowed for its parent table
 
+    /** @var array array of Field objects that represent the fields of the table */
     protected $fields = array();
+
+    /** @var array array of Row objects used to store rows of data for the table */
     protected $rows = array();
 
-    private $primaryKey = 1;
+    private $primaryKeyValue;
 
     public $usesLookup = false;   // Are fields in this table represented
                                   // in the Lookup table?
@@ -56,6 +61,9 @@ class Table
      *    is a root table, it will be a string that represents the
      *    name to use as the synthetic primary key. Otherwise it
      *    should be the table's parent Table object.
+     *
+     * @param FieldTypeSpecifier $keyType Field parameter for describing the field type
+     *     for the primary key for the table.
      *
      * @param string $recordIdFieldName the field name of the record ID
      *     in the REDCap data project.
@@ -75,6 +83,8 @@ class Table
         $this->recordIdFieldName = $recordIdFieldName;
         $this->keyType = $keyType;
         
+        $this->primaryKeyValue = 1;
+        
         $this->name = str_replace(' ', '_', $name);
         $this->namePrefix = $namePrefix;
         $this->parent = $parent;
@@ -93,6 +103,115 @@ class Table
             // Otherwise, create a new synthetic primary key
             $this->primary = $this->createPrimary();
         }
+    }
+
+    /**
+     * Merges the specified table with this table and returns the result.
+     *
+     * @param Table $table the table to merge.
+     * @param boolean $mergeData indicates if data (in addition to the metadata) should be merged.
+     * @param Task $task the task of the table being merged (if any); used to get info for logging.
+     */
+    public function merge($table, $mergeData = false, $task = null)
+    {
+        $mergedTable = clone $this;
+
+        $mergedTable->usesLookup = $this->usesLookup || $table->usesLookup;
+
+        # Check the table name (tables with different names should not be merged in the first place,
+        # so this error would tend to indicate some kind of logic error in the calling code).
+        if ($this->name !== $table->getName()) {
+            $message = 'Cannot merge tables; names are different: "'.$this->name.'" and "'.$table->getName().'".';
+            throw new EtlException($message, EtlException::INPUT_ERROR);
+        }
+        
+        # Check the table name prefix (tables with different name prefixes should not be merged in the first place,
+        # so this error would tend to indicate some kind of logic error in the calling code).
+        if ($this->namePrefix !== $table->getNamePrefix()) {
+            $message = 'Cannot merge tables; name prefixes are different: "'.$this->namePrefix.'"'
+                .' and "'.$table->getNamePrefix().'".';
+            throw new EtlException($message, EtlException::INPUT_ERROR);
+        }
+        
+        # Check the rows type (ROOT, EVENTS, etc.)
+        if ($this->rowsType != $table->rowsType) {
+            $message = 'Cannot merge tables; rows type are different: "'.$this->getRowsTypeString()
+                .'" and "'.$table->getRowsTypeString().'".';
+            throw new EtlException($message, EtlException::INPUT_ERROR);
+        }
+
+
+        #----------------------------------------
+        # Merge the primary key fields
+        #----------------------------------------
+        $mergedTable->primary = $this->primary->merge($table->primary, $task);
+
+        #------------------------------------------------
+        # Merge foreign key fields
+        #------------------------------------------------
+        if (isset($this->foreign) && isset($table->foreign)) {
+            $mergedTable->foreign = $this->foreign->merge($table->foreign, $task);
+        } elseif (isset($this->foreign) && !isset($table->foreign)) {
+            $message = 'Table "'.$this->getTableName().'" is defined both with and without a foreign key.';
+            throw new EtlException($message, EtlException::INPUT_ERROR);
+        } elseif (!isset($this->foreign) && isset($table->foreign)) {
+            $message = 'Table "'.$this->getTableName().'" is defined both with and without a foreign key.';
+            throw new EtlException($message, EtlException::INPUT_ERROR);
+        }
+
+        #--------------------------------------------------------------
+        # Create a field map that combines both tables that maps
+        # from database field names to an array of 2 fields.
+        # dbName => [$this field, $table field]
+        #--------------------------------------------------------------
+        $fieldMap = array();
+        foreach ($this->fields as $field) {
+            $fieldMap[$field->dbName] = [$field, null];
+        }
+
+        foreach ($table->fields as $field) {
+            if (array_key_exists($field->dbName, $fieldMap)) {
+                $fields = $fieldMap[$field->dbName];
+                $fields[1] = $field;
+                $fieldMap[$field->dbName] = $fields;
+            } else {
+                $fieldMap[$field->dbName] = [null, $field];
+            }
+        }
+
+        $mergedFields = array();
+        foreach ($fieldMap as $dbName => $fields) {
+            if (empty($fields[0])) {
+                $mergedFields[] = $fields[1];
+            } elseif (empty($fields[1])) {
+                $mergedFields[] = $fields[0];
+            } else {
+                $mergedFields[] = ($fields[0])->merge($fields[1], $task);
+            }
+        }
+
+        $mergedTable->fields = $mergedFields;
+
+        #------------------------------------------------
+        # If specified, merge the data for the 2 tables
+        #------------------------------------------------
+        if ($mergeData) {
+            $mergedTable->rows = $this->mergeDataRows($table);
+        }
+
+        return $mergedTable;
+    }
+
+    /**
+     * Merges only the data rows of 2 tables.
+     *
+     * @return array array of Row objects that represent the combined
+     *     data rows of the tables.
+     */
+    public function mergeDataRows($table)
+    {
+        $mergedRows = array_merge($this->getRows(), $table->getRows());
+        return $mergedRows;
     }
 
     /**
@@ -151,6 +270,16 @@ class Table
     {
         return $this->fields;
     }
+
+    public function getDbFieldNameMap()
+    {
+        $map = array();
+        foreach ($this->getAllFields() as $field) {
+            $map[$field->dbName] = $field;
+        }
+        return $map;
+    }
+
 
     /**
      * Returns regular fields, primary field, and, if
@@ -233,8 +362,10 @@ class Table
 
     public function nextPrimaryKey()
     {
-        $this->primaryKey += 1;
-        return($this->primaryKey - 1);
+        # if not primary key db was set, use the internal variable to get the next value
+        $value = $this->primaryKeyValue;
+        $this->primaryKeyValue += 1;
+        return $value;
     }
 
 
@@ -257,7 +388,8 @@ class Table
         $suffix,
         $rowType,
         $calcFieldIgnorePattern = '',
-        $ignoreEmptyIncompleteForms = false
+        $ignoreEmptyIncompleteForms = false,
+        $dbId = null
     ) {
         #---------------------------------------------------------------
         # If a row is being created for a repeating instrument, don't
@@ -331,7 +463,6 @@ class Table
         $dataFound = false;
         
         $allFields = $this->getFields();
-        $fieldNames = array_column($allFields, 'name');
         
         // Foreach field
         foreach ($allFields as $field) {
@@ -358,6 +489,8 @@ class Table
                 }
             } elseif ($field->name === RedCapEtl::COLUMN_EVENT) {
                 // If this is the field to store the current event
+                #print "\nTABLE {$this->name}\n";
+                #print_r($row->data);
                 $row->data[$field->dbName] = $data[$field->name];
             } elseif ($field->name === RedCapEtl::COLUMN_SUFFIXES) {
                 // if this is the field to store the current suffix
@@ -380,6 +513,9 @@ class Table
                 } else {
                     $row->data[$field->dbName] = '';
                 }
+            } elseif ($field->name === RedCapEtl::COLUMN_DATA_SOURCE) {
+                # Just copy the field and don't count it as a "data found" field
+                $row->data[$field->dbName] = $data[$field->name];
             } elseif (preg_match('/_timestamp$/', $field->name) === 1 && $field->type === FieldType::DATETIME) {
                 # Handle survey timestamps differently; can have '[not completed]' value,
                 # which may cause an error for datetime fields
@@ -397,6 +533,7 @@ class Table
                 
                 $isCalcField     = false;
                 $isCheckbox      = false;
+                $isRadio         = false;
                 $isCompleteField = false;
 
                 // If this is a checkbox field
@@ -411,6 +548,8 @@ class Table
                                         
                     if ($field->redcapType === 'calc') {
                         $isCalcField = true;
+                    } elseif ($field->redcapType === 'radio') {
+                        $isRadio = true;
                     }
 
                     if (preg_match('/_complete$/', $field->name)) {
@@ -424,11 +563,12 @@ class Table
 
                 // Add field and value to row and
                 // keep track of whether any data is found
-                $row->data[$field->name] = '';
+                $row->data[$field->dbName] = '';
                 $value = null;
                 if (array_key_exists($variableName, $data)) {
                     $value = $data[$variableName];
-                    $row->data[$field->name] = $value;
+                    # print "\nAdded value {$value} to field {$field->dbName}\n";
+                    $row->data[$field->dbName] = $value;
                 }
 
                 if (isset($value)) {
@@ -464,13 +604,18 @@ class Table
 
         if ($dataFound) {
             // Get and set primary key
-            $primaryKey = $this->nextPrimaryKey();
-            $row->data[$this->primary->name] = $primaryKey;
+            if (empty($dbId)) {
+                $primaryKeyValue = $this->nextPrimaryKey();
+            } else {
+                # If a database identifier was passed, use the centralized key value class
+                # to get the primary key value.
+                $primaryKeyValue = KeyValueDb::getNextKeyValue($dbId, $this->name);
+            }
+            $row->data[$this->primary->name] = $primaryKeyValue;
 
-            // Add Row
             $this->addRow($row);
 
-            return($primaryKey);
+            return($primaryKeyValue);
         }
 
         return(false);
@@ -516,13 +661,13 @@ class Table
         $allFields = $this->getFields();
         $fieldNames = array_column($allFields, 'name');
 
-        if (count($fieldNames) === 1) {
-            if (in_array($this->recordIdFieldName, $fieldNames)) {
+        if (count($fieldNames) === 2) {
+            if ($fieldNames == [RedCapEtl::COLUMN_DATA_SOURCE, $this->recordIdFieldName]) {
                 # If the record ID is the ONLY field in the table
                 $isRecordIdTable = true;
             }
-        } elseif (count($fieldNames) === 2) {
-            if (in_array($this->recordIdFieldName, $fieldNames) && in_array(RedCapEtl::COLUMN_DAG, $fieldNames)) {
+        } elseif (count($fieldNames) === 3) {
+            if ($fieldNames == [RedCapEtl::COLUMN_DATA_SOURCE, $this->recordIdFieldName, RedCapEtl::COLUMN_DAG]) {
                 # If the record ID and DAG (Data Access Group) are the only records in the table
                 $isRecordIdTable = true;
             }
@@ -602,7 +747,7 @@ class Table
             $string .= "{$in}    ".$child->name."\n";
         }
 
-        $string .= "{$in}primary key value: ".$this->primaryKey."\n";
+        $string .= "{$in}primary key value: ".$this->primaryKeyValue."\n";
 
         $string .= "{$in}uses lookup: ".$this->usesLookup."\n";
 
@@ -619,6 +764,12 @@ class Table
         return $this->name;
     }
 
+    public function getNamePrefix()
+    {
+        return $this->namePrefix;
+    }
+
+
     /**
      * Get's the table's name without the table prefix.
      */
@@ -629,5 +780,23 @@ class Table
             $tableNameWithoutPrefix = substr($tableNameWithoutPrefix, strlen($this->namePrefix));
         }
         return $tableNameWithoutPrefix;
+    }
+
+    public function getRowsTypeString()
+    {
+        $string = '';
+        if ($this->rowsType != null) {
+            if (!is_array($this->rowsType)) {
+                $string .= "{$this->rowsType}\n";
+            } else {
+                for ($i = 0; $i < count($this->rowsType); $i++) {
+                    if ($i > 0) {
+                        $string .= " & ";
+                    }
+                    $string .= $this->rowsType[$i];
+                }
+            }
+        }
+        return $string;
     }
 }

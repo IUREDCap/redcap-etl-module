@@ -13,16 +13,22 @@ SPDX-License-Identifier: BSD-3-Clause
     -->
     <testsuite name="unit">
       <file>tests/unit/ConfigPropertiesTest.php</file>
-      <file>tests/unit/ConfigurationTest.php</file>
       <file>tests/unit/EtlExceptionTest.php</file>
       <file>tests/unit/EtlEventLogTableTest.php</file>
       <file>tests/unit/EtlLogTableTest.php</file>
       <file>tests/unit/FileUtilTest.php</file>
+      <file>tests/unit/KeyValueDbTest.php</file>
       <file>tests/unit/LookupTableTest.php</file>
       <file>tests/unit/LoggerTest.php</file>
+      <file>tests/unit/MetadataTableTest.php</file>
+      <file>tests/unit/ProjectInfoTableTest.php</file>
       <file>tests/unit/RulesParserTest.php</file>
       <file>tests/unit/RulesSemanticAnalyzerTest.php</file>
       <file>tests/unit/SchemaGeneratorTest.php</file>
+      <file>tests/unit/TaskTest.php</file>
+      <file>tests/unit/TaskConfigTest.php</file>
+      <file>tests/unit/WorkflowConfigTest.php</file>
+      <file>tests/unit/WorkflowTest.php</file>
 
       <file>tests/unit/Database/DbConnectionFactoryTest.php</file>
       <file>tests/unit/Database/DbConnectionTest.php</file>
@@ -63,6 +69,11 @@ SPDX-License-Identifier: BSD-3-Clause
       <file>tests/integration/RepeatingEventsTest.php</file>
       <file>tests/integration/RulesGenerationTest.php</file>
       <file>tests/integration/SchemaGeneration.php</file>
+      <file>tests/integration/Workflow1Test.php</file>
+      <file>tests/integration/WorkflowBasicDemographyTest.php</file>
+      <file>tests/integration/WorkflowBasicDemographyJsonTest.php</file>
+      <file>tests/integration/WorkflowErrorsTest.php</file>
+      <file>tests/integration/WorkflowFileIncludeTest.php</file>
     </testsuite>
 
     <!--
@@ -73,8 +84,12 @@ SPDX-License-Identifier: BSD-3-Clause
           a server
     -->
     <testsuite name="system">
-      <file>tests/system/MysqlAutoRulesTest.php</file>
+      <file>tests/system/BasicDemographyMysqlTest.php</file>
+      <file>tests/system/BasicDemographyPostgreSqlTest.php</file>
+      <file>tests/system/BasicDemographySqliteTest.php</file>
+      <file>tests/system/BasicDemographySqlServerTest.php</file>
       <file>tests/system/DynamicRulesTest.php</file>
+      <file>tests/system/MysqlAutoRulesTest.php</file>
       <file>tests/system/MysqlSslTest.php</file>
       <file>tests/system/MysqlTest.php</file>
       <file>tests/system/PostgreSqlTest.php</file>
@@ -82,11 +97,23 @@ SPDX-License-Identifier: BSD-3-Clause
       <file>tests/system/RepeatingEventsPostgreSqlTest.php</file>
       <file>tests/system/RepeatingEventsSqliteTest.php</file>
       <file>tests/system/RepeatingEventsSqlServerTest.php</file>
+      <file>tests/system/RepeatingFormsCsvTest.php</file>
+      <file>tests/system/RepeatingFormsMysqlTest.php</file>
+      <file>tests/system/RepeatingFormsPostgresqlTest.php</file>
+      <file>tests/system/RepeatingFormsSqliteTest.php</file>
+      <file>tests/system/RepeatingFormsSqlServerTest.php</file>
       <file>tests/system/SqlServerTest.php</file>
       <file>tests/system/SqlServerAutoRulesTest.php</file>
       <file>tests/system/VisitsMysqlTest.php</file>
       <file>tests/system/VisitsMysqlCodeTest.php</file>
       <file>tests/system/VisitsSqliteCodeTest.php</file>
+      <file>tests/system/Workflow1Test.php</file>
+      <file>tests/system/WorkflowBasicDemographyCsvTest.php</file>
+      <file>tests/system/WorkflowBasicDemographyMysqlTest.php</file>
+      <file>tests/system/WorkflowBasicDemographyPostgreSqlTest.php</file>
+      <file>tests/system/WorkflowBasicDemographySqliteTest.php</file>
+      <file>tests/system/WorkflowBasicDemographySqlServerTest.php</file>
+      <file>tests/system/WorkflowMultiDbTest.php</file>
     </testsuite>
 
   </testsuites>

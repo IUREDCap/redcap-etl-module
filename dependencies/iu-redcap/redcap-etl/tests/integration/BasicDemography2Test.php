@@ -32,7 +32,7 @@ class BasicDemography2Test extends TestCase
             $redCapEtl = new RedCapEtl(self::$logger, self::CONFIG_FILE);
             $this->assertNotNull($redCapEtl, 'redCapEtl not null');
 
-            $config = $redCapEtl->getConfiguration();
+            $config = $redCapEtl->getTaskConfig(0);
             $this->assertNotNull($config, 'redCapEtl configuration not null');
 
             self::$csvDir = str_ireplace('CSV:', '', $config->getDbConnection());
@@ -60,7 +60,7 @@ class BasicDemography2Test extends TestCase
         $expectedCsv = $parser2->parse();
 
         $header = $csv[0];
-        $this->assertEquals($header[1], 'record_id', 'Record id header test.');
+        $this->assertEquals($header[2], 'record_id', 'Record id header test.');
         $this->assertEquals(101, count($csv), 'Demography row count check.');
 
         $this->assertEquals($expectedCsv, $csv, 'CSV file check.');

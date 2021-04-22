@@ -49,7 +49,7 @@ class RepeatingEventsTest extends TestCase
         #-----------------------------
         # Get the CSV directory
         #-----------------------------
-        self::$config = self::$redCapEtl->getConfiguration();
+        self::$config = self::$redCapEtl->getTaskConfig(0);
         self::$csvDir = str_ireplace('CSV:', '', self::$config->getDbConnection());
         if (substr(self::$csvDir, -strlen(DIRECTORY_SEPARATOR)) !== DIRECTORY_SEPARATOR) {
             self::$csvDir .= DIRECTORY_SEPARATOR;
@@ -134,7 +134,7 @@ class RepeatingEventsTest extends TestCase
         #----------------------------------------------
         # Test the data project
         #----------------------------------------------
-        $dataProject = self::$redCapEtl->getDataProject();
+        $dataProject = self::$redCapEtl->getDataProject(0);
         $this->assertNotNull($dataProject, 'data project not null check');
 
         #-----------------------------------------
@@ -156,7 +156,7 @@ class RepeatingEventsTest extends TestCase
         $expectedCsv = $parser2->parse();
 
         $header = $csv[0];
-        $this->assertEquals($header[1], 'record_id', 'Record id header test.');
+        $this->assertEquals($header[2], 'record_id', 'Record id header test.');
         $this->assertEquals(101, count($csv), 'Row count check.');
 
         

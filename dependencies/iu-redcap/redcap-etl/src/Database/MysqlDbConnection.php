@@ -19,6 +19,10 @@ class MysqlDbConnection extends DbConnection
 {
     private $mysqli;
 
+    private $id;
+
+    private $databaseName;
+
     public function __construct($dbString, $ssl, $sslVerify, $caCertFile, $tablePrefix, $labelViewSuffix)
     {
         parent::__construct($dbString, $ssl, $sslVerify, $caCertFile, $tablePrefix, $labelViewSuffix);
@@ -30,11 +34,16 @@ class MysqlDbConnection extends DbConnection
         # Get the database connection values
         #--------------------------------------------------------------
         $dbValues = DbConnection::parseConnectionString($dbString);
+        $idValues = array();
         $port = null;
         if (count($dbValues) == 4) {
             list($host,$username,$password,$database) = $dbValues;
+            $this->databaseName = $database;
+            $idValues = array(DbConnectionFactory::DBTYPE_MYSQL, $host, $database);
         } elseif (count($dbValues) == 5) {
             list($host,$username,$password,$database,$port) = $dbValues;
+            $this->databaseName = $database;
+            $idValues = array(DbConnectionFactory::DBTYPE_MYSQL, $host, $database, $port);
             $port = intval($port);
         } else {
             $message = 'The database connection is not correctly formatted: ';
@@ -46,6 +55,8 @@ class MysqlDbConnection extends DbConnection
             $code = EtlException::DATABASE_ERROR;
             throw new EtlException($message, $code);
         }
+
+        $this->id = DbConnection::createConnectionString($idValues);
 
         // Get MySQL connection
         // NOTE: Could add error checking
@@ -116,6 +127,12 @@ class MysqlDbConnection extends DbConnection
     }
 
 
+    public function getId()
+    {
+        return $this->id;
+    }
+
+
     /**
      * Drops the specified table from the database.
      *
@@ -126,9 +143,9 @@ class MysqlDbConnection extends DbConnection
     {
         // Define query
         if ($ifExists) {
-            $query = "DROP TABLE IF EXISTS ". $this->escapeName($table->name);
+            $query = "DROP TABLE IF EXISTS ". $this->escapeName($table->getName());
         } else {
-            $query = "DROP TABLE ". $this->escapeName($table->name);
+            $query = "DROP TABLE ". $this->escapeName($table->getName());
         }
         
         // Execute query
@@ -155,9 +172,9 @@ class MysqlDbConnection extends DbConnection
     {
         // Start query
         if ($ifNotExists) {
-            $query = 'CREATE TABLE IF NOT EXISTS '.$this->escapeName($table->name).' (';
+            $query = 'CREATE TABLE IF NOT EXISTS '.$this->escapeName($table->getName()).' (';
         } else {
-            $query = 'CREATE TABLE '.$this->escapeName($table->name).' (';
+            $query = 'CREATE TABLE '.$this->escapeName($table->getName()).' (';
         }
 
         // foreach field
@@ -272,7 +289,7 @@ class MysqlDbConnection extends DbConnection
 
     public function dropLabelView($table, $ifExists = false)
     {
-        $view = ($table->name).($this->labelViewSuffix);
+        $view = ($table->getName()).($this->labelViewSuffix);
 
         // Define query
         if ($ifExists) {
@@ -294,6 +311,9 @@ class MysqlDbConnection extends DbConnection
 
     /**
      * Creates (or replaces) the lookup view for the specified table.
+     *
+     * @param Table $table the table for which the label view is being created.
+     * @param LookupTable $lookup the lookup table.
      */
     public function replaceLookupView($table, $lookup)
     {
@@ -302,12 +322,12 @@ class MysqlDbConnection extends DbConnection
         // foreach field
         foreach ($table->getAllFields() as $field) {
             // If the field does not use lookup table
-            if ($field->usesLookup === false) {
+            if ($field->usesLookup() === false) {
                 array_push($selects, $this->escapeName($field->dbName));
             } else {
                 // $field->usesLookup holds name of lookup field, if not false
                 // name of lookup field is root of field name for checkbox
-                $fname = $field->usesLookup;
+                $fname = $field->usesLookup();
 
                 // If the field uses the lookup table and is a checkbox field
                 if (preg_match('/'.RedCapEtl::CHECKBOX_SEPARATOR.'/', $field->dbName)) {
@@ -318,7 +338,7 @@ class MysqlDbConnection extends DbConnection
                     list($rootName, $cat) = explode(RedCapEtl::CHECKBOX_SEPARATOR, $field->dbName);
 
                     $label = $this->mysqli->real_escape_string(
-                        $lookup->getLabel($table->name, $fname, $cat)
+                        $lookup->getLabel($table->getName(), $fname, $cat)
                     );
                     $select = 'CASE '.$this->escapeName($field->dbName).' WHEN 1 THEN '
                         . "'".$label."'"
@@ -327,7 +347,7 @@ class MysqlDbConnection extends DbConnection
                 } // The field uses the lookup table and is not a checkbox field
                 else {
                     $select = 'CASE '.$this->escapeName($field->dbName);
-                    $map = $lookup->getValueLabelMap($table->name, $fname);
+                    $map = $lookup->getValueLabelMap($table->getName(), $fname);
                     foreach ($map as $value => $label) {
                         $select .= ' WHEN '."'".($this->mysqli->real_escape_string($value))."'"
                             .' THEN '."'".($this->mysqli->real_escape_string($label))."'";
@@ -338,10 +358,10 @@ class MysqlDbConnection extends DbConnection
             }
         }
 
-        $query = 'CREATE OR REPLACE VIEW '.$this->escapeName($table->name.$this->labelViewSuffix).' AS ';
+        $query = 'CREATE OR REPLACE VIEW '.$this->escapeName($table->getName().$this->labelViewSuffix).' AS ';
 
         $select = 'SELECT '. implode(', ', $selects);
-        $from = 'FROM '.$this->escapeName($table->name);
+        $from = 'FROM '.$this->escapeName($table->getName());
 
         $query .= $select.' '.$from;
 
@@ -384,8 +404,8 @@ class MysqlDbConnection extends DbConnection
         $rowValues = $this->getRowValues($row, $fields);
         $queryValues[] = '('.implode(",", $rowValues).')';
     
-        $query = $this->createInsertStatement($table->name, $fields, $queryValues);
-        #print "\nQUERY: $query\n";
+        $query = $this->createInsertStatement($table->getName(), $fields, $queryValues);
+        # print "\nQUERY: $query\n";
     
         $rc = $this->mysqli->query($query);
     
@@ -397,7 +417,7 @@ class MysqlDbConnection extends DbConnection
             # Note: do not print out the specific query here, because it will
             #     be logged, and could contain PHI
             $message = 'MySQL error while trying to insert a single row into table "'
-                .$table->name.'": '
+                .$table->getName().'": '
                 .' ['.$this->mysqli->errno.']: '.$this->mysqli->error;
             $code = EtlException::DATABASE_ERROR;
             throw new EtlException($message, $code);
@@ -432,7 +452,8 @@ class MysqlDbConnection extends DbConnection
                 $queryValues[] = '('.implode(",", $rowValues).')';
             }
     
-            $query = $this->createInsertStatement($table->name, $fields, $queryValues);
+            $query = $this->createInsertStatement($table->getName(), $fields, $queryValues);
+            # print "QUERY: {$query}\n";
     
             $rc = $this->mysqli->query($query);
     
@@ -446,7 +467,7 @@ class MysqlDbConnection extends DbConnection
                 # Note: do not print out the specific query here, because it will
                 #     be logged, and could contain PHI
                 $message = 'MySQL error while trying to insert values into table "'
-                    .$this->escapeName($table->name).'": '
+                    .$this->escapeName($table->getName()).'": '
                     .' ['.$this->mysqli->errno.']: '.$this->mysqli->error;
                 $code = EtlException::DATABASE_ERROR;
                 throw new EtlException($message, $code);
@@ -482,48 +503,50 @@ class MysqlDbConnection extends DbConnection
         $rowData = $row->getData();
         $rowValues = array();
         foreach ($fields as $field) {
-            $fieldName  = $field->name;
-            $fieldType  = $field->type;
-            $redcapType = $field->redcapType;
+            $fieldDbName = $field->dbName;
+            $fieldType   = $field->type;
+            $redcapType  = $field->redcapType;
 
             switch ($fieldType) {
                 case FieldType::INT:
-                    #print "REDCAP TYPE FOR {$fieldName}: {$redcapType}\n";
-                    if (empty($rowData[$fieldName]) && $rowData[$fieldName] !== 0) {
+                    #print "REDCAP TYPE FOR {$fieldDbName}: {$redcapType}\n";
+                    if (empty($rowData[$fieldDbName])
+                            && $rowData[$fieldDbName] !== 0
+                            && $rowData[$fieldDbName] !== '0') {
                         if (strcasecmp($redcapType, 'checkbox') === 0) {
                             $rowValues[] = 0;
                         } else {
                             $rowValues[] = 'null';
                         }
                     } else {
-                        $rowValues[] = (int) $rowData[$fieldName];
+                        $rowValues[] = (int) $rowData[$fieldDbName];
                     }
                     break;
                 case FieldType::CHECKBOX:
-                    if (empty($rowData[$fieldName])) {
+                    if (empty($rowData[$fieldDbName])) {
                         $rowValues[] = 0;
                     } else {
-                        $rowValues[] = (int) $rowData[$fieldName];
+                        $rowValues[] = (int) $rowData[$fieldDbName];
                     }
                     break;
                 case FieldType::FLOAT:
-                    if (empty($rowData[$fieldName]) && $rowData[$fieldName] !== 0.0) {
+                    if (empty($rowData[$fieldDbName]) && $rowData[$fieldDbName] !== 0.0) {
                         $rowValues[] = 'null';
                     } else {
-                        $rowValues[] = (float) $rowData[$fieldName];
+                        $rowValues[] = (float) $rowData[$fieldDbName];
                     }
                     break;
                 case FieldType::STRING:
                 case FieldType::CHAR:
                 case FieldType::VARCHAR:
-                    $rowValues[] = "'".$this->mysqli->real_escape_string($rowData[$fieldName])."'";
+                    $rowValues[] = "'".$this->mysqli->real_escape_string($rowData[$fieldDbName])."'";
                     break;
                 case FieldType::DATE:
                 case FieldType::DATETIME:
-                    if (empty($rowData[$fieldName])) {
+                    if (empty($rowData[$fieldDbName])) {
                         $rowValues[] = "null";
                     } else {
-                        $rowValues[] = "'".$this->mysqli->real_escape_string($rowData[$fieldName])."'";
+                        $rowValues[] = "'".$this->mysqli->real_escape_string($rowData[$fieldDbName])."'";
                     }
                     break;
                 default:
@@ -536,6 +559,24 @@ class MysqlDbConnection extends DbConnection
         return $rowValues;
     }
 
+    public function getTableColumnNames($tableName)
+    {
+        $columnNames = array();
+
+        $query = 'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?';
+        $statement = $this->mysqli->prepare($query);
+        $statement->bind_param('ss', $this->databaseName, $tableName);
+
+        $statement->execute();
+        $result = $statement->get_result();
+
+        $rows = $result->fetch_all(MYSQLI_NUM);
+        foreach ($rows as $row) {
+            $columnNames[] = $row[0];
+        }
+
+        return $columnNames;
+    }
 
     public function processQueryFile($queryFile)
     {
@@ -594,6 +635,27 @@ class MysqlDbConnection extends DbConnection
             }
         }
     }
+
+
+    /**
+     * Note: MySQL with return all values with type string.
+     */
+    public function getData($tableName, $orderByField = null)
+    {
+        $data = array();
+        $query = 'SELECT * FROM '.$this->escapeName($tableName);
+
+        if (!empty($orderByField)) {
+            $query .= ' ORDER BY '.$this->escapeName($orderByField);
+        }
+
+        $result = $this->mysqli->query($query);
+        if ($result) {
+            $data = $result->fetch_all(MYSQLI_ASSOC);
+        }
+        return $data;
+    }
+
 
     /**
      * Escapes a name for use as a table or column name in a query.

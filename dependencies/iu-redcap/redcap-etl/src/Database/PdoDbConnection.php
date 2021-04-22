@@ -38,9 +38,9 @@ abstract class PdoDbConnection extends DbConnection
     {
         // Define query
         if ($ifExists) {
-            $query = "DROP TABLE IF EXISTS ". $this->escapeName($table->name);
+            $query = "DROP TABLE IF EXISTS ". $this->escapeName($table->getName());
         } else {
-            $query = "DROP TABLE ". $this->escapeName($table->name);
+            $query = "DROP TABLE ". $this->escapeName($table->getName());
         }
         
         // Execute query
@@ -65,10 +65,10 @@ abstract class PdoDbConnection extends DbConnection
     {
         // Start query
         if ($ifNotExists) {
-            $query = $this->getCreateTableIfNotExistsQueryPrefix($table->name);
-            #$query = 'CREATE TABLE IF NOT EXISTS '.$this->escapeName($table->name).' (';
+            $query = $this->getCreateTableIfNotExistsQueryPrefix($table->getName());
+            #$query = 'CREATE TABLE IF NOT EXISTS '.$this->escapeName($table->getName()).' (';
         } else {
-            $query = 'CREATE TABLE '.$this->escapeName($table->name).' (';
+            $query = 'CREATE TABLE '.$this->escapeName($table->getName()).' (';
         }
 
         // foreach field
@@ -183,7 +183,7 @@ abstract class PdoDbConnection extends DbConnection
 
     public function dropLabelView($table, $ifExists = false)
     {
-        $view = ($table->name).($this->labelViewSuffix);
+        $view = ($table->getName()).($this->labelViewSuffix);
 
         // Define query
         if ($ifExists) {
@@ -213,12 +213,12 @@ abstract class PdoDbConnection extends DbConnection
         // foreach field
         foreach ($table->getAllFields() as $field) {
             // If the field does not use lookup table
-            if ($field->usesLookup === false) {
+            if ($field->usesLookup() === false) {
                 array_push($selects, $this->escapeName($field->dbName));
             } else {
                 // $field->usesLookup holds name of lookup field, if not false
                 // name of lookup field is root of field name for checkbox
-                $fname = $field->usesLookup;
+                $fname = $field->usesLookup();
 
                 // If the field uses the lookup table and is a checkbox field
                 if (preg_match('/'.RedCapEtl::CHECKBOX_SEPARATOR.'/', $field->dbName)) {
@@ -229,7 +229,7 @@ abstract class PdoDbConnection extends DbConnection
                     list($rootName, $choiceValue) = explode(RedCapEtl::CHECKBOX_SEPARATOR, $field->dbName);
 
                     $label = $this->db->quote(
-                        $lookup->getLabel($table->name, $fname, $choiceValue)
+                        $lookup->getLabel($table->getName(), $fname, $choiceValue)
                     );
                     $select = 'CASE '.$this->escapeName($field->dbName).' WHEN 1 THEN '
                         . $label
@@ -238,7 +238,7 @@ abstract class PdoDbConnection extends DbConnection
                 } // The field uses the lookup table and is not a checkbox field
                 else {
                     $select = 'CASE '.$this->escapeName($field->dbName);
-                    $map = $lookup->getValueLabelMap($table->name, $fname);
+                    $map = $lookup->getValueLabelMap($table->getName(), $fname);
                     foreach ($map as $value => $label) {
                         $select .= ' WHEN '.($this->db->quote($value))
                             .' THEN '.($this->db->quote($label));
@@ -252,7 +252,7 @@ abstract class PdoDbConnection extends DbConnection
         #------------------------------------------------
         # Drop the view if it exists
         #------------------------------------------------
-        $query = 'DROP VIEW IF EXISTS '.$this->escapeName($table->name.$this->labelViewSuffix);
+        $query = 'DROP VIEW IF EXISTS '.$this->escapeName($table->getName().$this->labelViewSuffix);
 
         # Execute query
         try {
@@ -266,10 +266,10 @@ abstract class PdoDbConnection extends DbConnection
         #------------------------------------------------------------
         # Create the view
         #------------------------------------------------------------
-        $query = 'CREATE VIEW '.$this->escapeName($table->name.$this->labelViewSuffix).' AS ';
+        $query = 'CREATE VIEW '.$this->escapeName($table->getName().$this->labelViewSuffix).' AS ';
 
         $select = 'SELECT '. implode(', ', $selects);
-        $from = 'FROM '.$this->escapeName($table->name);
+        $from = 'FROM '.$this->escapeName($table->getName());
 
         $query .= $select.' '.$from;
 
@@ -308,7 +308,7 @@ abstract class PdoDbConnection extends DbConnection
         $rowValues = $this->getRowValues($row, $fields);
         $queryValues[] = '('.implode(",", $rowValues).')';
     
-        $query = $this->createInsertStatement($table->name, $fields, $queryValues);
+        $query = $this->createInsertStatement($table->getName(), $fields, $queryValues);
         #print "\nQUERY: $query\n";
     
         try {
@@ -316,7 +316,7 @@ abstract class PdoDbConnection extends DbConnection
             $insertId = $this->db->lastInsertId();
         } catch (\Exception $exception) {
             $message = 'Database error while trying to insert a single row into table "'
-                .$table->name.'": '.$exception->getMessage();
+                .$table->getName().'": '.$exception->getMessage();
             $code = EtlException::DATABASE_ERROR;
             throw new EtlException($message, $code);
         }
@@ -348,14 +348,14 @@ abstract class PdoDbConnection extends DbConnection
                 $queryValues[] = '('.implode(",", $rowValues).')';
             }
     
-            $query = $this->createInsertStatement($table->name, $fields, $queryValues);
+            $query = $this->createInsertStatement($table->getName(), $fields, $queryValues);
             #print "\n\nQUERY:\n----------------------------\n$query\n\n";
     
             try {
                 $rc = $this->db->exec($query);
             } catch (\Exception $exception) {
                 $message = 'Database error while trying to insert values into table "'
-                    .$this->escapeName($table->name).'": '.$exception->getMessage();
+                    .$this->escapeName($table->getName()).'": '.$exception->getMessage();
                 $code = EtlException::DATABASE_ERROR;
                 throw new EtlException($message, $code);
             }
@@ -394,48 +394,50 @@ abstract class PdoDbConnection extends DbConnection
         $rowData = $row->getData();
         $rowValues = array();
         foreach ($fields as $field) {
-            $fieldName  = $field->name;
-            $fieldType  = $field->type;
-            $redcapType = $field->redcapType;
+            $fieldDbName = $field->dbName;
+            $fieldType   = $field->type;
+            $redcapType  = $field->redcapType;
 
             switch ($fieldType) {
                 case FieldType::INT:
-                    #print "REDCAP TYPE FOR {$fieldName}: {$redcapType}\n";
-                    if (empty($rowData[$fieldName]) && $rowData[$fieldName] !== 0) {
+                    #print "REDCAP TYPE FOR {$fieldDbName}: {$redcapType}\n";
+                    if (empty($rowData[$fieldDbName])
+                        && $rowData[$fieldDbName] !== 0
+                        && $rowData[$fieldDbName] !== '0') {
                         if (strcasecmp($redcapType, 'checkbox') === 0) {
                             $rowValues[] = 0;
                         } else {
                             $rowValues[] = 'null';
                         }
                     } else {
-                        $rowValues[] = (int) $rowData[$fieldName];
+                        $rowValues[] = (int) $rowData[$fieldDbName];
                     }
                     break;
                 case FieldType::CHECKBOX:
-                    if (empty($rowData[$fieldName])) {
+                    if (empty($rowData[$fieldDbName])) {
                         $rowValues[] = 0;
                     } else {
-                        $rowValues[] = (int) $rowData[$fieldName];
+                        $rowValues[] = (int) $rowData[$fieldDbName];
                     }
                     break;
                 case FieldType::FLOAT:
-                    if (empty($rowData[$fieldName]) && $rowData[$fieldName] !== 0.0) {
+                    if (empty($rowData[$fieldDbName]) && $rowData[$fieldDbName] !== 0.0) {
                         $rowValues[] = 'null';
                     } else {
-                        $rowValues[] = (float) $rowData[$fieldName];
+                        $rowValues[] = (float) $rowData[$fieldDbName];
                     }
                     break;
                 case FieldType::STRING:
                 case FieldType::CHAR:
                 case FieldType::VARCHAR:
-                    $rowValues[] = $this->db->quote($rowData[$fieldName]);
+                    $rowValues[] = $this->db->quote($rowData[$fieldDbName]);
                     break;
                 case FieldType::DATE:
                 case FieldType::DATETIME:
-                    if (empty($rowData[$fieldName])) {
+                    if (empty($rowData[$fieldDbName])) {
                         $rowValues[] = "null";
                     } else {
-                        $rowValues[] = $this->db->quote($rowData[$fieldName]);
+                        $rowValues[] = $this->db->quote($rowData[$fieldDbName]);
                     }
                     break;
                 default:
@@ -469,7 +471,6 @@ abstract class PdoDbConnection extends DbConnection
         }
     }
     
-
     public function processQueries($queries)
     {
         try {
@@ -482,6 +483,22 @@ abstract class PdoDbConnection extends DbConnection
             $code = EtlException::DATABASE_ERROR;
             throw new EtlException($error, $code);
         }
+    }
+
+    public function getData($tableName, $orderByField = null)
+    {
+        $data = array();
+        $query = 'SELECT * FROM '.$this->escapeName($tableName);
+
+        if (!empty($orderByField)) {
+            $query .= ' ORDER BY '.$this->escapeName($orderByField);
+        }
+
+        $result = $this->db->query($query);
+        if ($result) {
+            $data = $result->fetchAll(\PDO::FETCH_ASSOC);
+        }
+        return $data;
     }
 
     /**

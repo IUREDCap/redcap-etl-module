@@ -26,7 +26,9 @@ class SchemaGenerationTest extends TestCase
     {
         # create an EtlRecCapProject object from which a schema will be generated
         $configFile = __DIR__.'/../config/basic-demography.ini';
-        $configuration = new Configuration(self::$logger, $configFile);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, $configFile);
+
         $apiUrl = $configuration->getRedCapApiUrl();
         $apiToken = $configuration->getDataSourceApiToken();
         $sslVerify = false;
@@ -58,19 +60,9 @@ class SchemaGenerationTest extends TestCase
         $tables = $schema->getTables();
         $actualTableNames = array();
         foreach ($tables as $table) {
-            array_push($actualTableNames, $table->getName());
+            $actualTableNames[] = $table->getName();
         }
         $this->assertEquals($expectedTableNames, $actualTableNames, 'Get tables test');
-
-        # Put the returned schema into a string format for comparison purposes
-        $output = print_r($schema, true);
-
-        # Retrieve what the output text string should resemble
-        $file = 'tests/data/schema_generator_output1.txt';
-        $expected = file_get_contents($file);
- 
-        # Test that the generated output matches what is expected
-        $this->assertEquals($expected, $output, 'SchemaGenerator, generateSchema output');
     }
    
     /**
@@ -80,7 +72,9 @@ class SchemaGenerationTest extends TestCase
     {
         #create an EtlRecCapProject object from which a schema will be generated
         $configFile = __DIR__.'/../config/repeating-events.ini';
-        $configuration = new Configuration(self::$logger, $configFile);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, $configFile);
+
         $apiUrl = $configuration->getRedCapApiUrl();
         $apiToken = $configuration->getDataSourceApiToken();
         $sslVerify = false;
@@ -101,17 +95,60 @@ class SchemaGenerationTest extends TestCase
 
         #Generate the schema
         $rulesText = $configuration->getTransformationRules();
-        $result = $schemaGenerator->generateSchema($rulesText);
+        list($schema, $parseResult) = $schemaGenerator->generateSchema($rulesText);
 
-        #Put the returned schema into a string format for comparison purposes
-        $output = print_r($result[0], true);
+        $this->assertNotNull($schema);
 
-        #Retrieve what the output text string should resemble
-        $file='tests/data/schema_generator_output4.txt';
-        $expected = file_get_contents($file);
+        #--------------------------------------------
+        # Test table names
+        #--------------------------------------------
+        $tables = $schema->getTables();
+        $tableNames = array();
+        foreach ($tables as $table) {
+            $tableName = $table->getName();
+            $tableNames[] = $tableName;
+        }
 
-        #test that the generated output matches what is expected
-        $this->assertEquals($expected, $output, 'SchemaGenerator, generateSchema longitudinal output');
+        $expectedTableNames = [
+            're_enrollment', 're_baseline', 're_home_weight_visits', 're_home_cardiovascular_visits',
+            're_visits', 're_baseline_and_visits', 're_baseline_and_home_visits',
+            're_visits_and_home_visits', 're_all_visits'
+        ];
+
+        $this->assertEquals($expectedTableNames, $tableNames, 'Table names test');
+
+        #------------------------------------------
+        # Test enrollment field names
+        #------------------------------------------
+        $table = $schema->getTable('re_enrollment');
+        $fields = $table->getFields();
+        $enrollmentFieldNames = array_column($fields, 'name');
+
+        $expectedEnrollmentFieldNames = [
+            'redcap_data_source', 'record_id',    # fields added by REDCap-ETL
+            'registration_date', 'first_name', 'last_name', 'birthdate', 'registration_age', 'gender',
+            'race___0', 'race___1', 'race___2', 'race___3', 'race___4', 'race___5'
+        ];
+
+        $this->assertEquals($expectedEnrollmentFieldNames, $enrollmentFieldNames, 'Enrollment field names test');
+
+ 
+        #-----------------------------------------
+        # Test baseline field names
+        #-----------------------------------------
+        $table = $schema->getTable('re_baseline');
+        $fields = $table->getFields();
+        $baselineFieldNames = array_column($fields, 'name');
+
+        $expectedBaselineFieldNames = [
+            'redcap_data_source', 'record_id', 'redcap_event_name',    # fields added by REDCap-ETL
+            'weight_time', 'weight_kg', 'height_m',
+            'cardiovascular_date', 'hdl_mg_dl', 'ldl_mg_dl', 'triglycerides_mg_dl',
+            'diastolic1', 'diastolic2', 'diastolic3',
+            'systolic1', 'systolic2', 'systolic3'
+        ];
+
+        $this->assertEquals($expectedBaselineFieldNames, $baselineFieldNames, 'Enrollment field names test');
     }
 
     /**
@@ -121,7 +158,9 @@ class SchemaGenerationTest extends TestCase
     {
         #create an EtlRecCapProject object from which a schema will be generated
         $configFile = __DIR__.'/../config/visits.ini';
-        $configuration = new Configuration(self::$logger, $configFile);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, $configFile);
+
         $apiUrl = $configuration->getRedCapApiUrl();
         $apiToken = $configuration->getDataSourceApiToken();
         $sslVerify = false;
@@ -164,7 +203,7 @@ class SchemaGenerationTest extends TestCase
         $labsTable = $schema->getTable('Labs');
         $this->assertTrue($labsTable instanceof Table, 'Labs table class check');
 
-        $expectedLabsFieldNames = ['record_id', 'redcap_suffix', 'lab'];
+        $expectedLabsFieldNames = ['redcap_data_source', 'record_id', 'redcap_suffix', 'lab'];
         $labsFields = $labsTable->getFields();
         $actualLabsFieldNames = array_column($labsFields, 'name');
         $this->assertEquals($expectedLabsFieldNames, $actualLabsFieldNames, 'Labs field names check');
@@ -178,7 +217,9 @@ class SchemaGenerationTest extends TestCase
     {
         #create an EtlRecCapProject object from which a schema will be generated
         $configFile = __DIR__.'/../config/basic-demography-bad-rule.ini';
-        $configuration = new Configuration(self::$logger, $configFile);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, $configFile);
+
         $apiUrl = $configuration->getRedCapApiUrl();
         $apiToken = $configuration->getDataSourceApiToken();
         $sslVerify = false;
@@ -205,17 +246,6 @@ class SchemaGenerationTest extends TestCase
         #Generate the schema
         $rulesText = $configuration->getTransformationRules();
         $result = $schemaGenerator->generateSchema($rulesText);
-
-        #Put the returned schema into a string format for comparison purposes
-        $output = print_r($result[0], true);
-
-        #Retrieve what the output text string should resemble (no comments field, since that
-        #field has the misspelled 'FIELD' reserved word)
-        $file='tests/data/schema_generator_output2.txt';
-        $expected = file_get_contents($file);
-
-        #test that the generated output matches what is expected
-        $this->assertEquals($expected, $output, 'SchemaGenerator, generateSchema bad rule output');
 
         #test that the error message was written to the log file
         $logText = file_get_contents($logFile, false, null, 0, 500);
@@ -240,7 +270,9 @@ class SchemaGenerationTest extends TestCase
     {
         #create an EtlRecCapProject object from which a schema will be generated
         $configFile = __DIR__.'/../config/basic-demography-bad-field-name.ini';
-        $configuration = new Configuration(self::$logger, $configFile);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, $configFile);
+
         $apiUrl = $configuration->getRedCapApiUrl();
         $apiToken = $configuration->getDataSourceApiToken();
         $sslVerify = false;
@@ -268,17 +300,6 @@ class SchemaGenerationTest extends TestCase
         $rulesText = $configuration->getTransformationRules();
         $result = $schemaGenerator->generateSchema($rulesText);
 
-        #Put the returned schema into a string format for comparison purposes
-        $output = print_r($result[0], true);
-
-        #Retrieve what the output text string should resemble (no bmi field, since that
-        #field name was misspelled as 'bbbmi')
-        $file='tests/data/schema_generator_output3.txt';
-        $expected = file_get_contents($file);
-
-        #test that the generated output matches what is expected
-        $this->assertEquals($expected, $output, 'SchemaGenerator, generateSchema bad field name output');
-
         #test that the error message was written to the log file
         $logText = file_get_contents($logFile, false, null, 0, 500);
         $fieldNotFoundMsg = "Field not found in REDCap: 'bbbmi'";
@@ -296,7 +317,9 @@ class SchemaGenerationTest extends TestCase
     {
         #create an EtlRecCapProject object from which a schema will be generated
         $configFile = __DIR__.'/../config/visits-missing-suffix.ini';
-        $configuration = new Configuration(self::$logger, $configFile);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, $configFile);
+
         $apiUrl = $configuration->getRedCapApiUrl();
         $apiToken = $configuration->getDataSourceApiToken();
         $sslVerify = false;
@@ -341,7 +364,9 @@ class SchemaGenerationTest extends TestCase
     {
         #create an EtlRecCapProject object from which a schema will be generated
         $configFile = __DIR__.'/../config/visits-empty-rules.ini';
-        $configuration = new Configuration(self::$logger, $configFile);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, $configFile);
+
         $apiUrl = $configuration->getRedCapApiUrl();
         $apiToken = $configuration->getDataSourceApiToken();
         $sslVerify = false;
@@ -388,7 +413,9 @@ class SchemaGenerationTest extends TestCase
     {
         #create an EtlRecCapProject object from which a schema will be generated
         $configFile = __DIR__.'/../config/basic-demography-duplicate-primary-key-name.ini';
-        $configuration = new Configuration(self::$logger, $configFile);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, $configFile);
+
         $apiUrl = $configuration->getRedCapApiUrl();
         $apiToken = $configuration->getDataSourceApiToken();
         $sslVerify = false;

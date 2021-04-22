@@ -16,10 +16,9 @@ use IU\REDCapETL\Schema\FieldTypeSpecifier;
 
 /**
  * Class used to store ETL configuration information from
- * the configuration file and the optional configuration
- * project if defined.
+ * a configuration file or proprties arrary.
  */
-class Configuration
+class TaskConfig
 {
     # Transform rules source values
     const TRANSFORM_RULES_TEXT    = '1';
@@ -63,7 +62,6 @@ class Configuration
     const DEFAULT_IGNORE_EMPTY_INCOMPLETE_FORMS = false;
 
     const DEFAULT_LABEL_VIEW_SUFFIX = '_label_view';
-    const DEFAULT_LOOKUP_TABLE_NAME = 'Lookup';
     
     const DEFAULT_PRINT_LOGGING = true;
     
@@ -128,7 +126,11 @@ class Configuration
     
     private $projectId;
     private $printLogging;
+
     private $redcapApiUrl;
+
+    private $redcapMetadataTable;
+    private $redcapProjectInfoTable;
 
     private $sslVerify;
     
@@ -152,8 +154,54 @@ class Configuration
      *     in property values */
     private $baseDir;
 
+    /** @var string the name of the task (only tasks within workflows will have names). */
+    private $taskName;
+
     /**
-     * Creates a Configuration object from either an array or properties
+     */
+    public function __construct()
+    {
+        $this->logger = null;
+        $this->app    = '';
+        $this->propertiesFile = null;
+
+        $this->taskName = '';
+
+        #---------------------------------------------------------
+        # Set default config properties values
+        #---------------------------------------------------------
+        $this->redcapApiUrl       = null;
+        $this->dataSourceApiToken = null;
+
+        $this->dbSsl           = self::DEFAULT_DB_SSL;
+
+        $this->printLogging    = self::DEFAULT_PRINT_LOGGING;
+        $this->logFile         = null;
+
+        $this->dbLogging       = self::DEFAULT_DB_LOGGING;
+        $this->dbLogTable      = self::DEFAULT_DB_LOG_TABLE;
+        $this->dbEventLogTable = self::DEFAULT_DB_EVENT_LOG_TABLE;
+
+        $this->emailErrors      = self::DEFAULT_EMAIL_ERRORS;
+        $this->emailSummary     = self::DEFAULT_EMAIL_SUMMARY;
+        $this->emailFromAddress = null;
+        $this->emailToList      = null;
+        $this->emailSubject     = self::DEFAULT_EMAIL_SUBJECT;
+
+        $this->cronJob          = ''; # By default, make this blank
+
+        $this->redcapMetadataTable    = MetadataTable::DEFAULT_NAME;
+        $this->redcapProjectInfoTable = ProjectInfoTable::DEFAULT_NAME;
+
+        $this->sslVerify        = true;
+
+        $this->extractedRecordCountCheck = true;
+
+        $this->transformRulesSource = null;
+    }
+
+    /**
+     * Sets a TaskConfig object from either an array of properties
      * or a configuration file, * and updates the logger based on the
      * configuration information found.
      *
@@ -165,16 +213,22 @@ class Configuration
      *     If a properties file name string is used, then it is assumed
      *     to be a JSON file if the file name ends with .json, and a
      *     .ini file otherwise.
+     *
+     * @param string $baseDir the base directory to use for references to files
+     *     in the properties. For example, if the base directory was specified as
+     *     "/home/etluser/" and the post_sql_processing_file property was specified
+     *     as "post.sql", then the file "/home/etluser/post.sql" would be used
+     *     for the post-processing SQL commands.
      */
-    public function __construct(& $logger, $properties)
+    public function set(& $logger, $properties, $taskName = '', $baseDir = null)
     {
         $this->logger = $logger;
         $this->app = $this->logger->getApp();
-        $this->propertiesFile = null;
+        $this->taskName = $taskName;
 
-        #------------------------------------------------------------------------
-        # Process the properties, which could be specified as an array of a file
-        #------------------------------------------------------------------------
+        #-----------------------------------------------------------------------------------------
+        # Process the properties, which could be specified as an array or a file name (string)
+        #-----------------------------------------------------------------------------------------
         if (empty($properties)) {
             # No properties specified
             $message = 'No properties or properties file was specified.';
@@ -193,7 +247,6 @@ class Configuration
         # Set the base directory, wich is used for properties
         # that contain relative paths
         #-----------------------------------------------------
-        $baseDir = null; // eventually, this may be a parameter or property
         if (isset($baseDir)) {
             $this->baseDir = $baseDir;
         } elseif (!empty($this->propertiesFile)) {
@@ -202,10 +255,10 @@ class Configuration
             $this->baseDir = realpath(__DIR__);
         }
 
+
         #-------------------------------------------
         # Print logging
         #-------------------------------------------
-        $this->printLogging = self::DEFAULT_PRINT_LOGGING;
         if (array_key_exists(ConfigProperties::PRINT_LOGGING, $this->properties)) {
             $printLogging = $this->properties[ConfigProperties::PRINT_LOGGING];
             if ($printLogging === true || strcasecmp($printLogging, 'true') === 0 || $printLogging === '1') {
@@ -220,7 +273,6 @@ class Configuration
         # Get the log file and set it in the logger, so that messages
         # will start to log to the file
         #-----------------------------------------------------------------------------
-        $this->logFile = null;
         if (array_key_exists(ConfigProperties::LOG_FILE, $this->properties)) {
             $this->logFile = $this->properties[ConfigProperties::LOG_FILE];
         }
@@ -233,7 +285,6 @@ class Configuration
         #-------------------------------------------------------------------
         # Database logging
         #-------------------------------------------------------------------
-        $this->dbLogging = self::DEFAULT_DB_LOGGING;
         if (array_key_exists(ConfigProperties::DB_LOGGING, $this->properties)) {
             $dbLogging = $this->properties[ConfigProperties::DB_LOGGING];
             if ($dbLogging === true || strcasecmp($dbLogging, 'true') === 0 || $dbLogging === '1') {
@@ -243,7 +294,6 @@ class Configuration
             }
         }
         
-        $this->dbLogTable = self::DEFAULT_DB_LOG_TABLE;
         if (array_key_exists(ConfigProperties::DB_LOG_TABLE, $this->properties)) {
             $dbLogTable = trim($this->properties[ConfigProperties::DB_LOG_TABLE]);
             if (!empty($dbLogTable)) {
@@ -251,7 +301,6 @@ class Configuration
             }
         }
 
-        $this->dbEventLogTable = self::DEFAULT_DB_EVENT_LOG_TABLE;
         if (array_key_exists(ConfigProperties::DB_EVENT_LOG_TABLE, $this->properties)) {
             $dbEventLogTable = trim($this->properties[ConfigProperties::DB_EVENT_LOG_TABLE]);
             if (!empty($dbEventLogTable)) {
@@ -262,7 +311,6 @@ class Configuration
         #-----------------------------------------------------------
         # Email logging
         #-----------------------------------------------------------
-        $this->emailErrors = self::DEFAULT_EMAIL_ERRORS;
         if (array_key_exists(ConfigProperties::EMAIL_ERRORS, $this->properties)) {
             $emailErrors = $this->properties[ConfigProperties::EMAIL_ERRORS];
             if ($emailErrors === true || strcasecmp($emailErrors, 'true') === 0 || $emailErrors === '1') {
@@ -274,7 +322,6 @@ class Configuration
         $this->logger->setEmailErrors($this->emailErrors);
 
         # E-mail summary notification
-        $this->emailSummary = self::DEFAULT_EMAIL_SUMMARY;
         if (array_key_exists(ConfigProperties::EMAIL_SUMMARY, $this->properties)) {
             $send = $this->properties[ConfigProperties::EMAIL_SUMMARY];
             if ($send === true || strcasecmp($send, 'true') === 0 || $send === '1') {
@@ -284,19 +331,16 @@ class Configuration
         $this->logger->setEmailSummary($this->emailSummary);
         
         # E-mail from address
-        $this->emailFromAddress = null;
         if (array_key_exists(ConfigProperties::EMAIL_FROM_ADDRESS, $this->properties)) {
             $this->emailFromAddress = trim($this->properties[ConfigProperties::EMAIL_FROM_ADDRESS]);
         }
 
         # E-mail to list
-        $this->emailToList = null;
         if (array_key_exists(ConfigProperties::EMAIL_TO_LIST, $this->properties)) {
             $this->emailToList = trim($this->properties[ConfigProperties::EMAIL_TO_LIST]);
         }
         
         # E-mail subject
-        $this->emailSubject = self::DEFAULT_EMAIL_SUBJECT;
         if (array_key_exists(ConfigProperties::EMAIL_SUBJECT, $this->properties)) {
             $this->emailSubject = $this->properties[ConfigProperties::EMAIL_SUBJECT];
         }
@@ -322,14 +366,39 @@ class Configuration
             );
         }
 
+        #-------------------------------------------------------------------------
+        # Check for illegal workflow name property withing a task configuration
+        #-------------------------------------------------------------------------
+        if (array_key_exists(ConfigProperties::WORKFLOW_NAME, $this->properties)) {
+            $message = 'The "'.ConfigProperties::WORKFLOW_NAME.'" property cannot be used in a task configuration.';
+            $code    = EtlException::INPUT_ERROR;
+            throw new EtlException($message, $code);
+        }
+
         #------------------------------------------------
         # Get the REDCap API URL
         #------------------------------------------------
         if (array_key_exists(ConfigProperties::REDCAP_API_URL, $this->properties)) {
             $this->redcapApiUrl = $this->properties[ConfigProperties::REDCAP_API_URL];
-        } else {
-            $message = 'No "'.ConfigProperties::REDCAP_API_URL.'" property was defined.';
-            throw new EtlException($message, EtlException::INPUT_ERROR);
+        }
+        
+        #---------------------------------------------------
+        # Get the REDCap Metadata and Project Info tables
+        #---------------------------------------------------
+        if (array_key_exists(ConfigProperties::REDCAP_METADATA_TABLE, $this->properties)) {
+            if (empty($this->properties[ConfigProperties::REDCAP_METADATA_TABLE])) {
+                $this->redcapMetadataTable = MetadataTable::DEFAULT_NAME;
+            } else {
+                $this->redcapMetadataTable = $this->properties[ConfigProperties::REDCAP_METADATA_TABLE];
+            }
+        }
+
+        if (array_key_exists(ConfigProperties::REDCAP_PROJECT_INFO_TABLE, $this->properties)) {
+            if (empty($this->properties[ConfigProperties::REDCAP_PROJECT_INFO_TABLE])) {
+                $this->redcapProjectInfoTable = ProjectInfoTable::DEFAULT_NAME;
+            } else {
+                $this->redcapProjectInfoTable = $this->properties[ConfigProperties::REDCAP_PROJECT_INFO_TABLE];
+            }
         }
         
         #--------------------------------------------------------
@@ -347,7 +416,6 @@ class Configuration
             $this->configName = $this->properties[ConfigProperties::CONFIG_NAME];
         }
         
-        $this->cronJob = ''; # By default, make this blank
         if (array_key_exists(ConfigProperties::CRON_JOB, $this->properties)) {
             $cronJob = $this->properties[ConfigProperties::CRON_JOB];
             
@@ -359,6 +427,14 @@ class Configuration
             }
         }
         
+        #--------------------------------------------------
+        # Check for invalid configuration file property
+        #--------------------------------------------------
+        if (array_key_exists(ConfigProperties::TASK_CONFIG_FILE, $this->properties)) {
+            $message = 'Invalid property '.ConfigProperties::TASK_CONFIG_FILE
+                .' specified in configuration; this property can only be used in workflows.';
+            throw new EtlException($message, EtlException::INPUT_ERROR);
+        }
         
         #---------------------------------------------------------------
         # Get SSL verify flag
@@ -379,8 +455,6 @@ class Configuration
                     .' property; a true or false value should be specified.';
                 throw new EtlException($message, EtlException::INPUT_ERROR);
             }
-        } else {
-            $this->sslVerify = true;
         }
 
 
@@ -406,8 +480,6 @@ class Configuration
                     .' property; a true or false value should be specified.';
                 throw new EtlException($message, EtlException::INPUT_ERROR);
             }
-        } else {
-            $this->extractedRecordCountCheck = true;
         }
 
         #---------------------------------------------------------
@@ -424,7 +496,7 @@ class Configuration
             if (isset($caCertFile)) {
                 $caCertFile = trim($caCertFile);
                 if ($caCertFile !== '') {
-                    $this->caCertFile = $caCertFile;
+                    $this->caCertFile = $this->processFile($caCertFile);
                 }
             }
         }
@@ -447,7 +519,7 @@ class Configuration
         if (array_key_exists(ConfigProperties::PRE_PROCESSING_SQL_FILE, $this->properties)) {
             $file = $this->properties[ConfigProperties::PRE_PROCESSING_SQL_FILE];
             if (!empty($file)) {
-                $this->preProcessingSqlFile = $this->processFile($file, $fileShouldExist = false);
+                $this->preProcessingSqlFile = $this->processFile($file);
             }
         }
 
@@ -469,7 +541,7 @@ class Configuration
         if (array_key_exists(ConfigProperties::POST_PROCESSING_SQL_FILE, $this->properties)) {
             $file = $this->properties[ConfigProperties::POST_PROCESSING_SQL_FILE];
             if (!empty($file)) {
-                $this->postProcessingSqlFile = $this->processFile($file, $fileShouldExist = false);
+                $this->postProcessingSqlFile = $this->processFile($file);
             }
         }
 
@@ -484,17 +556,17 @@ class Configuration
         $this->generatedRecordIdType = FieldTypeSpecifier::create(self::DEFAULT_GENERATED_RECORD_ID_TYPE);
         $this->generatedSuffixType   = FieldTypeSpecifier::create(self::DEFAULT_GENERATED_SUFFIX_TYPE);
 
-        if (array_key_exists(ConfigProperties::GENERATED_INSTANCE_TYPE, $this->properties)) {
-            $this->generatedInstanceType = FieldTypeSpecifier::create(
-                $this->properties[ConfigProperties::GENERATED_INSTANCE_TYPE]
-            );
-        }
+        #if (array_key_exists(ConfigProperties::GENERATED_INSTANCE_TYPE, $this->properties)) {
+        #    $this->generatedInstanceType = FieldTypeSpecifier::create(
+        #        $this->properties[ConfigProperties::GENERATED_INSTANCE_TYPE]
+        #    );
+        #}
 
-        if (array_key_exists(ConfigProperties::GENERATED_KEY_TYPE, $this->properties)) {
-            $this->generatedKeyType = FieldTypeSpecifier::create(
-                $this->properties[ConfigProperties::GENERATED_KEY_TYPE]
-            );
-        }
+        #if (array_key_exists(ConfigProperties::GENERATED_KEY_TYPE, $this->properties)) {
+        #    $this->generatedKeyType = FieldTypeSpecifier::create(
+        #        $this->properties[ConfigProperties::GENERATED_KEY_TYPE]
+        #    );
+        #}
 
         if (array_key_exists(ConfigProperties::GENERATED_LABEL_TYPE, $this->properties)) {
             $this->generatedLabelType = FieldTypeSpecifier::create(
@@ -529,9 +601,11 @@ class Configuration
             $this->createLookupTable = $this->properties[ConfigProperties::CREATE_LOOKUP_TABLE];
         }
 
-        $this->lookupTableName = self::DEFAULT_LOOKUP_TABLE_NAME;
+        $this->lookupTableName = LookupTable::DEFAULT_NAME;
         if (array_key_exists(ConfigProperties::LOOKUP_TABLE_NAME, $this->properties)) {
-            $this->lookupTableName = $this->properties[ConfigProperties::LOOKUP_TABLE_NAME];
+            if (!empty($this->properties[ConfigProperties::LOOKUP_TABLE_NAME])) {
+                $this->lookupTableName = $this->properties[ConfigProperties::LOOKUP_TABLE_NAME];
+            }
         }
 
         #-------------------------------------------------------------
@@ -561,9 +635,6 @@ class Configuration
         $this->dataSourceApiToken = '';
         if (array_key_exists(ConfigProperties::DATA_SOURCE_API_TOKEN, $this->properties)) {
             $this->dataSourceApiToken = $this->properties[ConfigProperties::DATA_SOURCE_API_TOKEN];
-        } else {
-            $message = 'No data source API token was found.';
-            throw new EtlException($message, EtlException::INPUT_ERROR);
         }
 
         #----------------------------------------------------------
@@ -585,7 +656,7 @@ class Configuration
 
         #-----------------------------------------------------------------------
         # Determine the batch size to use (how many records to process at once)
-        # Batch size is expected to be a positive integer. The Configuration
+        # Batch size is expected to be a positive integer. The TaskConfig
         # project should enforce that, but not the configuration file.
         #-----------------------------------------------------------------------
         $this->batchSize = self::DEFAULT_BATCH_SIZE;
@@ -674,7 +745,6 @@ class Configuration
         #-----------------------------------------
         # Process the database SSL flag
         #-----------------------------------------
-        $this->dbSsl = self::DEFAULT_DB_SSL;
         if (array_key_exists(ConfigProperties::DB_SSL, $this->properties)) {
             $ssl = $this->properties[ConfigProperties::DB_SSL];
             if ($ssl === false|| strcasecmp($ssl, 'false') === 0 || $ssl === '0') {
@@ -727,8 +797,71 @@ class Configuration
             throw new EtlException($message, EtlException::INPUT_ERROR);
         }
 
-        return true;
+        $this->hasValidSetOfProperties();
     }
+
+
+    /**
+     * Indicates if the task configuration has a valid set of (non-emtpy) properties.
+     * A valid set of properties consists of either a database connection and
+     * at least one SQL property (an SQL task), or a REDCap API URL,
+     * API token, transformation rules, and a database connection (an ETL task).
+     */
+    public function hasValidSetOfProperties()
+    {
+        $hasValidSet = false;
+
+        $hasDbConnection  = false;
+        $hasSql           = false;   // has pre or post-processing SQL
+        $hasApiUrl        = false;
+        $hasApiToken      = false;
+
+        $hasTransformationRules = false;
+
+        if (!empty($this->dbConnection)) {
+            $hasDbConnection = true;
+        }
+
+        if (!empty($this->preProcessingSql) || !empty($this->preProcessingSqlFile)
+            || !empty($this->postProcessingSql) || !empty($this->postProcessingSqlFile)) {
+            $hasSql = true;
+        }
+
+        if (!empty($this->redcapApiUrl)) {
+            $hasApiUrl = true;
+        }
+
+        if (!empty($this->dataSourceApiToken)) {
+            $hasApiToken = true;
+        }
+
+        if (!empty($this->transformRulesSource)) {
+            $hasTransformationRules = true;
+        }
+
+        if ($hasDbConnection && $hasSql) {
+            # SQL task
+            $hasValidSet = true;
+        } else {
+            # Check for valid ETL task
+            if (!$hasApiUrl) {
+                $message = 'No REDCap API URL was specified.';
+                throw new EtlException($message, EtlException::INPUT_ERROR);
+            } elseif (!$hasApiToken) {
+                $message = 'No API token was found.';
+                throw new EtlException($message, EtlException::INPUT_ERROR);
+            } elseif (!$hasTransformationRules) {
+                $message = 'No transformation rules specified.';
+                throw new EtlException($message, EtlException::INPUT_ERROR);
+            } else {
+                $hasValidSet = true;
+            }
+        }
+
+        return $hasValidSet;
+    }
+
+
 
     /**
      * Gets properties from a configuration file.
@@ -821,6 +954,30 @@ class Configuration
         return $properties;
     }
 
+    /**
+     * Gets version of properties where any relative paths specified for
+     * file properties are modified to absolute paths.
+     */
+    public static function makeFilePropertiesAbsolute($properties, $baseDir)
+    {
+        foreach ($properties as $name => $value) {
+            if (ConfigProperties::isFileProperty($name) && !empty($value)) {
+                if ($name === ConfigProperties::LOG_FILE) {
+                    $properties[$name] = self::processFileProperty($value, $baseDir, false);
+                } else {
+                    $properties[$name] = self::processFileProperty($value, $baseDir);
+                }
+            } elseif ($name === ConfigProperties::DB_CONNECTION) {
+                list($dbType, $dbString) = DbConnectionFactory::parseConnectionString($value);
+                if ($dbType === DbConnectionFactory::DBTYPE_CSV) {
+                    $dbString = self::processDirectorySpecification($dbString, $baseDir);
+                    $properties[$name] = DbConnectionFactory::createConnectionString($dbType, $dbString);
+                }
+            }
+        }
+        return $properties;
+    }
+
 
     /**
      * Processes the transformation rules.
@@ -829,49 +986,58 @@ class Configuration
      */
     private function processTransformationRules($properties)
     {
-        $this->getAutogenProperties($properties);
-
-        $this->transformRulesSource = $properties[ConfigProperties::TRANSFORM_RULES_SOURCE];
-
-        if ($this->transformRulesSource === self::TRANSFORM_RULES_TEXT) {
-            if (array_key_exists(ConfigProperties::TRANSFORM_RULES_TEXT, $properties)) {
-                $this->transformationRules = $properties[ConfigProperties::TRANSFORM_RULES_TEXT];
-                if ($this->transformationRules == '') {
-                    $error = 'No transformation rules were entered.';
-                    throw new EtlException($error, EtlException::FILE_ERROR);
+        if (array_key_exists(ConfigProperties::TRANSFORM_RULES_SOURCE, $properties)) {
+            $this->transformRulesSource = $properties[ConfigProperties::TRANSFORM_RULES_SOURCE];
+            if (empty($this->transformRulesSource)) {
+                ; // Could be OK, if this is an SQL task - that needs to be checked later
+            } elseif ($this->transformRulesSource == self::TRANSFORM_RULES_TEXT) {
+                if (array_key_exists(ConfigProperties::TRANSFORM_RULES_TEXT, $properties)) {
+                    $this->transformationRules = $properties[ConfigProperties::TRANSFORM_RULES_TEXT];
+                    if ($this->transformationRules == '') {
+                        $error = 'No transformation rules were entered.';
+                        throw new EtlException($error, EtlException::FILE_ERROR);
+                    }
+                } else {
+                    $error = 'No transformation rules text was defined.';
+                    throw new EtlException($error, EtlException::INPUT_ERROR);
                 }
+            } elseif ($this->transformRulesSource == self::TRANSFORM_RULES_FILE) {
+                $file = $properties[ConfigProperties::TRANSFORM_RULES_FILE];
+                $file = $this->processFile($file);
+                $this->transformationRules = file_get_contents($file);
+            } elseif ($this->transformRulesSource == self::TRANSFORM_RULES_DEFAULT) {
+                # The actual rules are not part of the configuration and will need
+                # to be generate later after the data project has been set up.
+                $this->transformationRules == '';
+                $this->getAutogenProperties($properties);
             } else {
-                $error = 'No transformation rules text was defined.';
-                throw new EtlException($error, EtlException::INPUT_ERROR);
+                $message = 'Unrecognized transformation rules source: '.$this->transformRulesSource;
+                throw new EtlException($message, EtlException::INPUT_ERROR);
             }
-        } elseif ($this->transformRulesSource === self::TRANSFORM_RULES_FILE) {
-            $file = $properties[ConfigProperties::TRANSFORM_RULES_FILE];
-            $file = $this->processFile($file);
-            $this->transformationRules = file_get_contents($file);
-        } elseif ($this->transformRulesSource === self::TRANSFORM_RULES_DEFAULT) {
-            # The actual rules are not part of the configuration and will need
-            # to be generated later after the data project has been set up.
-            $this->transformationRules == '';
-        } else {
-            $message = 'Unrecognized transformation rules source: '.$this->transformRulesSource;
-            throw new EtlException($message, EtlException::INPUT_ERROR);
         }
     }
 
+
+    public function processFile($file, $fileShouldExist = true)
+    {
+        $baseDir = $this->baseDir;
+        return self::processFileProperty($file, $baseDir, $fileShouldExist);
+    }
 
     /**
      * Processes a file and returns the absolute pathname for the file.
      * Relative file paths in the configuration file are considered
      * to be relative to the directory of the configuration file.
      *
-     * @param string $file Relative or absolute path for file to be
-     *     processed.
+     * @param string $file The file property value, which should be a relative or absolute path
+     *     to a file for file.
+     *
      * @param boolean $fileShouldExist if true, the file should already
      *    exists, so an exception will be thrown if it does nore.
      *
      * @return string absolute path for file to use.
      */
-    public function processFile($file, $fileShouldExist = true)
+    public static function processFileProperty($file, $baseDir, $fileShouldExist = true)
     {
         if ($file == null) {
             $file = '';
@@ -880,7 +1046,7 @@ class Configuration
         }
 
         if (!FileUtil::isAbsolutePath($file)) {
-            $file = $this->baseDir . '/' . $file;
+            $file = $baseDir . '/' . $file;
         }
         
         $dirName  = dirname($file);
@@ -916,6 +1082,11 @@ class Configuration
      */
     public function processDirectory($path)
     {
+        return self::processDirectorySpecification($path, $this->baseDir);
+    }
+
+    public static function processDirectorySpecification($path, $baseDir)
+    {
         if ($path == null) {
             $message = 'Null path specified as argument to '.__METHOD__;
             throw new EtlException($message, EtlException::INPUT_ERROR);
@@ -929,7 +1100,7 @@ class Configuration
         if (FileUtil::isAbsolutePath($path)) {
             $realDir  = realpath($path);
         } else { // Relative path
-            $realDir = realpath(realpath($this->baseDir).'/'.$path);
+            $realDir = realpath(realpath($baseDir).'/'.$path);
         }
 
         if ($realDir === false) {
@@ -939,6 +1110,7 @@ class Configuration
 
         return $realDir;
     }
+
 
 
     /**
@@ -1259,6 +1431,16 @@ class Configuration
         return $this->redcapApiUrl;
     }
 
+    public function getRedCapMetadataTable()
+    {
+        return $this->redcapMetadataTable;
+    }
+
+    public function getRedCapProjectInfoTable()
+    {
+        return $this->redcapProjectInfoTable;
+    }
+
     public function getSslVerify()
     {
         return $this->sslVerify;
@@ -1332,6 +1514,11 @@ class Configuration
     public function getAutogenNonRepeatingFieldsTable()
     {
         return $this->autogenNonRepeatingFieldsTable;
+    }
+
+    public function getTaskName()
+    {
+        return $this->taskName;
     }
 
 

@@ -32,13 +32,22 @@ class SchemaGenerator
 
     private $rules;
 
+    /** @var array for multiple-choice fields, a map of field names to a map of values to labels
+     *  for the choices for that field name. */
     private $lookupChoices;
+
+    /** @var LookupTable a table object that maps multiple choice values to multiple choice labels */
     private $lookupTable;
-    private $lookupTableIn;
 
     private $dataProject;
+
     private $logger;
-    private $configuration;
+
+    private $taskConfig;
+
+    /** @var the ID of the task for the configuration for which the schema is being generated */
+    private $taskId;
+
     private $tablePrefix;
 
     /**
@@ -46,16 +55,17 @@ class SchemaGenerator
      *
      * @param EtlRedCapProject $dataProject the REDCap project that
      *     contains the data to extract.
-     * @param Configuration $configuration ETL configuration information.
+     * @param TaskConfig $taskConfig ETL task configuration information.
      * @param Logger $logger logger for logging ETL process information
      *     and errors.
      */
-    public function __construct($dataProject, $configuration, $logger)
+    public function __construct($dataProject, $taskConfig, $logger, $taskId = 1)
     {
         $this->dataProject   = $dataProject;
-        $this->configuration = $configuration;
-        $this->tablePrefix   = $configuration->getTablePrefix();
+        $this->taskConfig    = $taskConfig;
+        $this->tablePrefix   = $taskConfig->getTablePrefix();
         $this->logger        = $logger;
+        $this->taskId        = $taskId;
     }
 
 
@@ -72,7 +82,9 @@ class SchemaGenerator
      */
     public function generateSchema($rulesText)
     {
+        $redCapApiUrl      = $this->taskConfig->getRedCapApiUrl();
         $projectInfo       = $this->dataProject->exportProjectInfo();
+        $metadata          = $this->dataProject->exportMetadata();
         $recordIdFieldName = $this->dataProject->getRecordIdFieldName();
         $fieldNames        = $this->dataProject->getFieldNames();
 
@@ -105,10 +117,13 @@ class SchemaGenerator
             }
         }
 
+        #----------------------------------------------------------------
+        # Create lookup table that maps multiple choice values to labels
+        #----------------------------------------------------------------
         $this->lookupChoices = $this->dataProject->getLookupChoices();
-        $keyType = $this->configuration->getGeneratedKeyType();
-        $lookupTableName = $this->configuration->getLookupTableName();
-        $this->lookupTable = new LookupTable($this->lookupChoices, $this->tablePrefix, $keyType, $lookupTableName);
+        $keyType = $this->taskConfig->getGeneratedKeyType();
+        $lookupTableName = $this->taskConfig->getLookupTableName();
+        $this->lookupTable = new LookupTable($this->lookupChoices, $keyType, $lookupTableName);
 
         $info = '';
         $warnings = '';
@@ -116,7 +131,20 @@ class SchemaGenerator
 
         $schema = new Schema();
 
-        // Log how many fields in REDCap could be parsed
+        #-----------------------------------------
+        # Add the REDCap project info table
+        #-----------------------------------------
+        $projectInfoTableName = $this->taskConfig->getRedCapProjectInfoTable();
+        $projectInfoTable = new ProjectInfoTable($projectInfoTableName);
+
+        $row = $projectInfoTable->createDataRow($this->taskId, $redCapApiUrl, $projectInfo);
+        $projectInfoTable->addRow($row);
+        $schema->setProjectInfoTable($projectInfoTable);
+
+
+        #---------------------------------------------------
+        # Log how many fields in REDCap could be parsed
+        #---------------------------------------------------
         $message = "Found ".count($unmappedRedCapFields)." user-defined fields in REDCap.";
         $this->logger->log($message);
         $info .= $message."\n";
@@ -170,8 +198,10 @@ class SchemaGenerator
                     $table->setForeign($parentTable);  # Add a foreign key
                     $parentTable->addChild($table);    # Add as a child of parent table
                 }
-            } elseif ($rule instanceof FieldRule) {     # FIELD RULE
-                // generate Fields...
+            } elseif ($rule instanceof FieldRule) {
+                #-------------------------------------------
+                # FIELD RULE
+                #-------------------------------------------
                  
                 if ($table == null) {
                     break; // table not set, probably error with table rule
@@ -307,8 +337,16 @@ class SchemaGenerator
 
                         // If this field has category/label choices
                         if (array_key_exists($originalFieldName, $this->lookupChoices)) {
-                            $this->lookupTable->addLookupField($table->name, $originalFieldName);
-                            $field->usesLookup = $originalFieldName;
+                            $this->lookupTable->addLookupField(
+                                $table->getName(),
+                                $originalFieldName,
+                                $rule->dbFieldName
+                            );
+                            if (empty($rule->dbFieldName)) {
+                                $field->setUsesLookup($originalFieldName);
+                            } else {
+                                $field->setUsesLookup($rule->dbFieldName);
+                            }
                             $table->usesLookup = true;
                         }
                     }
@@ -316,6 +354,38 @@ class SchemaGenerator
             } // End if for rule types
         } // End foreach
         
+        #-----------------------------------------
+        # Add the REDCap metadata table
+        #-----------------------------------------
+        $metadataTableName = $this->taskConfig->getRedCapMetadataTable();
+        $metadataTable = new MetadataTable($metadataTableName);
+
+        $metadataMap = array();
+        foreach ($metadata as $fieldMetadata) {
+            $metadataMap[$fieldMetadata['field_name']] = $fieldMetadata;
+        }
+
+        foreach ($schema->getTables() as $table) {
+            foreach ($table->getFields() as $field) {
+                # For checkbox fields, need to remove the checbox value for looking up the metadata
+                $fieldName = $field->name;
+                if ($field->redcapType === 'checkbox') {
+                    $fieldName = substr($fieldName, 0, strpos($fieldName, RedCapEtl::CHECKBOX_SEPARATOR));
+                }
+
+                if (array_key_exists($fieldName, $metadataMap)) {
+                    $row = $metadataTable->createDataRow(
+                        $this->taskId,
+                        $table->getName(),
+                        $field->dbName,
+                        $metadataMap[$fieldName]
+                    );
+                    $metadataTable->addRow($row);
+                }
+            }
+        }
+        $schema->setMetadataTable($metadataTable);
+
         
         if ($parsedRules->getParsedLineCount() < 1) {
             $message = "Found no transformation rules.";
@@ -348,6 +418,7 @@ class SchemaGenerator
             $messages = array(self::PARSE_VALID,$info);
         }
 
+        $schema->setLabelViewSuffix($this->taskConfig->getLabelViewSuffix());
         $schema->setLookupTable($this->lookupTable);
         
         return array($schema, $messages);
@@ -359,7 +430,7 @@ class SchemaGenerator
         $tableName = $this->tablePrefix . $rule->tableName;
         $rowsType  = $rule->rowsType;
 
-        $keyType = $this->configuration->getGeneratedKeyType();
+        $keyType = $this->taskConfig->getGeneratedKeyType();
         
         # Create the table
         $table = new Table(
@@ -371,6 +442,12 @@ class SchemaGenerator
             $recordIdFieldName,
             $this->tablePrefix
         );
+
+        #-----------------------------------------------------
+        # Add redcap_data_source field to all tables
+        #-----------------------------------------------------
+        $field = new Field(RedCapEtl::COLUMN_DATA_SOURCE, FieldType::INT);
+        $table->addField($field);
 
         #---------------------------------------------------------
         # Add the record ID field as a field for all tables
@@ -390,7 +467,7 @@ class SchemaGenerator
                 .$rule->getLineNumber().': "'.$rule->getLine().'"';
             throw new EtlException($errorMessage, EtlException::INPUT_ERROR);
         } else {
-            $fieldTypeSpecifier = $this->configuration->getGeneratedRecordIdType();
+            $fieldTypeSpecifier = $this->taskConfig->getGeneratedRecordIdType();
             $field = new Field(
                 $recordIdFieldName,
                 $fieldTypeSpecifier->getType(),
@@ -441,13 +518,13 @@ class SchemaGenerator
         # Create event/instrument/instance/suffix identifier fields
         #--------------------------------------------------------------
         if ($hasEvent) {
-            $fieldTypeSpecifier = $this->configuration->getGeneratedNameType();
+            $fieldTypeSpecifier = $this->taskConfig->getGeneratedNameType();
             $field = new Field(RedCapEtl::COLUMN_EVENT, $fieldTypeSpecifier->getType(), $fieldTypeSpecifier->getSize());
             $table->addField($field);
         }
 
         if ($hasInstrument) {
-            $fieldTypeSpecifier = $this->configuration->getGeneratedNameType();
+            $fieldTypeSpecifier = $this->taskConfig->getGeneratedNameType();
             $field = new Field(
                 RedCapEtl::COLUMN_REPEATING_INSTRUMENT,
                 $fieldTypeSpecifier->getType(),
@@ -457,7 +534,7 @@ class SchemaGenerator
         }
 
         if ($hasInstance) {
-            $fieldTypeSpecifier = $this->configuration->getGeneratedInstanceType();
+            $fieldTypeSpecifier = $this->taskConfig->getGeneratedInstanceType();
             $field = new Field(
                 RedCapEtl::COLUMN_REPEATING_INSTANCE,
                 $fieldTypeSpecifier->getType(),
@@ -467,7 +544,7 @@ class SchemaGenerator
         }
 
         if ($hasSuffixes) {
-            $fieldTypeSpecifier = $this->configuration->getGeneratedSuffixType();
+            $fieldTypeSpecifier = $this->taskConfig->getGeneratedSuffixType();
             $field = new Field(
                 RedCapEtl::COLUMN_SUFFIXES,
                 $fieldTypeSpecifier->getType(),
@@ -535,6 +612,9 @@ class SchemaGenerator
             // Process a single field
             $redcapFieldType = $this->dataProject->getFieldType($fieldName);
             $field = new Field($fieldName, $fieldType, $fieldSize, $dbFieldName, $redcapFieldType);
+            if (array_key_exists($fieldName, $this->lookupChoices)) {
+                $field->valueToLabelMap = $this->lookupChoices[$fieldName];
+            }
             $fields[$fieldName] = $field;
         }
 

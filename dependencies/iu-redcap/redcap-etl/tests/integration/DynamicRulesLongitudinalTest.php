@@ -47,10 +47,9 @@ class DynamicRulesLongitudinalTest extends TestCase
     {
         if (file_exists(self::CONFIG_FILE)) {
             self::$logger = new Logger('dynamic_rules_longitudinal_test');
-            self::$config = new Configuration(
-                self::$logger,
-                self::CONFIG_FILE
-            );
+            self::$config = new TaskConfig();
+            self::$config->set(self::$logger, self::CONFIG_FILE);
+
             #-----------------------------
             # Get the CSV directory
             #-----------------------------
@@ -158,7 +157,7 @@ class DynamicRulesLongitudinalTest extends TestCase
         self::$properties = self::$config->getProperties();
         self::$properties[ConfigProperties::DB_CONNECTION] = 'CSV:'
             . self::$csvDir;
-        self::$properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = Configuration::TRANSFORM_RULES_DEFAULT;
+        self::$properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = TaskConfig::TRANSFORM_RULES_DEFAULT;
         self::$properties[ConfigProperties::TRANSFORM_RULES_TEXT] = '';
         self::$properties[ConfigProperties::TRANSFORM_RULES_FILE] = '';
 

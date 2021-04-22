@@ -9,7 +9,7 @@ namespace IU\REDCapETL\Database;
 use PHPUnit\Framework\TestCase;
 
 use IU\REDCapETL\RedCapEtl;
-use IU\REDCapETL\Configuration;
+use IU\REDCapETL\TaskConfig;
 use IU\REDCapETL\EtlException;
 use IU\REDCapETL\Logger;
 use IU\REDCapETL\LookupTable;
@@ -54,7 +54,9 @@ class DatabasesTest extends TestCase
      */
     public function testMysqlDbConnectionCreateTableWithPort()
     {
-        $configuration = new Configuration(self::$logger, self::$configFile);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, self::$configFile);
+
         $dbInfo = $configuration->getMySqlConnectionInfo();
         $port = '3306';
         $dbString = implode(":", $dbInfo).":$port";
@@ -249,6 +251,7 @@ class DatabasesTest extends TestCase
         $suffix = null;
         #update_date deliberately not populated in any of the rows
         $data1 = [
+            'redcap_data_source' => 1,
             'record_id' => 1001,
             'full_name' => 'Ima Tester',
             'score' => 12.3,
@@ -258,6 +261,7 @@ class DatabasesTest extends TestCase
         $rootTable->createRow($data1, $foreignKey, $suffix, RowsType::BY_EVENTS);
 
         $data2 = [
+            'redcap_data_source' => 1,
             'record_id' => 1002,
             'full_name' => 'Spider Webb',
             'score' => 4.56,
@@ -269,7 +273,9 @@ class DatabasesTest extends TestCase
         #############################################################
         # create the table in the database
         #############################################################
-        $configuration = new Configuration(self::$logger, self::$configFile);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, self::$configFile);
+
         $dbInfo = $configuration->getMySqlConnectionInfo();
         $dbString = implode(":", $dbInfo);
 
@@ -360,12 +366,14 @@ class DatabasesTest extends TestCase
         $foreignKey = null;
         $suffix = null;
         $data21 = [
+            'redcap_data_source' => 1,
             'record_id' => 1001,
             'full_name' => 'Ima Tester'
         ];
         $rootTable2->createRow($data21, $foreignKey, $suffix, RowsType::BY_EVENTS);
 
         $data22 = [
+            'redcap_data_source' => 1,
             'record_id' => 1002,
             'full_name' => 'Person That Has Way TOOOOO Many Letters in Their Name'
         ];
@@ -442,12 +450,14 @@ class DatabasesTest extends TestCase
         $foreignKey = null;
         $suffix = null;
         $data = [
+            'redcap_data_source' => 1,
             'record_id' => 1001,
             'full_name' => 'Ima Tester'
         ];
         $rootTable->createRow($data, $foreignKey, $suffix, RowsType::BY_EVENTS);
 
         $data1 = [
+            'redcap_data_source' => 1,
             'record_id' => 1002,
             'full_name' => 'Person That Has Way TOOOOO Many Letters in Their Name'
         ];
@@ -456,7 +466,8 @@ class DatabasesTest extends TestCase
         #############################################################
         # create the table in the database
         #############################################################
-        $configuration = new Configuration(self::$logger, self::$configFile);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, self::$configFile);
 
         $dbInfo = $configuration->getMySqlConnectionInfo();
         $dbString = implode(":", $dbInfo);
@@ -482,6 +493,7 @@ class DatabasesTest extends TestCase
         #############################################################
         #insert one row to see if it processes correctly
         $data = [
+            'redcap_data_source' => 1,
             'record_id' => 1001,
             'name' => 'Some Other Person'
         ];
@@ -552,7 +564,9 @@ class DatabasesTest extends TestCase
     public function testMysqlDbConnectionProcessQueryFile()
     {
         #Create the mysqlDbConnection object
-        $configuration = new Configuration(self::$logger, self::$configFile);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, self::$configFile);
+
         $dbInfo = $configuration->getMySqlConnectionInfo();
         $dbString = implode(":", $dbInfo);
 
@@ -773,12 +787,14 @@ class DatabasesTest extends TestCase
         $foreignKey = null;
         $suffix = null;
         $data1 = [
+            'redcap_data_source' => 1,
             'record_id' => 1001,
             'full_name' => 'Ima Tester'
         ];
         $rootTable->createRow($data1, $foreignKey, $suffix, RowsType::BY_EVENTS);
 
         $data2 = [
+            'redcap_data_source' => 1,
             'record_id' => 1002,
             'full_name' => 'Spider Webb'
         ];
@@ -787,7 +803,9 @@ class DatabasesTest extends TestCase
         #############################################################
         # create the table in the database
         #############################################################
-        $configuration = new Configuration(self::$logger, self::$configFile);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, self::$configFile);
+
         $dbInfo = $configuration->getMySqlConnectionInfo();
         $dbString = implode(":", $dbInfo);
 
@@ -905,7 +923,9 @@ class DatabasesTest extends TestCase
     public function testMysqlDbConnectionReplaceLookupViewWithLookup()
     {
         #Create the MysqlDbConnection
-        $configuration = new Configuration(self::$logger, self::$configFile);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, self::$configFile);
+
         $dbInfo = $configuration->getMySqlConnectionInfo();
         $dbString = implode(":", $dbInfo);
 
@@ -956,12 +976,13 @@ class DatabasesTest extends TestCase
             FieldType::INT,
             null
         );
-        $field2->usesLookup = 'marital_status';
+        $field2->setUsesLookup('marital_status');
         $rootTable->addField($field2);
 
         $foreignKey = null;
         $suffix = null;
         $data1 = [
+            'redcap_data_source' => 1,
             'record_id' => 1001,
             'full_name' => 'Ima Tester',
             'marital_status' => 0
@@ -969,6 +990,7 @@ class DatabasesTest extends TestCase
         $rootTable->createRow($data1, $foreignKey, $suffix, RowsType::BY_EVENTS);
 
         $data2 = [
+            'redcap_data_source' => 1,
             'record_id' => 1002,
             'full_name' => 'Spider Webb',
             'marital_status' => 3
@@ -984,7 +1006,7 @@ class DatabasesTest extends TestCase
         ];
         $tablePrefix = null;
         $keyType = new FieldTypeSpecifier(FieldType::INT, null);
-        $lookupTable = new LookupTable($lookupChoices, $tablePrefix, $keyType);
+        $lookupTable = new LookupTable($lookupChoices, $keyType);
 
         #identify marital_status as a lookup field in the data table
         $fieldName = 'marital_status';
@@ -1051,7 +1073,9 @@ class DatabasesTest extends TestCase
 
     public function testMysqlDbConnectionParseSqlQueries()
     {
-        $configuration = new Configuration(self::$logger, self::$configFile);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, self::$configFile);
+
         $dbInfo = $configuration->getMySqlConnectionInfo();
         $dbString = implode(":", $dbInfo);
 
@@ -1110,7 +1134,9 @@ class DatabasesTest extends TestCase
         );
 
         #create the MysqlDbConnection
-        $configuration = new Configuration(self::$logger, self::$configFile);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, self::$configFile);
+
         $dbInfo = $configuration->getMySqlConnectionInfo();
         $dbString = implode(":", $dbInfo);
 
