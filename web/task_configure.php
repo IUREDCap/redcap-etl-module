@@ -54,9 +54,9 @@ try {
         $warning = Filter::stripTags($_GET['warning']);
     }
 
-    $listUrl = $module->getUrl("web/index.php");
-    $configureUrl = $module->getUrl("web/configure.php");
-    $selfUrl = $module->getUrl("web/etl_configure.php");
+    $listUrl = $module->getUrl('web/index.php');
+    $configureUrl = $module->getUrl('web/configure.php');
+    $selfUrl = $module->getUrl('web/task_configure.php');
     $generateRulesUrl = $module->getUrl('web/generate_rules.php');
 
     $adminConfig = $module->getAdminConfig();

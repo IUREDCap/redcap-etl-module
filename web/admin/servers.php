@@ -12,7 +12,7 @@
 $module->checkAdminPagePermission();
 
 
-require_once __DIR__.'/../../dependencies/autoload.php';
+require_once __DIR__ . '/../../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Csrf;
@@ -78,8 +78,8 @@ ob_start();
 require_once APP_PATH_DOCROOT . 'ControlCenter/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-$jsInclude = '<script type="text/javascript" src="'.($module->getUrl('resources/servers.js')).'"></script>';
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
+$jsInclude = '<script type="text/javascript" src="' . ($module->getUrl('resources/servers.js')) . '"></script>';
 $buffer = str_replace('</head>', "    {$link}\n{$jsInclude}\n</head>", $buffer);
 
 echo $buffer;
@@ -127,18 +127,18 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
         } else {
             echo "<tr class=\"odd\">\n";
         }
-        echo "<td>".Filter::escapeForHtml($server)."</td>\n";
+        echo "<td>" . Filter::escapeForHtml($server) . "</td>\n";
 
-        $serverConfigureUrl = $configureUrl.'&serverName='.Filter::escapeForUrlParameter($server);
+        $serverConfigureUrl = $configureUrl . '&serverName=' . Filter::escapeForUrlParameter($server);
         
         #-------------------------------
         # Active
         #-------------------------------
         echo '<td style="text-align:center;">';
         if ($serverConfig->getIsActive()) {
-            echo '<img src="'.APP_PATH_IMAGES.'tick.png" alt="Yes">';
+            echo '<img src="' . APP_PATH_IMAGES . 'tick.png" alt="Yes">';
         } else {
-            echo '<img src="'.APP_PATH_IMAGES.'cross.png" alt="No">';
+            echo '<img src="' . APP_PATH_IMAGES . 'cross.png" alt="No">';
         }
         echo "</td>\n";
 
@@ -157,9 +157,9 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
         # Configure
         #-------------------------------
         echo '<td style="text-align:center;">'
-            .'<a href="'.$serverConfigureUrl.'">'
-            .'<img src="'.APP_PATH_IMAGES.'gear.png" alt="CONFIG"></a>'
-            ."</td>\n";
+            . '<a href="' . $serverConfigureUrl . '">'
+            . '<img src="' . APP_PATH_IMAGES . 'gear.png" alt="CONFIG"></a>'
+            . "</td>\n";
 
         
         if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
@@ -169,28 +169,28 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
             # Copy
             #-------------------------------
             echo '<td style="text-align:center;">'
-                .'<input type="image" src="'.APP_PATH_IMAGES.'page_copy.png" alt="COPY" '
-                .'id="copyServer'.$row.'"'
-                .' class="copyServer" style="cursor: pointer;">'
-                ."</td>\n";
+                . '<input type="image" src="' . APP_PATH_IMAGES . 'page_copy.png" alt="COPY" '
+                . 'id="copyServer' . $row . '"'
+                . ' class="copyServer" style="cursor: pointer;">'
+                . "</td>\n";
 
             #-------------------------------
             # Rename
             #-------------------------------
             echo '<td style="text-align:center;">'
-                .'<input type="image" src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME"'
-                .' id="renameServer'.$row.'"'
-                .' class="renameServer" style="cursor: pointer;">'
-                ."</td>\n";
+                . '<input type="image" src="' . APP_PATH_IMAGES . 'page_white_edit.png" alt="RENAME"'
+                . ' id="renameServer' . $row . '"'
+                . ' class="renameServer" style="cursor: pointer;">'
+                . "</td>\n";
           
             #-------------------------------
             # Delete
             #-------------------------------
             echo '<td style="text-align:center;">'
-                .'<input type="image" src="'.APP_PATH_IMAGES.'delete.png" alt="DELETE"'
-                .' id="deleteServer'.$row.'"'
-                .' class="deleteServer" style="cursor: pointer;">'
-                ."</td>\n";
+                .  '<input type="image" src="' . APP_PATH_IMAGES . 'delete.png" alt="DELETE"'
+                . ' id="deleteServer' . $row . '"'
+                . ' class="deleteServer" style="cursor: pointer;">'
+                . "</td>\n";
         }
               
         echo "</tr>\n";
@@ -269,15 +269,15 @@ echo "<script>\n";
 
 $row = 1;
 foreach ($servers as $server) {
-    echo '$("#copyServer'.$row.'").click({server: "'
-        .Filter::escapeForJavaScriptInDoubleQuotes($server)
-        .'"}, RedCapEtlModule.copyServer);'."\n";
-    echo '$("#renameServer'.$row.'").click({server: "'
-        .Filter::escapeForJavaScriptInDoubleQuotes($server)
-        .'"}, RedCapEtlModule.renameServer);'."\n";
-    echo '$("#deleteServer'.$row.'").click({server: "'
-        .Filter::escapeForJavaScriptInDoubleQuotes($server)
-        .'"}, RedCapEtlModule.deleteServer);'."\n";
+    echo '$("#copyServer' . $row . '").click({server: "'
+        . Filter::escapeForJavaScriptInDoubleQuotes($server)
+        . '"}, RedCapEtlModule.copyServer);' . "\n";
+    echo '$("#renameServer' . $row . '").click({server: "'
+        . Filter::escapeForJavaScriptInDoubleQuotes($server)
+        . '"}, RedCapEtlModule.renameServer);' . "\n";
+    echo '$("#deleteServer' . $row . '").click({server: "'
+        . Filter::escapeForJavaScriptInDoubleQuotes($server)
+        . '"}, RedCapEtlModule.deleteServer);' . "\n";
     $row++;
 }
 

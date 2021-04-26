@@ -18,7 +18,7 @@ class StatusTest extends TestCase
     private static $mink;
     private static $session;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
         $baseUrl = self::$testConfig->getRedCap()['base_url'];
@@ -40,23 +40,23 @@ class StatusTest extends TestCase
     {
         $username = self::$testConfig->getUser()['username'];
         $testProjectTitle = self::$testConfig->getUser()['test_project_title'];
-        #print "\n";
-        #print "User username: \"{$username}\"\n";
-        #print "Test Project: \"{$testProjectTitle}\"\n";
 
         Util::loginAsUser(self::$session);
         $page = self::$session->getPage();
         $text = $page->getText();
 
-        // Check that the test user is set up
-        $this->assertRegExp("/Logged in as {$username}/", $text); 
+        # Check that the test user is set up
+        $this->assertMatchesRegularExpression("/Logged in as {$username}/", $text); 
 
-        // Check that test REDCap ETL project is set up correctly
+        # Make sure you are on the REDCap "My Projects" page
+        $page->clickLink('My Projects');
+
+        # Check that test REDCap ETL project is set up correctly
         Util::selectTestProject(self::$session);
         $page = self::$session->getPage();
         $page->clickLink('REDCap-ETL');
         $text = $page->getText();
-        $this->assertRegExp("/ETL Configurations/", $text); 
+        $this->assertMatchesRegularExpression("/ETL Configurations/", $text); 
 
         // Test logout
         $page->clickLink('Log out');
@@ -75,10 +75,10 @@ class StatusTest extends TestCase
         $page->clickLink('REDCap-ETL');
 
         $text = $page->getText();
-        $this->assertRegExp("/REDCap-ETL Admin/", $text);
+        $this->assertMatchesRegularExpression("/REDCap-ETL Admin/", $text);
 
         $page->clickLink("ETL Servers");
         $text = $page->getText();
-        $this->assertRegExp("/\(embedded server\)(\s)*public/", $text);
+        $this->assertMatchesRegularExpression("/\(embedded server\)(\s)*public/", $text);
     }
 }

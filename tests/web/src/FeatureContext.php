@@ -27,6 +27,8 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
 
     private static $featureFileName;
 
+    private $previousWindowName;
+
     /**
      * Initializes context.
      *
@@ -99,7 +101,6 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         $session = $this->getSession();
         #print_r($session);
 
-
         $this->setMinkParameter('base_url', $this->baseUrl);
         echo "Base URL set to: ".$this->baseUrl;
 
@@ -156,6 +157,18 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     {
         $session = $this->getSession();
         Util::loginAsUser($session);
+    }
+
+    /**
+     * @Then /^I go to previous window$/
+     */
+    public function iGoToPreviousWindow()
+    {
+        if (!empty($this->previousWindowName)) {
+            print "*** SWITCH TO PREVIOUS WINDOW {$this->previousWindowName}\n";
+            $this->getSession()->switchToWindow($this->previousWindowName);
+            $this->previousWindowName = '';
+        }
     }
 
     /**
@@ -313,45 +326,11 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
 
 
     /**
-     * @When /^I go to new window in (\d+) seconds$/
-     */
-    public function iGoToNewWindow($seconds)
-    {
-        sleep($seconds);  // Need time for new window to open
-        $windowNames = $this->getSession()->getWindowNames();
-        $numWindows  = count($windowNames);
-
-        $currentWindowName  = $this->getSession()->getWindowName();
-        $currentWindowIndex = array_search($currentWindowName, $windowNames);
-
-        if (isset($currentWindowIndex) && $numWindows > $currentWindowIndex + 1) {
-            $this->getSession()->switchToWindow($windowNames[$currentWindowIndex + 1]);
-            #$this->getSession()->reset();
-        }
-    }
-
-    /**
      * @When /^I wait for (\d+) seconds$/
      */
     public function iWaitForSeconds($seconds)
     {
         sleep($seconds);
-    }
-
-    /**
-     * @When /^I go to old window$/
-     */
-    public function iGoToOldWindow()
-    {
-        $windowNames = $this->getSession()->getWindowNames();
-
-        $currentWindowName  = $this->getSession()->getWindowName();
-        $currentWindowIndex = array_search($currentWindowName, $windowNames);
-
-        if (isset($currentWindowIndex) && $currentWindowIndex > 0) {
-            $this->getSession()->switchToWindow($windowNames[$currentWindowIndex - 1]);
-            $this->getSession()->restart();
-        }
     }
 
     /**
@@ -394,7 +373,7 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     /**
      * @When /^I log in as admin and access REDCap-ETL$/
      */
-    public function i()
+    public function iLogInAsAdminAndAccessRedCapEtl()
     {
         $session = $this->getSession();
         Util::logInAsAdminAndAccessRedCapEtl($session);
@@ -416,6 +395,30 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     {
         $session = $this->getSession();
         Util::selectTestProject($session);
+    }
+
+    /**
+     * @When /^I select the test project in new window$/
+     */
+    public function iSelectTheTestProjectInNewWindow()
+    {
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
+        $testProjectTitle = $testConfig->getUser()['test_project_title'];
+
+        $session = $this->getSession();
+
+        $this->previousWindowName = $session->getWindowName();
+        Util::goToNewWindow($session, $testProjectTitle);
+    }
+
+    /**
+     * @When /^I follow "([^"]*)" to new window$/
+     */
+    public function iFollowLinkToNewWindow($link)
+    {
+        $session = $this->getSession();
+        $this->previousWindowName = $session->getWindowName();
+        Util::goToNewWindow($session, $link);
     }
 
     /**

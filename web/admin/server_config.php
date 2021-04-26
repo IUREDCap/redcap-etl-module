@@ -12,7 +12,7 @@
 $module->checkAdminPagePermission();
 
 
-require_once __DIR__.'/../../dependencies/autoload.php';
+require_once __DIR__ . '/../../dependencies/autoload.php';
 
 use phpseclib\Crypt\RSA;
 use phpseclib\Net\SCP;
@@ -26,7 +26,7 @@ use IU\RedCapEtlModule\RedCapEtlModule;
 
 $selfUrl      = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
 $serversUrl   = $module->getUrl(RedCapEtlModule::SERVERS_PAGE);
-$configureUserUrl=$module->getUrl(RedCapEtlModule::USER_CONFIG_PAGE);
+$configureUserUrl = $module->getUrl(RedCapEtlModule::USER_CONFIG_PAGE);
 
 $submit = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
@@ -92,13 +92,13 @@ if (strcasecmp($submit, 'Save') === 0) {
                 }
             }
             $module->processPrivateServerUsers($serverName, $removeUsernames);
-            header('Location: '.$serversUrl);
+            header('Location: ' . $serversUrl);
         } catch (Exception $exception) {
-            $error = 'ERROR: '.$exception->getMessage();
+            $error = 'ERROR: ' . $exception->getMessage();
         }
     }
 } elseif (strcasecmp($submit, 'Cancel') === 0) {
-    header('Location: '.$serversUrl);
+    header('Location: ' . $serversUrl);
 } elseif (strcasecmp($submit, 'Test Server Connection') === 0) {
     if (!isset($serverConfig)) {
         $testOutput = 'ERROR: no server configuration found.';
@@ -126,7 +126,7 @@ if (strcasecmp($submit, 'Save') === 0) {
             }
         }
     } catch (Exception $exception) {
-        $error = 'ERROR: '.$exception->getMessage();
+        $error = 'ERROR: ' . $exception->getMessage();
     }
 }
 ?>
@@ -142,8 +142,8 @@ ob_start();
 require_once APP_PATH_DOCROOT . 'ControlCenter/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    " . $link . "\n</head>", $buffer);
 echo $buffer;
 ?>
 
@@ -169,11 +169,11 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
     array_unshift($values, '');
     foreach ($values as $value) {
         if (strcmp($value, $serverName) === 0) {
-            echo '<option value="'.Filter::escapeForHtmlAttribute($value)
-                .'" selected>'.Filter::escapeForHtml($value)."</option>\n";
+            echo '<option value="' . Filter::escapeForHtmlAttribute($value)
+                . '" selected>' . Filter::escapeForHtml($value) . "</option>\n";
         } else {
-            echo '<option value="'.Filter::escapeForHtmlAttribute($value).'">'
-                .Filter::escapeForHtml($value)."</option>\n";
+            echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '">'
+                . Filter::escapeForHtml($value) . "</option>\n";
         }
     }
     ?>
@@ -249,7 +249,7 @@ if (!empty($serverName)) {
     if ($access === 'private') {
         $privateUsers = $module->getPrivateServerUsers($serverName);
     }
-?>
+    ?>
 
 <script>
 $(document).ready(function(){
@@ -329,9 +329,9 @@ $(function() {
                 <?php
                 foreach ($accessLevels as $value) {
                     if (strcmp($value, $access) === 0) {
-                        echo '<option value="'.$value.'" selected>'.$value."</option>\n";
+                        echo '<option value="' . $value . '" selected>' . $value . "</option>\n";
                     } else {
-                        echo '<option value="'.$value.'">'.$value."</option>\n";
+                        echo '<option value="' . $value . '">' . $value . "</option>\n";
                     }
                 }
                 ?>
@@ -358,9 +358,9 @@ $(function() {
                  Remove<br />
                     <?php
                     foreach ($privateUsers as $username) {
-                        echo '<input type="checkbox" name="removeUserCheckbox['.$username.']" '
-                          .'style="vertical-align: middle; margin: 0px 10px 0px 25px;"' .">\n";
-                        echo '<label for="removeUserCheckbox['.$username.']">'.$username."</label>\n<br />";
+                        echo '<input type="checkbox" name="removeUserCheckbox[' . $username . ']" '
+                          . 'style="vertical-align: middle; margin: 0px 10px 0px 25px;"'  . ">\n";
+                        echo '<label for="removeUserCheckbox[' . $username . ']">' . $username . "</label>\n<br />";
                     }
                     ?>
               </div>
@@ -380,7 +380,7 @@ $(function() {
   <!-- SERVER CONNECTION SETTINGS -->
     <?php
     if (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) !== 0) {
-    ?>
+        ?>
         <fieldset class="server-config">
             <legend>Server Connection Settings</legend>
             <table>  
@@ -495,7 +495,7 @@ $(function() {
       </tr>
     </table>
     </fieldset>
-    <?php
+        <?php
     } // end if not embedded server
     ?>
   
@@ -613,7 +613,7 @@ $(function() {
   </div>
     <?php Csrf::generateFormToken(); ?>
 </form>
-<?php
+    <?php
 }
 ?>
 

@@ -52,7 +52,7 @@ try {
 
     $selfUrl = $module->getUrl('web/workflow_global_properties.php')
                    .'&workflowName='.Filter::escapeForUrlParameter($workflowName);
-    $workflowUrl = $module->getUrl('web/workflow_configuration.php')
+    $workflowUrl = $module->getUrl('web/workflow_configure.php')
                        .'&workflowName='.Filter::escapeForUrlParameter($workflowName);
     $workflowsUrl = $module->getUrl('web/workflows.php');
     $configureUrl = $module->getUrl('web/configure.php');

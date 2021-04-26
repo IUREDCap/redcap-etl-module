@@ -139,7 +139,7 @@ class ModuleLog
         } elseif ($type === self::ETL_CRON) {
             $query .= ', log_type, cron_day, cron_hour, num_jobs';
         }
-        $query .= " where log_type = '".Filter::escapeForMysql($type)."'";
+        $query .= " where log_type = '" . Filter::escapeForMysql($type) . "'";
         
         #----------------------------------------
         # Query start date condition (if any)
@@ -147,7 +147,7 @@ class ModuleLog
         if (!empty($startDate)) {
             $startTime = \DateTime::createFromFormat('m/d/Y', $startDate);
             $startTime = $startTime->format('Y-m-d');
-            $query .= " and timestamp >= '".Filter::escapeForMysql($startTime)."'";
+            $query .= " and timestamp >= '" . Filter::escapeForMysql($startTime) . "'";
         }
         
         #---------------------------------------
@@ -157,7 +157,7 @@ class ModuleLog
             $endTime = \DateTime::createFromFormat('m/d/Y', $endDate);
             $endTime->modify('+1 day');
             $endTime = $endTime->format('Y-m-d');
-            $query .= " and timestamp < '".Filter::escapeForMysql($endTime)."'";
+            $query .= " and timestamp < '" . Filter::escapeForMysql($endTime) . "'";
         }
         
         $logData = $this->module->queryLogs($query);
@@ -247,8 +247,8 @@ class ModuleLog
     public function getCronJobs($logId)
     {
         $query = "select log_id, timestamp, ui_id, project_id, message, log_type, etl_server, config, cron_log_id";
-        $query .= " where log_type = '".self::ETL_CRON_JOB."'"
-            ." and cron_log_id = '".Filter::escapeForMysql($logId)."'";
+        $query .= " where log_type = '" . self::ETL_CRON_JOB . "'"
+            . " and cron_log_id = '" . Filter::escapeForMysql($logId) . "'";
         $cronJob = $this->module->queryLogs($query);
         return $cronJob;
     }
@@ -259,8 +259,8 @@ class ModuleLog
     public function getEtlRunLogIdForCronJob($cronLogId)
     {
         $query = "select log_id";
-        $query .= " where log_type = '".self::ETL_RUN."'"
-            ." and cron_log_id = '".Filter::escapeForMysql($cronLogId)."'";
+        $query .= " where log_type = '" . self::ETL_RUN . "'"
+            . " and cron_log_id = '" . Filter::escapeForMysql($cronLogId) . "'";
         $result = $this->module->queryLogs($query);
         
         $logId = null;
@@ -277,8 +277,8 @@ class ModuleLog
     public function getEtlRunDetails($etlRunLogId)
     {
         $query = "select log_id, timestamp, ui_id, project_id, message, log_type, etl_server, config, etl_run_log_id";
-        $query .= " where log_type = '".self::ETL_RUN_DETAILS."'"
-            ." and etl_run_log_id = '".Filter::escapeForMysql($etlRunLogId)."'";
+        $query .= " where log_type = '" . self::ETL_RUN_DETAILS . "'"
+            . " and etl_run_log_id = '" . Filter::escapeForMysql($etlRunLogId) . "'";
         $etlRunDetails = $this->module->queryLogs($query);
         return $etlRunDetails;
     }
@@ -286,8 +286,8 @@ class ModuleLog
     public function renderCronJobs($logId)
     {
         $cronJobs = '';
-        $cronJobs .= '<h4>Cron Jobs</h4>'."\n";
-        $cronJobs .= '<table class="etl-log">'."\n";
+        $cronJobs .= '<h4>Cron Jobs</h4>' . "\n";
+        $cronJobs .= '<table class="etl-log">' . "\n";
         $cronJobs .= "<thead>\n";
         $cronJobs .= "<tr><th>Log ID</th><th>Cron Log ID</th><th>Server</th><th>Config</th><th>Project ID</th></tr>\n";
         $cronJobs .= "</thead>\n";
@@ -297,11 +297,11 @@ class ModuleLog
         $tableRows = '';
         foreach ($cronJobsData as $job) {
             $row = "<tr>";
-            $row .= '<td style="text-align: right;">'.Filter::sanitizeInt($job['log_id'])."</td>";
-            $row .= '<td style="text-align: right;">'.Filter::sanitizeInt($job['cron_log_id'])."</td>";
-            $row .= "<td>".Filter::sanitizeString($job['etl_server'])."</td>";
-            $row .= "<td>".Filter::sanitizeString($job['config'])."</td>";
-            $row .= '<td style="text-align: right;">'.Filter::sanitizeString($job['project_id'])."</td>";
+            $row .= '<td style="text-align: right;">' . Filter::sanitizeInt($job['log_id']) . "</td>";
+            $row .= '<td style="text-align: right;">' . Filter::sanitizeInt($job['cron_log_id']) . "</td>";
+            $row .= "<td>" . Filter::sanitizeString($job['etl_server']) . "</td>";
+            $row .= "<td>" . Filter::sanitizeString($job['config']) . "</td>";
+            $row .= '<td style="text-align: right;">' . Filter::sanitizeString($job['project_id']) . "</td>";
             
             $row .= "</tr>\n";
             $tableRows .= $row;
@@ -317,8 +317,8 @@ class ModuleLog
     public function renderEtlRunDetails($logId)
     {
         $details = '';
-        $details .= '<h4>ETL Run</h4>'."\n";
-        $details .= '<table class="etl-log">'."\n";
+        $details .= '<h4>ETL Run</h4>' . "\n";
+        $details .= '<table class="etl-log">' . "\n";
         $details .= "<thead>\n";
         $details .= "<tr><th>Log ID</th><th>Time</th></th><th>Message</th></tr>\n";
         $details .= "</thead>\n";
@@ -328,10 +328,10 @@ class ModuleLog
         $tableRows = '';
         foreach ($logEntries as $logEntry) {
             $row = "<tr>";
-            $row .= '<td style="text-align: right;">'.Filter::sanitizeInt($logEntry['log_id'])."</td>";
+            $row .= '<td style="text-align: right;">' . Filter::sanitizeInt($logEntry['log_id']) . "</td>";
             $row .= '<td style="text-align: right; padding: 0px 6px 0px 6px;">'
-                .Filter::sanitizeString($logEntry['timestamp'])."</td>";
-            $row .= "<td>".Filter::sanitizeString($logEntry['message'])."</td>";
+                . Filter::sanitizeString($logEntry['timestamp']) . "</td>";
+            $row .= "<td>" . Filter::sanitizeString($logEntry['message']) . "</td>";
             $row .= "</tr>\n";
             $tableRows .= $row;
         }

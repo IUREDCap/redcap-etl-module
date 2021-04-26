@@ -12,7 +12,7 @@
 $module->checkAdminPagePermission();
 
 
-require_once __DIR__.'/../../dependencies/autoload.php';
+require_once __DIR__ . '/../../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Csrf;
@@ -49,10 +49,10 @@ try {
     if (!empty($username)) {
         if (strcmp($submitValue, $deleteButtonLabel) === 0) {
             $module->deleteUser($username);
-            $success = 'User "'.$username.'" deleted from REDCap-ETL.';
-            $urlValue = RedCapEtlModule::USERS_PAGE.'?success='.Filter::escapeForUrlParameter($success);
+            $success = 'User "' . $username . '" deleted from REDCap-ETL.';
+            $urlValue = RedCapEtlModule::USERS_PAGE . '?success=' . Filter::escapeForUrlParameter($success);
             $usersUrl = $module->getUrl($urlValue);
-            header('Location: '.$usersUrl);
+            header('Location: ' . $usersUrl);
         } else {
             #$privateServers = $module->getPrivateServers();
             $privateServers = $module->getServersViaAccessLevels('private');
@@ -75,9 +75,11 @@ try {
                 $module->addUser($username);
                 $module->setUserEtlProjects($username, $userEtlProjects);
                 $module->processUserPrivateServers($username, $userPrivateServerNames, $privateServers);
-                $success = 'User '.$username.' saved.';
-                $url = $module->getUrl(RedCapEtlModule::USERS_PAGE.'?success='.Filter::escapeForUrlParameter($success));
-                header('Location: '.$url);
+                $success = 'User ' . $username . ' saved.';
+                $url = $module->getUrl(
+                    RedCapEtlModule::USERS_PAGE . '?success=' . Filter::escapeForUrlParameter($success)
+                );
+                header('Location: ' . $url);
             }
             $db = new RedCapDb();
             $userProjects = $db->getUserProjects($username);
@@ -97,8 +99,8 @@ ob_start();
 require_once APP_PATH_DOCROOT . 'ControlCenter/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    " . $link . "\n</head>", $buffer);
 echo $buffer;
 ?>
 
@@ -152,14 +154,14 @@ $(function() {
 
 <?php
 if (!empty($username)) {
-    echo "<p>Server private-level access for user ".Filter::escapeForHtml($userLabel)."</p>\n";
-?>
+    echo "<p>Server private-level access for user " . Filter::escapeForHtml($userLabel) . "</p>\n";
+    ?>
 
-<?php
-#--------------------------------------
-# Delete User from REDCap-ETL dialog
-#--------------------------------------
-?>
+    <?php
+    #--------------------------------------
+    # Delete User from REDCap-ETL dialog
+    #--------------------------------------
+    ?>
 <div id="deleteDialog"
     title="<?php echo $deleteButtonLabel;?>"
     style="display: none;"
@@ -206,11 +208,11 @@ $(function() {
 </script>
 
 
-<?php
-#-----------------------------------------------
-# User configuration form
-#-----------------------------------------------
-?>
+    <?php
+    #-----------------------------------------------
+    # User configuration form
+    #-----------------------------------------------
+    ?>
 <form action="<?php echo $selfUrl;?>" method="post">
 <input type="hidden" name="username" value="<?php echo Filter::escapeForHtmlAttribute($username);?>">
 <table class="user-projects">
@@ -222,34 +224,36 @@ $(function() {
         $row = 1;
         foreach ($privateServers as $serverName) {
             if ($row % 2 == 0) {
-                echo '<tr class="even-row">'."\n";
+                echo '<tr class="even-row">' . "\n";
             } else {
-                echo '<tr class="odd-row">'."\n";
+                echo '<tr class="odd-row">' . "\n";
             }
             
             $checked = '';
             if (!empty($userPrivateServerNames) && in_array($serverName, $userPrivateServerNames)) {
                 $checked = ' checked ';
             }
-            echo '<td style="text-align: center;"><input type="checkbox" name="accessCheckbox['.$serverName.']" '
-                .$checked.'></td>'."\n";
-            echo '<td style="text-align: left">'.$serverName."</td>\n";
+            echo '<td style="text-align: center;"><input type="checkbox" name="accessCheckbox[' . $serverName . ']" '
+                . $checked . '></td>' . "\n";
+            echo '<td style="text-align: left">' . $serverName . "</td>\n";
             echo "</tr>\n";
             $row++;
         }
         ?>
     </tbody>
 </table>
-<?php
-if (empty($privateServers)) {
-    echo '<p>No servers currently have private access.</p>';
-}
-?>
+
+    <?php
+    if (empty($privateServers)) {
+        echo '<p>No servers currently have private access.</p>';
+    }
+    ?>
+
 <hr />
 
-<?php
-   echo "<p>Projects for user ".Filter::escapeForHtml($userLabel)."</p>\n";
-?>
+    <?php
+       echo "<p>Projects for user " . Filter::escapeForHtml($userLabel) . "</p>\n";
+    ?>
 <table class="user-projects">
     <thead>
         <tr> <th>ETL Access?</th> </th><th>PID</th> <th>Project</th> <th>ETL Configurations</th> </tr>
@@ -263,24 +267,24 @@ if (empty($privateServers)) {
             $configNames = $module->getConfigurationNames($projectId);
             
             if ($row % 2 == 0) {
-                echo '<tr class="even-row">'."\n";
+                echo '<tr class="even-row">' . "\n";
             } else {
-                echo '<tr class="odd-row">'."\n";
+                echo '<tr class="odd-row">' . "\n";
             }
             
             $checked = '';
             if (!empty($userEtlProjects) && in_array($projectId, $userEtlProjects)) {
                 $checked = ' checked ';
             }
-            echo '<td style="text-align: center;"><input type="checkbox" name="checkbox['.(int)$projectId.']" '
-                .$checked.'></td>'."\n";
-            echo '<td style="text-align: right">'.(int)$projectId."</td>\n";
+            echo '<td style="text-align: center;"><input type="checkbox" name="checkbox[' . (int)$projectId . ']" '
+                . $checked . '></td>' . "\n";
+            echo '<td style="text-align: right">' . (int)$projectId . "</td>\n";
             
             # Project title
             echo "<td>\n";
-            echo '<a href="'.APP_PATH_WEBROOT.'index.php?pid='
-                .Filter::escapeForUrlParameter($project['project_id']).'" target="_blank">'
-                .Filter::escapeForHtml($project['app_title'])."</a>\n";
+            echo '<a href="' . APP_PATH_WEBROOT . 'index.php?pid='
+                . Filter::escapeForUrlParameter($project['project_id']) . '" target="_blank">'
+                . Filter::escapeForHtml($project['app_title']) . "</a>\n";
             echo "</td>\n";
             
             echo "<td>\n";
@@ -288,8 +292,8 @@ if (empty($privateServers)) {
             foreach ($configNames as $configName) {
                 $configUrl = $module->getURL(
                     RedCapEtlModule::USER_ETL_CONFIG_PAGE
-                    .'?pid='.Filter::escapeForUrlParameter($projectId)
-                    .'&configName='.Filter::escapeForUrlParameter($configName)
+                    . '?pid=' . Filter::escapeForUrlParameter($projectId)
+                    . '&configName=' . Filter::escapeForUrlParameter($configName)
                     #.'&username='.Filter::escapeForUrlParameter($username)
                 );
                 if ($isFirst) {
@@ -297,7 +301,7 @@ if (empty($privateServers)) {
                 } else {
                     echo ", ";
                 }
-                echo '<a href="'.$configUrl.'">'.Filter::escapeForHtml($configName)."</a>\n";
+                echo '<a href="' . $configUrl . '">' . Filter::escapeForHtml($configName) . "</a>\n";
             }
             echo "\n";
             echo "</td>\n";
@@ -315,9 +319,9 @@ if (empty($privateServers)) {
     style="float: right;">
 <div style="clear: both;"></div>
 </p>
-<?php Csrf::generateFormToken(); ?>
+    <?php Csrf::generateFormToken(); ?>
 </form>
-<?php
+    <?php
 }
 ?>
 

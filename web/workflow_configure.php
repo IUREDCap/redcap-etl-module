@@ -43,10 +43,10 @@ $db = new RedCapDb();
 $availableUserProjects = $db->getUserProjects($username);
 array_unshift($availableUserProjects, '');
 
-$selfUrl      = $module->getUrl('web/workflow_configuration.php')
+$selfUrl      = $module->getUrl('web/workflow_configure.php')
                    .'&workflowName='.Filter::escapeForUrlParameter($workflowName);
-$workflowsUrl = $module->getUrl("web/workflows.php");
-$configureUrl = $module->getUrl("web/configure.php");
+$workflowsUrl = $module->getUrl('web/workflows.php');
+$configureUrl = $module->getUrl('web/configure.php');
 $globalPropertiesUrl = $module->getUrl('web/workflow_global_properties.php')
                    .'&workflowName='.Filter::escapeForUrlParameter($workflowName);
 
@@ -148,7 +148,7 @@ $workflowStatus = $module->getWorkflowStatus($workflowName);
 #Get the workflow's updated tasks list
 $tasks = $module->getWorkflow($workflowName, true);
 $taskProjectIds = array_column($tasks, 'projectId');
-#print "============ 172 in workflow_configuration.php, tasks is: ";
+#print "============ 172 in workflow_configure.php, tasks is: ";
 #print_r($tasks);
 ?>
 

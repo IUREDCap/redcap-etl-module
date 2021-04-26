@@ -38,7 +38,7 @@ try {
     #$servers = $module->getServers();
     $servers   = $module->getUserAllowedServersBasedOnAccessLevel(USERID);
 
-    $selfUrl   = $module->getUrl('web/etl_run.php');
+    $selfUrl   = $module->getUrl('web/task_run.php');
     $runUrl   = $module->getUrl('web/run.php');
     $listUrl   = $module->getUrl('web/index.php');
 

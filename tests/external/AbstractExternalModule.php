@@ -9,13 +9,13 @@ abstract class AbstractExternalModule
 {
     protected $log;
     protected $index;
-    
+
     public function __construct()
     {
         $this->log = array();
         $this->index = 0;
     }
-    
+
     public function log($message, $params)
     {
         $this->index++;

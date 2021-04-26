@@ -148,8 +148,8 @@ class ServerConfig implements \JsonSerializable
 
     private function createServerErrorMessageForUser($message)
     {
-        $errorMessage = 'Server "'.$this->name.'" has the following configuration error: '.$message
-            .'. Please contact your system administrator or use another server.';
+        $errorMessage = 'Server "' . $this->name . '" has the following configuration error: '
+            . $message . '. Please contact your system administrator or use another server.';
         return $errorMessage;
     }
     
@@ -160,7 +160,7 @@ class ServerConfig implements \JsonSerializable
      *
      * @param Configuration the ETL configuration to modify.
      */
-    private function updateEtlConfig(& $etlConfig, $isCronJob)
+    private function updateEtlConfig(&$etlConfig, $isCronJob)
     {
         $etlConfig->setProperty(Configuration::CRON_JOB, $isCronJob);
         
@@ -206,7 +206,7 @@ class ServerConfig implements \JsonSerializable
         }
         
         if (!$this->getIsActive()) {
-            $message = 'Server "'.$this->name.'" is set as inactive.';
+            $message = 'Server "' . $this->name . '" is set as inactive.';
             throw new \Exception($message);
         }
 
@@ -290,8 +290,8 @@ class ServerConfig implements \JsonSerializable
             $scp = new SCP($ssh);
             
             $propertiesJson = $etlConfig->getRedCapEtlJsonProperties();
-            $configFileName = 'etl_config_'.$fileNameSuffix.'.json';
-            $configFilePath = $this->configDir.'/'.$configFileName;
+            $configFileName = 'etl_config_' . $fileNameSuffix . '.json';
+            $configFilePath = $this->configDir . '/' . $configFileName;
 
             $scpResult = $scp->put($configFilePath, $propertiesJson);
             if (!$scpResult) {
@@ -302,7 +302,8 @@ class ServerConfig implements \JsonSerializable
             
             #$ssh->setTimeout(1);
 
-            $command = $this->etlCommandPrefix.' '.$this->etlCommand .' '.$configFilePath.' '.$this->etlCommandSuffix;
+            $command = $this->etlCommandPrefix . ' ' . $this->etlCommand . ' '
+                . $configFilePath . ' ' . $this->etlCommandSuffix;
 
             #\REDCap::logEvent('REDCap-ETL run command: '.$command);
 
@@ -310,7 +311,7 @@ class ServerConfig implements \JsonSerializable
                     
             $execOutput = $ssh->exec($command);
             
-            $output = 'Your job has been submitted to server "'.$this->getName().'".'."\n";
+            $output = 'Your job has been submitted to server "' . $this->getName() . '".' . "\n";
             #\REDCap::logEvent('REDCap-ETL run output: '.$output);
         }  // End else not embedded server
         
@@ -322,7 +323,7 @@ class ServerConfig implements \JsonSerializable
         $testOutput = '';
         try {
             if ($this->isEmbeddedServer()) {
-                $testOutput = 'REDCap-ETL '.\IU\REDCapETL\Version::RELEASE_NUMBER.' found.';
+                $testOutput = 'REDCap-ETL ' . \IU\REDCapETL\Version::RELEASE_NUMBER . ' found.';
             } else {
                 $serverAddress = $this->getServerAddress();
                 if (empty($serverAddress)) {
@@ -364,11 +365,11 @@ class ServerConfig implements \JsonSerializable
                     $testOutput = "ERROR: ssh command failed.";
                 } else {
                     $testOutput = "SUCCESS:\noutput of hostname command:\n"
-                        .$output."\n";
+                        . $output . "\n";
                 }
             }
         } catch (\Exception $exception) {
-            $testOutput = 'ERROR: '.$exception->getMessage();
+            $testOutput = 'ERROR: ' . $exception->getMessage();
         }
         return $testOutput;
     }
@@ -384,10 +385,10 @@ class ServerConfig implements \JsonSerializable
         if (empty($name)) {
             throw new \Exception('No server configuration name specified.');
         } elseif (!is_string($name)) {
-            throw new \Exception('Server configuration name is not a string; has type: '.gettype($name).'.');
+            throw new \Exception('Server configuration name is not a string; has type: ' . gettype($name) . '.');
         } elseif (preg_match('/([^a-zA-Z0-9_\- .])/', $name, $matches) === 1) {
             if (strcasecmp($name, self::EMBEDDED_SERVER_NAME) !== 0) {
-                $errorMessage = 'Invalid character in server configuration name: '.$matches[0];
+                $errorMessage = 'Invalid character in server configuration name: ' . $matches[0];
                 throw new \Exception($errorMessage);
             }
         }

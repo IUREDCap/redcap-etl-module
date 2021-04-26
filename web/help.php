@@ -6,7 +6,7 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
-require_once __DIR__.'/../dependencies/autoload.php';
+require_once __DIR__ . '/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\Help;
@@ -33,17 +33,17 @@ $htmlPage = new HtmlPage();
 $htmlPage->PrintHeaderExt();
 ?>
 <div style="text-align:right;float:right;">
-    <img src="<?php echo APP_PATH_IMAGES."redcap-logo.png"; ?>" alt="REDCap"/>
+    <img src="<?php echo APP_PATH_IMAGES . "redcap-logo.png"; ?>" alt="REDCap"/>
 </div>
 <div style="clear: both">
 
 <?php
 
 if (Help::isValidTopic($topic)) {
-    echo '<h3 style="color: #286090;">'.Help::getTitle($topic)."</h3>\n";
+    echo '<h3 style="color: #286090;">' . Help::getTitle($topic) . "</h3>\n";
     echo Help::getHelp($topic, $module);
 } else {
-    echo 'No help was found for topic "'.Filter::escapeForHtml($topic).'".';
+    echo 'No help was found for topic "' . Filter::escapeForHtml($topic) . '".';
 }
 
 ?>

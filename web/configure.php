@@ -6,7 +6,7 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
-require_once __DIR__.'/../dependencies/autoload.php';
+require_once __DIR__ . '/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\Csrf;
 
@@ -20,7 +20,7 @@ try {
     # Check for test mode (which should only be used for development)
     #-------------------------------------------------------------------
     $testMode = false;
-    if (@file_exists(__DIR__.'/../test-config.ini')) {
+    if (@file_exists(__DIR__ . '/../test-config.ini')) {
         $testMode = true;
     }
 
@@ -28,7 +28,7 @@ try {
     $workflowListUrl  = $module->getUrl("web/workflows.php");
     $selfUrl  = $module->getUrl("web/configure.php");
 } catch (\Exception $exception) {
-    $error = 'ERROR: '.$exception->getMessage();
+    $error = 'ERROR: ' . $exception->getMessage();
 }
 ?>
 
@@ -41,8 +41,8 @@ ob_start();
 require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    " . $link . "\n</head>", $buffer);
 echo $buffer;
 ?>
 

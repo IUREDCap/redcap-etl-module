@@ -6,7 +6,7 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
-require_once __DIR__.'/../dependencies/autoload.php';
+require_once __DIR__ . '/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Configuration;
@@ -79,7 +79,7 @@ try {
         }
     }
 } catch (\Exception $exception) {
-    $error = 'ERROR: '.$exception->getMessage();
+    $error = 'ERROR: ' . $exception->getMessage();
 }
 
 #---------------------------------------------
@@ -89,8 +89,8 @@ ob_start();
 require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    " . $link . "\n</head>", $buffer);
 echo $buffer;
 ?>
 
@@ -106,11 +106,10 @@ $configurationNames = $module->getConfigurationNames();
 $adminConfig = $module->getAdminConfig();
 
 $selfUrl     = $module->getUrl('web/index.php');
-$configUrl   = $module->getUrl("web/configure.php");
-$configUrl   = $module->getUrl("web/etl_configure.php");
-$testUrl     = $module->getUrl("web/test.php");
-$scheduleUrl = $module->getUrl("web/schedule.php");
-$runUrl      = $module->getUrl("web/etl_run.php");
+$configUrl   = $module->getUrl('web/task_configure.php');
+$testUrl     = $module->getUrl('web/test.php');
+$scheduleUrl = $module->getUrl('web/schedule.php');
+$runUrl      = $module->getUrl('web/task_run.php');
 
 $userEtlProjects = $module->getUserEtlProjects();
 $projectId = $module->getProjectId();
@@ -172,35 +171,36 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 $row = 1;
 foreach ($configurationNames as $configurationName) {
     if ($row % 2 === 0) {
-        echo '<tr class="even">'."\n";
+        echo '<tr class="even">' . "\n";
     } else {
-        echo '<tr class="odd">'."\n";
+        echo '<tr class="odd">' . "\n";
     }
     
-    $configureUrl = $configUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
-    $testingUrl = $testUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
-    $runConfigurationUrl = $runUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
-    $scheduleConfigUrl = $scheduleUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
+    $configureUrl = $configUrl . '&configName=' . Filter::escapeForUrlParameter($configurationName);
+    $testingUrl = $testUrl . '&configName=' . Filter::escapeForUrlParameter($configurationName);
+    $runConfigurationUrl = $runUrl . '&configName=' . Filter::escapeForUrlParameter($configurationName);
+    $scheduleConfigUrl = $scheduleUrl . '&configName=' . Filter::escapeForUrlParameter($configurationName);
 
     $configuration = $module->getConfiguration($configurationName);
     $exportRight = $module->getConfigurationExportRight($configuration);
     #$exportRightLabel = $module->getExportRightLabel($exportRight);
     
-    echo "<td>".Filter::escapeForHtml($configurationName)."</td>\n";
-    #echo "<td>".Filter::escapeForHtml($exportRightLabel)."</td>\n";
+    echo "<td>" . Filter::escapeForHtml($configurationName) . "</td>\n";
+    #echo "<td>" . Filter::escapeForHtml($exportRightLabel) . "</td>\n";
     
     #-------------------------------------------------------------------------------------
     # CONFIGURE BUTTON - disable if user does not have permission to access configuration
     #-------------------------------------------------------------------------------------
     if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
-            .'<a href="'.$configureUrl.'" id="'.Filter::escapeForHtmlAttribute('configure-'.$configurationName).'">'
-            .'<img alt="CONFIG" src="'.APP_PATH_IMAGES.'gear.png"></a>'
-            ."</td>\n";
+            . '<a href="' . $configureUrl
+            . '" id="' . Filter::escapeForHtmlAttribute('configure-' . $configurationName) . '">'
+            . '<img alt="CONFIG" src="' . APP_PATH_IMAGES . 'gear.png"></a>'
+            . "</td>\n";
     } else {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'gear.png" alt="CONFIG" class="disabled">'
-            ."</td>\n";
+            . '<img src="' . APP_PATH_IMAGES . 'gear.png" alt="CONFIG" class="disabled">'
+            . "</td>\n";
     }
     
     #-------------------------------------------------------------------------------------
@@ -223,12 +223,13 @@ foreach ($configurationNames as $configurationName) {
     if ($adminConfig->getAllowOnDemand()) {
         if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
             echo '<td style="text-align:center;">'
-                .'<a href="'.$runConfigurationUrl.'"><img src="'.APP_PATH_IMAGES.'application_go.png" alt="RUN"></a>'
-                ."</td>\n";
+                . '<a href="' . $runConfigurationUrl . '"><img src="' . APP_PATH_IMAGES
+                . 'application_go.png" alt="RUN"></a>'
+                . "</td>\n";
         } else {
             echo '<td style="text-align:center;">'
-                .'<img src="'.APP_PATH_IMAGES.'application_go.png"  alt="RUN" class="disabled">'
-                ."</td>\n";
+                . '<img src="' . APP_PATH_IMAGES . 'application_go.png"  alt="RUN" class="disabled">'
+                . "</td>\n";
         }
     }
 
@@ -239,12 +240,13 @@ foreach ($configurationNames as $configurationName) {
     if ($adminConfig->getAllowCron()) {
         if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
             echo '<td style="text-align:center;">'
-                .'<a href="'.$scheduleConfigUrl.'"><img src="'.APP_PATH_IMAGES.'clock_frame.png" alt="SCHEDULE"></a>'
-                ."</td>\n";
+                . '<a href="' . $scheduleConfigUrl . '"><img src="' . APP_PATH_IMAGES
+                . 'clock_frame.png" alt="SCHEDULE"></a>'
+                . "</td>\n";
         } else {
             echo '<td style="text-align:center;">'
-                .'<img src="'.APP_PATH_IMAGES.'clock_frame.png" alt="SCHEDULE" class="disabled">'
-                ."</td>\n";
+                . '<img src="' . APP_PATH_IMAGES . 'clock_frame.png" alt="SCHEDULE" class="disabled">'
+                . "</td>\n";
         }
     }
 
@@ -254,14 +256,14 @@ foreach ($configurationNames as $configurationName) {
     #-----------------------------------------------------------
     if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
-            .'<input type="image" src="'.APP_PATH_IMAGES.'page_copy.png" alt="COPY"'
-            .' class="copyConfig" style="cursor: pointer;"'
-            .' id="copyConfig'.$row.'"/>'
-            ."</td>\n";
+            . '<input type="image" src="' . APP_PATH_IMAGES . 'page_copy.png" alt="COPY"'
+            . ' class="copyConfig" style="cursor: pointer;"'
+            . ' id="copyConfig' . $row . '"/>'
+            . "</td>\n";
     } else {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'page_copy.png" alt="COPY" class="disabled" />'
-            ."</td>\n";
+            . '<img src="' . APP_PATH_IMAGES . 'page_copy.png" alt="COPY" class="disabled" />'
+            . "</td>\n";
     }
     
     #-----------------------------------------------------------
@@ -270,14 +272,14 @@ foreach ($configurationNames as $configurationName) {
     #-----------------------------------------------------------
     if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
-            .'<input type="image" src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME"'
-            .' class="renameConfig" style="cursor: pointer;"'
-            .' id="renameConfig'.$row.'"/>'
-            ."</td>\n";
+            . '<input type="image" src="' . APP_PATH_IMAGES . 'page_white_edit.png" alt="RENAME"'
+            . ' class="renameConfig" style="cursor: pointer;"'
+            . ' id="renameConfig' . $row . '"/>'
+            . "</td>\n";
     } else {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME" class="disabled" />'
-            ."</td>\n";
+            . '<img src="' . APP_PATH_IMAGES . 'page_white_edit.png" alt="RENAME" class="disabled" />'
+            . "</td>\n";
     }
 
     #-----------------------------------------------------------
@@ -286,14 +288,14 @@ foreach ($configurationNames as $configurationName) {
     #-----------------------------------------------------------
     if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
         echo '<td style="text-align:center;">'
-            .'<input type="image" src="'.APP_PATH_IMAGES.'delete.png" alt="DELETE"'
-            .' class="deleteConfig" style="cursor: pointer;"'
-            .' id="deleteConfig'.$row.'"/>'
-            ."</td>\n";
+            . '<input type="image" src="' . APP_PATH_IMAGES . 'delete.png" alt="DELETE"'
+            . ' class="deleteConfig" style="cursor: pointer;"'
+            . ' id="deleteConfig' . $row . '"/>'
+            . "</td>\n";
     } else {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'delete.png" alt="DELETE" class="disabled" />'
-            ."</td>\n";
+            . '<img src="' . APP_PATH_IMAGES . 'delete.png" alt="DELETE" class="disabled" />'
+            . "</td>\n";
     }
     
     echo "</tr>\n";
@@ -327,9 +329,9 @@ $(function() {
     # Set up click event handlers for the Copy Configuration  buttons
     $row = 1;
     foreach ($configurationNames as $configurationName) {
-        echo '$("#copyConfig'.$row.'").click({fromConfig: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($configurationName)
-            .'"}, copyConfig);'."\n";
+        echo '$("#copyConfig' . $row . '").click({fromConfig: "'
+            . Filter::escapeForJavaScriptInDoubleQuotes($configurationName)
+            . '"}, copyConfig);' . "\n";
         $row++;
     }
     ?>
@@ -384,9 +386,9 @@ $(function() {
     # Set up click event handlers for the Rename Configuration  buttons
     $row = 1;
     foreach ($configurationNames as $configurationName) {
-        echo '$("#renameConfig'.$row.'").click({configName: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($configurationName)
-            .'"}, renameConfig);'."\n";
+        echo '$("#renameConfig' . $row . '").click({configName: "'
+            . Filter::escapeForJavaScriptInDoubleQuotes($configurationName)
+            . '"}, renameConfig);' . "\n";
         $row++;
     }
     ?>
@@ -442,9 +444,9 @@ $(function() {
     # Set up click event handlers for the Delete Configuration  buttons
     $row = 1;
     foreach ($configurationNames as $configurationName) {
-        echo '$("#deleteConfig'.$row.'").click({configName: "'
-           .Filter::escapeForJavaScriptInDoubleQuotes($configurationName)
-           .'"}, deleteConfig);'."\n";
+        echo '$("#deleteConfig' . $row . '").click({configName: "'
+           . Filter::escapeForJavaScriptInDoubleQuotes($configurationName)
+           . '"}, deleteConfig);' . "\n";
         $row++;
     }
     ?>

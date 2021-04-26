@@ -174,7 +174,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                     $this->run($configName, $serverName, $isCronJob, $projectId, $cronJobLogId, $day, $hour);
                 }
             } catch (\Exception $exception) {
-                $details = "Cron job failed\n".$details.'error: '.$exception->getMessage();
+                $details = "Cron job failed\n"
+                    . $details . 'error: '
+                    . $exception->getMessage();
                 \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
             }
         }  # End foreach cron job
@@ -239,7 +241,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             } else {
                 $etlConfig = $this->getConfiguration($configName, $projectId);
                 if (!isset($etlConfig)) {
-                    throw new \Exception('Configuration "'.$configName.'" not found for project ID '.$projectId);
+                    $message = 'Configuration "' . $configName
+                        . '" not found for project ID ' . $projectId;
+                    throw new \Exception($message);
                 }
             }
             
@@ -251,7 +255,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             } else {
                 $serverConfig = $this->getServerConfig($serverName); # Method throws exception if server not found
                 if (!$serverConfig->getIsActive()) {
-                    throw new \Exception('Server "'.$serverName.'" has been deactivated and cannot be used.');
+                    throw new \Exception('Server "' . $serverName . '" has been deactivated and cannot be used.');
                 }
             }
             
@@ -275,7 +279,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             
             $details .= "project ID: {$projectId}\n";
             if (!$isCronJob) {
-                $details .= "user: ".USERID."\n";
+                $details .= "user: " . USERID . "\n";
             }
             $details .= "configuration: {$configName}\n";
             $details .= "server: {$serverName}\n";
@@ -304,7 +308,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             if ($isCronJob) {
                 if (!$adminConfig->getAllowCron()) {
                     # Cron jobs not allowed
-                    $message = "Cron job failed - cron jobs not allowed\n".$details;
+                    $message = "Cron job failed - cron jobs not allowed\n" . $details;
                     throw new \Exception($message);
                 }
                 # Note: the following check is no longer valid (an admin could set up a cron job):
@@ -316,12 +320,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             } else {
                 # If NOT a cron job
                 if (!Authorization::hasEtlProjectPagePermission($this)) {
-                    $message = 'User "'.USERID.'" does not have permission to run ETL for this project.';
+                    $message = 'User "' . USERID . '" does not have permission to run ETL for this project.';
                     throw new \Exception($message);
                 }
             }
             
-            $details = "ETL job submitted \n".$details;
+            $details = "ETL job submitted \n" . $details;
             \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
             
             #------------------------------------------------------------------------
@@ -335,9 +339,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             #}
             $status = $serverConfig->run($etlConfig, $isCronJob, $this->moduleLog);
         } catch (\Exception $exception) {
-            $status = "ETL job failed: ".$exception->getMessage();
-            $details = "ETL job failed\n".$details
-                .'error: '.$exception->getMessage();
+            $status = "ETL job failed: " . $exception->getMessage();
+            $details = "ETL job failed\n" . $details
+                . 'error: ' . $exception->getMessage();
             \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
         }
         
@@ -390,7 +394,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public static function getRedCapApiUrl()
     {
-        return APP_PATH_WEBROOT_FULL.'api/';
+        return APP_PATH_WEBROOT_FULL . 'api/';
     }
 
     /**
@@ -425,14 +429,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function addUser($username)
     {
         $this->settings->addUser($username);
-        $details = 'User '.$username.' added to ETL users.';
+        $details = 'User ' . $username . ' added to ETL users.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
     public function deleteUser($username)
     {
         $this->settings->deleteUser($username);
-        $details = 'User '.$username.' deleted from ETL users.';
+        $details = 'User ' . $username . ' deleted from ETL users.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
@@ -445,7 +449,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         #loop through the server names to get their access levels
         foreach ($allServers as $serverName) {
            #get the server configurations for the server name
-            $serverConfig=$this->settings->getServerConfig($serverName);
+            $serverConfig = $this->settings->getServerConfig($serverName);
 
            #if the server has the access level specified,
            #add it to the array of servers
@@ -473,7 +477,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             $servers = $this->getServersViaAccessLevels('none');
         } else {
             #add servers with public access
-            $servers=$this->getServersViaAccessLevels('public');
+            $servers = $this->getServersViaAccessLevels('public');
 
             #add the private servers that the user is allowed to access
             $userPrivateServers = array();
@@ -487,7 +491,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function setUserPrivateServerNames($username, $userServerNames)
     {
         $this->settings->setUserPrivateServerNames($username, $userServerNames);
-        $details = 'Allowable private servers modified for user '.$username;
+        $details = 'Allowable private servers modified for user ' . $username;
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
@@ -607,7 +611,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function setUserEtlProjects($username, $projects)
     {
         $this->settings->setUserEtlProjects($username, $projects);
-        $details = 'ETL projects modified for user '.$username;
+        $details = 'ETL projects modified for user ' . $username;
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
@@ -635,16 +639,16 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function setConfiguration($configuration, $username = USERID, $projectId = PROJECT_ID)
     {
         $this->settings->setConfiguration($configuration, $username, $projectId);
-        $details = 'REDCap-ETL configuration "'.$configuration->getName()
-            .'" updated (pid='.$configuration->getProjectId().') ';
+        $details = 'REDCap-ETL configuration "' . $configuration->getName()
+            . '" updated (pid=' . $configuration->getProjectId() . ') ';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
     public function setConfigSchedule($configName, $server, $schedule, $username = USERID, $projectId = PROJECT_ID)
     {
         $this->settings->setConfigSchedule($configName, $server, $schedule, $username, $projectId);
-        $details = 'REDCap-ETL configuration "'.$configName
-            .'" schedule modified for user '.$username.' and project ID '.$projectId.'.';
+        $details = 'REDCap-ETL configuration "' . $configName
+            . '" schedule modified for user ' . $username . ' and project ID ' . $projectId . '.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
     
@@ -652,7 +656,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $dataExportRight = $this->getDataExportRight();
         $this->settings->addConfiguration($name, $username, $projectId, $dataExportRight);
-        $details = 'REDCap-ETL configuration "'.$name.'" created.';
+        $details = 'REDCap-ETL configuration "' . $name . '" created.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
@@ -666,11 +670,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         if (Authorization::hasEtlConfigNamePermission($this, $fromConfigName, PROJECT_ID)) {
             $toExportRight = $this->getDataExportRight();
             $this->settings->copyConfiguration($fromConfigName, $toConfigName, $toExportRight);
-            $details = 'REDCap-ETL configuration "'.$fromConfigName.'" copied to "'.
-                $toConfigName.'" for user '.USERID.', project ID '.PROJECT_ID.'.';
+            $details = 'REDCap-ETL configuration "' . $fromConfigName . '" copied to "'
+                . $toConfigName . '" for user ' . USERID . ', project ID ' . PROJECT_ID . '.';
             \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
         } else {
-            throw new \Exception('You do not have permission to copy configuration "'.$configName.'".');
+            throw new \Exception('You do not have permission to copy configuration "' . $configName . '".');
         }
     }
     
@@ -684,11 +688,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         if (Authorization::hasEtlConfigNamePermission($this, $configName, PROJECT_ID)) {
             $this->settings->renameConfiguration($configName, $newConfigName);
-            $details = 'REDCap-ETL configuration "'.$configName.'" renamed to "'.
-                $newConfigName.'" for user '.USERID.', project ID '.PROJECT_ID.'.';
+            $details = 'REDCap-ETL configuration "' . $configName . '" renamed to "'
+                . $newConfigName . '" for user ' . USERID . ', project ID ' . PROJECT_ID . '.';
             \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
         } else {
-            throw new \Exception('You do not have permission to remname configuration "'.$configName.'".');
+            throw new \Exception('You do not have permission to remname configuration "' . $configName . '".');
         }
     }
     
@@ -696,10 +700,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         if (Authorization::hasEtlConfigNamePermission($this, $configName, PROJECT_ID)) {
             $this->settings->removeConfiguration($configName);
-            $details = 'REDCap-ETL configuration "'.$configName.'" deleted.';
+            $details = 'REDCap-ETL configuration "' . $configName . '" deleted.';
             \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
         } else {
-            throw new \Exception('You do not have permission to remove configuration "'.$configName.'".');
+            throw new \Exception('You do not have permission to remove configuration "' . $configName . '".');
         }
     }
     
@@ -807,7 +811,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function setAdminConfig($adminConfig)
     {
         $this->settings->setAdminConfig($adminConfig);
-        $details = 'REDCap-ETL admin configuration "'.$configName.'" modified.';
+        $details = 'REDCap-ETL admin configuration "' . $configName . '" modified.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
@@ -828,27 +832,27 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function addServer($serverName)
     {
         $this->settings->addServer($serverName);
-        $details = 'Server "'.$serverName.'" created.';
+        $details = 'Server "' . $serverName . '" created.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
     public function copyServer($fromServerName, $toServerName)
     {
         if (strcasecmp($fromServerName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
-            throw new \Exception('The embedded server "'.ServerConfig::EMBEDDED_SERVER_NAME.'" cannot be copied.');
+            throw new \Exception('The embedded server "' . ServerConfig::EMBEDDED_SERVER_NAME . '" cannot be copied.');
         }
         $this->settings->copyServer($fromServerName, $toServerName);
-        $details = 'Server "'.$fromServerName.'" copied to "'.$toServerName.'".';
+        $details = 'Server "' . $fromServerName . '" copied to "' . $toServerName . '".';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
     
     public function renameServer($serverName, $newServerName)
     {
         if (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
-            throw new \Exception('The embedded server "'.ServerConfig::EMBEDDED_SERVER_NAME.'" cannot be renamed.');
+            throw new \Exception('The embedded server "' . ServerConfig::EMBEDDED_SERVER_NAME . '" cannot be renamed.');
         }
         $this->settings->renameServer($serverName, $newServerName);
-        $details = 'Server "'.$serverName.'" renamed to "'.$newServerName.'".';
+        $details = 'Server "' . $serverName . '" renamed to "' . $newServerName . '".';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
     
@@ -856,10 +860,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function removeServer($serverName)
     {
         if (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
-            throw new \Exception('The embedded server "'.ServerConfig::EMBEDDED_SERVER_NAME.'" cannot be deleted.');
+            throw new \Exception('The embedded server "' . ServerConfig::EMBEDDED_SERVER_NAME . '" cannot be deleted.');
         }
         $this->settings->removeServer($serverName);
-        $details = 'Server "'.$serverName.'" deleted.';
+        $details = 'Server "' . $serverName . '" deleted.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
@@ -876,7 +880,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function setServerConfig($serverConfig)
     {
         $this->settings->setServerConfig($serverConfig);
-        $details = 'Server "'.$serverName.'" modified.';
+        $details = 'Server "' . $serverName . '" modified.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
@@ -936,27 +940,27 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         
         $adminUrl = $this->getUrl(self::ADMIN_HOME_PAGE);
         $adminLabel = '<span class="fas fa-cog"></span>'
-           .' Config';
+           . ' Config';
 
         $cronJobsUrl = $this->getUrl(self::CRON_DETAIL_PAGE);
         $cronJobsLabel = '<span class="fas fa-clock"></span>'
-           .' Cron Detail';
+           . ' Cron Detail';
 
         $usersUrl = $this->getUrl(self::USERS_PAGE);
         $usersLabel = '<span class="fas fa-user"></span>'
-           .' Users</span>';
+           . ' Users</span>';
 
         $serversUrl = $this->getUrl(self::SERVERS_PAGE);
         $serversLabel = '<span class="fas fa-server"></span>'
-           .' ETL Servers';
+           . ' ETL Servers';
 
         $helpEditUrl = $this->getUrl(self::HELP_LIST_PAGE);
         $helpEditLabel = '<span class="fas fa-edit"></span>'
-           .' Help Edit';
+           . ' Help Edit';
                       
         $logUrl = $this->getUrl(self::LOG_PAGE);
         $logLabel = '<span class="fas fa-file-alt"></span>'
-           .' Log';
+           . ' Log';
                       
         $tabs = array();
         
@@ -984,11 +988,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $serversUrl = $this->getUrl(self::SERVERS_PAGE);
         $serversLabel = '<span class="fas fa-list"></span>'
-           .' List';
+           . ' List';
 
         $serverConfigUrl = $this->getUrl(self::SERVER_CONFIG_PAGE);
         $serverConfigLabel = '<span class="fas fa-cog"></span>'
-           .' Configuration';
+           . ' Configuration';
 
         $tabs = array();
 
@@ -1005,11 +1009,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $usersUrl = $this->getUrl(self::USERS_PAGE);
         $usersLabel = '<span class="fas fa-list"></span>'
-           .' List</span>';
+           . ' List</span>';
 
         $configureUserUrl = $this->getUrl(self::USER_CONFIG_PAGE);
         $configureUserLabel = '<span class="fas fa-search"></span>'
-           .' Search</span>';
+           . ' Search</span>';
 
         $tabs = array();
 
@@ -1026,11 +1030,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $usersUrl = $this->getUrl(self::HELP_LIST_PAGE);
         $usersLabel = '<span class="fas fa-list"></span>'
-           .' List</span>';
+           . ' List</span>';
 
         $configureUserUrl = $this->getUrl(self::HELP_EDIT_PAGE);
         $configureUserLabel = '<span class="fas fa-edit"></span>'
-           .' Edit</span>';
+           . ' Edit</span>';
 
         $tabs = array();
 
@@ -1048,21 +1052,21 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $listUrl = $this->getUrl('web/index.php');
         $listLabel = '<span class="fas fa-list"></span>'
-           .' ETL Configurations';
+           . ' ETL Configurations';
 
         
         $configUrl = $this->getUrl('web/configure.php');
         $configLabel = '<span style="color: #808080;" class="fas fa-cog"></span>'
-           .' Configure';
+           . ' Configure';
 
         $scheduleUrl = $this->getUrl('web/schedule.php');
         $scheduleLabel =
            '<span id="schedule-tab" class="fas fa-clock"></span>'
-           .' Schedule';
+           . ' Schedule';
 
         $runUrl = $this->getUrl('web/run.php');
         $runLabel = '<span style="color: #008000;" class="fas fa-play-circle"></span>'
-           .' Run';
+           . ' Run';
 
         $workflowsUrl = $this->getUrl('web/workflows.php');
         $workflowsLabel = '<span style="color: #808080;" class="fas fa-list"></span>'
@@ -1071,7 +1075,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $userManualUrl = $this->getUrl('web/user_manual.php');
         $userManualLabel =
             '<i class="fas fa-book"></i>'
-            .' User Manual';
+            . ' User Manual';
 
 
         $adminConfig = $this->getAdminConfig();
@@ -1111,8 +1115,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function renderTabs($tabs = array(), $activeUrl = '')
     {
-        echo '<div id="sub-nav" style="margin:5px 0 20px;">'."\n";
-        echo '<ul>'."\n";
+        echo '<div id="sub-nav" style="margin:5px 0 20px;">' . "\n";
+        echo '<ul>' . "\n";
         foreach ($tabs as $tabUrl => $tabLabel) {
             // Check for Active tab
             $isActive = false;
@@ -1121,16 +1125,16 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 $class = ' class="active"';
                 $isActive = true;
             }
-            echo '<li '.$class.'>'."\n";
+            echo '<li ' . $class . '>' . "\n";
             # Note: URLs created with the getUrl method, so they should already be escaped
-            echo '<a href="'.$tabUrl.'" style="font-size:13px;color:#393733;padding:6px 9px 5px 10px;">';
+            echo '<a href="' . $tabUrl . '" style="font-size:13px;color:#393733;padding:6px 9px 5px 10px;">';
             # Note: labels are static values in code, and not based on user input
-            echo $tabLabel.'</a>'."\n";
+            echo $tabLabel . '</a>' . "\n";
         }
-        echo '</li>'."\n";
-        echo '</ul>'."\n";
-        echo '</div>'."\n";
-        echo '<div class="clear"></div>'."\n";
+        echo '</li>' . "\n";
+        echo '</ul>' . "\n";
+        echo '</div>' . "\n";
+        echo '<div class="clear"></div>' . "\n";
     }
     
     /**
@@ -1156,7 +1160,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             } else {
                 echo "&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;";
             }
-            echo '<a href="'.$url.'" '.$style.'>'."{$label}</a>";
+            echo '<a href="' . $url . '" ' . $style . '>' . "{$label}</a>";
         }
         echo "</div>\n";
     }
@@ -1165,9 +1169,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function renderSuccessMessageDiv($message)
     {
         if (!empty($message)) {
-            echo '<div align="center" class="darkgreen" style="margin: 20px 0;">'."\n";
-            echo '<img src="'.(APP_PATH_IMAGES.'accept.png').'" alt="">';
-            echo '&nbsp;'.Filter::escapeForHtml($message)."\n";
+            echo '<div align="center" class="darkgreen" style="margin: 20px 0;">' . "\n";
+            echo '<img src="' . (APP_PATH_IMAGES . 'accept.png') . '" alt="">';
+            echo '&nbsp;' . Filter::escapeForHtml($message) . "\n";
             echo "</div>\n";
         }
     }
@@ -1175,9 +1179,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function renderWarningMessageDiv($message)
     {
         if (!empty($message)) {
-            echo '<div align="center" class="yellow" style="margin: 20px 0;">'."\n";
-            echo '<img src="'.(APP_PATH_IMAGES.'warning.png').'"  alt="" width="16px">';
-            echo '&nbsp;'.Filter::escapeForHtml($message)."\n";
+            echo '<div align="center" class="yellow" style="margin: 20px 0;">' . "\n";
+            echo '<img src="' . (APP_PATH_IMAGES . 'warning.png') . '"  alt="" width="16px">';
+            echo '&nbsp;' . Filter::escapeForHtml($message) . "\n";
             echo "</div>\n";
         }
     }
@@ -1185,9 +1189,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function renderErrorMessageDiv($message)
     {
         if (!empty($message)) {
-            echo '<div align="center" class="red" style="margin: 20px 0;">'."\n";
-            echo '<img src="'.(APP_PATH_IMAGES.'exclamation.png').'" alt="">';
-            echo '&nbsp;'.Filter::escapeForHtml($message)."\n";
+            echo '<div align="center" class="red" style="margin: 20px 0;">' . "\n";
+            echo '<img src="' . (APP_PATH_IMAGES . 'exclamation.png') . '" alt="">';
+            echo '&nbsp;' . Filter::escapeForHtml($message) . "\n";
             echo "</div>\n";
         }
     }
@@ -1239,28 +1243,28 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         if (!Csrf::isValidRequest()) {
             # CSRF (Cross-Site Request Forgery) check failed; this should mean that either the
             # request is a CSRF attack or the user's session expired
-            $accessUrl = $this->getUrl('web/access.php?accessError='.self::CSRF_ERROR);
-            header('Location: '.$accessUrl);
+            $accessUrl = $this->getUrl('web/access.php?accessError=' . self::CSRF_ERROR);
+            header('Location: ' . $accessUrl);
             exit();
         } elseif ($runCheck && !$adminConfig->getAllowOnDemand()) {
             # Trying to access the run page when running on demand has been disabled
             $indexUrl = $this->getUrl('web/index.php');
-            header('Location: '.$indexUrl);
+            header('Location: ' . $indexUrl);
             exit();
         } elseif ($scheduleCheck && !$adminConfig->getAllowCron()) {
             # trying to access the schedule page when ETL cron jobs have been disabled
             $indexUrl = $this->getUrl('web/index.php');
-            header('Location: '.$indexUrl);
+            header('Location: ' . $indexUrl);
             exit();
         } elseif (!Authorization::hasRedCapUserRightsForEtl($this)) {
             # User does not have REDCap user rights to use ETL for this project
-            $accessUrl = $this->getUrl('web/access.php?accessError='.self::USER_RIGHTS_ERROR);
-            header('Location: '.$accessUrl);
+            $accessUrl = $this->getUrl('web/access.php?accessError=' . self::USER_RIGHTS_ERROR);
+            header('Location: ' . $accessUrl);
             exit();
         } elseif (!Authorization::hasEtlProjectPagePermission($this)) {
             # User has REDCap ETL user rights, but does not have specific ETL permission for this project
-            $accessUrl = $this->getUrl('web/access.php?accessError='.self::NO_ETL_PROJECT_PERMISSION);
-            header('Location: '.$accessUrl);
+            $accessUrl = $this->getUrl('web/access.php?accessError=' . self::NO_ETL_PROJECT_PERMISSION);
+            header('Location: ' . $accessUrl);
             exit();
         } else {
             # See if a configuration was specified in the request, and if so, check that the user
@@ -1270,8 +1274,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 if (!Authorization::hasEtlConfigurationPermission($this, $configuration)) {
                     if ($configCheck) {
                         # User does not have permission to access the specified configuration
-                        $accessUrl = $this->getUrl('web/access.php?accessError='.self::NO_CONFIGURATION_PERMISSION);
-                        header('Location: '.$accessUrl);
+                        $accessUrl = $this->getUrl('web/access.php?accessError=' . self::NO_CONFIGURATION_PERMISSION);
+                        header('Location: ' . $accessUrl);
                         exit();
                     } else {
                         $configuration = null;
@@ -1292,7 +1296,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         } elseif (!Csrf::isValidRequest()) {
             exit(
                 "Access not allowed. Your session may have expired."
-                ." Please make sure you are logged in and try again."
+                . " Please make sure you are logged in and try again."
             );
         }
     }

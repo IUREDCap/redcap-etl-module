@@ -16,10 +16,7 @@ Feature: Admin-Interface
     When I follow "Users"
     And I follow "Search"
     And I search for user
-    And I select the test project
-    And I go to new window in 7 seconds
+    And I select the test project in new window
     And I follow "REDCap-ETL"
-    And I wait for 4 seconds
     Then I should see "ETL Configurations"
-    And I go to old window
 

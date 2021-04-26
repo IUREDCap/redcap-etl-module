@@ -30,7 +30,7 @@ class Csrf
      */
     public static function generateFormToken()
     {
-        echo '<input type="hidden" name="'.self::TOKEN_NAME.'" value="'.self::getToken().'"'.">\n";
+        echo '<input type="hidden" name="' . self::TOKEN_NAME . '" value="' . self::getToken() . '"' . ">\n";
     }
 
     /**

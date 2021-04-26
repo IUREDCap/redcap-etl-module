@@ -6,7 +6,7 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
-require_once __DIR__.'/../dependencies/autoload.php';
+require_once __DIR__ . '/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Authorization;
@@ -70,7 +70,7 @@ try {
         if (empty($configName)) {
             $error = 'ERROR: No ETL configuration specified.';
         } elseif (!isset($configuration)) {
-            $error = 'ERROR: No ETL configuration found for '.$configName.'.';
+            $error = 'ERROR: No ETL configuration found for ' . $configName . '.';
         } elseif (empty($server)) {
             $error = 'ERROR: No server specified.';
         } else {
@@ -85,7 +85,7 @@ try {
         }
     }
 } catch (Exception $exception) {
-    $error = 'ERROR: '.$exception->getMessage();
+    $error = 'ERROR: ' . $exception->getMessage();
 }
 ?>
 
@@ -105,7 +105,7 @@ echo $buffer;
 require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
 echo "{$link}\n";
 ?>
 
@@ -136,11 +136,11 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     array_unshift($values, '');
     foreach ($values as $value) {
         if (strcmp($value, $configName) === 0) {
-            echo '<option value="'.Filter::escapeForHtmlAttribute($value).'" selected>'
-                .Filter::escapeForHtml($value)."</option>\n";
+            echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '" selected>'
+                . Filter::escapeForHtml($value) . "</option>\n";
         } else {
-            echo '<option value="'.Filter::escapeForHtmlAttribute($value).'">'
-                .Filter::escapeForHtml($value)."</option>\n";
+            echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '">'
+                . Filter::escapeForHtml($value) . "</option>\n";
         }
     }
     ?>
@@ -194,8 +194,8 @@ $(function () {
     #--------------------------------------------------------------
     # Server selection
     #--------------------------------------------------------------
-    echo '<select name="server" id="serverId">'."\n";
-    echo '<option value=""></option>'."\n";
+    echo '<select name="server" id="serverId">' . "\n";
+    echo '<option value=""></option>' . "\n";
 
     #if ($adminConfig->getAllowEmbeddedServer()) {
     #    $selected = '';
@@ -215,8 +215,8 @@ $(function () {
             if ($serverName === $server) {
                 $selected = 'selected';
             }
-            echo '<option value="'.Filter::escapeForHtmlAttribute($serverName).'" '.$selected.'>'
-                .Filter::escapeForHtml($serverName)."</option>\n";
+            echo '<option value="' . Filter::escapeForHtmlAttribute($serverName) . '" ' . $selected . '>'
+                . Filter::escapeForHtml($serverName) . "</option>\n";
         }
     }
     echo "</select>\n";
@@ -248,7 +248,7 @@ $(function () {
             echo '<tr>';
         }
         
-        echo '<td class="time-range">'.($adminConfig->getHtmlTimeLabel($time))."</td>";
+        echo '<td class="time-range">' . ($adminConfig->getHtmlTimeLabel($time)) . "</td>";
         
         foreach (AdminConfig::DAY_LABELS as $day => $label) {
             $radioName = $label;
@@ -261,11 +261,11 @@ $(function () {
 
             if ($adminConfig->isAllowedCronTime($day, $time)) {
                 echo '<td class="day" >';
-                echo '<input type="radio" name="'.$radioName.'" value="'.$value.'" '.$checked.'>';
-                echo '</td>'."\n";
+                echo '<input type="radio" name="' . $radioName . '" value="' . $value . '" ' . $checked . '>';
+                echo '</td>' . "\n";
             } else {
-                echo '<td class="day" ><input type="radio" name="'.$radioName.'"'
-                    .' value="'.$value.'" disabled></td>'."\n";
+                echo '<td class="day" ><input type="radio" name="' . $radioName . '"'
+                    . ' value="' . $value . '" disabled></td>' . "\n";
             }
         }
         echo "</tr>\n";

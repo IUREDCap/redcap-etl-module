@@ -119,11 +119,11 @@ echo $buffer;
 $workflowNames = $module->getProjectAvailableWorkflows();
 $adminConfig   = $module->getAdminConfig();
 
-$selfUrl       = $module->getUrl("web/workflows.php");
-$configUrl     = $module->getUrl("web/workflow_configuration.php");
-$testUrl       = $module->getUrl("web/test.php");
-$scheduleUrl   = $module->getUrl("web/schedule.php");
-$runUrl        = $module->getUrl("web/workflow_run.php");
+$selfUrl       = $module->getUrl('web/workflows.php');
+$configUrl     = $module->getUrl('web/workflow_configure.php');
+$testUrl       = $module->getUrl('web/test.php');
+$scheduleUrl   = $module->getUrl('web/schedule.php');
+$runUrl        = $module->getUrl('web/workflow_run.php');
 
 $userEtlProjects = $module->getUserEtlProjects();
 $projectId = $module->getProjectId();

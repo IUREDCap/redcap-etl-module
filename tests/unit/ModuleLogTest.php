@@ -12,7 +12,7 @@ class ModuleLogTest extends TestCase
 {
     private $moduleMock;
 
-    public function setup()
+    public function setUp(): void
     {
         $this->moduleMock = new ModuleMock();
     }

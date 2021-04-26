@@ -103,7 +103,7 @@ class ConfigurationTest extends TestCase
             $exceptionCaught = true;
         }
         $this->assertTrue($exceptionCaught, 'API token exception check');
-        $this->assertRegExp('/No API token specified/', $message, 'API Token message check');
+        $this->assertMatchesRegularExpression('/No API token specified/', $message, 'API Token message check');
         $properties[Configuration::API_TOKEN_USERNAME] = $originalValue;
     }
 
@@ -133,7 +133,7 @@ class ConfigurationTest extends TestCase
         }
 
         $this->assertTrue($exceptionCaught, 'Invalid characters caught');
-        $this->assertContains('should only contain', $message, 'Invalid characters message');
+        $this->assertStringContainsString('should only contain', $message, 'Invalid characters message');
 
         # Invalid length
         $exceptionCaught = false;
@@ -145,7 +145,7 @@ class ConfigurationTest extends TestCase
         }
 
         $this->assertTrue($exceptionCaught, 'Invalid length caught');
-        $this->assertContains('length of', $message, 'Invalid length message');
+        $this->assertStringContainsString('length of', $message, 'Invalid length message');
     }
 
 
@@ -161,7 +161,7 @@ class ConfigurationTest extends TestCase
         }
 
         $this->assertTrue($exceptionCaught, 'Invalid batch size caught');
-        $this->assertContains('positive integer', $message, 'Invalid batch size message');
+        $this->assertStringContainsString('positive integer', $message, 'Invalid batch size message');
     }
     
     public function testDatabaseProperties()

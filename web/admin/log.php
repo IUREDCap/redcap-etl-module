@@ -12,7 +12,7 @@
 $module->checkAdminPagePermission();
 
 
-require_once __DIR__.'/../../dependencies/autoload.php';
+require_once __DIR__ . '/../../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Csrf;
@@ -72,14 +72,14 @@ ob_start();
 require_once APP_PATH_DOCROOT . 'ControlCenter/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">'."\n";
-$jsCode = '<script>'."\n"
-    .'    $( function() {'."\n"
-    .'        $("#startDate").datepicker();'."\n"
-    .'        $("#endDate").datepicker();'."\n"
-    .'    } );'."\n"
-    .'</script>'."\n";
-$buffer = str_replace('</head>', "    ".$link.$jsCode."</head>", $buffer);
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">' . "\n";
+$jsCode = '<script>' . "\n"
+    . '    $( function() {' . "\n"
+    . '        $("#startDate").datepicker();' . "\n"
+    . '        $("#endDate").datepicker();' . "\n"
+    . '    } );' . "\n"
+    . '</script>' . "\n";
+$buffer = str_replace('</head>', "    " . $link . $jsCode . "</head>", $buffer);
 echo $buffer;
 ?>
 
@@ -151,7 +151,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
     
         <input type="submit" value="Display" name="submitValue" style="margin-left: 7px;">
         
-        <input type="image" name="downloadButton" src="<?php echo APP_PATH_IMAGES.'download_csvexcel.gif'; ?>"
+        <input type="image" name="downloadButton" src="<?php echo APP_PATH_IMAGES . 'download_csvexcel.gif'; ?>"
                alt="CSV" style="vertical-align: middle; margin-left: 2em;">
     </div>
     <?php Csrf::generateFormToken(); ?>
@@ -208,33 +208,34 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
             foreach ($logData as $entry) {
                 if ($logType === RedCapEtlModule::ETL_RUN) {
                     $projectId = $entry['project_id'];
-                    $projectUrl = APP_PATH_WEBROOT.'index.php?pid='.(int)$projectId;
+                    $projectUrl = APP_PATH_WEBROOT . 'index.php?pid=' . (int)$projectId;
                     
                     $cron = $entry['cron'];
                     
                     $config = $entry['config'];
                     $configUrl = $module->getURL(
                         RedCapEtlModule::USER_ETL_CONFIG_PAGE
-                        .'?pid='.Filter::escapeForUrlParameter($projectId)
-                        .'&configName='.Filter::escapeForUrlParameter($config)
+                        . '?pid=' . Filter::escapeForUrlParameter($projectId)
+                        . '&configName=' . Filter::escapeForUrlParameter($config)
                     );
                     
                     $server = $entry['etl_server'];
-                    $serverUrl = $serverConfigUrl.'&serverName='.Filter::escapeForUrlParameter($server);
+                    $serverUrl = $serverConfigUrl . '&serverName=' . Filter::escapeForUrlParameter($server);
                     
                     echo "<tr>\n";
-                    echo '<td style="text-align: right;">'.$entry['log_id']."</td>\n";
-                    echo "<td>".$entry['timestamp']."</td>\n";
+                    echo '<td style="text-align: right;">' . $entry['log_id'] . "</td>\n";
+                    echo "<td>" . $entry['timestamp'] . "</td>\n";
 
-                    echo '<td style="text-align: right;">'.'<a href="'.$projectUrl.'">'.$projectId."</a></td>\n";
-                    echo "<td>".'<a href="'.$serverUrl.'">'.Filter::escapeForHtml($server).'</a>'."</td>\n";
-                    echo "<td>".'<a href="'.$configUrl.'">'.Filter::escapeForHtml($config).'</a>'."</td>\n";
+                    echo '<td style="text-align: right;">' . '<a href="'
+                        . $projectUrl . '">' . $projectId . "</a></td>\n";
+                    echo "<td>" . '<a href="' . $serverUrl . '">' . Filter::escapeForHtml($server) . '</a>' . "</td>\n";
+                    echo "<td>" . '<a href="' . $configUrl . '">' . Filter::escapeForHtml($config) . '</a>' . "</td>\n";
                     
                     #--------------------------------------------
                     # User info (not available for cron jobs)
                     #--------------------------------------------
-                    echo '<td style="text-align: right;">'.$entry['ui_id']."</td>\n";
-                    echo "<td>".Filter::escapeForHtml($entry['etl_username'])."</td>\n";
+                    echo '<td style="text-align: right;">' . $entry['ui_id'] . "</td>\n";
+                    echo "<td>" . Filter::escapeForHtml($entry['etl_username']) . "</td>\n";
                     
                     #-------------------------------------
                     # Cron info
@@ -244,14 +245,14 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     } else {
                         echo "<td>no</td>\n";
                     }
-                    echo '<td style="text-align: right;">'.$entry['cron_day']."</td>\n";
-                    echo '<td style="text-align: right;">'.$entry['cron_hour']."</td>\n";
+                    echo '<td style="text-align: right;">' . $entry['cron_day'] . "</td>\n";
+                    echo '<td style="text-align: right;">' . $entry['cron_hour'] . "</td>\n";
                     
                     echo '<td>';
                     if ($server === ServerConfig::EMBEDDED_SERVER_NAME) {
-                        echo '<a id="etl_run_detail_'.($entry['log_id']).'" class="etlRunDetails"'
-                            .' href="#">'
-                            .'details'.'</a>';
+                        echo '<a id="etl_run_detail_' . ($entry['log_id']) . '" class="etlRunDetails"'
+                            . ' href="#">'
+                            . 'details' . '</a>';
                     } else {
                         echo 'See remote server logs';
                     }
@@ -264,17 +265,17 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                         $cron = $entry['cron'];
                     }
                     echo "<tr>\n";
-                    echo '<td style="text-align: right;">'.$entry['log_id']."</td>\n";
-                    echo "<td>".$entry['timestamp']."</td>\n";
-                    echo '<td style="text-align: right;">'.$entry['cron_day']."</td>\n";
-                    echo '<td style="text-align: right;">'.$entry['cron_hour']."</td>\n";
+                    echo '<td style="text-align: right;">' . $entry['log_id'] . "</td>\n";
+                    echo "<td>" . $entry['timestamp'] . "</td>\n";
+                    echo '<td style="text-align: right;">' . $entry['cron_day'] . "</td>\n";
+                    echo '<td style="text-align: right;">' . $entry['cron_hour'] . "</td>\n";
                     
                     $numJobs = $entry['num_jobs'];
                     echo '<td style="text-align: right;">';
                     if ($numJobs > 0) {
-                        echo '<a id="cron_detail_'.($entry['log_id']).'" class="cronLogDetail"'
-                            .' href="#" style="font-weight: bold; text-decoration: underline;">'
-                            .$numJobs.'</a>';
+                        echo '<a id="cron_detail_' . ($entry['log_id']) . '" class="cronLogDetail"'
+                            . ' href="#" style="font-weight: bold; text-decoration: underline;">'
+                            . $numJobs . '</a>';
                     } else {
                         echo $numJobs;
                     }

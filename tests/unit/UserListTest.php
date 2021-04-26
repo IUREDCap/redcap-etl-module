@@ -40,9 +40,9 @@ class UserListTest extends TestCase
         $this->assertEquals($projects, $userList->getProjects('user0'), 'Remove project test');
 
         $json = $userList->toJson();
-        $this->assertRegexp('/user0/', $json, 'JSON user0 test');
-        $this->assertRegexp('/user2/', $json, 'JSON user2 test');
-        $this->assertRegexp('/20/', 'JSON projec 20 test');
+        $this->assertMatchesRegularExpression('/user0/', $json, 'JSON user0 test');
+        $this->assertMatchesRegularExpression('/user2/', $json, 'JSON user2 test');
+        $this->assertMatchesRegularExpression('/20/', 'JSON projec 20 test');
 
         $userList->fromJson($json);
         $json2 = $userList->toJson();
