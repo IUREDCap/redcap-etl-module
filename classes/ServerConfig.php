@@ -254,7 +254,7 @@ class ServerConfig implements \JsonSerializable
             
             if ($this->authMethod == self::AUTH_METHOD_PASSWORD) {
                 $ssh = new SSH2($this->serverAddress);
-                $ssh->login($username, $this->password);
+                $ssh->login($this->username, $this->password);
             } elseif ($this->authMethod == self::AUTH_METHOD_SSH_KEY) {
                 $keyFile = $this->getSshKeyFile();
                 
@@ -297,6 +297,12 @@ class ServerConfig implements \JsonSerializable
             if (!$scpResult) {
                 $message = 'Copy of ETL configuration to server failed.'
                     . ' Please contact your system administrator for assistance.';
+
+                $error = error_get_last();
+                if (isset($error) && is_array($error) && array_key_exists('message', $error)) {
+                    $message .= " Error: " . $error['message'];
+                }
+
                 throw new \Exception($message);
             }
             
