@@ -36,6 +36,12 @@ class StatusTest extends TestCase
         self::$session->setCookie($cookieName, $cookieValue);
     }
 
+    public static function tearDownAfterClass(): void
+    {
+        self::$mink->stopSessions();
+    }
+
+
     public function testUserSetup()
     {
         $username = self::$testConfig->getUser()['username'];

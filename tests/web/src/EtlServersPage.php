@@ -29,6 +29,13 @@ class EtlServersPage
         $element->click();
     }
 
+    public static function addServer($session, $serverName)
+    {
+        $page = $session->getPage();
+        $page->fillField('server-name', $serverName);
+        $page->pressButton('Add Server');
+    }
+
     public static function configureServer($session, $serverName)
     {
         $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
