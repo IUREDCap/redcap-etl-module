@@ -366,9 +366,19 @@ class ServerConfig implements \JsonSerializable
                     $ssh->login($username, $password);
                 }
 
+                $isAuthenticated = $ssh->isAuthenticated();
                 $output = $ssh->exec('hostname');
                 if (!$output) {
-                    $testOutput = "ERROR: ssh command failed.";
+                    if ($this->getAuthMethod() == ServerConfig::AUTH_METHOD_SSH_KEY) {
+                        $authMethod = "SSH key";
+                    } else {
+                        $authMethod = "password";
+                    }
+                        
+                    $err = $ssh->getLastError();
+                    $testOutput = "ERROR: ssh command failed. Server: '{$serverAddress}'."
+                        . " Username: '{$username}'. Authentication method: {$authMethod}."
+                        ;
                 } else {
                     $testOutput = "SUCCESS:\noutput of hostname command:\n"
                         . $output . "\n";
