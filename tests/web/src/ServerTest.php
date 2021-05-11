@@ -86,5 +86,56 @@ class ServerTest extends TestCase
         $testOutput = $page->findById("testOutput")->getValue();
         $this->assertMatchesRegularExpression("/SUCCESS/", $testOutput); 
         $this->assertMatchesRegularExpression("/output of hostname command:/", $testOutput); 
+
+        Util::logout(self::$session);
+    }
+
+    public function testServerWithSshKeyAuthentication()
+    {
+        $serverName = 'ssh_key_authentication';
+
+        $username = self::$testConfig->getUser()['username'];
+        $testProjectTitle = self::$testConfig->getUser()['test_project_title'];
+
+        $serverConfig = self::$testConfig->getServerConfig($serverName);
+
+        if (!isset($serverConfig)
+            || !is_array($serverConfig)
+            || !array_key_exists('active', $serverConfig)
+            || $serverConfig['active'] != 1
+        ) {
+            $this->markTestSkipped('Incompete "' . $serverName . '" server configuration');
+        }
+
+        $this->assertNotNull($serverConfig);
+
+        # print_r($serverConfig);
+
+        # Access the REDCap-ETL admin interface
+        Util::logInAsAdminAndAccessRedCapEtl(self::$session);
+        $page = self::$session->getPage();
+        $text = $page->getText();
+
+        # Go to the ETL Servers page
+        $page->clickLink('ETL Servers');
+        $text = $page->getText();
+        $this->assertMatchesRegularExpression("/Server Name/", $text); 
+
+        EtlServersPage::deleteServer(self::$session, $serverName);
+        EtlServersPage::addServer(self::$session, $serverName);
+        EtlServersPage::followServer(self::$session, $serverName);
+        EtlServersPage::configureServer(self::$session, $serverName);
+        EtlServersPage::followServer(self::$session, $serverName);
+
+        #-------------------------------------------------
+        # Test the ETL server connection
+        #-------------------------------------------------
+        $page = self::$session->getPage();
+        $page->pressButton('Test Server Connection');
+        $testOutput = $page->findById("testOutput")->getValue();
+        $this->assertMatchesRegularExpression("/SUCCESS/", $testOutput); 
+        $this->assertMatchesRegularExpression("/output of hostname command:/", $testOutput); 
+
+        Util::logout(self::$session);
     }
 }
