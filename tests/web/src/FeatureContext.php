@@ -500,7 +500,7 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     public function iConfigureServer($serverName)
     {
         $session = $this->getSession();
-        EtlServersPage::configureServer($session, $serverName);
+        EtlServerConfigPage::configureServer($session, $serverName);
     }
 
     /**

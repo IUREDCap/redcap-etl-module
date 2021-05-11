@@ -75,7 +75,7 @@ class ServerTest extends TestCase
         EtlServersPage::deleteServer(self::$session, $serverName);
         EtlServersPage::addServer(self::$session, $serverName);
         EtlServersPage::followServer(self::$session, $serverName);
-        EtlServersPage::configureServer(self::$session, $serverName);
+        EtlServerConfigPage::configureServer(self::$session, $serverName);
         EtlServersPage::followServer(self::$session, $serverName);
 
         #-------------------------------------------------
@@ -124,7 +124,7 @@ class ServerTest extends TestCase
         EtlServersPage::deleteServer(self::$session, $serverName);
         EtlServersPage::addServer(self::$session, $serverName);
         EtlServersPage::followServer(self::$session, $serverName);
-        EtlServersPage::configureServer(self::$session, $serverName);
+        EtlServerConfigPage::configureServer(self::$session, $serverName);
         EtlServersPage::followServer(self::$session, $serverName);
 
         #-------------------------------------------------
