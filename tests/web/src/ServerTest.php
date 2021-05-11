@@ -87,6 +87,10 @@ class ServerTest extends TestCase
         $this->assertMatchesRegularExpression("/SUCCESS/", $testOutput); 
         $this->assertMatchesRegularExpression("/output of hostname command:/", $testOutput); 
 
+        Util::logout(self::$session);   # logout as admin
+
+        Util::logInAsUserAndAccessRedCapEtlForTestProject(self::$session);
+
         Util::logout(self::$session);
     }
 

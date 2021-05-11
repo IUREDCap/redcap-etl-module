@@ -83,7 +83,7 @@ class EtlServerConfigPage
             $page->checkField('enableSummaryEmail');
         }
 
-        sleep(7);
+        #sleep(2);
 
         #------------------------------
         # Save
