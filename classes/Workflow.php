@@ -38,7 +38,7 @@ class Workflow implements \JsonSerializable
     {
         $this->workflows[$workflowName] = array();
         $this->workflows[$workflowName]["metadata"] = array();
-        $this->workflows[$workflowName]["properties"] = array();
+        $this->workflows[$workflowName]["properties"] = array(); #global properties
 
         $now = new \DateTime();
         $now->format('Y-m-d H:i:s');
@@ -51,7 +51,8 @@ class Workflow implements \JsonSerializable
     public function getWorkflow($workflowName, $removeMetadata = null)
     {
         $workflow = $this->workflows[$workflowName];
-        unset($workflow["properties"]);
+        unset($workflow["properties"]); #remove global properties
+        $this->sequenceWorkflow($workflowName, $workflow, null);
         if ($removeMetadata) {
             unset($workflow["metadata"]);
         }
@@ -390,11 +391,6 @@ class Workflow implements \JsonSerializable
 
     public function getWorkflowGlobalProperties($workflowName)
     {
-#print "==================wwwwwwwwwwwwwwwwwww00000000, 393 workflow.php, getWorkflowGlobalProperties, workflow: $workflowName, is ";
-#print_r($this->workflows[$workflowName]);
-#print "==================wwwwwwwwwwwwwwwwww00000000, 395 workflow.php, getWorkflowGlobalProperties, properties is ";
-#print_r($this->workflows[$workflowName]["properties"]);
-				
         return $this->workflows[$workflowName]["properties"];
     }
 
@@ -407,8 +403,6 @@ class Workflow implements \JsonSerializable
         }
 
         $this->workflows[$workflowName]["properties"] = $properties;
-print "==================wwwwwwwwwwwwwwwwww1111111111111111 workflow.php, setWorkflowGlobalProperties, workflow: $workflowName, is ";
-print_r($this->workflows[$workflowName]);
 
         #workflow metadata
         if ($username) {

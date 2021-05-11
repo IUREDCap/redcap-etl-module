@@ -1052,7 +1052,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $listUrl = $this->getUrl('web/index.php');
         $listLabel = '<span class="fas fa-list"></span>'
-           . ' ETL Configurations';
+           . ' ETL Tasks';
 
         
         $configUrl = $this->getUrl('web/configure.php');
@@ -1070,7 +1070,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
         $workflowsUrl = $this->getUrl('web/workflows.php');
         $workflowsLabel = '<span style="color: #808080;" class="fas fa-list"></span>'
-           .' Workflows';
+           .' ETL Workflows';
 
         $userManualUrl = $this->getUrl('web/user_manual.php');
         $userManualLabel =
@@ -1463,6 +1463,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
   public function runWorkflow(
         $workflowName,
         $serverName,
+        $username,
+        $userProjects,
         $isCronJob = false,
         $originatingProjectId = PROJECT_ID,
         $cronJobLogId = null,
@@ -1473,11 +1475,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     $status = null; 
     
     try {
-            $username = '';
-            if (defined('USERID')) {
-                $username = USERID;
+            if (empty($usernamei)) { 
+                if (defined('USERID')) {
+                    $username = USERID;
+                }
             }
 
+            $superUser = SUPER_USER; 
             #-------------------------------------------------
             # Log run information to external module log
             #-------------------------------------------------
@@ -1529,86 +1533,156 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 if (empty($serverName)) {
                     throw new \Exception('No server specified.');
                 } else {
-                    $serverConfig = $this->getServerConfig($serverName); # Method throws exception if server not found
+                    $serverConfig = $this->getServerConfig($serverName); # calls settings->getserverconfig
                     if (!$serverConfig->getIsActive()) {
                         throw new \Exception('Server "'.$serverName.'" has been deactivated and cannot be used.');
                     }
                 }   
 
-                $cron = 'no';
-                if ($isCronJob) {
-                    $cron = 'yes';
-                }
-            
+                $workflowProperties = array();
+                $workflowProperties['workflow_name'] = $workflowName;
+
+                #---------------------------------------------
+                # Add global variables to workflow properties 
+                #---------------------------------------------
+                $workflowProperties = array_merge($workflowProperties, array_filter($globalProperties));
+
                 #---------------------------------------------
                 # Run each workflow ETL task 
                 #---------------------------------------------
+                $isWorkflow = true;
+                #$workflowProperties['username'] = $username;
+                #$workflowProperties['serverName'] = $serverName;
+                #$workflowProperties['tasks'] = array();
                 foreach ($tasks as $key => $task) {
-                    $projectId = $task['projectId'];
-                    $configName = $task['projectEtlConfig'];
-                    if (!empty($configName)) {
-                        Configuration::validateName($configName);  # throw exception if invalid
-                        $etlConfig = $this->getConfiguration($configName, $projectId);
-                        if (isset($etlConfig)) {
-                            $etlProperties = $etlConfig->getProperties();
-                        } else {
-                            throw new \Exception('Configuration "'.$configName.'" not found for project ID '.$projectId);
+
+                    #check to see if the user has permissions to export for this project
+                    $hasPermissionToExport = false;
+                    if ($superUser) { 
+				        $hasPermissionToExport = true; 
+                    } else {
+                        $pKey = array_search($projectId, array_column($userProjects, 'project_id'));
+						if ($pKey || $pKey === 0) {
+                            $hasPermissionToExport = $userProjects[$pKey]['data_export_tool'] == 1 ? true : false;
                         }
-                    } else {
-                        throw new \Exception('No configuration name provided for project ID '.$projectId);
                     }
-        
-                    $taskProperties = $this->getWorkflowTaskProperties($workflowName, $globalProperties, $etlProperties);
-                    $isWorkflow = true;
-                    $etlConfig->set($taskProperties, $isWorkflow);
+                    if ($hasPermissionToExport) {
+                        $projectId = $task['projectId'];
+                        $taskName = $task['taskName'];
+                        #$workflowProperties['tasks'][$taskName] = array();
+                        $workflowProperties[$taskName] = array();
 
-                    $configUrl  = $etlConfig->getProperty(Configuration::REDCAP_API_URL);
+                        $configName = $task['projectEtlConfig'];
+                        if (!empty($configName)) {
+                            Configuration::validateName($configName);  # throw exception if invalid
+                            $etlConfig = $this->getConfiguration($configName, $projectId);
+                            if (isset($etlConfig)) {
+                                $etlProperties = $etlConfig->getProperties();
+                            } else {
+                                throw new \Exception('For Workflow "'.$workflowName.'", Configuration "'.$configName.'" not found for project ID '.$projectId);
+                            }
+                        } else {
+                            throw new \Exception('No configuration name provided for Workflow "'.$workflowName.'", project ID '.$projectId);
+                        }
+
+                        #get the task properties updated with the global properties        
+                        #$taskProperties = $this->getWorkflowTaskProperties($workflowName, $globalProperties, $etlProperties);
+
+                        #update the task configuration with the task properties 
+                        #$etlConfig->set($taskProperties, $isWorkflow);
+
+                        #update the task configuration with server values
+                        $serverConfig->updateEtlConfig($etlConfig, $isCronJob); 
+#print "=================== Redcapetlmodule.php, runWorkflow, 1596, etlConfig is ";
+#print_r($etlConfig);
+#                        $etlConfig->validateForRunning($isWorkflow);                        
+                        $workflowProperties[$taskName] = $etlConfigi['properties'];
+print "=================== Redcapetlmodule.php, runWorkflow, 1600, workflowProperties is ";
+print_r($workflowProperties);
+# YOU ARE HERE, see what the workflow properties look like 
+                        $configUrl  = $etlConfig->getProperty(Configuration::REDCAP_API_URL);
             
-                    #-----------------------------------------------------
-                    # Set task logging information
-                    #-----------------------------------------------------
-                    $details = '';
-                    # If being run on remote REDCap
-                    if (strcasecmp($configUrl, $this->getRedCapApiUrl()) !== 0) {
-                        $details .= "REDCap API URL: {$configUrl}\n";
-                    } else {
-                        # If local REDCap is being used, set SSL verify to the global value
-                        $sslVerify = $adminConfig->getSslVerify();
-                       $etlConfig->setProperty(Configuration::SSL_VERIFY, $sslVerify);
-                    }
+                        #-----------------------------------------------------
+                        # Set task logging information
+                        #-----------------------------------------------------
+                        $details = '';
+                        # If being run on remote REDCap
+                        if (strcasecmp($configUrl, $this->getRedCapApiUrl()) !== 0) {
+                            $details .= "REDCap API URL: {$configUrl}\n";
+                        } else {
+                            # If local REDCap is being used, set SSL verify to the global value
+                            $sslVerify = $adminConfig->getSslVerify();
+                            $etlConfig->setProperty(Configuration::SSL_VERIFY, $sslVerify);
+                        }
 
-                    $details .= "project ID: {$projectId}\n";
-                    if (!$isCronJob) {
-                        $details .= "user: ".USERID."\n";
-                    }
-                    $details .= "configuration: {$configName}\n";
-                    $details .= "server: {$serverName}\n";
-                    if ($isCronJob) {
-                        $details .= "cron: yes\n";
-                    } else {
-                        $details .= "cron: no\n";
-                    }
+                        $details .= "project ID: {$projectId}\n";
+                        if (!$isCronJob) {
+                            $details .= "user: ".$username."\n";
+                        }
+                        $details .= "configuration: {$configName}\n";
+                        $details .= "server: {$serverName}\n";
+                        if ($isCronJob) {
+                            $details .= "cron: yes\n";
+                        } else {
+                            $details .= "cron: no\n";
+                        }
 
-                    $status = '';
+                        $status = '';
                     
-                    $sql    = null;
-                    $record = null;
-                    $event  = self::LOG_EVENT;
+                        $sql    = null;
+                        $record = null;
+                        $event  = self::LOG_EVENT;
             
-                    $details = "Workflow ETL task submitted \n".$details;
-                    \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
+                        $details = "Workflow $workflowName, ETL task # $key, submitted \n".$details;
+                        \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
 
-                    #------------------------------------------------------------------------
-                    # If no server configuration was specified, run on the embedded server
-                    #------------------------------------------------------------------------
-                    #if (empty($serverConfig)) {
-                    #    $status = $this->runEmbedded($etlConfig, $isCronJob);
-                    #} else {
-                    #    # Run on the specified server
-                    #    $status = $serverConfig->run($etlConfig, $isCronJob);
-                    #}
-                    $status = $serverConfig->run($etlConfig, $isCronJob, $this->moduleLog);
- 
+                        #------------------------------------------------------------------------
+                        # If no server configuration was specified, run on the embedded server
+                        #------------------------------------------------------------------------
+                        #if (empty($serverConfig)) {
+                        #    $status = $this->runEmbedded($etlConfig, $isCronJob);
+                        #} else {
+                        #    # Run on the specified server
+                        #    $status = $serverConfig->run($etlConfig, $isCronJob);
+                        #}
+
+                        # calls redcapetl-->run, which calls etl workflow and workflow config
+                        #$status = $serverConfig->run($etlConfig, $isCronJob, $this->moduleLog);
+                        #$workflowProperties['tasks'][$taskName] = $etlConfig;
+                        #$workflowProperties['tasks'][$taskName]['serverConfigName'] = $configName;
+#print "=============redcapETLmodule.php, 1646, IN LOOP, etlConfig is ";
+#print_r($etlConfig);
+#print ".......................................................................";
+
+                        # does the project_id already exist? $workflowProperties['tasks'][$taskName]['project_id'] = $projectId;
+                        #$status = Workflow($workflowProperties, $isCronJob, $this->moduleLog);
+
+                    } else {
+                    	#skip this task because the user does not have permissions to export
+
+                        #-----------------------------------------------------
+                        # Set task logging information
+                        #-----------------------------------------------------
+                        $details = '';
+                        $details .= "project ID: {$projectId}\n";
+                        if (!$isCronJob) {
+                            $details .= "user: ".$username."\n";
+                        }
+                        $details .= "server: {$serverName}\n";
+                        if ($isCronJob) {
+                            $details .= "cron: yes\n";
+                        } else {
+                            $details .= "cron: no\n";
+                        }
+
+                        $sql    = null;
+                        $record = null;
+                        $event  = self::LOG_EVENT;
+            
+                        $details = "Workflow $workflowName, ETL task # $key, SKIPPED. User does not have export permissions \n".$details;
+                        \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
+						
+                    } #end if (hasPermissionToExport))
 		        } #next task
             } #end if (empty(workflowName))
 
@@ -1619,6 +1693,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
         }
 
+#print "=============redcapETLmodule.php, 1689, AFTER LOOP, workflowProperties is ";
+#print_r($workflowProperties);
+#print ".......................................................................";
         return $status;
     }
 

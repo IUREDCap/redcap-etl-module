@@ -108,7 +108,7 @@ $adminConfig = $module->getAdminConfig();
 $selfUrl     = $module->getUrl('web/index.php');
 $configUrl   = $module->getUrl('web/task_configure.php');
 $testUrl     = $module->getUrl('web/test.php');
-$scheduleUrl = $module->getUrl('web/schedule.php');
+$scheduleUrl = $module->getUrl('web/task_schedule.php');
 $runUrl      = $module->getUrl('web/task_run.php');
 
 $userEtlProjects = $module->getUserEtlProjects();

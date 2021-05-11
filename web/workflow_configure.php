@@ -40,7 +40,8 @@ $workflowName = Filter::escapeForHtml($_GET['workflowName']);
 
 #Get projects that this user has access to
 $db = new RedCapDb();
-$availableUserProjects = $db->getUserProjects($username);
+$userProjects = $db->getUserProjects($username);
+$availableUserProjects = $userProjects;
 array_unshift($availableUserProjects, '');
 
 $selfUrl      = $module->getUrl('web/workflow_configure.php')
@@ -250,15 +251,15 @@ if (!empty($availableUserProjects)) {
             $projectId = $task['projectId'];
             if (empty($projectId)) { $projectId = "No project Id"; }
             $taskName = $task['taskName'];
-            $pKey = array_search($projectId, array_column($availableUserProjects, 'project_id'));
+            $pKey = array_search($projectId, array_column($userProjects, 'project_id'));
             $isAssignedUser = false;
             $hasPermissionToExport = false;
             $projectName = null;
 
             if ($pKey || $pKey === 0) {
                 $isAssignedUser = true;
-                $hasPermissionToExport = $availableUserProjects[$pKey]['data_export_tool'] == 1 ? true : false;
-				$projectName = $availableUserProjects[$pKey]['app_title'] ;
+                $hasPermissionToExport = $userProjects[$pKey]['data_export_tool'] == 1 ? true : false;
+				$projectName = $userProjects[$pKey]['app_title'];
                 $projectEtlConfig = $task['projectEtlConfig'] ? $task['projectEtlConfig'] : "None specified";
             } else {
 				$projectName = "(You are not a listed user on this project)";

@@ -8,12 +8,9 @@
 
 require_once __DIR__.'/../dependencies/autoload.php';
 
-use IU\RedCapEtlModule\AdminConfig;
-use IU\RedCapEtlModule\Authorization;
-use IU\RedCapEtlModule\Configuration;
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
-use IU\RedCapEtlModule\RedCapEtlModule;
+use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\ServerConfig;
 
 $error   = '';
@@ -21,28 +18,30 @@ $warning = '';
 $success = '';
 
 $pid = PROJECT_ID;
+$username = USERID;
 
 $workflowName = Filter::escapeForHtml($_GET['workflowName']);
 if (empty($workflowName)) {
     $workflowName = $_POST['workflowName'];  
 }
 
-$excludeIncomplete = true;
-$projectWorkflows = $module->getProjectAvailableWorkflows($pid, $excludeIncomplete);
-
-$noReadyProjects = false;
-if (empty($projectWorkflows)) { 
-    $noReadyProjects = true;
-}
-
-if (!empty($workflowName)) {
-   $p = array_search($workflowName, $projectWorkflows); 
-   $workflowReady = $p === false ? false : true;
-}
-
-array_unshift($projectWorkflows, '');
 
 try {
+    $excludeIncomplete = true;
+    $projectWorkflows = $module->getProjectAvailableWorkflows($pid, $excludeIncomplete);
+
+    $noReadyProjects = false;
+    if (empty($projectWorkflows)) { 
+        $noReadyProjects = true;
+    }
+
+    if (!empty($workflowName)) {
+        $p = array_search($workflowName, $projectWorkflows); 
+        $workflowReady = $p === false ? false : true;
+    }
+
+    array_unshift($projectWorkflows, '');
+
     #-----------------------------------------------------------
     # Check that the user has permission to access this page
     # and get the configuration if one was specified
@@ -71,7 +70,10 @@ try {
         } else  {
             $server = ServerConfig::EMBEDDED_SERVER_NAME;
             $isCronJob = false;
-            $runOutput = $module->runWorkflow($workflowName, $server, $isCronJob);
+            #Get projects that this user has access to
+            $db = new RedCapDb();
+            $userProjects = $db->getUserProjects($username);
+            $runOutput = $module->runWorkflow($workflowName, $server, $username, $userProjects, $isCronJob);
         }
     }
 } catch (Exception $exception) {
@@ -121,7 +123,7 @@ if ($noReadyProjects) {
 ?>
 <form action="<?php echo $selfUrl;?>" method="post" 
       style="padding: 4px; margin-bottom: 0px; border: 1px solid #ccc; background-color: #ccc;">
-    <span style="font-weight: bold;">Workflow:</span>
+    <span style="font-weight: bold;">ETL Workflow:</span>
     <select name="workflowName" onchange="this.form.submit()">
 
     <?php

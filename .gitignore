@@ -41,3 +41,11 @@ test-config.ini
 # Ignore web test coverage data files, except for README
 /tests/web/coverage-data/*
 !/tests/web/coverage-data/README.md
+
+
+# Ignore dependencies directory
+/dependencies
+
+# Composer lock file
+composer.lock
+composer.*

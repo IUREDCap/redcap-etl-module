@@ -90,6 +90,7 @@ try {
         #------------------------------------------------------
         # Process Actions
         #------------------------------------------------------
+        $properties[Configuration::DB_CONNECTION] = null;
         try {
             if (strcasecmp($submitValue, 'Cancel') === 0) {
                 header('Location: '.$workflowUrl);
@@ -101,8 +102,8 @@ try {
             } elseif (strcasecmp($submitValue, 'Save and Exit') === 0) {
                 if (empty($warning) && empty($error)) {
                     $configuration->validate($isWorkflow);
-                    $module->setConfiguration($configuration);  // Save configuration to database
-                    $location = 'Location: '.$listUrl;
+                    $module->setWorkflowGlobalProperties($workflowName, $properties, USERID);  // Save configuration to database
+                    $location = 'Location: '.$workflowUrl;
                     header($location);
                 }
             } 
@@ -173,12 +174,6 @@ echo $buffer;
                     ;
                 return false;
             });            
-            $('#extract-settings-help-link').click(function () {
-                $('#extract-settings-help').dialog({dialogClass: 'redcap-etl-help', width: 500, maxHeight: 440})
-                    .dialog('widget').position({my: 'left top', at: 'right top+60', of: $(this)})
-                    ;
-                return false;
-            });
             $('#ignore-empty-incomplete-forms-help-link').click(function () {
                 $('#ignore-empty-incomplete-forms-help')
                     .dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
@@ -269,44 +264,6 @@ $module->renderProjectPageContentHeader($configureUrl, $error, $warning, $succes
     <div>
      <span style="font-weight: bold;">WORKFLOW GLOBAL PROPERTIES</span>
     </div>
-
-
-<?php
-#-------------------------------------
-# Configuration selection form
-#-------------------------------------
-?>
-<!-- <form action="<?php echo $selfUrl;?>" method="post" 
-      style="padding: 4px; margin-bottom: 0px; border: 1px solid #ccc; background-color: #ccc;">
-    <span style="font-weight: bold;">ETL Global Properties for Task:</span>
-    <select name="taskKey" onchange="this.form.submit()">
--->
-    <?php
-#    $tasks = $module->getWorkflow($workflowName, true);
-#    array_unshift($values, '');
- #   foreach ($tasks as $key => $task) {
-  #      $value = $key."-".$task['taskName'];
-   #     if (strcmp($key, $taskKey) === 0) {
-    #        echo '<option value="'.Filter::escapeForHtmlAttribute($key).'" selected>'
-     #           .Filter::escapeForHtml($value)."</option>\n";
-      #  } else {
-       #     echo '<option value="'.Filter::escapeForHtmlAttribute($key).'">'
-        #        .Filter::escapeForHtml($value)."</option>\n";
-        #}
-    #}
-    ?>
-   <!-- </select> -->
-    <?php Csrf::generateFormToken(); ?>
-</form>
-
-
-<?php
-#if ($taskKey!==0 && $taskKey!=='0' && empty($taskKey) {
-if (2==3) {
-    ; // Don't display any page content
-} else {
- 
-?>
 
 <!-- ====================================
 Configuration form
@@ -752,14 +709,6 @@ p
 
     <?php Csrf::generateFormToken(); ?>
 </form>
-
-<?php
-#------------------------------------------------------
-# End, if configuration is not empty
-#------------------------------------------------------
-}
-?>
-
 
 <?php
 // See JSON output of properties for REDCap-ETL

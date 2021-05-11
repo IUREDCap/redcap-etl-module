@@ -1177,8 +1177,6 @@ class Settings
         $json = $this->module->getSystemSetting($key);
         $workflowsObject->fromJson($json);
         $workflows = $workflowsObject->getWorkflows();
-#print "====================!!!!!!!!!!!!!!!!!!settings.php, getProjectAvailableWorkflows, exclude is $excludeIncomplete";
-#print_r($workflows);
         $projectWorkflows = array();
         foreach ($workflows as $workflowName => $workflow) {
             if ($workflow['metadata']['workflowStatus'] !== 'Removed') {
@@ -1502,12 +1500,12 @@ class Settings
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
         
     }
-    
- /*   public function setWorkflows($name, $workflow)
+/*    
+    public function setWorkflows($workflows)
     {
-#delete this?
-        $key = self::WORKFLOWS_KEY_PREFIX . $name;
-        $json = json_encode($workflow);
+        $key = self::WORKFLOWS_KEY;
+
+        $json = json_encode($workflows);
         print "=== SSSSS.Y    in Settings.php, setWorkflows, ABOUT TO WRITE JSON, json for all workflows is : ";
         print_r($json);
 

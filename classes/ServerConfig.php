@@ -160,7 +160,7 @@ class ServerConfig implements \JsonSerializable
      *
      * @param Configuration the ETL configuration to modify.
      */
-    private function updateEtlConfig(&$etlConfig, $isCronJob)
+    public function updateEtlConfig(&$etlConfig, $isCronJob)
     {
         $etlConfig->setProperty(Configuration::CRON_JOB, $isCronJob);
         
@@ -525,4 +525,127 @@ class ServerConfig implements \JsonSerializable
     {
         $this->accessLevel = $accessLevel;
     }
+    
+     /**
+     * Run the ETL process for a workflow.
+     *
+     */
+    public function runWorkflow($workflow, $isCronJob = false, $moduleLog = null)
+    {
+        if (!isset($workflow)) {
+            $message = 'No Workflow specified.';
+            throw new \Exception($message);
+        }
+        
+        if (!$this->getIsActive()) {
+            $message = 'Server "' . $this->name . '" is set as inactive.';
+            throw new \Exception($message);
+        }
+
+        if ($this->isEmbeddedServer()) {
+            #-------------------------------------------------
+            # Embedded server
+            #-------------------------------------------------
+            #$properties = $etlConfig->getPropertiesArray();
+            #$properties[Configuration::PRINT_LOGGING] = false;
+            
+            # Set a syntactically valid API token to avoid getting an error,
+            # which would not be valid in this case, since the REDCap Project class
+            # being used here does not need an API token
+            #$properties[Configuration::DATA_SOURCE_API_TOKEN] = '12345678901234567890123456789012';
+            
+            $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
+            $logId = $logger->getLogId();
+
+            if (isset($moduleLog)) {
+                $logger->setLoggingCallback(array($moduleLog, 'logEtlRunMessage'));
+            }
+
+            try {
+                #$redcapProjectClass = EtlExtRedCapProject::class;
+                $redcapProjectClass = null;
+                $redCapEtl = new \IU\REDCapETL\RedCapEtl($logger, $workflow, null, $redcapProjectClass);
+                #$redCapEtl->run();
+            } catch (\Exception $exception) {
+                $logger->logException($exception);
+                $logger->log('Processing failed.');
+            }
+
+            $output = implode("\n", $logger->getLogArray());
+        }  else {
+            #-------------------------------------------------
+            # Remote server
+            #-------------------------------------------------
+
+            if (empty($this->serverAddress)) {
+                $message = $this->createServerErrorMessageForUser('no server address specified');
+                throw new \Exception($message);
+            }
+            
+            if ($this->authMethod == self::AUTH_METHOD_PASSWORD) {
+                $ssh = new SSH2($this->serverAddress);
+                $ssh->login($username, $this->password);
+            } elseif ($this->authMethod == self::AUTH_METHOD_SSH_KEY) {
+                $keyFile = $this->getSshKeyFile();
+                
+                if (empty($keyFile)) {
+                    $message = $this->createServerErrorMessageForUser('no SSH key file was specified');
+                    throw new \Exception($message);
+                }
+                
+                #\REDCap::logEvent('REDCap-ETL run current user: '.get_current_user());
+                            
+                $key = new RSA();
+                $key->setPassword($this->sshKeyPassword);
+                
+                $keyFileContents = file_get_contents($keyFile);
+                
+                if ($keyFileContents === false) {
+                    $message = $this->createServerErrorMessageForUser('SSH key file could not be accessed');
+                    throw new \Exception($message);
+                }
+                $key->loadKey($keyFileContents);
+                $ssh = new SSH2($this->serverAddress);
+                $ssh->login($this->username, $key);
+            } else {
+                $message = $this->createServerErrorMessageForUser('unrecognized authentication menthod');
+                throw new \Exception($message);
+            }
+                    
+            #------------------------------------------------
+            # Copy configuration file and transformation
+            # rules file (if any) to the server.
+            #------------------------------------------------
+            $fileNameSuffix = uniqid('', true);
+            $scp = new SCP($ssh);
+            
+            $propertiesJson = $etlConfig->getRedCapEtlJsonProperties();
+            $configFileName = 'etl_config_' . $fileNameSuffix . '.json';
+            $configFilePath = $this->configDir . '/' . $configFileName;
+
+            $scpResult = $scp->put($configFilePath, $propertiesJson);
+            if (!$scpResult) {
+                $message = 'Copy of ETL configuration to server failed.'
+                    . ' Please contact your system administrator for assistance.';
+                throw new \Exception($message);
+            }
+            
+            #$ssh->setTimeout(1);
+
+            $command = $this->etlCommandPrefix . ' ' . $this->etlCommand . ' '
+                . $configFilePath . ' ' . $this->etlCommandSuffix;
+
+            #\REDCap::logEvent('REDCap-ETL run command: '.$command);
+
+            $ssh->setTimeout(1.0);  # to prevent blocking
+                    
+            $execOutput = $ssh->exec($command);
+            
+            $output = 'Your job has been submitted to server "' . $this->getName() . '".' . "\n";
+            #\REDCap::logEvent('REDCap-ETL run output: '.$output);
+        }  // End else not embedded server
+        
+        return $output;
+    }
+    
 }
