@@ -6,7 +6,8 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'phpseclib\\' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
+    'phpseclib3\\' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
+    'ParagonIE\\ConstantTime\\' => array($vendorDir . '/paragonie/constant_time_encoding/src'),
     'IU\\RedCapEtlModule\\' => array($baseDir . '/', $baseDir . '/classes'),
     'IU\\REDCapETL\\' => array($vendorDir . '/iu-redcap/redcap-etl/src'),
     'IU\\PHPCap\\' => array($vendorDir . '/iu-redcap/phpcap/src'),

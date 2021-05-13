@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitb4f0442f81ae45e0683ec29aa14a741a
+class ComposerStaticInit062aaa02559f812186e5d62f49e4c802
 {
     public static $files = array (
         'decc78cc4436b1292c6c0d151b19445c' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
@@ -13,7 +13,11 @@ class ComposerStaticInitb4f0442f81ae45e0683ec29aa14a741a
     public static $prefixLengthsPsr4 = array (
         'p' => 
         array (
-            'phpseclib\\' => 10,
+            'phpseclib3\\' => 11,
+        ),
+        'P' => 
+        array (
+            'ParagonIE\\ConstantTime\\' => 23,
         ),
         'I' => 
         array (
@@ -24,9 +28,13 @@ class ComposerStaticInitb4f0442f81ae45e0683ec29aa14a741a
     );
 
     public static $prefixDirsPsr4 = array (
-        'phpseclib\\' => 
+        'phpseclib3\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib',
+        ),
+        'ParagonIE\\ConstantTime\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src',
         ),
         'IU\\RedCapEtlModule\\' => 
         array (
@@ -46,8 +54,8 @@ class ComposerStaticInitb4f0442f81ae45e0683ec29aa14a741a
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitb4f0442f81ae45e0683ec29aa14a741a::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitb4f0442f81ae45e0683ec29aa14a741a::$prefixDirsPsr4;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit062aaa02559f812186e5d62f49e4c802::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit062aaa02559f812186e5d62f49e4c802::$prefixDirsPsr4;
 
         }, null, ClassLoader::class);
     }

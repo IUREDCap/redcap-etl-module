@@ -88,31 +88,7 @@ class ServerTest extends TestCase
 
         Util::logout(self::$session);   # logout as admin
 
-        Util::logInAsUserAndAccessRedCapEtlForTestProject(self::$session);
-        $page = self::$session->getPage();
-
-        # Need to create configuration
-        $page->clickLink('ETL Configurations');
-        $configName = 'remote-server-test';
-        EtlConfigsPage::deleteConfigurationIfExists(self::$session, $configName);
-        EtlConfigsPage::addConfiguration(self::$session, $configName);
-
-        EtlConfigsPage::followConfiguration(self::$session, $configName);
-
-        ConfigurePage::configureConfiguration(self::$session, 'behat');
-
-
-        $page->clickLink('Run');
-        $text = $page->getText();
-        $this->assertMatchesRegularExpression("/Configuration:/", $text); 
-        $this->assertMatchesRegularExpression("/Run Now/", $text); 
-
-        RunPage::runConfiguration(self::$session, $configName, $serverName);
-        sleep(4);
-        $text = $page->getText();
-        $this->assertMatchesRegularExpression("/Your job has been submitted to server/", $text); 
-
-        Util::logout(self::$session);
+        $this->runEtlOnRemoteServer($serverName);
     }
 
     public function testServerWithSshKeyAuthentication()
@@ -157,9 +133,42 @@ class ServerTest extends TestCase
         #-------------------------------------------------
         $page = self::$session->getPage();
         $page->pressButton('Test Server Connection');
+        sleep(4);
         $testOutput = $page->findById("testOutput")->getValue();
         $this->assertMatchesRegularExpression("/SUCCESS/", $testOutput); 
         $this->assertMatchesRegularExpression("/output of hostname command:/", $testOutput); 
+
+        Util::logout(self::$session);
+
+        $this->runEtlOnRemoteServer($serverName);
+    }
+
+    public function runEtlOnRemoteServer($serverName)
+    {
+
+        Util::logInAsUserAndAccessRedCapEtlForTestProject(self::$session);
+        $page = self::$session->getPage();
+
+        # Need to create configuration
+        $page->clickLink('ETL Configurations');
+        $configName = 'remote-server-test';
+        EtlConfigsPage::deleteConfigurationIfExists(self::$session, $configName);
+        EtlConfigsPage::addConfiguration(self::$session, $configName);
+
+        EtlConfigsPage::followConfiguration(self::$session, $configName);
+
+        ConfigurePage::configureConfiguration(self::$session, 'behat');
+
+
+        $page->clickLink('Run');
+        $text = $page->getText();
+        $this->assertMatchesRegularExpression("/Configuration:/", $text); 
+        $this->assertMatchesRegularExpression("/Run Now/", $text); 
+
+        RunPage::runConfiguration(self::$session, $configName, $serverName);
+        sleep(4);
+        $text = $page->getText();
+        $this->assertMatchesRegularExpression("/Your job has been submitted to server/", $text); 
 
         Util::logout(self::$session);
     }

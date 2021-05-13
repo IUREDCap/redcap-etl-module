@@ -6,10 +6,9 @@
 
 namespace IU\RedCapEtlModule;
 
-use phpseclib\Crypt\RSA;
-use phpseclib\Net\SCP;
-use phpseclib\Net\SFTP;
-use phpseclib\Net\SSH2;
+use phpseclib3\Net\SFTP;
+use phpseclib3\Crypt\PublicKeyLoader;
+
 
 class ServerConfig implements \JsonSerializable
 {
@@ -219,11 +218,6 @@ class ServerConfig implements \JsonSerializable
             $properties = $etlConfig->getPropertiesArray();
             $properties[Configuration::PRINT_LOGGING] = false;
             
-            # Set a syntactically valid API token to avoid getting an error,
-            # which would not be valid in this case, since the REDCap Project class
-            # being used here does not need an API token
-            #$properties[Configuration::DATA_SOURCE_API_TOKEN] = '12345678901234567890123456789012';
-            
             $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
             $logId = $logger->getLogId();
 
@@ -247,54 +241,20 @@ class ServerConfig implements \JsonSerializable
             # Remote server
             #-------------------------------------------------
 
-            if (empty($this->serverAddress)) {
-                $message = $this->createServerErrorMessageForUser('no server address specified');
-                throw new \Exception($message);
-            }
-            
-            if ($this->authMethod == self::AUTH_METHOD_PASSWORD) {
-                $ssh = new SSH2($this->serverAddress);
-                $ssh->login($this->username, $this->password);
-            } elseif ($this->authMethod == self::AUTH_METHOD_SSH_KEY) {
-                $keyFile = $this->getSshKeyFile();
-                
-                if (empty($keyFile)) {
-                    $message = $this->createServerErrorMessageForUser('no SSH key file was specified');
-                    throw new \Exception($message);
-                }
-                
-                #\REDCap::logEvent('REDCap-ETL run current user: '.get_current_user());
-                            
-                $key = new RSA();
-                $key->setPassword($this->sshKeyPassword);
-                
-                $keyFileContents = file_get_contents($keyFile);
-                
-                if ($keyFileContents === false) {
-                    $message = $this->createServerErrorMessageForUser('SSH key file could not be accessed');
-                    throw new \Exception($message);
-                }
-                $key->loadKey($keyFileContents);
-                $ssh = new SSH2($this->serverAddress);
-                $ssh->login($this->username, $key);
-            } else {
-                $message = $this->createServerErrorMessageForUser('unrecognized authentication menthod');
-                throw new \Exception($message);
-            }
+            $ssh = $this->getRemoteConnection();
                     
             #------------------------------------------------
             # Copy configuration file and transformation
             # rules file (if any) to the server.
             #------------------------------------------------
             $fileNameSuffix = uniqid('', true);
-            $scp = new SCP($ssh);
             
             $propertiesJson = $etlConfig->getRedCapEtlJsonProperties();
             $configFileName = 'etl_config_' . $fileNameSuffix . '.json';
             $configFilePath = $this->configDir . '/' . $configFileName;
 
-            $scpResult = $scp->put($configFilePath, $propertiesJson);
-            if (!$scpResult) {
+            $sftpResult = $ssh->put($configFilePath, $propertiesJson);
+            if (!$sftpResult) {
                 $message = 'Copy of ETL configuration to server failed.'
                     . ' Please contact your system administrator for assistance.';
 
@@ -324,6 +284,48 @@ class ServerConfig implements \JsonSerializable
         return $output;
     }
     
+    /**
+     * Returns an ssh/ftp connection for the server represented by this class.
+     *
+     * @return SFTP ssh/sftp connection.
+     */
+    public function getRemoteConnection()
+    {
+        $ssh = null;
+
+        if (empty($this->serverAddress)) {
+            $message = $this->createServerErrorMessageForUser('no server address specified');
+            throw new \Exception($message);
+        }
+
+        if ($this->authMethod == self::AUTH_METHOD_PASSWORD) {
+            $ssh = new SFTP($this->serverAddress);  # SFTP class provides SSH functionality also
+            $ssh->login($this->username, $this->password);
+        } elseif ($this->authMethod == self::AUTH_METHOD_SSH_KEY) {
+            $keyFile = $this->getSshKeyFile();
+
+            if (empty($keyFile)) {
+                $message = $this->createServerErrorMessageForUser('no SSH key file was specified');
+                throw new \Exception($message);
+            }
+
+            $keyFileContents = file_get_contents($keyFile);
+
+            if ($keyFileContents === false) {
+                $message = $this->createServerErrorMessageForUser('SSH key file could not be accessed');
+                throw new \Exception($message);
+            }
+
+            $key = PublicKeyLoader::load($keyFileContents, $this->sshKeyPassword);
+            $ssh = new SFTP($this->serverAddress);
+            $ssh->login($this->username, $key);
+        } else {
+            $message = $this->createServerErrorMessageForUser('unrecognized authentication menthod');
+            throw new \Exception($message);
+        }
+        return $ssh;
+    }
+
     public function test()
     {
         $testOutput = '';
@@ -331,53 +333,20 @@ class ServerConfig implements \JsonSerializable
             if ($this->isEmbeddedServer()) {
                 $testOutput = 'REDCap-ETL ' . \IU\REDCapETL\Version::RELEASE_NUMBER . ' found.';
             } else {
-                $serverAddress = $this->getServerAddress();
-                if (empty($serverAddress)) {
-                    throw new \Exception('No server address found.');
-                }
-                        
-                $username = $this->getUsername();
+                $ssh = $this->getRemoteConnection();
+
                 if ($this->getAuthMethod() == ServerConfig::AUTH_METHOD_SSH_KEY) {
-                    $keyFile = $this->getSshKeyFile();
-                    if (empty($keyFile)) {
-                        throw new \Exception('SSH key file cound not be found.');
-                    }
-                                
-                    $keyPassword = $this->getSshKeyPassword();
-                                    
-                    $key = new RSA();
-                    
-                    #if (!empty($keyPassword)) {
-                        $key->setPassword($keyPassword);
-                    #}
-                
-                    $keyFileContents = file_get_contents($keyFile);
-                    if ($keyFileContents === false) {
-                        throw new \Exception('SSH key file could not be accessed.');
-                    }
-                    $key->loadKey($keyFileContents);
-
-                    $ssh = new SSH2($serverAddress);
-                    $ssh->login($username, $key);
+                     $authMethod = "SSH key";
                 } else {
-                    $password = $this->getPassword();
-                    
-                    $ssh = new SSH2($serverAddress);
-                    $ssh->login($username, $password);
+                     $authMethod = "password";
                 }
 
-                $isAuthenticated = $ssh->isAuthenticated();
                 $output = $ssh->exec('hostname');
+
                 if (!$output) {
-                    if ($this->getAuthMethod() == ServerConfig::AUTH_METHOD_SSH_KEY) {
-                        $authMethod = "SSH key";
-                    } else {
-                        $authMethod = "password";
-                    }
-                        
                     $err = $ssh->getLastError();
-                    $testOutput = "ERROR: ssh command failed. Server: '{$serverAddress}'."
-                        . " Username: '{$username}'. Authentication method: {$authMethod}."
+                    $testOutput = "ERROR: ssh command failed. Server: '{$this->serverAddress}'."
+                        . " Username: '{$this->username}' . Authentication method: {$authMethod}."
                         ;
                 } else {
                     $testOutput = "SUCCESS:\noutput of hostname command:\n"
