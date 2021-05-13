@@ -96,4 +96,11 @@ class EtlConfigsPage
             $page->pressButton("Delete configuration");
         }
     }
+
+    public static function addConfiguration($session, $configName)
+    {
+        $page = $session->getPage();
+        $page->fillField('configurationName', $configName);
+        $page->pressButton("Add");
+    }
 }
