@@ -67,7 +67,7 @@ try {
 
     $redCapDb = new RedCapDb();
 
-    $isWorkflow = true;
+    $isWorkflowGlobalProperties = true;
     if (!empty($configuration)) {
         #-------------------------
         # Get the submit value
@@ -81,7 +81,7 @@ try {
         # update the configuration properties with the POST values
         #---------------------------------------------------------------
         if (!empty($submitValue) && strcasecmp($submitValue, 'Cancel')) {
-            $configuration->set(Filter::stripTagsArrayRecursive($_POST), $isWorkflow);
+            $configuration->set(Filter::stripTagsArrayRecursive($_POST), $isWorkflowGlobalProperties);
             # Reset properties, since they may have been modified above
             $initialize = false;
             $properties = $configuration->getGlobalProperties($initialize);
@@ -96,12 +96,12 @@ try {
                 header('Location: '.$workflowUrl);
             } elseif (strcasecmp($submitValue, 'Save') === 0) {
                 if (empty($warning) && empty($error)) {
-                    $configuration->validate($isWorkflow);
+                    $configuration->validate($isWorkflowGlobalProperties);
                     $module->setWorkflowGlobalProperties($workflowName, $properties, USERID);  // Save configuration to database
                 }
             } elseif (strcasecmp($submitValue, 'Save and Exit') === 0) {
                 if (empty($warning) && empty($error)) {
-                    $configuration->validate($isWorkflow);
+                    $configuration->validate($isWorkflowGlobalProperties);
                     $module->setWorkflowGlobalProperties($workflowName, $properties, USERID);  // Save configuration to database
                     $location = 'Location: '.$workflowUrl;
                     header($location);
