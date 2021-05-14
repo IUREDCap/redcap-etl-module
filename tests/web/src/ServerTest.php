@@ -47,44 +47,11 @@ class ServerTest extends TestCase
 
         $username = self::$testConfig->getUser()['username'];
 
-        $serverConfig = self::$testConfig->getServerConfig($serverName);
-
-        if (!isset($serverConfig)
-            || !is_array($serverConfig)
-            || !array_key_exists('active', $serverConfig)
-            || $serverConfig['active'] != 1
-        ) {
-            $this->markTestSkipped('Incompete "' . $serverName . '" server configuration');
-        }
-
-        $this->assertNotNull($serverConfig);
-
-        # print_r($serverConfig);
-
-        # Access the REDCap-ETL admin interface
         Util::logInAsAdminAndAccessRedCapEtl(self::$session);
-        $page = self::$session->getPage();
-        $text = $page->getText();
 
-        # Go to the ETL Servers page
-        $page->clickLink('ETL Servers');
-        $text = $page->getText();
-        $this->assertMatchesRegularExpression("/Server Name/", $text); 
+        $this->configureEtlServer($serverName);
 
-        EtlServersPage::deleteServer(self::$session, $serverName);
-        EtlServersPage::addServer(self::$session, $serverName);
-        EtlServersPage::followServer(self::$session, $serverName);
-        EtlServerConfigPage::configureServer(self::$session, $serverName);
-        EtlServersPage::followServer(self::$session, $serverName);
-
-        #-------------------------------------------------
-        # Test the ETL server connection
-        #-------------------------------------------------
-        $page = self::$session->getPage();
-        $page->pressButton('Test Server Connection');
-        $testOutput = $page->findById("testOutput")->getValue();
-        $this->assertMatchesRegularExpression("/SUCCESS/", $testOutput); 
-        $this->assertMatchesRegularExpression("/output of hostname command:/", $testOutput); 
+        $this->checkEtlServer();
 
         Util::logout(self::$session);   # logout as admin
 
@@ -96,8 +63,20 @@ class ServerTest extends TestCase
         $serverName = 'ssh_key_authentication';
 
         $username = self::$testConfig->getUser()['username'];
-        $testProjectTitle = self::$testConfig->getUser()['test_project_title'];
 
+        Util::logInAsAdminAndAccessRedCapEtl(self::$session);
+
+        $this->configureEtlServer($serverName);
+
+        $this->checkEtlServer();
+
+        Util::logout(self::$session);
+
+        $this->runEtlOnRemoteServer($serverName);
+    }
+
+    public function configureEtlServer($serverName)
+    {
         $serverConfig = self::$testConfig->getServerConfig($serverName);
 
         if (!isset($serverConfig)
@@ -113,7 +92,6 @@ class ServerTest extends TestCase
         # print_r($serverConfig);
 
         # Access the REDCap-ETL admin interface
-        Util::logInAsAdminAndAccessRedCapEtl(self::$session);
         $page = self::$session->getPage();
         $text = $page->getText();
 
@@ -127,20 +105,20 @@ class ServerTest extends TestCase
         EtlServersPage::followServer(self::$session, $serverName);
         EtlServerConfigPage::configureServer(self::$session, $serverName);
         EtlServersPage::followServer(self::$session, $serverName);
+    }
 
-        #-------------------------------------------------
-        # Test the ETL server connection
-        #-------------------------------------------------
+    /**
+     * Checks the ETL server connection using the test functionality built into the web page.
+     * This method assumes that the current page is the configuration page for the ETL
+     * configuration to be tested.
+     */
+    public function checkEtlServer()
+    {
         $page = self::$session->getPage();
         $page->pressButton('Test Server Connection');
-        sleep(4);
         $testOutput = $page->findById("testOutput")->getValue();
         $this->assertMatchesRegularExpression("/SUCCESS/", $testOutput); 
         $this->assertMatchesRegularExpression("/output of hostname command:/", $testOutput); 
-
-        Util::logout(self::$session);
-
-        $this->runEtlOnRemoteServer($serverName);
     }
 
     public function runEtlOnRemoteServer($serverName)
