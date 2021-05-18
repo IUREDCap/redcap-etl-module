@@ -97,8 +97,6 @@ try {
             #----------------------------------------------
             # Update properties
             #----------------------------------------------
-            #$globalPropertiesUrl = $module->getUrl('web/workflow_global_properties.php');
-            #$globalPropertiesUrl .= '&workflowName='.Filter::escapeForUrlParameter($workflowName);
             header('Location: '.$globalPropertiesUrl);
             exit();
         }
@@ -147,10 +145,9 @@ try {
 $workflowStatus = $module->getWorkflowStatus($workflowName);
 
 #Get the workflow's updated tasks list
-$tasks = $module->getWorkflow($workflowName, true);
+$tasksOnly = true;
+$tasks = $module->getWorkflow($workflowName, $tasksOnly);
 $taskProjectIds = array_column($tasks, 'projectId');
-#print "============ 172 in workflow_configure.php, tasks is: ";
-#print_r($tasks);
 ?>
 
 <?php

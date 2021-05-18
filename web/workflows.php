@@ -122,7 +122,7 @@ $adminConfig   = $module->getAdminConfig();
 $selfUrl       = $module->getUrl('web/workflows.php');
 $configUrl     = $module->getUrl('web/workflow_configure.php');
 $testUrl       = $module->getUrl('web/test.php');
-$scheduleUrl   = $module->getUrl('web/schedule.php');
+$scheduleUrl   = $module->getUrl('web/workflow_schedule.php');
 $runUrl        = $module->getUrl('web/workflow_run.php');
 
 $userEtlProjects = $module->getUserEtlProjects();
@@ -195,20 +195,15 @@ foreach ($workflowNames as $workflowName) {
         echo '<tr class="odd">'."\n";
     }
     
-    $configureUrl = $configUrl.'&workflowName='.Filter::escapeForUrlParameter($workflowName);
-    $runConfigurationUrl = $runUrl.'&workflowName='.Filter::escapeForUrlParameter($workflowName);
-    /**
-    $testingUrl = $testUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
-    $scheduleConfigUrl = $scheduleUrl.'&configName='.Filter::escapeForUrlParameter($configurationName);
-    **/
     echo "<td>".Filter::escapeForHtml($workflowName)."</td>\n";
     
     #-------------------------------------------------------------------------------------
     # CONFIGURE BUTTON - disable if user does not have permission to access the project
     #-------------------------------------------------------------------------------------
     if ($hasPermissionToExport) {
+        $configureUrl = $configUrl.'&workflowName='.Filter::escapeForUrlParameter($workflowName);
         echo '<td style="text-align:center;">'
-            .'<a href="'.$configureUrl.'" id="'.Filter::escapeForHtmlAttribute('configure-'.$workflowName).'">'
+            .'<a href="'.$configureUrl.'">'
             .'<img alt="CONFIG" src="'.APP_PATH_IMAGES.'gear.png"></a>'
             ."</td>\n";
     } else {
@@ -217,13 +212,13 @@ foreach ($workflowNames as $workflowName) {
             ."</td>\n";
     }
     
-    
     #--------------------------------------------------------------------------------------
     # RUN BUTTON - display if running on demand allowed, but disable if user does not have
     # the needed data export permission to access the configuration
     #--------------------------------------------------------------------------------------
     if ($adminConfig->getAllowOnDemand()) {
         if ($hasPermissionToExport) {
+            $runConfigurationUrl = $runUrl.'&workflowName='.Filter::escapeForUrlParameter($workflowName);
             echo '<td style="text-align:center;">'
                 .'<a href="'.$runConfigurationUrl.'"><img src="'.APP_PATH_IMAGES.'application_go.png" alt="RUN"></a>'
                 ."</td>\n";
@@ -240,8 +235,9 @@ foreach ($workflowNames as $workflowName) {
     #--------------------------------------------------------------------------------------
     if ($adminConfig->getAllowCron()) {
         if ($hasPermissionToExport) {
+            $scheduleConfigurationUrl = $scheduleUrl.'&workflowName='.Filter::escapeForUrlParameter($workflowName);
             echo '<td style="text-align:center;">'
-                .'<a href="'.$scheduleConfigUrl.'"><img src="'.APP_PATH_IMAGES.'clock_frame.png" alt="SCHEDULE"></a>'
+                .'<a href="'.$scheduleConfigurationUrl.'"><img src="'.APP_PATH_IMAGES.'clock_frame.png" alt="SCHEDULE"></a>'
                 ."</td>\n";
         } else {
             echo '<td style="text-align:center;">'

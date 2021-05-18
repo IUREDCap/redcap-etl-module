@@ -6,6 +6,8 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
+# FOR WORKFLOWS
+
 #---------------------------------------------
 # Check that the user has access permission
 #---------------------------------------------
@@ -20,7 +22,7 @@ use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
-$selfUrl         = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);
+$selfUrl         = $module->getUrl(RedCapEtlModule::CRON_DETAIL_WORKFLOWS_PAGE);
 $serverConfigUrl = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
 $userUrl         = $module->getURL(RedCapEtlModule::USER_CONFIG_PAGE);
 
@@ -46,17 +48,6 @@ $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
 $cronJobs = $module->getCronJobs($selectedDay, $selectedTime);
 
-/*
-if ($submitValue === 'Run') {
-    try {
-        $module->runCronJobs($selectedDay, $selectedTime);
-        $success = "Cron jobs were run for: day={$selectedDay} hour={$selectedTime}\n\n";
-    } catch (\Exception $exception) {
-        $error = $exception->getMessage();
-    }
-}
-*/
-
 ?>
 
 
@@ -81,7 +72,7 @@ echo $buffer;
 <?php
 
 $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
-
+$module->renderAdminEtlCronDetailSubTabs($selfUrl);
 ?>
 
 <?php
@@ -91,7 +82,7 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
 $days = AdminConfig::DAY_LABELS;
 $times = $adminConfig->getTimeLabels();
 ?>
-
+<h5 style="margin-top: 2em;">ETL Workflows</h5>
 <form action="<?php echo $selfUrl;?>" method="post"
       style="padding: 4px; margin-bottom: 12px; border: 1px solid #ccc; background-color: #ccc;">
     <span style="font-weight: bold;">Day:</span>
@@ -161,56 +152,5 @@ $times = $adminConfig->getTimeLabels();
         ?>
     </tbody>
 </table>
-
-
-<!--
-<form action="<?php #echo $selfUrl;?>" method="post" style="margin-top: 12px;">
-    <input type="hidden" name="selectedDay" value="<?php #echo $selectedDay; ?>">
-    <input type="hidden" name="selectedTime" value="<?php #echo $selectedTime; ?>">
-    <input type="submit" id="runButton" name="submitValue" value="Run"
-       onclick='$("#runButton").css("cursor", "progress"); $("body").css("cursor", "progress");'/>
--->
-    <?php # Csrf::generateFormToken(); ?>
-<!-- </form>
--->
-
-<div id="popup" style="display: none;"></div>
-
-
-<script>
-$(function() {
-$('#popup').dialog({
-    autoOpen: false,
-    open: function(event, ui) {
-        $('#popup').load(
-            "<?php echo $module->getURL(
-                "config_dialog.php?config={$config}&username={$username}"
-                . "&projectId={$projectId}"
-            ) ?>",
-            function() {}
-        );
-    },
-  modal: true,
-  minHeight: 600,
-  minWidth: 800,
-  buttons: {
-    'Save Changes': function(){
-        $(this).dialog('close');
-    },
-    'Discard & Exit' : function(){
-      $(this).dialog('close');
-    }
-  }
-});
-    $(".copyConfig").click(function(){
-        var id = this.id;
-        var configName = id.substring(4);
-        $("#configToCopy").text('"'+configName+'"');
-        $('#copyFromConfigName').val(configName);
-        $("#popup").dialog("open");
-    });
-});
-</script>
-
 
 <?php require_once APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>

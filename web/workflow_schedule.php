@@ -55,18 +55,14 @@ try {
     $runCheck = false;
     $scheduleCheck = true;
     $configuration = $module->checkUserPagePermission(USERID, $configCheck, $runCheck, $scheduleCheck);
-    #$configName = '';
-    #if (!empty($configuration)) {
-    #    $configName = $configuration->getName();
-    #}
 
     $adminConfig = $module->getAdminConfig();
 
     $servers   = $module->getUserAllowedServersBasedOnAccessLevel(USERID);
 
-    $selfUrl = $module->getUrl('web/task_schedule.php');
+    $selfUrl = $module->getUrl('web/workflow_schedule.php');
     $scheduleUrl = $module->getUrl('web/schedule.php');
-    $workflow = $module->getUrl('web/workflows.php');
+    $workflows = $module->getUrl('web/workflows.php');
 
     #-------------------------
     # Set the submit value
@@ -99,7 +95,7 @@ try {
             $schedule[5] = Filter::sanitizeInt($_POST['Friday']);
             $schedule[6] = Filter::sanitizeInt($_POST['Saturday']);
         
-            $module->setConfigSchedule($configName, $server, $schedule);
+            $module->setConfigSchedule($workflowName, $server, $schedule);
             $success = " Schedule saved.";
         }
     } else {
@@ -155,12 +151,10 @@ $module->renderProjectPageContentHeader($scheduleUrl, $error, $warning, $success
 <form action="<?php echo $selfUrl;?>" method="post" 
       style="padding: 4px; margin-bottom: 0px; border: 1px solid #ccc; background-color: #ccc;">
     <span style="font-weight: bold;">ETL Workflow Configuration:</span>
-    <select name="configName" onchange="this.form.submit();">
+    <select name="workflowName" onchange="this.form.submit();">
     <?php
-    $values = $module->getAccessibleConfigurationNames();
-    array_unshift($values, '');
-    foreach ($values as $value) {
-        if (strcmp($value, $configName) === 0) {
+    foreach ($projectWorkflows as $value) {
+        if (strcmp($value, $workflowName) === 0) {
             echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '" selected>'
                 . Filter::escapeForHtml($value) . "</option>\n";
         } else {

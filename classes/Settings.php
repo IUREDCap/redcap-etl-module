@@ -1148,14 +1148,14 @@ class Settings
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
     }
 
-    public function getWorkflow($workflowName, $removeMetadata = null)
+    public function getWorkflow($workflowName, $tasksOnly = null)
     {
         $workflows = new Workflow();
         $key = self::WORKFLOWS_KEY;
         $json = $this->module->getSystemSetting($key);
         $workflows->fromJson($json);
 
-        return $workflows->getWorkflow($workflowName, $removeMetadata);
+        return $workflows->getWorkflow($workflowName, $tasksOnly);
     }
 
     public function getWorkflowStatus($workflowName)
@@ -1310,7 +1310,8 @@ class Settings
         $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
-        $tasks = $workflows->getWorkflow($workflowName, true);
+        $tasksOnly = true;
+        $tasks = $workflows->getWorkflow($workflowName, $tasksOnly);
         $keys = array_keys($tasks);
         $keysIndex = array_search($moveTaskKey, $keys);
         $numberOfTasks = count($tasks);
@@ -1500,6 +1501,18 @@ class Settings
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
         
     }
+
+    public function setWorkflowSchedule($workflowName, $server, $schedule, $username)
+    {
+		$workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+        $workflows->setCronSchedule($workflowName, $server, $schedule, $username);
+        $json = json_encode($workflows);
+        $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+        
+    }
+    
 /*    
     public function setWorkflows($workflows)
     {

@@ -39,6 +39,7 @@ class Workflow implements \JsonSerializable
         $this->workflows[$workflowName] = array();
         $this->workflows[$workflowName]["metadata"] = array();
         $this->workflows[$workflowName]["properties"] = array(); #global properties
+        $this->workflows[$workflowName]["cron"] = array(); #cron job details
 
         $now = new \DateTime();
         $now->format('Y-m-d H:i:s');
@@ -48,13 +49,15 @@ class Workflow implements \JsonSerializable
         $this->workflows[$workflowName]["metadata"]["workflowStatus"] = self::WORKFLOW_INCOMPLETE;
     }
 
-    public function getWorkflow($workflowName, $removeMetadata = null)
+    public function getWorkflow($workflowName, $tasksOnly = null)
     {
         $workflow = $this->workflows[$workflowName];
         unset($workflow["properties"]); #remove global properties
         $this->sequenceWorkflow($workflowName, $workflow, null);
-        if ($removeMetadata) {
+        if ($tasksOnly) {
             unset($workflow["metadata"]);
+            unset($workflow["properties"]);
+            unset($workflow["cron"]);
         }
 
         return $workflow;
@@ -396,13 +399,34 @@ class Workflow implements \JsonSerializable
 
     public function setGlobalProperties($workflowName, $properties, $username)
     {
-       $message = 'When settting workflow global properties, ';
+       $message = 'When setting workflow global properties, ';
         if (empty($workflowName)) {
             $message .= 'no workflow name was specified.';
             throw new \Exception($message);
         }
 
         $this->workflows[$workflowName]["properties"] = $properties;
+
+        #workflow metadata
+        if ($username) {
+            $this->workflows[$workflowName]["metadata"]["updatedBy"] = $username;
+            $now = new \DateTime();
+            $now->format('Y-m-d H:i:s');
+            $now->getTimestamp();
+            $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
+        }
+    }
+    
+    public function setWorkflowSchedule($workflowName, $server, $schedule, $username)
+    {
+       $message = 'When setting workflow cron schdule, ';
+        if (empty($workflowName)) {
+            $message .= 'no workflow name was specified.';
+            throw new \Exception($message);
+        }
+
+        $this->workflows[$workflowName]["cron"][Configuration::CRON_SERVER] = $server;
+        $this->workflows[$workflowName]["cron"][Configuration::CRON_SCHEDULE] = $schedule;
 
         #workflow metadata
         if ($username) {

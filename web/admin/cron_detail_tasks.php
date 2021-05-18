@@ -6,6 +6,8 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
+# FOR STAND-ALONE TASKS
+
 #---------------------------------------------
 # Check that the user has access permission
 #---------------------------------------------
@@ -20,7 +22,7 @@ use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
-$selfUrl         = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);
+$selfUrl         = $module->getUrl(RedCapEtlModule::CRON_DETAIL_TASKS_PAGE);
 $serverConfigUrl = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
 $userUrl         = $module->getURL(RedCapEtlModule::USER_CONFIG_PAGE);
 
@@ -81,7 +83,7 @@ echo $buffer;
 <?php
 
 $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
-
+$module->renderAdminEtlCronDetailSubTabs($selfUrl);
 ?>
 
 <?php
@@ -91,7 +93,7 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
 $days = AdminConfig::DAY_LABELS;
 $times = $adminConfig->getTimeLabels();
 ?>
-
+<h5 style="margin-top: 2em;">ETL Stand-alone Tasks</h5>
 <form action="<?php echo $selfUrl;?>" method="post"
       style="padding: 4px; margin-bottom: 12px; border: 1px solid #ccc; background-color: #ccc;">
     <span style="font-weight: bold;">Day:</span>
@@ -138,8 +140,7 @@ $times = $adminConfig->getTimeLabels();
             $userConfigUrl = $userUrl . '&username=' . Filter::escapeForUrlParameter($username);
             
             $configUrl = $module->getURL(
-                RedCapEtlModule::USER_ETL_CONFIG_PAGE
-                # RedCapEtlModule::USER_ETL_TASK_CONFIG_PAGE
+                RedCapEtlModule::USER_ETL_TASK_CONFIG_PAGE
                 . '?pid=' . Filter::escapeForUrlParameter($projectId)
                 . '&configName=' . Filter::escapeForUrlParameter($config)
             );
