@@ -417,7 +417,7 @@ class Workflow implements \JsonSerializable
         }
     }
     
-    public function setWorkflowSchedule($workflowName, $server, $schedule, $username)
+    public function setCronSchedule($workflowName, $server, $schedule, $username)
     {
        $message = 'When setting workflow cron schdule, ';
         if (empty($workflowName)) {
@@ -436,6 +436,11 @@ class Workflow implements \JsonSerializable
             $now->getTimestamp();
             $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
         }
+    }
+    
+    public function getCronSchedule($workflowName)
+    {
+        return $this->workflows[$workflowName]["cron"];
     }
     
     public function getProjects($username)

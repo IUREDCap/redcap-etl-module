@@ -30,6 +30,7 @@ $workflowName = Filter::escapeForHtml($_GET['workflowName']);
 if (empty($workflowName)) {
     $workflowName = $_POST['workflowName'];  
 }
+$selfUrl = $module->getUrl('web/workflow_schedule.php').'&workflowName='.Filter::escapeForUrlParameter($workflowName);
 
 try {
     $excludeIncomplete = true;
@@ -60,10 +61,6 @@ try {
 
     $servers   = $module->getUserAllowedServersBasedOnAccessLevel(USERID);
 
-    $selfUrl = $module->getUrl('web/workflow_schedule.php');
-    $scheduleUrl = $module->getUrl('web/schedule.php');
-    $workflows = $module->getUrl('web/workflows.php');
-
     #-------------------------
     # Set the submit value
     #-------------------------
@@ -73,17 +70,12 @@ try {
     }
     
     if (strcasecmp($submitValue, 'Save') === 0) {
-        $workflowName = $_POST['workflowName'];
+        $server = Filter::sanitizeString($_POST['server']); #ServerConfig::EMBEDDED_SERVER_NAME;
         if (empty($workflowName)) {
             $error = 'ERROR: No workflow specified.';
+        } elseif (empty($server)) {
+            $error = 'ERROR: No server specified.';
         } else  {
-            $server = ServerConfig::EMBEDDED_SERVER_NAME;
-            $isCronJob = false;
-
-            #Get projects that this user has access to
-            $db = new RedCapDb();
-            $userProjects = $db->getUserProjects($username);
-
             # Saving the schedule values
             $schedule = array();
         
@@ -94,15 +86,15 @@ try {
             $schedule[4] = Filter::sanitizeInt($_POST['Thursday']);
             $schedule[5] = Filter::sanitizeInt($_POST['Friday']);
             $schedule[6] = Filter::sanitizeInt($_POST['Saturday']);
-        
-            $module->setConfigSchedule($workflowName, $server, $schedule);
+            $module->setWorkflowSchedule($workflowName, $server, $schedule, $username);
             $success = " Schedule saved.";
         }
     } else {
         # Just displaying page
-        if (isset($configuration)) {
-            $server   = $configuration->getProperty(Configuration::CRON_SERVER);
-            $schedule = $configuration->getProperty(Configuration::CRON_SCHEDULE);
+        if (isset($workflowName)) {
+            $cron = $module->getWorkflowSchedule($workflowName);
+            $server = $cron[Configuration::CRON_SERVER];
+            $schedule = $cron[Configuration::CRON_SCHEDULE];
         }
     }
 } catch (Exception $exception) {
@@ -242,10 +234,6 @@ $(function () {
     ?>
     </div>
 
-
-  <!-- <fieldset style="border: 2px solid #ccc; border-radius: 7px; padding: 7px;"> -->
-  <!-- <legend style="font-weight: bold;">Schedule Automated Repeating Run</legend> -->
-
   <table class="cron-schedule">
     <thead>
       <tr>
@@ -293,10 +281,9 @@ $(function () {
     ?>
     </tbody>
   </table>
-  <!-- </fieldset> -->
   <p>
-    <input type="submit" name="submitValue" value="Save">
-  </p>
+      <input type="submit" name="submitValue" value="Save">
+   </p>
     <?php Csrf::generateFormToken(); ?>
 </form>
 

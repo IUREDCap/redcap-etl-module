@@ -1513,6 +1513,16 @@ class Settings
         
     }
     
+   public function getWorkflowSchedule($workflowName)
+    {
+        $workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+
+        $cron = $workflows->getCronSchedule($workflowName);
+
+        return $cron;
+    }
 /*    
     public function setWorkflows($workflows)
     {

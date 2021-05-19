@@ -1715,4 +1715,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
         $this->renderSubTabs($tabs, $activeUrl);
     }
+    
+	public function getWorkflowSchedule($workflowName)
+    {
+         return $this->settings->getWorkflowSchedule($workflowName);
+	}
 }
