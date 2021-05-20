@@ -111,14 +111,15 @@ if (strcasecmp($submit, 'Save') === 0) {
         $serverConfig->set(Filter::stripTagsArrayRecursive($_POST));
         $serverConfig->validate();
         $module->setServerConfig($serverConfig);
-        #if the access-level was changed from private to something else,
-        #then check to see if the user indicated to remove all of the
-        #allowed-users for this server, for example, so that those users
-        #can't have access again if the access-level for the server
-        #should go back to private in the future
+
+        # if the access-level was changed from private to something else,
+        # then check to see if the user indicated to remove all of the
+        # allowed-users for this server, for example, so that those users
+        # can't have access again if the access-level for the server
+        # should go back to private in the future
         if ($accessSet !== 'private') {
-            #this request value is set in a javascript function based on what
-            #the user clicks on a js confirm prompt.
+            # this request value is set in a javascript function based on what
+            # the user clicks on a js confirm prompt.
             $deleteUsers = $_REQUEST["deletePrivateAccessUsers"] === 'true' ? true : false;
             if ($deleteUsers) {
                 $removeUsernames = $module->getPrivateServerUsers($serverName);
@@ -216,7 +217,7 @@ $(function() {
 $(function() {
      $("input[name=authMethod]").change(function() {
         var value = $(this).val();
-        if (value == 'private') {
+        if (value == 0) {
             $("#passwordRow").hide();
             $("#sshKeyFileRow").show();
             $("#sshKeyPasswordRow").show();
