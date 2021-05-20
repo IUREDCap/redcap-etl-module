@@ -46,7 +46,7 @@ if (empty($selectedTime)) {
 
 $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
-$cronJobs = $module->getCronJobs($selectedDay, $selectedTime);
+$cronJobs = $module->getTaskCronJobs($selectedDay, $selectedTime);
 
 /*
 if ($submitValue === 'Run') {

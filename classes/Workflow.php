@@ -443,6 +443,30 @@ class Workflow implements \JsonSerializable
         return $this->workflows[$workflowName]["cron"];
     }
     
+    public function getCronJobs($day, $time)
+    {
+		$cronJobs = array();
+        foreach ($this->workflows as $workflowName=>$workflow) {
+            if (!empty($workflow["cron"])) {
+                $times  = $workflow["cron"][Configuration::CRON_SCHEDULE];
+                if (isset($times) && is_array($times)) {
+                    for ($cronDay = 0; $cronDay < 7; $cronDay++) {
+                        $cronTime = $times[$cronDay];
+                        if (isset($cronTime) && $cronTime != "" && $time == $cronTime && $day == $cronDay) {
+                            $job = array(
+                                "workflowName"  => $workflowName,
+                                "server"  => $workflow['cron'][Configuration::CRON_SERVER],
+                                "workflowStatus" => $workflow['metadata']['workflowStatus']
+                            );
+                            array_push($cronJobs, $job);
+                        }
+                    }
+                } 
+            }
+        }
+        return $cronJobs;
+    }
+    
     public function getProjects($username)
     {
 #delete?

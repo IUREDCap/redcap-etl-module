@@ -26,9 +26,9 @@ $success = '';
 $pid = PROJECT_ID;
 $username = USERID;
 
-$workflowName = Filter::escapeForHtml($_GET['workflowName']);
+$workflowName = $_POST['workflowName'];
 if (empty($workflowName)) {
-    $workflowName = $_POST['workflowName'];  
+    $workflowName = Filter::escapeForHtml($_GET['workflowName']);
 }
 $selfUrl = $module->getUrl('web/workflow_schedule.php').'&workflowName='.Filter::escapeForUrlParameter($workflowName);
 
@@ -136,6 +136,14 @@ $module->renderProjectPageContentHeader($scheduleUrl, $error, $warning, $success
 
 
 <?php
+if ($workflowName && !$workflowReady) {
+    $msg = 'The selected workflow '.$workflowName.' is not yet ready to be scheduled to run. ';
+	$msg .=  'If you wish to schedule this workflow to run, return to the workflow configuration page to complete the configuration.';
+	echo '<span style="font-weight: bold;">'.$msg.'</span>';
+} elseif ($noReadyProjects) {
+	echo '<span style="font-weight: bold;">There are no workflows with a status of READY for this project.</span>';
+} else {
+	      
 #---------------------------------------
 # Configuration selection form
 #---------------------------------------
@@ -208,17 +216,6 @@ $(function () {
     echo '<select name="server" id="serverId">' . "\n";
     echo '<option value=""></option>' . "\n";
 
-    #if ($adminConfig->getAllowEmbeddedServer()) {
-    #    $selected = '';
-    #    if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
-    #        $selected = 'selected';
-    #    }
-    #
-    #    echo '<option value="'.ServerConfig::EMBEDDED_SERVER_NAME.'" '.$selected.'>'
-    #         .ServerConfig::EMBEDDED_SERVER_NAME
-    #         .'</option>'."\n";
-    #}
-
     foreach ($servers as $serverName) {
         $serverConfig = $module->getServerConfig($serverName);
         if (isset($serverConfig) && $serverConfig->getIsActive()) {
@@ -286,5 +283,7 @@ $(function () {
    </p>
     <?php Csrf::generateFormToken(); ?>
 </form>
+
+<?php } # end if (noReadyProjects) ?> 
 
 <?php require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>

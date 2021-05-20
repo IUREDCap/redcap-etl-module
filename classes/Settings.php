@@ -674,7 +674,7 @@ class Settings
      * Gets the cron jobs for the specified day (0 = Sunday, 1 = Monday, ...)
      * and time (0 = 12am - 1am, 1 = 1am - 2am, ..., 23 = 11pm - 12am).
      */
-    public function getCronJobs($day, $time, $transaction = true)
+    public function getTaskCronJobs($day, $time, $transaction = true)
     {
         $commit = true;
         $errorMessage = '';
@@ -1523,6 +1523,16 @@ class Settings
 
         return $cron;
     }
+
+  public function getWorkflowCronJobs($day, $time)
+    {
+		$workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+        $cronJobs = $workflows->getCronJobs($day, $time);
+        return $cronJobs;
+    }
+
 /*    
     public function setWorkflows($workflows)
     {

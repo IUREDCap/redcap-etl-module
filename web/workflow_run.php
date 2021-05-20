@@ -109,11 +109,10 @@ $module->renderProjectPageContentHeader($runUrl, $error, $warning, $success);
 
 <?php
 if ($workflowName && !$workflowReady) {
-    #echo '<br /> <br />';
-    $runOutput = 'The selected workflow '.$workflowName.' is not yet ready to run. ';
-	$runOutput .=  'If you wish to run this workflow, return to the workflow configuration page to complete the configuration.';
-}
-if ($noReadyProjects) {
+    $msg = 'The selected workflow '.$workflowName.' is not yet ready to run. ';
+	$msg .=  'If you wish to run this workflow, return to the workflow configuration page to complete the configuration.';
+	echo '<span style="font-weight: bold;">'.$msg.'</span>';
+} elseif ($noReadyProjects) {
 	echo '<span style="font-weight: bold;">There are no workflows with a status of READY for this project.</span>';
 } else {
 	       

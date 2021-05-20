@@ -127,69 +127,16 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function runCronJobs($day, $hour)
     {
-        $cronJobs = $this->getCronJobs($day, $hour);
-        
-        $cronJobsRunLogId = $this->moduleLog->logCronJobsRun(count($cronJobs), $day, $hour);
+        $taskCronJobs = $this->getTaskCronJobs($day, $hour);
+        $workflowCronJobs = $this->getWorkflowCronJobs($day, $hour);
 
-        $pid = -1;   # process ID
+        $cronJobsCount = count($taskCronJobs) + count($workflowCronJobs);
+        $cronJobsCount = count($taskCronJobs) + count($workflowCronJobs);
+        $cronJobsRunLogId = $this->moduleLog->logCronJobsRun($cronJobsCount, $day, $hour);
 
-        foreach ($cronJobs as $cronJob) {
-            try {
-                $username   = $cronJob['username'];
-                $projectId  = $cronJob['projectId'];
-                $serverName = $cronJob['server'];
-                $configName = $cronJob['config'];
-            
-                $details = '';
-                $details .= "project ID: {$projectId}\n";
-                $details .= "configuration: {$configName}\n";
-                $details .= "server: {$serverName}\n";
-                $details .= "cron: yes\n";
-            
-                $sql    = null;
-                $record = null;
-                $event  = self::LOG_EVENT;
-
-                $isCronJob = true;
-
-                $cronJobLogId = $this->moduleLog->logCronJob($projectId, $serverName, $configName, $cronJobsRunLogId);
-
-                if (strcmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
-                    # Running on the embedded server
-                    #if (function_exists('pcntl_fork') && function_exists('pcntl_wait')) {
-                    #    $pid = pcntl_fork();
-                    #    if ($pid === -1) {
-                    #        # The fork was unsuccessful (and this is the only thread)
-                    #        $this->run($configName, $serverName, $isCronJob, $projectId);
-                    #    } elseif ($pid === 0) {
-                    #        # The fork was successful and this is the child process,
-                    #        $this->run($configName, $serverName, $isCronJob, $projectId);
-                    #        exit(0);
-                    #    } else {
-                    #        ; # the fork worked, and this is the parent process
-                    #    }
-                    #} else {
-                    # Forking not supported; run serially
-                       $this->run($configName, $serverName, $isCronJob, $projectId, $cronJobLogId, $day, $hour);
-                    #}
-                } else {
-                    $this->run($configName, $serverName, $isCronJob, $projectId, $cronJobLogId, $day, $hour);
-                }
-            } catch (\Exception $exception) {
-                $details = "Cron job failed\n"
-                    . $details . 'error: '
-                    . $exception->getMessage();
-                \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
-            }
-        }  # End foreach cron job
-                    
-        # If forking is supported, wait for child processes (if any))
-        $status = 0;
-        #if (function_exists('pcntl_fork') && function_exists('pcntl_wait')) {
-        #    while (pcntl_wait($status) != -1) {
-        #        ; // Wait for all child processes to finish
-        #    }
-        #}
+	    $this->runTaskCronJobs($taskCronJobs, $day, $hour, $cronJobsRunLogId);
+	    $this->runWorkflowCronJobs($workflowCronJobs, $day, $hour, $cronJobsRunLogId);
+	    
     }
 
     
@@ -796,9 +743,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      * Gets the cron jobs for the specified day (0 = Sunday, 1 = Monday, ...)
      * and time (0 = 12am - 1am, 1 = 1am - 2am, ..., 23 = 11pm - 12am).
      */
-    public function getCronJobs($day, $time)
+    public function getTaskCronJobs($day, $time)
     {
-        return $this->settings->getCronJobs($day, $time);
+        return $this->settings->getTaskCronJobs($day, $time);
     }
 
 
@@ -1471,7 +1418,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $username,
         $userProjects,
         $isCronJob = false,
-        $originatingProjectId = PROJECT_ID,
+        $originatingProjectId = null,
         $cronJobLogId = null,
         $cronDay = null,
         $cronHour = null
@@ -1561,7 +1508,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
                     #check to see if the user has permissions to export for this project
                     $hasPermissionToExport = false;
-                    if ($superUser) { 
+                    if ($superUser || $isCronJob) { 
 				        $hasPermissionToExport = true; 
                     } else {
                         $pKey = array_search($projectId, array_column($userProjects, 'project_id'));
@@ -1660,6 +1607,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 		        } #next task
 
                 $runWorkflow = true;
+
                 $status = $serverConfig->run($workflowProperties, $isCronJob, $this->moduleLog, $runWorkflow);
 
             } #end if (empty(workflowName))
@@ -1720,4 +1668,117 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
          return $this->settings->getWorkflowSchedule($workflowName);
 	}
+	
+    public function getWorkflowCronJobs($day, $time)
+    {
+         return $this->settings->getWorkflowCronJobs($day, $time);
+	}
+
+	public function runTaskCronJobs($cronJobs, $day, $hour, $cronJobsRunLogId)
+    {
+        $pid = -1;   # process ID
+
+        foreach ($cronJobs as $cronJob) {
+            try {
+                $username   = $cronJob['username'];
+                $projectId  = $cronJob['projectId'];
+                $serverName = $cronJob['server'];
+                $configName = $cronJob['config'];
+            
+                $details = '';
+                $details .= "project ID: {$projectId}\n";
+                $details .= "configuration: {$configName}\n";
+                $details .= "server: {$serverName}\n";
+                $details .= "cron: yes\n";
+            
+                $sql    = null;
+                $record = null;
+                $event  = self::LOG_EVENT;
+
+                $isCronJob = true;
+
+                $cronJobLogId = $this->moduleLog->logCronJob($projectId, $serverName, $configName, $cronJobsRunLogId);
+
+                if (strcmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
+                    # Running on the embedded server
+                    #if (function_exists('pcntl_fork') && function_exists('pcntl_wait')) {
+                    #    $pid = pcntl_fork();
+                    #    if ($pid === -1) {
+                    #        # The fork was unsuccessful (and this is the only thread)
+                    #        $this->run($configName, $serverName, $isCronJob, $projectId);
+                    #    } elseif ($pid === 0) {
+                    #        # The fork was successful and this is the child process,
+                    #        $this->run($configName, $serverName, $isCronJob, $projectId);
+                    #        exit(0);
+                    #    } else {
+                    #        ; # the fork worked, and this is the parent process
+                    #    }
+                    #} else {
+                    # Forking not supported; run serially
+                       $this->run($configName, $serverName, $isCronJob, $projectId, $cronJobLogId, $day, $hour);
+                    #}
+                } else {
+                    $this->run($configName, $serverName, $isCronJob, $projectId, $cronJobLogId, $day, $hour);
+                }
+            } catch (\Exception $exception) {
+                $details = "Cron job failed\n"
+                    . $details . 'error: '
+                    . $exception->getMessage();
+                \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
+            }
+        }  # End foreach cron job
+                    
+        # If forking is supported, wait for child processes (if any))
+        $status = 0;
+        #if (function_exists('pcntl_fork') && function_exists('pcntl_wait')) {
+        #    while (pcntl_wait($status) != -1) {
+        #        ; // Wait for all child processes to finish
+        #    }
+        #}
+    }
+    
+    public function runWorkflowCronJobs($cronJobs, $day, $hour, $cronJobsRunLogId)
+    {
+        $originatingProjectId = null;
+        $isCronJob = true;
+        $userProjects = null;
+        $username = null;
+        $sql = null;
+        $record = null;
+        $event = self::LOG_EVENT;
+        $projectId = null;
+        
+        foreach ($cronJobs as $cronJob) {
+            if ($cronJob['workflowStatus'] = 'Ready') {
+            
+                try {
+                    $workflowName = $cronJob['workflowName'];
+                    $serverName = $cronJob['server'];
+            
+                    $details = '';
+                    $details .= "workflow name: {$workflowName}\n";
+                    $details .= "server: {$serverName}\n";
+                    $details .= "cron: yes\n";
+              
+                    $cronJobLogId = $this->moduleLog->logWorkflowCronJob($workflowName, $serverName, $cronJobsRunLogId);
+
+                    $this->runWorkflow($workflowName, $serverName, $username, $userProjects, $isCronJob, $originatingProjectId, $cronJobsRunLog, $day, $hour);
+
+                } catch (\Exception $exception) {
+                    $details = "Cron job failed\n"
+                        . $details . 'error: '
+                        . $exception->getMessage();
+                    \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
+                }
+		    }
+        }  # End foreach cron job
+                    
+        # If forking is supported, wait for child processes (if any))
+        $status = 0;
+        #if (function_exists('pcntl_fork') && function_exists('pcntl_wait')) {
+        #    while (pcntl_wait($status) != -1) {
+        #        ; // Wait for all child processes to finish
+        #    }
+        #}
+    }
 }

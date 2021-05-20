@@ -19,6 +19,8 @@ class ModuleLog
     const ETL_RUN         = 'ETL run';
     const ETL_RUN_DETAILS = 'ETL run details';
     const WORKFLOW_RUN    = 'workflow run';
+    const WORKFLOW_CRON_JOB    = 'workflow_cron_job';
+
 
     private $module;
 
@@ -48,7 +50,6 @@ class ModuleLog
         ];
 
         $logMessage = 'REDCap-ETL cron jobs run';
-
         $logId = $this->module->log($logMessage, $logParams);
 
         return $logId;
@@ -365,7 +366,7 @@ class ModuleLog
             'etl_server'         => $serverName
         ];
 
-        $logMessage = "Workflow run";
+        $logMessage = "ETL workflow run";
 
         $logId = $this->module->log($logMessage, $logParams);
         $this->lastEtlRunLogId = $logId;
@@ -373,4 +374,22 @@ class ModuleLog
         return $logId;
     }
 
+    public function logWorkflowCronJob($workflowName, $serverName, $cronLogId)
+    {
+        $logParams = [
+            'log_type'           => self::WORKFLOW_CRON_JOB,
+            'log_format_version' => self::LOG_FORMAT_VERSION,
+            'project_id'         => null,
+            'etl_server'         => $serverName,
+            'config'             => 'Workflow '.$workflowName,
+            'cron_log_id'        => $cronLogId
+        ];
+
+        $logMessage = 'REDCap-ETL Workflow cron job';
+
+        $logId = $this->module->log($logMessage, $logParams);
+
+        return $logId;
+    }
+   
 }
