@@ -145,8 +145,7 @@ try {
 $workflowStatus = $module->getWorkflowStatus($workflowName);
 
 #Get the workflow's updated tasks list
-$tasksOnly = true;
-$tasks = $module->getWorkflow($workflowName, $tasksOnly);
+$tasks = $module->getWorkflowTasks($workflowName);
 $taskProjectIds = array_column($tasks, 'projectId');
 ?>
 

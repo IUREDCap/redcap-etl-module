@@ -137,10 +137,13 @@ class ModuleLog
         
         if ($type === self::ETL_RUN) {
             $query .= ', log_type, cron, config, etl_username, etl_server, cron_job_log_id, cron_day, cron_hour';
+            $query .= " where (log_type = '" . Filter::escapeForMysql($type) . "'";
+            $query .= " or log_type = '" . self::WORKFLOW_RUN . "')";
         } elseif ($type === self::ETL_CRON) {
             $query .= ', log_type, cron_day, cron_hour, num_jobs';
+            $query .= " where log_type = '" . Filter::escapeForMysql($type) . "'";
         }
-        $query .= " where log_type = '" . Filter::escapeForMysql($type) . "'";
+        #$query .= " where log_type = '" . Filter::escapeForMysql($type) . "'";
         
         #----------------------------------------
         # Query start date condition (if any)
@@ -149,6 +152,7 @@ class ModuleLog
             $startTime = \DateTime::createFromFormat('m/d/Y', $startDate);
             $startTime = $startTime->format('Y-m-d');
             $query .= " and timestamp >= '" . Filter::escapeForMysql($startTime) . "'";
+            #$query .= " where timestamp >= '" . Filter::escapeForMysql($startTime) . "'";
         }
         
         #---------------------------------------

@@ -204,12 +204,13 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
             <?php
 
             $logData = $moduleLog->getData($logType, $startDate, $endDate);
-
             foreach ($logData as $entry) {
                 if ($logType === RedCapEtlModule::ETL_RUN) {
-                    $projectId = $entry['project_id'];
-                    $projectUrl = APP_PATH_WEBROOT . 'index.php?pid=' . (int)$projectId;
-                    
+                    $projectId = null;
+                    if ($entry['log_type'] !== RedCapEtlModule::WORKFLOW_RUN) {
+                        $projectId = $entry['project_id'];
+                        $projectUrl = APP_PATH_WEBROOT . 'index.php?pid=' . (int)$projectId;
+                    } 
                     $cron = $entry['cron'];
                     
                     $config = $entry['config'];

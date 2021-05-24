@@ -1148,14 +1148,24 @@ class Settings
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
     }
 
-    public function getWorkflow($workflowName, $tasksOnly = null)
+    public function getWorkflow($workflowName)
     {
         $workflows = new Workflow();
         $key = self::WORKFLOWS_KEY;
         $json = $this->module->getSystemSetting($key);
         $workflows->fromJson($json);
 
-        return $workflows->getWorkflow($workflowName, $tasksOnly);
+        return $workflows->getWorkflow($workflowName);
+    }
+
+    public function getWorkflowTasks($workflowName)
+    {
+        $workflows = new Workflow();
+        $key = self::WORKFLOWS_KEY;
+        $json = $this->module->getSystemSetting($key);
+        $workflows->fromJson($json);
+
+        return $workflows->getWorkflowTasks($workflowName);
     }
 
     public function getWorkflowStatus($workflowName)
@@ -1310,8 +1320,7 @@ class Settings
         $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
-        $tasksOnly = true;
-        $tasks = $workflows->getWorkflow($workflowName, $tasksOnly);
+        $tasks = $workflows->getWorkflowTasks($workflowName);
         $keys = array_keys($tasks);
         $keysIndex = array_search($moveTaskKey, $keys);
         $numberOfTasks = count($tasks);
@@ -1367,7 +1376,7 @@ class Settings
         }
 
         #make sure the task sequences in sequential order
-        $workflows->sequenceWorkflow($workflowName, $tasks, $username);
+        $workflows->sequenceWorkflowTasks($workflowName, $tasks, $username);
 
         $json = $workflows->toJson();
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
@@ -1406,61 +1415,6 @@ class Settings
 
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
     }
-
-/*    public function updateWorkflowTasks(
-        $workflowName,
-        $incomingTaskNames,
-        $incomingProjectEtlConfigs,
-        $username
-    ) {
-#delete this?
-        $message = 'In updatinging workflow tasks, ';
-        if (empty($workflowName)) {
-            $message .= 'no workflow name was specified.';
-            throw new \Exception($message);
-        }
-               
-        $workflows = new Workflow();
-        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
-        $workflows->fromJson($json);
-        $tasks = $workflows->getWorkflow($workflowName, true);
-
-        $commit = true;
-        $this->db->startTransaction();
-
-        foreach ($tasks as $key => $task) {
-            $projectId = $task['projectId'];
-
-            #task names
-            if ($incomingTaskNames[$key] !== $task['taskName']) {
-                if (empty(trim($incomingTaskNames[$key]))) {
-                    $tasks[$key]['taskName'] = "Task for Project Id $projectId";
-                } else {
-                    $tasks[$key]['taskName'] = $incomingTaskNames[$key];
-                }
-            }
-
-            #project ETL configurations
-            if ($incomingProjectEtlConfigs[$key] !== $task['projectEtlConfig']) {
-                $tasks[$key]['projectEtlConfig'] = $incomingProjectEtlConfigs[$key];
-            }
-        }
-
-        #workflow status
-        $emptyEtlConfig = in_array(null, $incomingProjectEtlConfigs, true)
-            || in_array('', $incomingProjectEtlConfigs, true);
-        $workflowStatus = null;
-        if (!$emptyEtlConfig) {
-            $workflowStatus = 'Ready';
-        }
-
-        $workflows->updateWorkflow($workflowName, $tasks, $workflowStatus, $username);
-        $json = $workflows->toJson();
-
-        $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
-
-        $this->db->endTransaction($commit);
-    }*/
 
     public function getWorkflowGlobalProperties($workflowName)
     {

@@ -49,44 +49,66 @@ class Workflow implements \JsonSerializable
         $this->workflows[$workflowName]["metadata"]["workflowStatus"] = self::WORKFLOW_INCOMPLETE;
     }
 
-    public function getWorkflow($workflowName, $tasksOnly = null)
+    public function getWorkflow($workflowName)
     {
         $workflow = $this->workflows[$workflowName];
-        unset($workflow["properties"]); #remove global properties
-        $this->sequenceWorkflow($workflowName, $workflow, null);
-        if ($tasksOnly) {
-            unset($workflow["metadata"]);
-            unset($workflow["properties"]);
-            unset($workflow["cron"]);
-        }
+
+        return $this->sequenceWorkflowTasks($workflowName, $workflow, null);
+
+    }
+    
+    public function getWorkflowTasks($workflowName)
+    {
+        $workflow = $this->workflows[$workflowName];
+        unset($workflow["metadata"]);
+        unset($workflow["properties"]);
+        unset($workflow["cron"]);
+
+        $this->sequenceWorkflowTasks($workflowName, $workflow, null);
 
         return $workflow;
     }
 
-    public function sequenceWorkflow($workflowName, $workflow, $username)
+    public function sequenceWorkflowTasks($workflowName, $tasks, $username)
     {
 
         $metadata = null;
-        if (!array_key_exists('metadata', $workflow)) {
+        if (array_key_exists('metadata', $this->workflows[$workflowName])) {
             $metadata = $this->workflows[$workflowName]["metadata"];
+        }
+        $properties = null;
+        if (array_key_exists('properties', $this->workflows[$workflowName])) {
+            $properties = $this->workflows[$workflowName]["properties"];
+        }
+        $cron = null;
+        if (array_key_exists('cron', $this->workflows[$workflowName])) {
+            $cron = $this->workflows[$workflowName]["cron"];
         }
 
         #sort project-tasks by sequence number
-        array_multisort(array_column($workflow, 'taskSequenceNumber'), SORT_ASC, SORT_NUMERIC, $workflow);
+        array_multisort(array_column($tasks, 'taskSequenceNumber'), SORT_ASC, SORT_NUMERIC, $tasks);
         
         #renumber sequence to ensure the no sequence numbers duplicated or omitted
         $i = 1;
-        foreach ($workflow as $key => $task) {
-            $workflow[$key]['taskSequenceNumber'] = $i;
+        foreach ($tasks as $key => $task) {
+            $task[$key]['taskSequenceNumber'] = $i;
             ++$i;
         }
 
-        #replace the old workflow with this updated workflow
-        $this->workflows[$workflowName] = $workflow;
+        #replace the old workflow tasks with this updated workflow
+        $this->workflows[$workflowName] = $tasks;
 
         #add the metadata back to the updated workflow
         if ($metadata) {
             $this->workflows[$workflowName]["metadata"] = $metadata;
+        }
+        #add the global properties back to the updated workflow
+        if ($properties) {
+            $this->workflows[$workflowName]["properties"] = $properties;
+        }
+        #add the cron-job data back to the updated workflow
+        if ($cron) {
+            $this->workflows[$workflowName]["cron"] = $cron;
         }
 
         if ($username) {
@@ -196,7 +218,7 @@ class Workflow implements \JsonSerializable
         }
     }
 
-    public function updateWorkflowProject($workflowName, $projectId, $task, $username)
+/*    public function updateWorkflowProject($workflowName, $projectId, $task, $username)
     {
 #delete this??
 
@@ -228,7 +250,7 @@ class Workflow implements \JsonSerializable
             $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
         }
     }
-
+*/
     /**
      * Deletes a workflow from the workflows array.
      */

@@ -30,10 +30,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     const LOG_PAGE           = 'web/admin/log.php';
             
-    const USER_ETL_CONFIG_PAGE  = 'web/configure.php';
+    const USER_ETL_CONFIG_PAGE       = 'web/configure.php';
     const USER_ETL_TASK_CONFIG_PAGE  = 'web/task_configure.php';
 
     const WORKFLOWS_PAGE     = 'web/workflows.php';
+    const WORKFLOW_CONFIG_PAGE       = 'web/workflow_configure.php';
     
     # REDCap event log constants
     const RUN_LOG_ACTION    = 'REDCap-ETL Export';
@@ -45,6 +46,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const ETL_CRON_JOB    = 'ETL cron job';
     const ETL_RUN         = 'ETL run';
     const ETL_RUN_DETAILS = 'ETL run details';
+    const WORKFLOW_RUN    = 'workflow run';
      
     # Access/permission errors
     const CSRF_ERROR                  = 1;   # (Possible) Cross-Site Request Forgery Error
@@ -1264,9 +1266,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         }
     }
 
-    public function getWorkflow($workflowName, $tasksOnly = null)
+    public function getWorkflow($workflowName)
     {
-         return $this->settings->getWorkflow($workflowName, $tasksOnly);
+         return $this->settings->getWorkflow($workflowName);
+    }
+
+    public function getWorkflowTasks($workflowName)
+    {
+         return $this->settings->getWorkflowTasks($workflowName);
     }
 
     public function getWorkflowStatus($workflowName)
@@ -1488,8 +1495,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 #---------------------------------------------
                 # Get workflow tasks and global properties
                 #---------------------------------------------
-                $tasksOnly = true;
-                $tasks = $this->getWorkflow($workflowName, $tasksOnly);
+                $tasks = $this->getWorkflowTasks($workflowName);
                 $globalProperties = array_filter($this->getWorkflowGlobalProperties($workflowName));
                 if ($serverConfig->isEmbeddedServer()) {
 					$globalProperties[Configuration::PRINT_LOGGING] = false;
