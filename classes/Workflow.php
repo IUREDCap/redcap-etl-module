@@ -45,7 +45,7 @@ class Workflow implements \JsonSerializable
         $now->format('Y-m-d H:i:s');
         $now->getTimestamp();
         $this->workflows[$workflowName]["metadata"]["dateAdded"] = $now;
-        $this->workflows[$workflowName]["metadata"]["added_by"] = $username;
+        $this->workflows[$workflowName]["metadata"]["addedBy"] = $username;
         $this->workflows[$workflowName]["metadata"]["workflowStatus"] = self::WORKFLOW_INCOMPLETE;
     }
 
@@ -276,7 +276,7 @@ class Workflow implements \JsonSerializable
     public function copyWorkflow($fromWorkflowName, $toWorkflowName, $username)
     {
         $this->workflows[$toWorkflowName] = $this->workflows[$fromWorkflowName];
-        $this->workflows[$toWorkflowName]["metadata"]["added_by"] = $username;
+        $this->workflows[$toWorkflowName]["metadata"]["addedBy"] = $username;
 
         $now = new \DateTime();
         $now->format('Y-m-d H:i:s');

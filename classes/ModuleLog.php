@@ -141,9 +141,9 @@ class ModuleLog
             $query .= " or log_type = '" . self::WORKFLOW_RUN . "')";
         } elseif ($type === self::ETL_CRON) {
             $query .= ', log_type, cron_day, cron_hour, num_jobs';
-            $query .= " where log_type = '" . Filter::escapeForMysql($type) . "'";
+            $query .= " where (log_type = '" . Filter::escapeForMysql($type) . "'";
+            $query .= " or log_type = '" . self::WORKFLOW_CRON_JOB . "')";
         }
-        #$query .= " where log_type = '" . Filter::escapeForMysql($type) . "'";
         
         #----------------------------------------
         # Query start date condition (if any)
@@ -152,7 +152,6 @@ class ModuleLog
             $startTime = \DateTime::createFromFormat('m/d/Y', $startDate);
             $startTime = $startTime->format('Y-m-d');
             $query .= " and timestamp >= '" . Filter::escapeForMysql($startTime) . "'";
-            #$query .= " where timestamp >= '" . Filter::escapeForMysql($startTime) . "'";
         }
         
         #---------------------------------------
@@ -252,7 +251,8 @@ class ModuleLog
     public function getCronJobs($logId)
     {
         $query = "select log_id, timestamp, ui_id, project_id, message, log_type, etl_server, config, cron_log_id";
-        $query .= " where log_type = '" . self::ETL_CRON_JOB . "'"
+        $query .= " where (log_type = '" . self::ETL_CRON_JOB . "'"
+            . " or log_type = '" . self::WORKFLOW_CRON_JOB . "')"
             . " and cron_log_id = '" . Filter::escapeForMysql($logId) . "'";
         $cronJob = $this->module->queryLogs($query);
         return $cronJob;
@@ -264,7 +264,8 @@ class ModuleLog
     public function getEtlRunLogIdForCronJob($cronLogId)
     {
         $query = "select log_id";
-        $query .= " where log_type = '" . self::ETL_RUN . "'"
+        $query .= " where (log_type = '" . self::ETL_RUN . "'"
+            . " or log_type = '" . self::WORKFLOW_RUN . "')"
             . " and cron_log_id = '" . Filter::escapeForMysql($cronLogId) . "'";
         $result = $this->module->queryLogs($query);
         
@@ -301,12 +302,16 @@ class ModuleLog
         
         $tableRows = '';
         foreach ($cronJobsData as $job) {
+            $projectId = null;
+            if ($job['log_type'] !== self::WORKFLOW_CRON_JOB) {
+                $projectId = $job['project_id'];
+            }
             $row = "<tr>";
             $row .= '<td style="text-align: right;">' . Filter::sanitizeInt($job['log_id']) . "</td>";
             $row .= '<td style="text-align: right;">' . Filter::sanitizeInt($job['cron_log_id']) . "</td>";
             $row .= "<td>" . Filter::sanitizeString($job['etl_server']) . "</td>";
             $row .= "<td>" . Filter::sanitizeString($job['config']) . "</td>";
-            $row .= '<td style="text-align: right;">' . Filter::sanitizeString($job['project_id']) . "</td>";
+            $row .= '<td style="text-align: right;">' . Filter::sanitizeString($projectId) . "</td>";
             
             $row .= "</tr>\n";
             $tableRows .= $row;
@@ -366,7 +371,7 @@ class ModuleLog
             'cron_job_log_id'    => $cronJobLogId,
             'cron_day'           => $cronDay,
             'cron_hour'          => $cronHour,
-            'config'             => 'Workflow '.$workflowName,
+            'config'             => $workflowName,
             'etl_server'         => $serverName
         ];
 

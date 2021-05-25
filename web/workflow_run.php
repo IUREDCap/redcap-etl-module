@@ -70,10 +70,12 @@ try {
         } else  {
             $server = ServerConfig::EMBEDDED_SERVER_NAME;
             $isCronJob = false;
+            $originatingProjectId = $pid;
             #Get projects that this user has access to
             $db = new RedCapDb();
             $userProjects = $db->getUserProjects($username);
-            $runOutput = $module->runWorkflow($workflowName, $server, $username, $userProjects, $isCronJob);
+ 
+            $runOutput = $module->runWorkflow($workflowName, $server, $username, $userProjects, $isCronJob, $originatingProjectId);
         }
     }
 } catch (Exception $exception) {

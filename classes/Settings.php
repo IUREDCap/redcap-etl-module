@@ -1148,6 +1148,16 @@ class Settings
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
     }
 
+    public function getWorkflows()
+    {
+        $workflows = new Workflow();
+        $key = self::WORKFLOWS_KEY;
+        $json = $this->module->getSystemSetting($key);
+        $workflows->fromJson($json);
+
+        return $workflows->getWorkflows();
+    }
+
     public function getWorkflow($workflowName)
     {
         $workflows = new Workflow();

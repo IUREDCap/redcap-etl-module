@@ -24,6 +24,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const SERVERS_PAGE       = 'web/admin/servers.php';
     const SERVER_CONFIG_PAGE = 'web/admin/server_config.php';
     const ADMIN_INFO_PAGE    = 'web/admin/info.php';
+    const ADMIN_WORKFLOWS_PAGE    = 'web/admin/admin_workflows.php';
     
     const HELP_LIST_PAGE     = 'web/admin/help_list.php';
     const HELP_EDIT_PAGE     = 'web/admin/help_edit.php';
@@ -894,10 +895,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $adminLabel = '<span class="fas fa-cog"></span>'
            . ' Config';
 
-        #$cronJobsUrl = $this->getUrl(self::CRON_DETAIL_PAGE);
         $cronTaskJobsUrl = $this->getUrl(self::CRON_DETAIL_TASKS_PAGE);
         $cronJobsLabel = '<span class="fas fa-clock"></span>'
-           . ' Cron Detail';
+           . ' Cron';
+           #. ' Cron Detail';
 
         $usersUrl = $this->getUrl(self::USERS_PAGE);
         $usersLabel = '<span class="fas fa-user"></span>'
@@ -905,7 +906,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
         $serversUrl = $this->getUrl(self::SERVERS_PAGE);
         $serversLabel = '<span class="fas fa-server"></span>'
-           . ' ETL Servers';
+           . ' Servers';
+           #. ' ETL Servers';
+
+        $workflowsUrl = $this->getUrl(self::ADMIN_WORKFLOWS_PAGE);
+        $workflowsLabel = '<span class="fas fa-server"></span>'
+           . ' Workflows';
 
         $helpEditUrl = $this->getUrl(self::HELP_LIST_PAGE);
         $helpEditLabel = '<span class="fas fa-edit"></span>'
@@ -920,13 +926,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $tabs[$infoUrl]          = $infoLabel;
         
         $tabs[$adminUrl]         = $adminLabel;
-        #$tabs[$cronJobsUrl]      = $cronJobsLabel;
         $tabs[$cronTaskJobsUrl]      = $cronJobsLabel;
         $tabs[$usersUrl]         = $usersLabel;
         #$tabs[$configureUserUrl] = $configureUserLabel;
 
         $tabs[$serversUrl]       = $serversLabel;
         #$tabs[$serverConfigUrl]  = $serverConfigLabel;
+
+        $tabs[$workflowsUrl]     = $workflowsLabel;
 
         $tabs[$helpEditUrl]      = $helpEditLabel;
 
@@ -1266,6 +1273,18 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         }
     }
 
+    public function getWorkflows()
+    {
+        $superUser = SUPER_USER; 
+        $workflows = null;
+        if ($superUser) {
+             $workflows = $this->settings->getWorkflows();
+        } else {
+            throw new \Exception('You do not have permission to retrieve all workflows.');
+        }
+        return $workflows;
+    }
+
     public function getWorkflow($workflowName)
     {
          return $this->settings->getWorkflow($workflowName);
@@ -1425,7 +1444,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $username,
         $userProjects,
         $isCronJob = false,
-        $originatingProjectId = null,
+        $originatingProjectId = PROJECT_ID,
         $cronJobLogId = null,
         $cronDay = null,
         $cronHour = null
@@ -1434,7 +1453,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     $status = null; 
 
     try {
-            if (empty($usernamei)) { 
+            if (empty($username)) { 
                 if (defined('USERID')) {
                     $username = USERID;
                 }
@@ -1786,5 +1805,23 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         #        ; // Wait for all child processes to finish
         #    }
         #}
+    }
+    
+    public function renderAdminWorkflowsSubTabs($activeUrl = '')
+    {
+        $workflowsUrl = $this->getUrl(self::ADMIN_WORKFLOWS_PAGE);
+        $workflowsLabel = '<span class="fas fa-list"></span>'
+           . ' List</span>';
+
+        $searchWorkflowsUrl = $this->getUrl(self::USER_CONFIG_PAGE);
+        $searchWorkflowsLabel = '<span class="fas fa-search"></span>'
+           . ' Search</span>';
+
+        $tabs = array();
+
+        $tabs[$workflowsUrl]          = $workflowsLabel;
+        $tabs[$configureWorkflowsUrl] = $searchWorkflowsLabel;
+
+        $this->renderSubTabs($tabs, $activeUrl);
     }
 }
