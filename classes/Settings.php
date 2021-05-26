@@ -1239,15 +1239,8 @@ class Settings
         }
     }
 
-    public function deleteWorkflow($workflowName, $dataExportRight = 0, $transaction = true)
+    public function deleteWorkflow($workflowName)
     {
-# Check for admin?? (dataExportRight)?
-        $commit = true;
-
-        if ($transaction) {
-            $this->db->startTransaction();
-        }
-        
         $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
@@ -1255,12 +1248,17 @@ class Settings
         $workflows->deleteWorkflow($workflowName);
 
         $json = $workflows->toJson();
-
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+    }
 
-        if ($transaction) {
-            $this->db->endTransaction($commit);
-        }
+    public function reinstateWorkflow($workflowName, $username)
+    {
+        $workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+        $workflows->reinstateWorkflow($workflowName, $username);
+        $json = $workflows->toJson();
+        $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
     }
 
     public function copyWorkflow($fromWorkflowName, $toWorkflowName, $username, $toExportRight = null, $transaction = true)
@@ -1495,6 +1493,28 @@ class Settings
         $workflows->fromJson($json);
         $cronJobs = $workflows->getCronJobs($day, $time);
         return $cronJobs;
+    }
+    
+    public function hasPermissionsForAllTasks($workflowName, $username = USERID)
+    {
+    	$hasPermissions = false;
+        $userProjects = $this->db->getUserProjects($username);
+        $userProjectIds = array_column($userProjects, 'project_id');
+
+		$workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+        $tasks = $workflows->getWorkflowTasks($workflowName);
+        $workflowProjectIds = array_column($tasks, 'projectId');
+        $numWorkflowProjects = count($workflowProjectIds);
+
+        $commonProjectIds = array_intersect($userProjectIds, $workflowProjectIds);
+        $numCommonProjectIds = count($commonProjectIds);
+
+        if ($numWorkflowProjects === $numCommonProjectIds) {
+			$hasPermissions = true;
+		}
+        return $hasPermissions;
     }
 
 /*    

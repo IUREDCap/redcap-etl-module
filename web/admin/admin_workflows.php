@@ -20,12 +20,23 @@ use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
+$username = USERID;
 $selfUrl = $module->getUrl(RedCapEtlModule::ADMIN_WORKFLOWS_PAGE);
-$configUrl = $module->getUrl(RedCapEtlModule::WORKFLOW_CONFIG_PAGE);
+
+$submit = Filter::sanitizeLabel($_POST['submit']);
+$searchText = null;
+if ($submit === 'Search') {
+    $searchText = Filter::sanitizeString($_POST['search-text']);
+}
 
 $deleteWorkflowName = Filter::sanitizeString($_POST['delete-workflow-name']);
 if (!empty($deleteWorkflowName)) {
-    $module->deleteWorkflow($deleteWorkflowName);
+    $module->deleteWorkflow($deleteWorkflowName, $username);
+}
+
+$reinstateWorkflowName = Filter::sanitizeString($_POST['reinstate-workflow-name']);
+if (!empty($reinstateWorkflowName)) {
+    $module->reinstateWorkflow($reinstateWorkflowName, $username);
 }
 
 $workflows = $module->getworkflows();
@@ -41,7 +52,7 @@ require_once APP_PATH_DOCROOT . 'ControlCenter/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
 $link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
-$jsInclude = '<script type="text/javascript" src="' . ($module->getUrl('resources/servers.js')) . '"></script>';
+$jsInclude = '<script type="text/javascript" src="' . ($module->getUrl('resources/workflows.js')) . '"></script>';
 $buffer = str_replace('</head>', "    {$link}\n{$jsInclude}\n</head>", $buffer);
 
 echo $buffer;
@@ -56,87 +67,144 @@ echo $buffer;
 # Render page content header (tabs and messages)
 #-------------------------------------------------
 $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
-$module->renderAdminWorkflowsSubTabs($selfUrl);
 ?>
+
+
+
+<form action="<?php echo $selfUrl;?>" method="post" style="margin-bottom: 12px;">
+Workflow name: <input type="text" id="search-text" name="search-text" size="40">
+<input type="submit" name="submit" value="Search"><br />
+<?php Csrf::generateFormToken(); ?>
+</form>
+    <!--
+<div class="ui-widget">
+  <label for="user">User: </label>
+  <input type="text" id="user-search" size="40">
+</div>
+-->
 
 <table class="dataTable">
   <thead>
-    <tr> <th>Workflow Name</th> <th>Status</th> </th><th>Last Updated By/Date</th><th>Configure</th>
-    </th><th>Delete</th> </th></tr>
+    <tr> <th>Workflow Name</th> <th>Status</th> </th><th>Last Updated<th>Configure</th>
+    <th>Reinstate</th><th>Delete</th></tr>
   </thead>
   <tbody>
     <?php
+    $i=0;
     $row = 1;
-    foreach ($workflows as $workflowName => $workflow) {
-        #get the first project since the workflow config url requires a project id
-        $pid = array_column($workflow,'projectId')[0];
-        $workflowConfigUrl = $module->getURL(RedCapEtlModule::WORKFLOW_CONFIG_PAGE
-                                . '?pid=' . Filter::escapeForUrlParameter($pid)
-                                . '&workflowName=' . Filter::escapeForUrlParameter($workflowName)
-                            );
-        if ($row % 2 == 0) {
-            echo "<tr class=\"even\">\n";
-        } else {
-            echo "<tr class=\"odd\">\n";
-        }
+    foreach ($workflows as $workflowName=>$workflow) {
+        $display = true;
+        if (!empty($searchText)) {
+            if (strpos(strtoupper($workflowName), strtoupper($searchText)) === false) {
+				$display = false;
+            }
+	    }
+	    
+	    if ($display) {
+            if ($row % 2 == 0) {
+                echo "<tr class=\"even\">\n";
+            } else {
+                echo "<tr class=\"odd\">\n";
+            }
+            echo '<td>' . Filter::escapeForHtml($workflowName) . "</td>\n";
 
-        echo '<td>' . $workflowName . "</td>\n";
-        
-        #-------------------------------
-        # Status
-        #-------------------------------
-        $status = $workflow['metadata']['workflowStatus'];
-        echo '<td style="text-align:center;">' . $status . "</td>\n";
+            #-------------------------------
+            # Status
+            #-------------------------------
+            $status = $workflow['metadata']['workflowStatus'];
+            echo '<td style="text-align:center;">' . $status . "</td>\n";
 
-        #-------------------------------
-        # Last updated by/date
-        #-------------------------------
-        $updatedBy = $workflow['metadata']['updatedBy'];
-        $dateUpdated = substr($workflow['metadata']['dateUpdated']['date'],0,10);
-        if ($updatedBy || $dateUpdated) {
-            echo '<td style="text-align:center;">' . $updatedBy . '/' . $dateUpdated;
-        } else {
-            echo '<td>';
-        }
-        echo "</td>\n";
+            #-------------------------------
+            # Last updated by/date
+            #-------------------------------
+            $dateUpdated = substr($workflow['metadata']['dateUpdated']['date'],0,10);
+            if (empty($dateUpdated)) {$dateUpdated = substr($workflow['metadata']['dateAdded']['date'],0,10);}
 
-        #-------------------------------
-        # Configure
-        #-------------------------------
-        echo '<td style="text-align:center;">'
-            . '<a href="' . $workflowConfigUrl . '">'
-            . '<img src="' . APP_PATH_IMAGES . 'gear.png" alt="CONFIG"></a>'
-            . "</td>\n";
+            $updatedBy = $workflow['metadata']['updatedBy'];
+            if (empty($updatedBy)) {$updatedBy = $workflow['metadata']['addedBy'];}
+            if (!empty($updatedBy)) {$updatedBy = ' ['.$updatedBy.']';}
 
-        #-------------------------------
-        # Delete
-        #-------------------------------
-        echo '<td style="text-align:center;">'
-            .  '<input type="image" src="' . APP_PATH_IMAGES . 'delete.png" alt="DELETE"'
-            . ' id="deleteWorkflow' . $row . '"'
-            . ' class="deleteServer" style="cursor: pointer;">'
-            . "</td>\n";
-        
+            if ($updatedBy || $dateUpdated) {
+                echo '<td>' . $dateUpdated . $updatedBy;
+            } else {
+                echo '<td>';
+            }
+            echo "</td>\n";
+
+            #-------------------------------
+            # Configure
+            #-------------------------------
+            #get the first project since the workflow config url requires a project id
+            $pid = array_column($workflow,'projectId')[0];
+            $workflowConfigUrl = $module->getURL(RedCapEtlModule::WORKFLOW_CONFIG_PAGE
+                . '?pid=' . Filter::escapeForUrlParameter($pid)
+                . '&workflowName=' . Filter::escapeForUrlParameter($workflowName)
+            ); 
+            echo '<td style="text-align:center;">'
+                . '<a href="' . $workflowConfigUrl . '">'
+                . '<img src="' . APP_PATH_IMAGES . 'gear.png" alt="CONFIG"></a>'
+                . "</td>\n";
+
+            #-------------------------------
+            # Reinstate (take out of 'Removed' status)
+            #-------------------------------
+            if ($status === RedCapEtlModule::WORKFLOW_REMOVED) {
+                echo '<td style="text-align:center;">'
+                    . '<input type="image" src="' . APP_PATH_IMAGES . 'tick.png" alt="REINSTATE"'
+                    . ' id="reinstateWorkflow' . $row . '"'
+                    . ' class="renameServer" style="cursor: pointer;">'
+                    . "</td>\n";
+            } else {
+                echo "<td> </td>\n";
+            }
+         
+            #-------------------------------
+            # Delete
+            #-------------------------------
+            echo '<td style="text-align:center;">'
+                .  '<input type="image" src="' . APP_PATH_IMAGES . 'delete.png" alt="DELETE"'
+                . ' id="deleteWorkflow' . $row . '"'
+                . ' class="deleteServer" style="cursor: pointer;">'
+                . "</td>\n";
               
-        echo "</tr>\n";
+            echo "</tr>\n";
+        }
+        
         $row++;
     }
     ?>
   </tbody>
 </table>
 
+<?php
+#--------------------------------------
+# Reinstate workflow dialog
+#--------------------------------------
+?>
+<div id="reinstate-dialog"
+    title="Reinstate Workflow Configuration"
+    style="display: none;"
+    >
+    <form id="reinstate-form" action="<?php echo $selfUrl;?>" method="post">
+    To reinstate the workflow <span id="workflow-to-reinstate" style="font-weight: bold;"></span>
+    (i.e., remove it from 'Removed' status), click on the 
+    <span style="font-weight: bold;">Reinstate workflow</span> button.
+    <input type="hidden" name="reinstate-workflow-name" id="reinstate-workflow-name" value="">
+    <?php Csrf::generateFormToken(); ?>
+    </form>
+</div>
 
 <?php
 #--------------------------------------
-# Delete server dialog
+# Delete workflow dialog
 #--------------------------------------
 ?>
 <div id="delete-dialog"
-    title="Workflow Delete"
+    title="Workflow Configuration Delete"
     style="display: none;"
     >
     <form id="delete-form" action="<?php echo $selfUrl;?>" method="post">
-    To delete the workflow  <span id="workflow-to-delete" style="font-weight: bold;"></span>,
+    To delete the workflow <span id="workflow-to-delete" style="font-weight: bold;"></span>,
     click on the <span style="font-weight: bold;">Delete workflow</span> button.
     <input type="hidden" name="delete-workflow-name" id="delete-workflow-name" value="">
     <?php Csrf::generateFormToken(); ?>
@@ -146,14 +214,16 @@ $module->renderAdminWorkflowsSubTabs($selfUrl);
 <?php
 
 #-----------------------------------------------------------------------
-# Set up click event handlers for the workflow delete button
+# Set up click event handlers for the workflow reinstate/delete buttons
 #-----------------------------------------------------------------------
 echo "<script>\n";
 
 $row = 1;
-foreach ($workflows as $workflowName => $workflow) {
-echo "console.log('$workflowName');";
-    echo '$("#deleteWorkflow' . $row . '").click({workflowName: "'
+foreach ($workflows as $workflowName=>$workflow) {
+   echo '$("#reinstateWorkflow' . $row . '").click({workflow: "'
+        . Filter::escapeForJavaScriptInDoubleQuotes($workflowName)
+        . '"}, RedCapEtlModule.reinstateWorkflow);' . "\n";
+    echo '$("#deleteWorkflow' . $row . '").click({workflow: "'
         . Filter::escapeForJavaScriptInDoubleQuotes($workflowName)
         . '"}, RedCapEtlModule.deleteWorkflow);' . "\n";
     $row++;

@@ -46,7 +46,7 @@ try {
         } else {
             $workflowName = Filter::stripTags($_POST['workflowName']);
             
-            # Want to make sure workflow name is validated before it is used
+            # Make sure workflow name is validated before it is used
             Configuration::validateName($workflowName);
             
             # Add workflow; an exception should be thrown if the workflow
@@ -60,7 +60,7 @@ try {
         $copyFromWorkflowName = Filter::stripTags($_POST['copyFromWorkflowName']);
         $copyToWorkflowName   = Filter::stripTags($_POST['copyToWorkflowName']);
         if (!empty($copyFromWorkflowName) && !empty($copyToWorkflowName)) {
-            # Want to make sure config names are validated before it is used
+            # Make sure config names are validated before it is used
             Configuration::validateName($copyFromWorkflowName);
             Configuration::validateName($copyToWorkflowName);
                         
@@ -71,11 +71,17 @@ try {
         # Remove workflow
         #---------------------------------------------
         $removeWorkflowName = Filter::stripTags($_POST['removeWorkflowName']);
+        $hasPermissions = $module->hasPermissionsForAllTasks($removeWorkflowName, USERID);
         if (!empty($removeWorkflowName)) {
-            # Want to make sure workflow name is validated before it is used
+            # Make sure workflow name is validated before it is used
             Configuration::validateName($removeWorkflowName);
-            
-            $module->removeWorkflow($removeWorkflowName);
+
+            $hasPermissions = $module->hasPermissionsForAllTasks($removeWorkflowName, USERID);
+            if ($hasPermissions) {
+                $module->deleteWorkflow($removeWorkflowName, USERID);
+		    } else {
+                $module->removeWorkflow($removeWorkflowName, USERID);
+            }
         }
     } elseif (strcasecmp($submitValue, 'rename') === 0) {
         #----------------------------------------------
@@ -84,7 +90,7 @@ try {
         $renameWorkflowName    = Filter::stripTags($_POST['renameWorkflowName']);
         $renameNewWorkflowName = Filter::stripTags($_POST['renameNewWorkflowName']);
         if (!empty($renameWorkflowName) && !empty($renameNewWorkflowName)) {
-            # Want to make sure names are validated before it is used
+            # Make sure names are validated before it is used
             Configuration::validateName($renameWorkflowName);
             Configuration::validateName($renameNewWorkflowName);
             

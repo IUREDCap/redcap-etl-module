@@ -259,6 +259,24 @@ class Workflow implements \JsonSerializable
         unset($this->workflows[$workflowName]);
     }
 
+    public function reinstateWorkflow($workflowName, $username)
+    {
+        $etlConfigs = array_column($this->workflows[$workflowName], 'projectEtlConfig');
+        $emptyEtlConfig = empty($etlConfigs) || in_array(null, $etlConfigs, true)
+            || in_array('', $etlConfigs, true);
+        if (!$emptyEtlConfig) {
+            $this->workflows[$workflowName]["metadata"]["workflowStatus"] = self::WORKFLOW_READY;
+        } else {
+            $this->workflows[$workflowName]["metadata"]["workflowStatus"] = self::WORKFLOW_INCOMPLETE;
+        }
+        
+        $this->workflows[$workflowName]["metadata"]["updatedBy"] = $username;
+        $now = new \DateTime();
+        $now->format('Y-m-d H:i:s');
+        $now->getTimestamp();
+        $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
+    }
+    
     /**
      * Marks a workflow as being removed (inactive).
      */
@@ -297,8 +315,6 @@ class Workflow implements \JsonSerializable
     public function workflowExists($workflowName)
     {
         $exists = false;
-        #$workflows = json_decode($workflows_json, true);
-
         if (array_key_exists($workflowName, $this->workflows)) {
             $exists = true;
         }
