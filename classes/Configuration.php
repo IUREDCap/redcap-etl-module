@@ -570,8 +570,9 @@ class Configuration implements \JsonSerializable
      * Gets configuration properties in JSON, formatted for use
      * by REDCap-ETL.
      */
-    public function getRedCapEtlJsonProperties()
+    public function getRedCapEtlJsonProperties($runWorkflow)
     {
+#you are here adding in code for runWorkflow
         $properties = $this->properties;
        
         #---------------------------------------

@@ -194,8 +194,10 @@ class ServerConfig implements \JsonSerializable
     
     /**
      * Run the ETL process for this server.
+     *     If boolean $runWorkflow is true, then $etlConfig is type array. 
+     *     Otherwise, it is type Configuration.
      *
-     * @param Configuration $etlConfig the ETL configuration to run.
+     * @param mixed $etlConfig the ETL configuration to run.
      * @param boolean $isCronJob indicates if this run is a cron job.
      */
     public function run($etlConfig, $isCronJob = false, $moduleLog = null, $runWorkflow=false)
@@ -290,7 +292,11 @@ class ServerConfig implements \JsonSerializable
             $fileNameSuffix = uniqid('', true);
             $scp = new SCP($ssh);
             
-            $propertiesJson = $etlConfig->getRedCapEtlJsonProperties();
+            if ($runWorkflow) {
+                $propertiesJson = Configuration::getRedCapEtlJsonProperties($runWorkflow);
+		    } else {
+                $propertiesJson = $etlConfig->getRedCapEtlJsonProperties($runWorkflow);
+            }
             $configFileName = 'etl_config_' . $fileNameSuffix . '.json';
             $configFilePath = $this->configDir . '/' . $configFileName;
 

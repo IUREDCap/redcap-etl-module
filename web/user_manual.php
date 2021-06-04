@@ -165,6 +165,45 @@ There are 2 options for logging the results of your ETL processes, and they can 
 </ol>
 </div>
 
+<h4 style="font-weight: bold;">REDCap-ETL Workflows</h4>
+<p>Workflows allow you to combine multiple ETL processes into a unified process. Workflows
+can be run immediately or scheduled to run as a cron job.</p>
+<p><b>Tasks.</b> Each task in a workflow corresponds to a REDCap project and utilizes an ETL 
+configuration that was specified for that project. Workflow tasks run sequentially. A project 
+can be used in more than one workflow task. For example, if there are two ETL configurations 
+for a project, each with different database login information, you could add the project 
+to the workflow as two tasks, each with a different ETL configuration to load the extracted
+data to the database specified in the respective ETL configurations. Tasks are given a 
+default name that you can change. Tasks can't have the same name as an ETL property,
+for example 'batch_size.'
+</p>
+<p><b>Creating workflows and adding tasks.</b> Workflows are created (added) on the REDCap-ETL
+'ETL Workflows' tab, which lists all workflows that exist for the project you are viewing.
+Anyone with ETL access to a project can create a workflow. For a new workflow, the project 
+currently being viewed is automatically added. On the REDCap-ETL 'Configure' tab, you can add 
+any other projects to the workflow that you have ETL access to. Your workflow will appear on 
+the 'ETL Workflows' tab for all other users who also have ETL access to that project. They will 
+be able to add projects to the workflow you created. You will be able to see all of the tasks 
+that were added by other people. However, if you don't have permissions to the task's project, 
+you will see limited information.</p>
+<p><b>Deleting tasks and workflows.</b> From the REDCap-ETL 'Configure' tab, you will be able 
+to delete from a workflow any task that you have ETL permissions to. You will also be able to 
+remove any workflow that you have access to using the 'ETL Workflows' tab. If you have ETL 
+permissions to every project in the workflow, the workflow will be permanently deleted
+when you remove it. If you do not have ETL permissions to all projects in the workflow, the workflow
+will be assigned a status of 'Removed'. Only admins can see workflows that have been removed.
+They will be able to reinstate the workflow if it was removed accidentally, as well as permanently
+delete it.</p>
+<p><b>Global properties.</b>You can specify certain workflow global properties that will override 
+the values in the tasks. For example, if you want to ensure all e-mail notifications are enabled and
+sent to the same e-mail address(es), you could complete the 'E-mail Notifications' section
+of the global properties. Each task would then have 'E-mail errors' and 'E-mail summary',
+enabled, and all such e-mails from the different tasks would be sent to the address(es) in
+the 'Email to list' field. Anyone with access to the workflow can add or modify global properties.</p>
+<p><b>Running workflows</b>. Workflows with a status of' Ready' can be run. A workflow receives
+as status of 'Ready' once every task in the workflow has an ETL configuration assigned to it. 
+Until then, a workflow has an status of 'Incomplete.'</p>
+
 <h4 style="font-weight: bold;">Running REDCap-ETL</h4>
 
 <p>

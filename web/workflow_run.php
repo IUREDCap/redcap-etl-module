@@ -27,6 +27,8 @@ if (empty($workflowName)) {
 
 
 try {
+	$servers   = $module->getUserAllowedServersBasedOnAccessLevel(USERID);
+	
     $excludeIncomplete = true;
     $projectWorkflows = $module->getProjectAvailableWorkflows($pid, $excludeIncomplete);
 
@@ -53,6 +55,16 @@ try {
     $adminConfig = $module->getAdminConfig();
     $selfUrl   = $module->getUrl('web/workflow_run.php');
     $runUrl   = $module->getUrl('web/run.php');
+    
+    #------------------------------------------
+    # Get the server
+    #------------------------------------------
+    $server = Filter::stripTags($_POST['server']);
+    if (empty($server)) {
+        $server = $_SESSION['server'];
+    } else {
+        $_SESSION['server'] = $server;
+    }
 
     #-------------------------
     # Set the submit value
@@ -68,13 +80,12 @@ try {
         if (empty($workflowName)) {
             $error = 'ERROR: No workflow specified.';
         } else  {
-            $server = ServerConfig::EMBEDDED_SERVER_NAME;
+            #$server = ServerConfig::EMBEDDED_SERVER_NAME;
             $isCronJob = false;
             $originatingProjectId = $pid;
             #Get projects that this user has access to
             $db = new RedCapDb();
             $userProjects = $db->getUserProjects($username);
- 
             $runOutput = $module->runWorkflow($workflowName, $server, $username, $userProjects, $isCronJob, $originatingProjectId);
         }
     }
@@ -158,7 +169,25 @@ if ($workflowName && !$workflowReady) {
         <input type="submit" name="submit" value="Run"
             style="color: #008000; font-weight: bold;"
             onclick='$("#runOutput").text(""); $("body").css("cursor", "progress");' <?php echo $disabled; ?>/>
-  <p><pre id="runOutput"><?php echo Filter::escapeForHtml($runOutput);?></pre></p>
+            on
+       <?php
+        
+       echo '<select name="server" id="serverId">'."\n";
+       echo '<option value=""></option>'."\n";
+       foreach ($servers as $serverName) {
+           $serverConfig = $module->getServerConfig($serverName);
+           if (isset($serverConfig) && $serverConfig->getIsActive()) {
+               $selected = '';
+               if ($serverName === $server) {
+                   $selected = 'selected';
+               }
+               echo '<option value="'.Filter::escapeForHtmlAttribute($serverName).'" '.$selected.'>'
+                   .Filter::escapeForHtml($serverName)."</option>\n";
+           }
+       }
+       echo "</select>\n";
+       ?>
+       <p><pre id="runOutput"><?php echo Filter::escapeForHtml($runOutput);?></pre></p>
   </fieldset>
     <?php Csrf::generateFormToken(); ?>
 </form>

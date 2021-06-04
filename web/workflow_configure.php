@@ -127,14 +127,21 @@ try {
             $renameTaskKey = $_POST['renameTaskKey'];
             $renameProjectId = $_POST['renameProjectId'];
             $renameNewTaskName = $_POST['renameNewTaskName'];
+  
             if (isset($renameTaskKey)) {
-                $module->renameWorkflowTask(
-                    $workflowName,
-                    $renameTaskKey,
-                    $renameNewTaskName,
-                    $renameProjectId,
-                    $username
-                );
+  	            #check to see if the new task name is the same as an ETL property name 
+    			$matchFound = $module->checkWorkflowTaskNameAgainstEtlPropertyNames($renameProjectId, $renameNewTaskName);
+                if ($matchFound) {
+                    $error = 'ERROR: Task new name cannot be set to the name of an existing ETL property. Please enter another name for the task.';
+                } else {
+                   $module->renameWorkflowTask(
+                        $workflowName,
+                        $renameTaskKey,
+                        $renameNewTaskName,
+                        $renameProjectId,
+                        $username
+                    );
+                }
             }
         }
     }

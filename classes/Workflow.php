@@ -505,10 +505,18 @@ class Workflow implements \JsonSerializable
         return $cronJobs;
     }
     
-    public function getProjects($username)
+    public function getAllProjectTasksInAllWorkflows($project, $projectAvailableWorkflows)
     {
-#delete?
-        return $this->userList[$username];
+		$taskNames = array();
+        foreach ($this->workflows as $workflowName=>$workflow) {
+		   unset($workflow["metadata"]);
+		   unset($workflow["cron"]);
+		   unset($workflow["properties"]);
+		   
+           $commonWorkflows = array_intersect($workflow, $projectAvailableWorkflows);
+		}
+		
+        return $taskNames;
     }
     
     public function addProject($username, $projectId)

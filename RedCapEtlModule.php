@@ -291,6 +291,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             #    # Run on the specified server
             #    $status = $serverConfig->run($etlConfig, $isCronJob);
             #}
+
             $status = $serverConfig->run($etlConfig, $isCronJob, $this->moduleLog);
         } catch (\Exception $exception) {
             $status = "ETL job failed: " . $exception->getMessage();
@@ -1516,7 +1517,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 if (empty($serverName)) {
                     throw new \Exception('For workflow "'.$workflowName.':" No server specified.');
                 } else {
-                    $serverConfig = $this->getServerConfig($serverName); # calls settings->getserverconfig
+                    $serverConfig = $this->getServerConfig($serverName); 
                     if (!$serverConfig->getIsActive()) {
                         throw new \Exception('For workflow "'.$workflowName.'": Server "'.$serverName.'" has been deactivated and cannot be used.');
                     }
@@ -1643,7 +1644,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 		        } #next task
 
                 $runWorkflow = true;
+#$object = json_encode($workflowProperties);
+#$object = json_decode($workflowProperties);
+#$object = (object)$workflowProperties;
 
+#print "===================redcapetlmodule.php, runworkflow 1649, workflow properties is ";
+#print_r($workflowProperties);
+#print_r($object);
                 $status = $serverConfig->run($workflowProperties, $isCronJob, $this->moduleLog, $runWorkflow);
 
             } #end if (empty(workflowName))
@@ -1816,6 +1823,27 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         #        ; // Wait for all child processes to finish
         #    }
         #}
+    }
+    
+    public function checkWorkflowTaskNameAgainstEtlPropertyNames($projectId, $taskName)
+    {
+        $matchFound = false;
+        $errMsg = 'In checking the workflow task name against ETL property names for this project, ';
+        if (empty($projectId) && ($projectId !== 0)) {
+            throw new \Exception($errMsg . 'no project Id was specified.');
+        } elseif (empty($taskName)) {
+            throw new \Exception($errMsg . 'no task name was specified.');
+        } 
+
+        $propertyNames = Configuration::getPropertyNames();
+        if ($propertyNames) {
+            if (array_intersect((array)strtolower($taskName), $propertyNames)) {
+                $match = true;
+	      
+	        }
+	    }
+	    
+        return $match; 
     }
     
 }

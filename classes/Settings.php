@@ -1084,11 +1084,13 @@ class Settings
         $commit = true;
         $message = '';
 
+        if ($transaction) {
+            $this->db->startTransaction();
+        }
+
         $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
-#$key = self::WORKFLOWS_KEY;
-#$this->module->removeSystemSetting($key);
 
         if (empty($workflowName)) {
             $message = 'When adding new workflow, no workflow name specified.';
@@ -1096,10 +1098,6 @@ class Settings
         } elseif ($workflows->workflowExists($workflowName)) {
             $message = 'Workflow "'.$workflowName.'" already exists.';
             throw new \Exception($message);
-        }
-
-        if ($transaction) {
-            $this->db->startTransaction();
         }
 
         $workflows->createWorkflow($workflowName, $username);
@@ -1121,6 +1119,8 @@ class Settings
     ) {
         $message = '';
 
+        $this->db->startTransaction();
+
         $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
@@ -1131,6 +1131,9 @@ class Settings
         $json = $workflows->toJson();
 
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+
+        $commit = true;
+        $this->db->endTransaction($commit);
     }
 
     public function deleteTaskFromWorkflow(
@@ -1138,6 +1141,8 @@ class Settings
         $taskKey,
         $username = USERID
     ) {
+        $this->db->startTransaction();
+
         $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
@@ -1146,6 +1151,9 @@ class Settings
         $json = $workflows->toJson();
 
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+
+        $commit = true;
+        $this->db->endTransaction($commit);
     }
 
     public function getWorkflows()
@@ -1241,6 +1249,8 @@ class Settings
 
     public function deleteWorkflow($workflowName)
     {
+        $this->db->startTransaction();
+
         $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
@@ -1249,16 +1259,24 @@ class Settings
 
         $json = $workflows->toJson();
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+
+        $commit = true;
+        $this->db->endTransaction($commit);
     }
 
     public function reinstateWorkflow($workflowName, $username)
     {
+        $this->db->startTransaction();
+        
         $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
         $workflows->reinstateWorkflow($workflowName, $username);
         $json = $workflows->toJson();
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+
+		$commit = true;
+        $this->db->endTransaction($commit);
     }
 
     public function copyWorkflow($fromWorkflowName, $toWorkflowName, $username, $toExportRight = null, $transaction = true)
@@ -1325,6 +1343,8 @@ class Settings
             throw new \Exception($message);
         }
 
+        $this->db->startTransaction();
+
         $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
@@ -1388,6 +1408,9 @@ class Settings
 
         $json = $workflows->toJson();
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+
+        $commit = true;
+        $this->db->endTransaction($commit);
     }
 
     public function renameWorkflowTask(
@@ -1397,6 +1420,8 @@ class Settings
         $projectId,
         $username
     ) {
+        $this->db->startTransaction();
+
         $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
@@ -1405,6 +1430,9 @@ class Settings
         $json = $workflows->toJson();
 
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+
+        $commit = true;
+        $this->db->endTransaction($commit);
     }
 
     public function assignWorkflowTaskEtlConfig(
@@ -1414,6 +1442,8 @@ class Settings
         $etlConfig,
         $username
     ) {
+        $this->db->startTransaction();
+
         $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
@@ -1422,11 +1452,13 @@ class Settings
         $json = $workflows->toJson();
 
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
+
+        $commit = true;
+        $this->db->endTransaction($commit);
     }
 
     public function getWorkflowGlobalProperties($workflowName)
     {
-        $configuration = null;
         $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
@@ -1455,17 +1487,23 @@ class Settings
     
     public function setWorkflowGlobalProperties($workflowName, $properties, $username)
     {
+        $this->db->startTransaction();
+
 		$workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
         $workflows->setGlobalProperties($workflowName, $properties, $username);
         $json = json_encode($workflows);
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
-        
+
+        $commit = true;
+        $this->db->endTransaction($commit);
     }
 
     public function setWorkflowSchedule($workflowName, $server, $schedule, $username)
     {
+        $this->db->startTransaction();
+
 		$workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
@@ -1473,6 +1511,8 @@ class Settings
         $json = json_encode($workflows);
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
         
+        $commit = true;
+        $this->db->endTransaction($commit);
     }
     
    public function getWorkflowSchedule($workflowName)
@@ -1517,6 +1557,15 @@ class Settings
         return $hasPermissions;
     }
 
+    public function getAllProjectTasksInAllWorkflows($projectId)
+    {
+		$workflows = new Workflow();
+        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
+        $workflows->fromJson($json);
+        $excludeIncomplete = false;
+        $projectAvailableWorkflows = $this->getProjectAvailableWorkflows($projectId, $excludeIncomplete);
+        return $workflows->getAllProjectTasksInAllWorkflows($projectId, $projectAvailableWorkflows);
+    }
 /*    
     public function setWorkflows($workflows)
     {
