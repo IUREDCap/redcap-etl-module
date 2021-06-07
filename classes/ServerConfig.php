@@ -258,6 +258,7 @@ class ServerConfig implements \JsonSerializable
             if ($this->authMethod == self::AUTH_METHOD_PASSWORD) {
                 $ssh = new SSH2($this->serverAddress);
                 $ssh->login($username, $this->password);
+
             } elseif ($this->authMethod == self::AUTH_METHOD_SSH_KEY) {
                 $keyFile = $this->getSshKeyFile();
                 
@@ -293,13 +294,12 @@ class ServerConfig implements \JsonSerializable
             $scp = new SCP($ssh);
             
             if ($runWorkflow) {
-                $propertiesJson = Configuration::getRedCapEtlJsonProperties($runWorkflow);
+                $propertiesJson = Configuration::getRedCapEtlJsonProperties($runWorkflow, $etlConfig);
 		    } else {
                 $propertiesJson = $etlConfig->getRedCapEtlJsonProperties($runWorkflow);
             }
             $configFileName = 'etl_config_' . $fileNameSuffix . '.json';
             $configFilePath = $this->configDir . '/' . $configFileName;
-
             $scpResult = $scp->put($configFilePath, $propertiesJson);
             if (!$scpResult) {
                 $message = 'Copy of ETL configuration to server failed.'

@@ -1512,14 +1512,17 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 } 
                 
                 #---------------------------------------------
-                # Process server name
+                # Process ETL server name
                 #---------------------------------------------
+                $remoteEtlServer = false;
                 if (empty($serverName)) {
-                    throw new \Exception('For workflow "'.$workflowName.':" No server specified.');
+                    throw new \Exception('For workflow "'.$workflowName.':" No ETL server specified.');
                 } else {
                     $serverConfig = $this->getServerConfig($serverName); 
                     if (!$serverConfig->getIsActive()) {
-                        throw new \Exception('For workflow "'.$workflowName.'": Server "'.$serverName.'" has been deactivated and cannot be used.');
+                        throw new \Exception('For workflow "'.$workflowName.'": ETL Server "'.$serverName.'" has been deactivated and cannot be used.');
+                    } else {
+                        $remoteEtlServer = true;
                     }
                 }   
 
@@ -1533,13 +1536,36 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 }
                 
                 #---------------------------------------------
-                # Run each workflow ETL task 
+                # Create workflow properties 
+                #
+                # * Global properties are not added as an array in the workflow properties.
+                #   They are applied to the properties for each task before sending
+                #   the workflow to be run. 
+                #   -- Remote ETL servers: There is a global properties element for 
+                #   remote ETL servers that contains the workflow name, because processing
+                #   for the remote-server json file expects the workflow name to be 
+                #   in an element with that name. Processing for embedded ETLS servers,
+                #   which is sent in an array, does not.
+                #
+                # * There is a 'tasks' element for remote ETL servers to accommodate the 
+                #   expected file format. There is no 'tasks' element for embedded ETL servers
+                #   because that processing does not expect it.
                 #---------------------------------------------
                 $status = '';
                 $message = '';
-                $workflowProperties = array();
-                $workflowProperties['workflow_name'] = $workflowName;
 
+                if ($remoteEtlServer) {
+                    $workflowProperties['workflow']['global_properties'] = array();
+                    $workflowProperties['workflow']['global_properties']['workflow_name'] = $workflowName;
+                    $workflowProperties['workflow']['tasks'] = array();
+              
+                } else {
+                    $workflowProperties['workflow_name'] = $workflowName;
+			    }
+
+                #---------------------------------------------
+                # Run each workflow ETL task 
+                #---------------------------------------------
                 foreach ($tasks as $key => $task) {
                     $projectId = $task['projectId'];
 
@@ -1555,8 +1581,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                     }
                     if ($hasPermissionToExport) {
                         $taskName = $task['taskName'];
-                        $workflowProperties[$taskName] = array();
-
+                        if ($remoteEtlServer) {
+                            $workflowProperties['workflow']['tasks'][$taskName] = array();
+						} else {	
+                            $workflowProperties[$taskName] = array();
+                        }
+                        
                         $configName = $task['projectEtlConfig'];
                         if (!empty($configName)) {
                             Configuration::validateName($configName);  # throw exception if invalid
@@ -1579,8 +1609,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
                         $etlConfig->validateForRunning();
                         $etlProperties = $etlConfig->getProperties();
-                        $workflowProperties[$taskName] = $etlProperties;
-
+                        if ($remoteEtlServer) {
+                            $workflowProperties['workflow']['tasks'][$taskName] = $etlProperties;
+				     	} else {
+                            $workflowProperties[$taskName] = $etlProperties;
+                        }
+                        
                         #-----------------------------------------------------
                         # Set task logging information
                         #-----------------------------------------------------
@@ -1644,13 +1678,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 		        } #next task
 
                 $runWorkflow = true;
-#$object = json_encode($workflowProperties);
-#$object = json_decode($workflowProperties);
-#$object = (object)$workflowProperties;
-
-#print "===================redcapetlmodule.php, runworkflow 1649, workflow properties is ";
-#print_r($workflowProperties);
-#print_r($object);
                 $status = $serverConfig->run($workflowProperties, $isCronJob, $this->moduleLog, $runWorkflow);
 
             } #end if (empty(workflowName))
