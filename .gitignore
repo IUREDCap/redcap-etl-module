@@ -42,6 +42,7 @@ test-config.ini
 /tests/web/coverage-data/*
 !/tests/web/coverage-data/README.md
 
+<<<<<<< HEAD
 
 # Ignore dependencies directory
 /dependencies
@@ -49,3 +50,7 @@ test-config.ini
 # Composer lock file
 composer.lock
 composer.*
+=======
+# Dependencies directory
+/dependencies
+>>>>>>> develop

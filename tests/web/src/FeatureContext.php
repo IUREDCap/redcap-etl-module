@@ -445,7 +445,7 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     public function iConfigureConfiguration($configName)
     {
         $session = $this->getSession();
-        EtlConfigsPage::configureConfiguration($session, $configName);
+        ConfigurePage::configureConfiguration($session, $configName);
     }
 
     /**
@@ -500,7 +500,7 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     public function iConfigureServer($serverName)
     {
         $session = $this->getSession();
-        EtlServersPage::configureServer($session, $serverName);
+        EtlServerConfigPage::configureServer($session, $serverName);
     }
 
     /**
@@ -667,7 +667,7 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     public function iSpecifyTheAutoGenOptionsFor($arg1, $arg2)
     {
         $session = $this->getSession();
-        EtlConfigsPage::configureAutoGen($session, $arg2, $arg1);
+        ConfigurePage::configureAutoGen($session, $arg2, $arg1);
     }
 
     /**

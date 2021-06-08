@@ -37,4 +37,57 @@ class EtlServerConfigPage
         $accessLevel = $element->getValue();
         return $accessLevel;
     }
+
+    public static function configureServer($session, $serverName)
+    {
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
+
+        $serverConfig = $testConfig->getServerConfig($serverName);
+
+        $page = $session->getPage();
+
+        if ($serverConfig['active'] === 'true' || $serverConfig['active'] === '1') {
+            $page->checkField('isActive');
+        }
+
+        if ($serverConfig['server_address']) {
+            $page->selectFieldOption('accessLevel', $serverConfig['access_level']);
+        } else {
+            $page->selectFieldOption('accessLevel', 'public');
+        }
+
+        $page->fillField('serverAddress', $serverConfig['server_address']);
+        if ($serverConfig['auth_method'] === "0") {
+            $element = $page->find('xpath', "//*[@id='authMethodSshKey']");
+            $element->click();
+            $page->fillField('username', $serverConfig['username']);
+            $page->fillField('sshKeyFile', $serverConfig['ssh_key_file']);
+            $page->fillField('sshKeyPassword', $serverConfig['ssh_key_password']);
+        } elseif ($serverConfig['auth_method'] === "1") {
+            $element = $page->find('xpath', "//*[@id='authMethodPassword']");
+            $element->click();
+            $page->fillField('username', $serverConfig['username']);
+            $page->fillField('password', $serverConfig['password']);
+        }
+
+        $page->fillField('configDir', $serverConfig['configuration_directory']);
+        $page->fillField('etlCommand', $serverConfig['etl_command']);
+
+        $page->fillField('emailFromAddress', $serverConfig['email_from_address']);
+
+        if ($serverConfig['enable_error_email'] === 'true' || $serverConfig['enable_error_email'] === '1') {
+            $page->checkField('enableErrorEmail');
+        }
+
+        if ($serverConfig['enable_summary_email'] === 'true' || $serverConfig['enable_summary_email'] === '1') {
+            $page->checkField('enableSummaryEmail');
+        }
+
+        #sleep(2);
+
+        #------------------------------
+        # Save
+        #------------------------------
+        $page->pressButton('Save');
+    }
 }

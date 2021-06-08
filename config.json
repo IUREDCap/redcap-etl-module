@@ -7,6 +7,11 @@
            "name": "Jim Mullen",
            "email": "mullen2@iu.edu",
            "institution": "Indiana University"
+       },
+       {
+           "name": "Nancy Long",
+           "email": "naalong@iu.edu",
+           "institution": "Indiana University"
        }
    ],
    "crons": [
