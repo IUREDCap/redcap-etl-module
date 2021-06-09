@@ -214,7 +214,7 @@ class WorkflowConfigTest extends TestCase
         $propertiesArray = [
             'ssl_verify'    => 1,
             'db_connection' => 'CSV:../output/workflow1/',
-            'log_file'      => '../logs/workflow1.log',
+            'log_file'      => '../logs/workflow-task.log',
             'print_logging' => false,
             'transform_rules_source' => 3,
             'batch_size'    => 10,
@@ -230,31 +230,415 @@ class WorkflowConfigTest extends TestCase
         $baseDir = __DIR__;
         $workflowConfig->set($logger, $propertiesArray, $baseDir);
 
+        $this->checkSingleTask($workflowConfig, $baseDir);
+    }
+
+    public function testWorkflowSingleTaskIniConfig()
+    {
+        $configFile = __DIR__.'/../data/task1.ini';
+
+        $logger = new Logger('test-app');
+
+        $workflowConfig = new WorkflowConfig();
+        $this->assertNotNull($workflowConfig, 'Workflow config not null check');
+
+        $baseDir = __DIR__;
+        $workflowConfig->set($logger, $configFile, $baseDir);
+
+        $this->checkSingleTask($workflowConfig, $baseDir);
+    }
+
+    public function testWorkflowSingleTaskJsonConfig()
+    {
+        $configFile = __DIR__.'/../data/task1.json';
+
+        $logger = new Logger('test-app');
+
+        $workflowConfig = new WorkflowConfig();
+        $this->assertNotNull($workflowConfig, 'Workflow config not null check');
+
+        $baseDir = __DIR__;
+        $workflowConfig->set($logger, $configFile, $baseDir);
+
+        $this->checkSingleTask($workflowConfig, $baseDir);
+    }
+
+    public function checkSingleTask($workflowConfig, $baseDir)
+    {
+        #----------------------------------------------------------------
+        # Single Task
+        #----------------------------------------------------------------
         $taskConfigs = $workflowConfig->getTaskConfigs();
 
         $this->assertEquals(1, count($taskConfigs), 'Task configs count check');
 
-        #----------------------------------------------------------------
-        # Basic demography task
-        #----------------------------------------------------------------
         $taskConfig = $taskConfigs[0];
         $this->assertNotNull($taskConfig, 'Task config not null check');
 
         $logFile = $taskConfig->getLogFile();
-        $expectedLogFile = realpath($baseDir . '/'. $propertiesArray['log_file']);
+        $expectedLogFile = realpath($baseDir . '/../logs') . '/'. 'workflow-task.log';
         $this->assertEquals($expectedLogFile, $logFile, 'Log file check');
 
         $rulesSource = $taskConfig->getTransformRulesSource();
         $this->assertEquals(3, $rulesSource, 'Transformation rules source check');
 
         $token = $taskConfig->getDataSourceApiToken();
-        $this->assertEquals(
-            $propertiesArray['data_source_api_token'],
-            $token,
-            'Data source API token check'
-        );
+        $this->assertEquals('34D499569034F206F4A97E45AB424A4B', $token, 'Data source API token check');
 
         $taskName = $taskConfig->getTaskName();
         $this->assertEquals('', $taskName, 'Task config name check');
+    }
+
+
+    public function testWorkflowArrayConfigWithTaskConfig()
+    {
+        $propertiesArray = [
+            'workflow_name' => "workflow_with_task_config",
+            'db_connection' => 'CSV:../output/workflow1/',
+            'log_file'      => '../logs/workflow1.log',
+            'print_logging' => false,
+            'transform_rules_source' => 3,
+            'batch_size'    => 10,
+            'redcap_api_url'        => 'http://localhost/redcap/api/',
+            'data_source_api_token' => '34D499569034F206F4A97E45AB424A4B',
+            'task1' => [
+                'batch_size'    => 20,
+                'task_config'   => [
+                    'batch_size' => 30
+                ]
+             ],
+            'task2' => [
+                'task_config'   => [
+                    'batch_size' => 30,
+                    'email_to_list' => 'user@someplace.edu'
+                ]
+             ]
+        ];
+
+        $logger = new Logger('test-app');
+
+        $workflowConfig = new WorkflowConfig();
+        $this->assertNotNull($workflowConfig, 'Workflow config not null check');
+
+        $baseDir = __DIR__;
+        $workflowConfig->set($logger, $propertiesArray, $baseDir);
+
+        $this->taskConfigsCheck($workflowConfig);
+    }
+
+    public function testWorkflowJsonConfigWithTaskConfig()
+    {
+        $configFile = __DIR__.'/../data/workflow1.json';
+
+        $logger = new Logger('test-app');
+
+        $workflowConfig = new WorkflowConfig();
+        $this->assertNotNull($workflowConfig, 'Workflow config not null check');
+
+        $baseDir = __DIR__;
+        $workflowConfig->set($logger, $configFile, $baseDir);
+
+        $this->taskConfigsCheck($workflowConfig);
+    }
+
+    /**
+     * Common code for tests for test_config property.
+     */
+    public function taskConfigsCheck($workflowConfig)
+    {
+        $taskConfigs = $workflowConfig->getTaskConfigs();
+
+        $this->assertEquals(2, count($taskConfigs), 'Task configs count check');
+
+        #----------------------------------------------------------------
+        # Task 1
+        #----------------------------------------------------------------
+        $taskConfig = $taskConfigs[0];
+        $this->assertNotNull($taskConfig, 'Task 1 config not null check');
+
+        $taskName = $taskConfig->getTaskName();
+        $this->assertEquals('task1', $taskName, 'Task 1 config name check');
+
+        $batchSize = $taskConfig->getBatchSize();
+        $this->assertEquals(20, $batchSize, 'Task 1 config batch size check');
+
+        #----------------------------------------------------------------
+        # Task 2
+        #----------------------------------------------------------------
+        $taskConfig = $taskConfigs[1];
+        $this->assertNotNull($taskConfig, 'Task 2 config not null check');
+
+        $taskName = $taskConfig->getTaskName();
+        $this->assertEquals('task2', $taskName, 'Task 2 config name check');
+
+        $batchSize = $taskConfig->getBatchSize();
+        $this->assertEquals(10, $batchSize, 'Task 2 config batch size check');
+
+        $emailToList = $taskConfig->getEmailToList();
+        $this->assertEquals('user@someplace.edu', $emailToList, 'Task 2 email to-list check');
+
+        $apiUrl = $taskConfig->getRedCapApiUrl();
+        $this->assertEquals('http://localhost/redcap/api/', $apiUrl, 'Task 2 API URL check');
+    }
+
+    public function testGetSectionsWithNonExistentFile()
+    {
+        $exceptionCaught = false;
+        try {
+            $sections = WorkflowConfig::getSections('../not/a/real/file/path');
+        } catch (\Exception $exception) {
+            $exceptionCaught = true;
+            $code = $exception->getCode();
+        }
+        $this->assertTrue($exceptionCaught, 'Exception caught');
+        $this->assertEquals(EtlException::INPUT_ERROR, $code, 'Exception code check');
+    }
+
+    public function testTaskConfigError()
+    {
+        $propertiesArray = [
+            'workflow_name' => "workflow1",
+            'redcap_api_url' => 'http://localhost/redcap/api/',
+            'data_source_api_token' => '34D499569034F206F4A97E45AB424A4B',
+            'ssl_verify'    => 1,
+            'db_connection' => 'CSV:../output/workflow1/',
+            'log_file'      => '../logs/workflow1.log',
+            'print_logging' => false,
+            'transform_rules_source' => 3,
+
+            'task1' => [
+                'task_config'        => [
+                    'batch_size' => 20
+                ],
+                'task_config_file'   => __DIR__.'/../data/task1.json'
+            ]
+        ];
+
+        $logger = new Logger('test-app');
+
+        $workflowConfig = new WorkflowConfig();
+        $this->assertNotNull($workflowConfig, 'Workflow config not null check');
+
+        $baseDir = __DIR__;
+
+        $exceptionCaught = false;
+        try {
+            $workflowConfig->set($logger, $propertiesArray, $baseDir);
+        } catch (\Exception $exception) {
+            $exceptionCaught = true;
+            $code = $exception->getCode();
+        }
+
+        $this->assertTrue($exceptionCaught, 'Exception caught');
+        $this->assertEquals(EtlException::INPUT_ERROR, $code, 'Error code check');
+    }
+
+    public function testNoWorkflowNameInArray()
+    {
+        $propertiesArray = [
+            'redcap_api_url' => 'http://localhost/redcap/api/',
+            'data_source_api_token' => '34D499569034F206F4A97E45AB424A4B',
+            'ssl_verify'    => 1,
+            'db_connection' => 'CSV:../output/workflow1/',
+            'log_file'      => '../logs/workflow1.log',
+            'print_logging' => false,
+            'transform_rules_source' => 3,
+
+            'task1' => [
+                'batch_size' => 20
+            ]
+        ];
+
+        $logger = new Logger('test-app');
+
+        $workflowConfig = new WorkflowConfig();
+        $this->assertNotNull($workflowConfig, 'Workflow config not null check');
+
+        $baseDir = __DIR__;
+
+        $exceptionCaught = false;
+        try {
+            $workflowConfig->set($logger, $propertiesArray, $baseDir);
+        } catch (\Exception $exception) {
+            $exceptionCaught = true;
+            $code = $exception->getCode();
+        }
+
+        $this->assertTrue($exceptionCaught, 'Exception caught');
+        $this->assertEquals(EtlException::INPUT_ERROR, $code, 'Error code check');
+    }
+
+    public function testMissingProperties()
+    {
+        $properties = null;
+        $logger = new Logger('test-app');
+
+        $workflowConfig = new WorkflowConfig();
+        $this->assertNotNull($workflowConfig, 'Workflow config not null check');
+
+        $exceptionCaught = false;
+        try {
+            $workflowConfig->set($logger, $properties);
+        } catch (\Exception $exception) {
+            $exceptionCaught = true;
+        }
+
+        $this->assertTrue($exceptionCaught);
+    }
+
+    public function testIncorrectFileType()
+    {
+        $properties = __FILE__;
+        $logger = new Logger('test-app');
+
+        $workflowConfig = new WorkflowConfig();
+        $this->assertNotNull($workflowConfig, 'Workflow config not null check');
+
+        $exceptionCaught = false;
+        try {
+            $workflowConfig->set($logger, $properties);
+        } catch (\Exception $exception) {
+            $exceptionCaught = true;
+        }
+
+        $this->assertTrue($exceptionCaught);
+    }
+
+    public function testPropertiesType()
+    {
+        $properties = true;
+        $logger = new Logger('test-app');
+
+        $workflowConfig = new WorkflowConfig();
+        $this->assertNotNull($workflowConfig, 'Workflow config not null check');
+
+        $exceptionCaught = false;
+        try {
+            $workflowConfig->set($logger, $properties);
+        } catch (\Exception $exception) {
+            $exceptionCaught = true;
+        }
+
+        $this->assertTrue($exceptionCaught);
+    }
+
+    public function testIllegalIniTaskNamw()
+    {
+        $propertiesFile = __DIR__.'/../data/workflow-error1.ini';
+        $logger = new Logger('test-app');
+
+        $workflowConfig = new WorkflowConfig();
+        $this->assertNotNull($workflowConfig, 'Workflow config not null check');
+
+        $exceptionCaught = false;
+        try {
+            $workflowConfig->set($logger, $propertiesFile);
+        } catch (\Exception $exception) {
+            $exceptionCaught = true;
+            $message = $exception->getMessage();
+        }
+
+        $this->assertTrue($exceptionCaught, 'Exception caught check');
+        $this->assertStringContainsString('uses the same name', $message, 'Message check');
+    }
+
+    public function testNonExistantJsonConfigFile()
+    {
+        $propertiesFile = __DIR__.'/../data/workflow-does-not-exist.json';
+        $logger = new Logger('test-app');
+
+        $workflowConfig = new WorkflowConfig();
+        $this->assertNotNull($workflowConfig, 'Workflow config not null check');
+
+        $exceptionCaught = false;
+        try {
+            $workflowConfig->set($logger, $propertiesFile);
+        } catch (\Exception $exception) {
+            $exceptionCaught = true;
+            $message = $exception->getMessage();
+        }
+
+        $this->assertTrue($exceptionCaught, 'Exception caught check');
+        $this->assertStringContainsString('could not be read', $message, 'Message check');
+    }
+
+    public function testInvalidJsonConfigFile1()
+    {
+        $propertiesFile = __DIR__.'/../data/workflow-error1.json';
+        $logger = new Logger('test-app');
+
+        $workflowConfig = new WorkflowConfig();
+        $this->assertNotNull($workflowConfig, 'Workflow config not null check');
+
+        $exceptionCaught = false;
+        try {
+            $workflowConfig->set($logger, $propertiesFile);
+        } catch (\Exception $exception) {
+            $exceptionCaught = true;
+            $message = $exception->getMessage();
+        }
+
+        $this->assertTrue($exceptionCaught, 'Exception caught check');
+        $this->assertStringContainsString('Error parsing JSON configuration file', $message, 'Message check');
+    }
+
+    public function testInvalidJsonConfigFile2()
+    {
+        $propertiesFile = __DIR__.'/../data/workflow-error2.json';
+        $logger = new Logger('test-app');
+
+        $workflowConfig = new WorkflowConfig();
+        $this->assertNotNull($workflowConfig, 'Workflow config not null check');
+
+        $exceptionCaught = false;
+        try {
+            $workflowConfig->set($logger, $propertiesFile);
+        } catch (\Exception $exception) {
+            $exceptionCaught = true;
+            $message = $exception->getMessage();
+        }
+
+        $this->assertTrue($exceptionCaught, 'Exception caught check');
+        $this->assertStringContainsString('Non-workflow properties at top-level', $message, 'Message check');
+    }
+
+    public function testJsonWorkflowWithoutName()
+    {
+        $propertiesFile = __DIR__.'/../data/workflow-without-name.json';
+        $logger = new Logger('test-app');
+
+        $workflowConfig = new WorkflowConfig();
+        $this->assertNotNull($workflowConfig, 'Workflow config not null check');
+
+        $exceptionCaught = false;
+        try {
+            $workflowConfig->set($logger, $propertiesFile);
+        } catch (\Exception $exception) {
+            $exceptionCaught = true;
+            $message = $exception->getMessage();
+        }
+
+        $this->assertTrue($exceptionCaught, 'Exception caught check');
+        $this->assertStringContainsString('No workflow name was specified', $message, 'Message check');
+    }
+
+    public function testJsonWorkflowWithoutGlobalProperties()
+    {
+        $propertiesFile = __DIR__.'/../data/workflow-without-global-properties.json';
+        $logger = new Logger('test-app');
+
+        $workflowConfig = new WorkflowConfig();
+        $this->assertNotNull($workflowConfig, 'Workflow config not null check');
+
+        $exceptionCaught = false;
+        try {
+            $workflowConfig->set($logger, $propertiesFile);
+        } catch (\Exception $exception) {
+            $exceptionCaught = true;
+            $message = $exception->getMessage();
+        }
+
+        $this->assertTrue($exceptionCaught, 'Exception caught check');
+        $this->assertStringContainsString('No global properties section', $message, 'Message check');
     }
 }
