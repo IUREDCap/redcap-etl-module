@@ -103,13 +103,22 @@ class ServerConfig implements \JsonSerializable
                 case 'isActive':
                 case 'dbSsl':
                 case 'dbSslVerify':
+                    # changed value assignment to '' instead of false
+                    # because redcap-etl WorkflowConfig evaluated boolean
+                    # false as true for some reason. For instance, an error
+                    # would be generated for db_ssl_verify if it was unchecked
+                    # and set to false. But setting it to '' instead of false
+                    # was processed correctly by redcap-etl WorkflowConfig
+                    # and no error was generated.
                     if (!array_key_exists($var, $properties)) {
-                        $this->$var = false;
+                        #$this->$var = false;
+                        $this->$var = '';
                     } else {
                         if ($properties[$var]) {
                             $this->$var = true;
                         } else {
-                            $this->$var = false;
+                            #$this->$var = false;
+                            $this->$var = '';
                         }
                     }
                     break;
@@ -226,9 +235,6 @@ class ServerConfig implements \JsonSerializable
                 $properties[Configuration::PRINT_LOGGING] = false;
 	     	} 
 
-            $properties = $etlConfig->getPropertiesArray();
-            $properties[Configuration::PRINT_LOGGING] = false;
-            
             $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
             $logId = $logger->getLogId();
 

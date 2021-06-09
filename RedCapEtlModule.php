@@ -1514,16 +1514,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 #---------------------------------------------
                 # Process ETL server name
                 #---------------------------------------------
-                $remoteEtlServer = false;
                 if (empty($serverName)) {
                     throw new \Exception('For workflow "'.$workflowName.':" No ETL server specified.');
                 } else {
                     $serverConfig = $this->getServerConfig($serverName); 
                     if (!$serverConfig->getIsActive()) {
                         throw new \Exception('For workflow "'.$workflowName.'": ETL Server "'.$serverName.'" has been deactivated and cannot be used.');
-                    } else {
-                        $remoteEtlServer = true;
-                    }
+                    } 
                 }   
 
                 #---------------------------------------------
@@ -1533,7 +1530,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 $globalProperties = array_filter($this->getWorkflowGlobalProperties($workflowName));
                 if ($serverConfig->isEmbeddedServer()) {
 					$globalProperties[Configuration::PRINT_LOGGING] = false;
-                }
+                    $remoteEtlServer = false;
+                } else {
+                    $remoteEtlServer = true;
+			    }
                 
                 #---------------------------------------------
                 # Create workflow properties 
