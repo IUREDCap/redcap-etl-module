@@ -6,7 +6,7 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
-require_once __DIR__.'/../dependencies/autoload.php';
+require_once __DIR__ . '/../dependencies/autoload.php';
 
 use IU\REDCapETL\EtlRedCapProject;
 use IU\REDCapETL\Database\DbConnectionFactory;
@@ -42,7 +42,7 @@ try {
     # Check for test mode (which should only be used for development)
     #-------------------------------------------------------------------
     $testMode = false;
-    if (@file_exists(__DIR__.'/../test-config.ini')) {
+    if (@file_exists(__DIR__ . '/../test-config.ini')) {
         $testMode = true;
     }
 
@@ -139,12 +139,12 @@ try {
                 $apiTokenUser = $configuration->getProperty(Configuration::API_TOKEN_USERNAME);
                 # An API token user was specified
                 if (!array_key_exists($apiTokenUser, $apiTokens)) {
-                    $warning = 'WARNING: user "'.$apiTokenUser.'" does not'
-                        .' have a valid API token for using ETL with this project.'
-                        .' The user must have an API token with export rights,'
-                        .' have "Full Data Set" export privilege, '
-                        .' and not belong to a DAG (Data Access Group).'
-                        .' API token user reset to blank.';
+                    $warning = 'WARNING: user "' . $apiTokenUser . '" does not'
+                        . ' have a valid API token for using ETL with this project.'
+                        . ' The user must have an API token with export rights,'
+                        . ' have "Full Data Set" export privilege, '
+                        . ' and not belong to a DAG (Data Access Group).'
+                        . ' API token user reset to blank.';
                     # The API token user does not have a valid API token, so set it to blank
                     $configuration->setProperty(Configuration::API_TOKEN_USERNAME, '');
                     $configuration->setProperty(Configuration::DATA_SOURCE_API_TOKEN, '');
@@ -186,7 +186,7 @@ try {
         #------------------------------------------------------
         try {
             if (strcasecmp($submitValue, 'Cancel') === 0) {
-                header('Location: '.$listUrl);
+                header('Location: ' . $listUrl);
             } elseif (strcasecmp($submitValue, 'Save') === 0) {
                 if (empty($warning) && empty($error)) {
                     $configuration->validate();
@@ -196,7 +196,7 @@ try {
                 if (empty($warning) && empty($error)) {
                     $configuration->validate();
                     $module->setConfiguration($configuration);  // Save configuration to database
-                    $location = 'Location: '.$listUrl;
+                    $location = 'Location: ' . $listUrl;
                     header($location);
                 }
             } elseif (strcasecmp($submitValue, 'Upload CSV file') === 0) {
@@ -207,7 +207,7 @@ try {
                     $fileContents = file_get_contents($uploadFileName);
                     if ($fileContents === false) {
                         $error = 'ERROR: Unable to upload transformation rules file "'
-                            .$_FILES['uploadCsvFile']['tmp_name'].'"';
+                            . $_FILES['uploadCsvFile']['tmp_name'] . '"';
                     } else {
                         $properties[Configuration::TRANSFORM_RULES_TEXT] = $fileContents;
                     }
@@ -358,11 +358,11 @@ try {
                 list($schema, $parseResult) = $schemaGenerator->generateSchema($rulesText);
             }
         } catch (\Exception $exception) {
-            $error = 'ERROR: '.$exception->getMessage();
+            $error = 'ERROR: ' . $exception->getMessage();
         }
     }  // END - if configuration is not empty
 } catch (\Exception $exception) {
-    $error = 'ERROR: '.$exception->getMessage();
+    $error = 'ERROR: ' . $exception->getMessage();
 }
 ?>
 
@@ -375,8 +375,8 @@ ob_start();
 require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    " . $link . "\n</head>", $buffer);
 echo $buffer;
 ?>
 
@@ -528,11 +528,11 @@ $module->renderProjectPageContentHeader($configureUrl, $error, $warning, $succes
     array_unshift($values, '');
     foreach ($values as $value) {
         if (strcmp($value, $configName) === 0) {
-            echo '<option value="'.Filter::escapeForHtmlAttribute($value).'" selected>'
-                .Filter::escapeForHtml($value)."</option>\n";
+            echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '" selected>'
+                . Filter::escapeForHtml($value) . "</option>\n";
         } else {
-            echo '<option value="'.Filter::escapeForHtmlAttribute($value).'">'
-                .Filter::escapeForHtml($value)."</option>\n";
+            echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '">'
+                . Filter::escapeForHtml($value) . "</option>\n";
         }
     }
     ?>
@@ -545,7 +545,7 @@ $module->renderProjectPageContentHeader($configureUrl, $error, $warning, $succes
 if (empty($configuration)) {
     ; // Don't display any page content
 } else {
-?>
+    ?>
 
 
 <!-- Rules overwrite dialog -->
@@ -617,7 +617,7 @@ Configuration form
                     <?php
                     if ($testMode && SUPER_USER) { # make API URL editable
                         $displayApiUrl = Filter::escapeForHtmlAttribute($properties[Configuration::REDCAP_API_URL]);
-                    ?>
+                        ?>
                     <td>
                         <input type="text" size="60" 
                             value="<?php echo $displayApiUrl;?>"
@@ -692,14 +692,15 @@ Configuration form
                         <select name="<?php echo Configuration::API_TOKEN_USERNAME;?>">
                             <?php
 
-                            echo '<option value=""></option>'."\n";
+                            echo '<option value=""></option>' . "\n";
                             foreach ($apiTokens as $username => $apiToken) {
                                 $selected = '';
                                 if (strcasecmp($username, $apiTokenUser) === 0) {
                                     $selected = 'selected';
                                 }
-                                echo '<option '.$selected.' value="'.Filter::escapeForHtmlAttribute($username).'">'
-                                    .Filter::escapeForHtml($username).'</option>'."\n";
+                                echo '<option ' . $selected . ' value="'
+                                    . Filter::escapeForHtmlAttribute($username) . '">'
+                                    . Filter::escapeForHtml($username) . '</option>' . "\n";
                             }
                             ?>
                         </select>
@@ -724,7 +725,7 @@ Configuration form
                         <?php
 
                         echo "<div style=\"border: 1px solid #AAAAAA; margin-bottom: 4px;"
-                            ." padding: 4px; border-radius: 4px;\">\n";
+                            . " padding: 4px; border-radius: 4px;\">\n";
                         
                         
                         $apiUrl = $module->getRedCapApiUrl();
@@ -745,26 +746,26 @@ Configuration form
                         } else {
                             if (count($apiTokens) < 1) {
                                 echo '<img alt="X" style="color: red; font-weight: bold;" src='
-                                    .APP_PATH_IMAGES.'cross.png>&nbsp;&nbsp;';
+                                    . APP_PATH_IMAGES . 'cross.png>&nbsp;&nbsp;';
                                 echo "There are no API tokens for this project that have"
-                                    ." the same data export rights as this configuration."
-                                    ."<br /><br />"
-                                    ."An API token needs to be requested "
-                                    ." by a user whose data export rights matches those of the configuration.";
+                                    . " the same data export rights as this configuration."
+                                    . "<br /><br />"
+                                    . "An API token needs to be requested "
+                                    . " by a user whose data export rights matches those of the configuration.";
                             } elseif (empty($apiTokenUser)) {
                                 echo '<img alt="X" style="color: red; font-weight: bold;" src='
-                                    .APP_PATH_IMAGES.'cross.png>&nbsp;&nbsp;';
+                                    . APP_PATH_IMAGES . 'cross.png>&nbsp;&nbsp;';
                                 echo "No user's API token has been selected for this project."
-                                    ."<br /><br />"
-                                    ."You need to select an API token user"
-                                    ." (whose API token will be used to access REDCap).";
+                                    . "<br /><br />"
+                                    . "You need to select an API token user"
+                                    . " (whose API token will be used to access REDCap).";
                             } else {
                                 # If there is an API token and it has export permission
                                 echo '<img alt="OK" style="color: green; font-weight: bold;" src='
-                                    .APP_PATH_IMAGES.'tick.png>&nbsp;&nbsp;';
-                                echo 'The API token for user "'.Filter::escapeForHtml($apiTokenUser).'"'
-                                    .', which has export permission,'
-                                    .' has been selected.';
+                                    . APP_PATH_IMAGES . 'tick.png>&nbsp;&nbsp;';
+                                echo 'The API token for user "' . Filter::escapeForHtml($apiTokenUser) . '"'
+                                    . ', which has export permission,'
+                                    . ' has been selected.';
                             }
                         }
 
@@ -935,7 +936,7 @@ Configuration form
                         <div>
                             <button type="submit" value="Upload CSV file"
                                     name="submitValue" style="vertical-align: middle;">
-                                <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>" alt=""> Upload CSV file
+                                <img src="<?php echo APP_PATH_IMAGES . 'csv.gif';?>" alt=""> Upload CSV file
                             </button>
                             <input type="file" name="uploadCsvFile" id="uploadCsvFile" style="display: inline;">
                         </div>
@@ -943,7 +944,7 @@ Configuration form
                         <hr style="margin: 7px 0px;"/>
                         <div>
                             <button type="submit" value="Download CSV file" name="submitValue">
-                                <img src="<?php echo APP_PATH_IMAGES.'csv.gif';?>" alt=""
+                                <img src="<?php echo APP_PATH_IMAGES . 'csv.gif';?>" alt=""
                                     style="vertical-align: middle;">
                                 <span  style="vertical-align: middle;"> Download CSV file</span>
 
@@ -1391,34 +1392,34 @@ Configuration form
 </form>
 
 
-<?php
+    <?php
 #----------------------------------------------
 # Parse Result (for rules check)
 #----------------------------------------------
 
-$status = $parseResult[0];
-$parseMessages = nl2br($parseResult[1]);
+    $status = $parseResult[0];
+    $parseMessages = nl2br($parseResult[1]);
 
-$class = '';
-if (strcasecmp($status, 'valid') === 0) {
-    $class = ' class="darkgreen" ';
-} elseif (strcasecmp($status, 'warn') === 0) {
-    $class = ' class="yellow" ';
-    $status = 'warning';
-} elseif (strcasecmp($status, 'error') === 0) {
-    $class = ' class="red" ';
-}
+    $class = '';
+    if (strcasecmp($status, 'valid') === 0) {
+        $class = ' class="darkgreen" ';
+    } elseif (strcasecmp($status, 'warn') === 0) {
+        $class = ' class="yellow" ';
+        $status = 'warning';
+    } elseif (strcasecmp($status, 'error') === 0) {
+        $class = ' class="red" ';
+    }
 
 
-echo '<div id ="parse-result" style="display: none;" title="Transformation Rules Check">'."\n";
-echo '<div '.$class.'>'."\n";
-echo '<strong>Status: '.$status."</strong>\n";
-echo '</div><br/>'."\n";
-echo Filter::sanitizeRulesStatus($parseMessages)."\n";
-echo '</div>'."\n";
+    echo '<div id ="parse-result" style="display: none;" title="Transformation Rules Check">' . "\n";
+    echo '<div ' . $class . '>' . "\n";
+    echo '<strong>Status: ' . $status . "</strong>\n";
+    echo '</div><br/>' . "\n";
+    echo Filter::sanitizeRulesStatus($parseMessages) . "\n";
+    echo '</div>' . "\n";
 
-if (!empty($parseResult)) {
-?>
+    if (!empty($parseResult)) {
+        ?>
 
 <script>
     $('#parse-result').dialog({dialogClass: 'etl-rules-check', width: '500px'})
@@ -1426,12 +1427,12 @@ if (!empty($parseResult)) {
     ;
 </script>
 
-<?php
-}  // End if parse result not empty
-?>
+        <?php
+    }  // End if parse result not empty
+    ?>
 
 
-<?php
+    <?php
 #------------------------------------------------------
 # End, if configuration is not empty
 #------------------------------------------------------

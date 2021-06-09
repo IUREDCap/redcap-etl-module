@@ -20,7 +20,7 @@ try {
     # Check for test mode (which should only be used for development)
     #-------------------------------------------------------------------
     $testMode = false;
-    if (@file_exists(__DIR__.'/../test-config.ini')) {
+    if (@file_exists(__DIR__ . '/../test-config.ini')) {
         $testMode = true;
     }
 
@@ -28,7 +28,7 @@ try {
     $workflowScheduleUrl  = $module->getUrl("web/workflow_schedule.php");
     $selfUrl  = $module->getUrl("web/schedule.php");
 } catch (\Exception $exception) {
-    $error = 'ERROR: '.$exception->getMessage();
+    $error = 'ERROR: ' . $exception->getMessage();
 }
 ?>
 

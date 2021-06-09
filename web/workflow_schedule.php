@@ -27,22 +27,24 @@ $pid = PROJECT_ID;
 $username = USERID;
 
 $workflowName = $_POST['workflowName'];
-if (empty($workflowName)) {
+if (!isset($workflowName)) {
     $workflowName = Filter::escapeForHtml($_GET['workflowName']);
 }
-$selfUrl = $module->getUrl('web/workflow_schedule.php').'&workflowName='.Filter::escapeForUrlParameter($workflowName);
+$selfUrl = $module->getUrl('web/workflow_schedule.php') . '&workflowName='
+           . Filter::escapeForUrlParameter($workflowName);
 
 try {
     $excludeIncomplete = true;
     $projectWorkflows = $module->getProjectAvailableWorkflows($pid, $excludeIncomplete);
 
     $noReadyProjects = false;
-    if (empty($projectWorkflows)) { 
+    if (empty($projectWorkflows)) {
         $noReadyProjects = true;
     }
 
-    if (!empty($workflowName)) {
-        $p = array_search($workflowName, $projectWorkflows); 
+    $workflowReady = false;
+    if (isset($workflowName)) {
+        $p = array_search($workflowName, $projectWorkflows);
         $workflowReady = $p === false ? false : true;
     }
 
@@ -70,12 +72,12 @@ try {
     }
     
     if (strcasecmp($submitValue, 'Save') === 0) {
-        $server = Filter::sanitizeString($_POST['server']); #ServerConfig::EMBEDDED_SERVER_NAME;
-        if (empty($workflowName)) {
+        $server = Filter::sanitizeString($_POST['server']);
+        if (!isset($workflowName)) {
             $error = 'ERROR: No workflow specified.';
         } elseif (empty($server)) {
             $error = 'ERROR: No server specified.';
-        } else  {
+        } else {
             # Saving the schedule values
             $schedule = array();
         
@@ -137,17 +139,17 @@ $module->renderProjectPageContentHeader($scheduleUrl, $error, $warning, $success
 
 <?php
 if ($workflowName && !$workflowReady) {
-    $msg = 'The selected workflow '.$workflowName.' is not yet ready to be scheduled to run. ';
-	$msg .=  'If you wish to schedule this workflow to run, return to the workflow configuration page to complete the configuration.';
-	echo '<span style="font-weight: bold;">'.$msg.'</span>';
+    $msg = 'The selected workflow ' . $workflowName . ' is not yet ready to be scheduled to run. '
+           . 'If you wish to schedule this workflow to run, return to the workflow configuration page '
+           . 'to complete the configuration.';
+    echo '<span style="font-weight: bold;">' . $msg . '</span>';
 } elseif ($noReadyProjects) {
-	echo '<span style="font-weight: bold;">There are no workflows with a status of READY for this project.</span>';
+    echo '<span style="font-weight: bold;">There are no workflows with a status of READY for this project.</span>';
 } else {
-	      
 #---------------------------------------
 # Configuration selection form
 #---------------------------------------
-?>
+    ?>
 <form action="<?php echo $selfUrl;?>" method="post" 
       style="padding: 4px; margin-bottom: 0px; border: 1px solid #ccc; background-color: #ccc;">
     <span style="font-weight: bold;">ETL Workflow Configuration:</span>

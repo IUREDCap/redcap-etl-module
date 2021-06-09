@@ -6,7 +6,7 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
-require_once __DIR__.'/../dependencies/autoload.php';
+require_once __DIR__ . '/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Authorization;
@@ -41,7 +41,7 @@ try {
         #--------------------------------------
         # Add workflow
         #--------------------------------------
-        if (!array_key_exists('workflowName', $_POST) || empty($_POST['workflowName'])) {
+        if (!array_key_exists('workflowName', $_POST) || !isset($_POST['workflowName'])) {
             $error = 'ERROR: No workflow name was specified.';
         } else {
             $workflowName = Filter::stripTags($_POST['workflowName']);
@@ -59,7 +59,7 @@ try {
         #--------------------------------------------
         $copyFromWorkflowName = Filter::stripTags($_POST['copyFromWorkflowName']);
         $copyToWorkflowName   = Filter::stripTags($_POST['copyToWorkflowName']);
-        if (!empty($copyFromWorkflowName) && !empty($copyToWorkflowName)) {
+        if (isset($copyFromWorkflowName) && isset($copyToWorkflowName)) {
             # Make sure config names are validated before it is used
             Configuration::validateName($copyFromWorkflowName);
             Configuration::validateName($copyToWorkflowName);
@@ -72,14 +72,14 @@ try {
         #---------------------------------------------
         $removeWorkflowName = Filter::stripTags($_POST['removeWorkflowName']);
         $hasPermissions = $module->hasPermissionsForAllTasks($removeWorkflowName, USERID);
-        if (!empty($removeWorkflowName)) {
+        if (isset($removeWorkflowName)) {
             # Make sure workflow name is validated before it is used
             Configuration::validateName($removeWorkflowName);
 
             $hasPermissions = $module->hasPermissionsForAllTasks($removeWorkflowName, USERID);
             if ($hasPermissions) {
                 $module->deleteWorkflow($removeWorkflowName, USERID);
-		    } else {
+            } else {
                 $module->removeWorkflow($removeWorkflowName, USERID);
             }
         }
@@ -89,7 +89,7 @@ try {
         #----------------------------------------------
         $renameWorkflowName    = Filter::stripTags($_POST['renameWorkflowName']);
         $renameNewWorkflowName = Filter::stripTags($_POST['renameNewWorkflowName']);
-        if (!empty($renameWorkflowName) && !empty($renameNewWorkflowName)) {
+        if (isset($renameWorkflowName) && isset($renameNewWorkflowName)) {
             # Make sure names are validated before it is used
             Configuration::validateName($renameWorkflowName);
             Configuration::validateName($renameNewWorkflowName);
@@ -98,7 +98,7 @@ try {
         }
     }
 } catch (\Exception $exception) {
-    $error = 'ERROR: '.$exception->getMessage();
+    $error = 'ERROR: ' . $exception->getMessage();
 }
 
 ?>
@@ -111,8 +111,8 @@ ob_start();
 require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    " . $link . "\n</head>", $buffer);
 echo $buffer;
 ?>
 
@@ -180,7 +180,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 $hasPermissionToExport = false;
 $superUser = SUPER_USER;
 if ($superUser) {
-	$hasPermissionToExport = true;
+    $hasPermissionToExport = true;
 } else {
     $db = new RedCapDb();
     $username = USERID;
@@ -196,26 +196,26 @@ if ($superUser) {
 $row = 1;
 foreach ($workflowNames as $workflowName) {
     if ($row % 2 === 0) {
-        echo '<tr class="even">'."\n";
+        echo '<tr class="even">' . "\n";
     } else {
-        echo '<tr class="odd">'."\n";
+        echo '<tr class="odd">' . "\n";
     }
     
-    echo "<td>".Filter::escapeForHtml($workflowName)."</td>\n";
+    echo "<td>" . Filter::escapeForHtml($workflowName) . "</td>\n";
     
     #-------------------------------------------------------------------------------------
     # CONFIGURE BUTTON - disable if user does not have permission to access the project
     #-------------------------------------------------------------------------------------
     if ($hasPermissionToExport) {
-        $configureUrl = $configUrl.'&workflowName='.Filter::escapeForUrlParameter($workflowName);
+        $configureUrl = $configUrl . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
         echo '<td style="text-align:center;">'
-            .'<a href="'.$configureUrl.'">'
-            .'<img alt="CONFIG" src="'.APP_PATH_IMAGES.'gear.png"></a>'
-            ."</td>\n";
+            . '<a href="' . $configureUrl . '">'
+            . '<img alt="CONFIG" src="' . APP_PATH_IMAGES . 'gear.png"></a>'
+            . "</td>\n";
     } else {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'gear.png" alt="CONFIG" class="disabled">'
-            ."</td>\n";
+            . '<img src="' . APP_PATH_IMAGES . 'gear.png" alt="CONFIG" class="disabled">'
+            . "</td>\n";
     }
     
     #--------------------------------------------------------------------------------------
@@ -224,14 +224,15 @@ foreach ($workflowNames as $workflowName) {
     #--------------------------------------------------------------------------------------
     if ($adminConfig->getAllowOnDemand()) {
         if ($hasPermissionToExport) {
-            $runConfigurationUrl = $runUrl.'&workflowName='.Filter::escapeForUrlParameter($workflowName);
+            $runConfigurationUrl = $runUrl . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
             echo '<td style="text-align:center;">'
-                .'<a href="'.$runConfigurationUrl.'"><img src="'.APP_PATH_IMAGES.'application_go.png" alt="RUN"></a>'
-                ."</td>\n";
+                . '<a href="' . $runConfigurationUrl . '"><img src="' . APP_PATH_IMAGES
+                . 'application_go.png" alt="RUN"></a>'
+                . "</td>\n";
         } else {
             echo '<td style="text-align:center;">'
-                .'<img src="'.APP_PATH_IMAGES.'application_go.png"  alt="RUN" class="disabled">'
-                ."</td>\n";
+                . '<img src="' . APP_PATH_IMAGES . 'application_go.png"  alt="RUN" class="disabled">'
+                . "</td>\n";
         }
     }
 
@@ -241,14 +242,15 @@ foreach ($workflowNames as $workflowName) {
     #--------------------------------------------------------------------------------------
     if ($adminConfig->getAllowCron()) {
         if ($hasPermissionToExport) {
-            $scheduleConfigurationUrl = $scheduleUrl.'&workflowName='.Filter::escapeForUrlParameter($workflowName);
+            $scheduleConfigurationUrl = $scheduleUrl . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
             echo '<td style="text-align:center;">'
-                .'<a href="'.$scheduleConfigurationUrl.'"><img src="'.APP_PATH_IMAGES.'clock_frame.png" alt="SCHEDULE"></a>'
-                ."</td>\n";
+                . '<a href="' . $scheduleConfigurationUrl . '"><img src="' . APP_PATH_IMAGES
+                . 'clock_frame.png" alt="SCHEDULE"></a>'
+                . "</td>\n";
         } else {
             echo '<td style="text-align:center;">'
-                .'<img src="'.APP_PATH_IMAGES.'clock_frame.png" alt="SCHEDULE" class="disabled">'
-                ."</td>\n";
+                . '<img src="' . APP_PATH_IMAGES . 'clock_frame.png" alt="SCHEDULE" class="disabled">'
+                . "</td>\n";
         }
     }
 
@@ -258,14 +260,14 @@ foreach ($workflowNames as $workflowName) {
     #-----------------------------------------------------------
     if ($hasPermissionToExport) {
         echo '<td style="text-align:center;">'
-            .'<input type="image" src="'.APP_PATH_IMAGES.'page_copy.png" alt="COPY"'
-            .' class="copyConfig" style="cursor: pointer;"'
-            .' id="copyWorkflow'.$row.'"/>'
-            ."</td>\n";
-     } else {
+            . '<input type="image" src="' . APP_PATH_IMAGES . 'page_copy.png" alt="COPY"'
+            . ' class="copyConfig" style="cursor: pointer;"'
+            . ' id="copyWorkflow' . $row . '"/>'
+            . "</td>\n";
+    } else {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'page_copy.png" alt="COPY" class="disabled" />'
-            ."</td>\n";
+           . '<img src="' . APP_PATH_IMAGES . 'page_copy.png" alt="COPY" class="disabled" />'
+           . "</td>\n";
     }
     
     #-----------------------------------------------------------
@@ -274,14 +276,14 @@ foreach ($workflowNames as $workflowName) {
     #-----------------------------------------------------------
     if ($hasPermissionToExport) {
         echo '<td style="text-align:center;">'
-            .'<input type="image" src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME"'
-            .' class="renameConfig" style="cursor: pointer;"'
-            .' id="renameWorkflow'.$row.'"/>'
-            ."</td>\n";
+            . '<input type="image" src="' . APP_PATH_IMAGES . 'page_white_edit.png" alt="RENAME"'
+            . ' class="renameConfig" style="cursor: pointer;"'
+            . ' id="renameWorkflow' . $row . '"/>'
+            . "</td>\n";
     } else {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME" class="disabled" />'
-            ."</td>\n";
+            . '<img src="' . APP_PATH_IMAGES . 'page_white_edit.png" alt="RENAME" class="disabled" />'
+            . "</td>\n";
     }
 
     #-----------------------------------------------------------
@@ -290,14 +292,14 @@ foreach ($workflowNames as $workflowName) {
     #-----------------------------------------------------------
     if ($hasPermissionToExport) {
         echo '<td style="text-align:center;">'
-            .'<input type="image" src="'.APP_PATH_IMAGES.'delete.png" alt="REMOVE"'
-            .' class="deleteConfig" style="cursor: pointer;"'
-            .' id="removeWorkflow'.$row.'"/>'
-            ."</td>\n";
+            . '<input type="image" src="' . APP_PATH_IMAGES . 'delete.png" alt="REMOVE"'
+            . ' class="deleteConfig" style="cursor: pointer;"'
+            . ' id="removeWorkflow' . $row . '"/>'
+            . "</td>\n";
     } else {
         echo '<td style="text-align:center;">'
-            .'<img src="'.APP_PATH_IMAGES.'delete.png" alt="REMOVE" class="disabled" />'
-            ."</td>\n";
+            . '<img src="' . APP_PATH_IMAGES . 'delete.png" alt="REMOVE" class="disabled" />'
+            . "</td>\n";
     }
     
     echo "</tr>\n";
@@ -333,9 +335,9 @@ $(function() {
     # Set up click event handlers for the Copy Workflow buttons
     $row = 1;
     foreach ($workflowNames as $workflowName) {
-        echo '$("#copyWorkflow'.$row.'").click({fromWorkflow: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($workflowName)
-            .'"}, copyWorkflow);'."\n";
+        echo '$("#copyWorkflow' . $row . '").click({fromWorkflow: "'
+            . Filter::escapeForJavaScriptInDoubleQuotes($workflowName)
+            . '"}, copyWorkflow);' . "\n";
         $row++;
     }
     ?>
@@ -390,9 +392,9 @@ $(function() {
     # Set up click event handlers for the Rename Workflow buttons
     $row = 1;
     foreach ($workflowNames as $workflowName) {
-        echo '$("#renameWorkflow'.$row.'").click({workflowName: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($workflowName)
-            .'"}, renameWorkflow);'."\n";
+        echo '$("#renameWorkflow' . $row . '").click({workflowName: "'
+            . Filter::escapeForJavaScriptInDoubleQuotes($workflowName)
+            . '"}, renameWorkflow);' . "\n";
         $row++;
     }
     ?>
@@ -448,9 +450,9 @@ $(function() {
     # Set up click event handlers for the Remove Workflow buttons
     $row = 1;
     foreach ($workflowNames as $workflowName) {
-        echo '$("#removeWorkflow'.$row.'").click({workflowName: "'
-           .Filter::escapeForJavaScriptInDoubleQuotes($workflowName)
-           .'"}, removeWorkflow);'."\n";
+        echo '$("#removeWorkflow' . $row . '").click({workflowName: "'
+           . Filter::escapeForJavaScriptInDoubleQuotes($workflowName)
+           . '"}, removeWorkflow);' . "\n";
         $row++;
     }
     ?>

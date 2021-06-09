@@ -128,7 +128,8 @@ $times = $adminConfig->getTimeLabels();
             $tasks = $module->getWorkflowTasks($workflowName);
             $taskProjectIds = array_column($tasks, 'projectId');
             $firstPid = $taskProjectIds[0];
-            $workflowUrl = $configUrl.'&pid='.Filter::escapeForUrlParameter($firstPid).'&workflowName='.Filter::escapeForUrlParameter($workflowName);
+            $workflowUrl = $configUrl . '&pid=' . Filter::escapeForUrlParameter($firstPid)
+                . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
 
             if ($row % 2 === 0) {
                 echo '<tr class="even">' . "\n";

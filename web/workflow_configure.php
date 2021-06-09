@@ -6,7 +6,7 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
-require_once __DIR__.'/../dependencies/autoload.php';
+require_once __DIR__ . '/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
@@ -45,11 +45,11 @@ $availableUserProjects = $userProjects;
 array_unshift($availableUserProjects, '');
 
 $selfUrl      = $module->getUrl('web/workflow_configure.php')
-                   .'&workflowName='.Filter::escapeForUrlParameter($workflowName);
+                   . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
 $workflowsUrl = $module->getUrl('web/workflows.php');
 $configureUrl = $module->getUrl('web/configure.php');
 $globalPropertiesUrl = $module->getUrl('web/workflow_global_properties.php')
-                   .'&workflowName='.Filter::escapeForUrlParameter($workflowName);
+                   . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
 
 try {
     #-----------------------------------------------------------
@@ -66,7 +66,7 @@ try {
         #--------------------------------------
         # Add task
         #--------------------------------------
-        if (!array_key_exists('newTask', $_POST) || empty($_POST['newTask'])) {
+        if (!array_key_exists('newTask', $_POST) || !isset($_POST['newTask'])) {
             $error = 'ERROR: No project was selected.';
         } else {
             $newTaskKey = Filter::stripTags($_POST['newTask']);
@@ -97,10 +97,9 @@ try {
             #----------------------------------------------
             # Update properties
             #----------------------------------------------
-            header('Location: '.$globalPropertiesUrl);
+            header('Location: ' . $globalPropertiesUrl);
             exit();
         }
-        
     } elseif (strcasecmp($submitValue, 'etlConfig') === 0) {
         if (empty($warning) && empty($error)) {
             #----------------------------------------------
@@ -129,12 +128,16 @@ try {
             $renameNewTaskName = $_POST['renameNewTaskName'];
   
             if (isset($renameTaskKey)) {
-  	            #check to see if the new task name is the same as an ETL property name 
-    			$matchFound = $module->checkWorkflowTaskNameAgainstEtlPropertyNames($renameProjectId, $renameNewTaskName);
+                #check to see if the new task name is the same as an ETL property name
+                $matchFound = $module->checkWorkflowTaskNameAgainstEtlPropertyNames(
+                    $renameProjectId,
+                    $renameNewTaskName
+                );
                 if ($matchFound) {
-                    $error = 'ERROR: Task new name cannot be set to the name of an existing ETL property. Please enter another name for the task.';
+                    $error = 'ERROR: Task new name cannot be set to the name of an existing ETL property. i'
+                    . 'Please enter another name for the task.';
                 } else {
-                   $module->renameWorkflowTask(
+                    $module->renameWorkflowTask(
                         $workflowName,
                         $renameTaskKey,
                         $renameNewTaskName,
@@ -146,7 +149,7 @@ try {
         }
     }
 } catch (\Exception $exception) {
-    $error = 'ERROR: '.$exception->getMessage();
+    $error = 'ERROR: ' . $exception->getMessage();
 }
 
 $workflowStatus = $module->getWorkflowStatus($workflowName);
@@ -164,8 +167,8 @@ ob_start();
 require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    " . $link . "\n</head>", $buffer);
 echo $buffer;
 ?>
 
@@ -193,18 +196,19 @@ $module->renderProjectPageContentHeader($configureUrl, $error, $warning, $succes
 # Add-task form
 #------------------------------------------------------------
 if (!empty($availableUserProjects)) {
-?>
-    <form action="<?php echo $selfUrl;?>" method="post" style="margin-bottom: 12px;" name="addTaskForm" id="addTaskForm">
+    ?>
+    <form action="<?php echo $selfUrl;?>" method="post" style="margin-bottom: 12px;" 
+        name="addTaskForm" id="addTaskForm">
 
     <label for="newTask">REDCap project:</label>
     <select name="newTask" id="newTask">
     <?php
     foreach ($availableUserProjects as $key => $userProject) {
         if ($userProject) {
-            echo '<option value="'.Filter::escapeForHtmlAttribute($key).'">'
-                .Filter::escapeForHtml($userProject['project_id'].'-'.$userProject['app_title'])."</option>\n";
+            echo '<option value="' . Filter::escapeForHtmlAttribute($key) . '">'
+                . Filter::escapeForHtml($userProject['project_id'] . '-' . $userProject['app_title']) . "</option>\n";
         } else {
-            echo '<option value=""></option>'."\n";
+            echo '<option value=""></option>' . "\n";
         }
     }
     ?>
@@ -252,7 +256,9 @@ if (!empty($availableUserProjects)) {
         $row = 1;
         foreach ($tasks as $taskKey => $task) {
             $projectId = $task['projectId'];
-            if (empty($projectId)) { $projectId = "No project Id"; }
+            if (empty($projectId) && $projectId !== 0) {
+                $projectId = "No project Id";
+            }
             $taskName = $task['taskName'];
             $pKey = array_search($projectId, array_column($userProjects, 'project_id'));
             $isAssignedUser = false;
@@ -262,40 +268,40 @@ if (!empty($availableUserProjects)) {
             if ($pKey || $pKey === 0) {
                 $isAssignedUser = true;
                 $hasPermissionToExport = $userProjects[$pKey]['data_export_tool'] == 1 ? true : false;
-				$projectName = $userProjects[$pKey]['app_title'];
+                $projectName = $userProjects[$pKey]['app_title'];
                 $projectEtlConfig = $task['projectEtlConfig'] ? $task['projectEtlConfig'] : "None specified";
             } else {
-				$projectName = "(You are not a listed user on this project)";
+                $projectName = "(You are not a listed user on this project)";
                 $projectEtlConfig = null;
-			} 
+            }
 
-            if ($superUser) { 
-				$hasPermissionToExport = true; 
+            if ($superUser) {
+                $hasPermissionToExport = true;
                 $projectName = $projectName ? $projectName : $db->getProjectName($projectId);
                 $projectEtlConfig = $task['projectEtlConfig'] ? $task['projectEtlConfig'] : "None specified";
-			}
+            }
 
             if ($row % 2 == 0) {
-                echo '<tr class="even-row">'."\n";
+                echo '<tr class="even-row">' . "\n";
             } else {
-                echo '<tr class="odd-row">'."\n";
+                echo '<tr class="odd-row">' . "\n";
             }
             
             if ($numTasks > 1) {
                     echo '<td style="text-align:left;"> '
-                        .'<input type="image" src="'.APP_PATH_IMAGES.'arrow_down.png" alt="MOVE DOWN"'
-                        .' class="deleteConfig" style="cursor: pointer;"'
-                        .' id="moveTaskDown'.$row.'"/>';
-                    echo'<input type="image" src="'.APP_PATH_IMAGES.'arrow_up2.png" alt="MOVE UP"'
-                        .' class="deleteConfig" style="margin-left: 5px; cursor: pointer;"'
-                        .' id="moveTaskUp'.$row.'"/> ';
+                        . '<input type="image" src="' . APP_PATH_IMAGES . 'arrow_down.png" alt="MOVE DOWN"'
+                        . ' class="deleteConfig" style="cursor: pointer;"'
+                        . ' id="moveTaskDown' . $row . '"/>';
+                    echo'<input type="image" src="' . APP_PATH_IMAGES . 'arrow_up2.png" alt="MOVE UP"'
+                        . ' class="deleteConfig" style="margin-left: 5px; cursor: pointer;"'
+                        . ' id="moveTaskUp' . $row . '"/> ';
                     echo "</td>\n";
             }
 
-            echo "<td>".Filter::escapeForHtml($taskName)."</td>\n";
-            echo "<td>".Filter::escapeForHtml($projectId)."</td>\n";
-            echo "<td>".Filter::escapeForHtml($projectName)."</td>\n";
-            echo "<td>".Filter::escapeForHtml($projectEtlConfig)."</td>\n";
+            echo "<td>" . Filter::escapeForHtml($taskName) . "</td>\n";
+            echo "<td>" . Filter::escapeForHtml($projectId) . "</td>\n";
+            echo "<td>" . Filter::escapeForHtml($projectName) . "</td>\n";
+            echo "<td>" . Filter::escapeForHtml($projectEtlConfig) . "</td>\n";
 
             #-----------------------------------------------------------
             # RENAME TASK BUTTON - disable if user does not have the needed
@@ -303,15 +309,15 @@ if (!empty($availableUserProjects)) {
             #-----------------------------------------------------------
             if ($hasPermissionToExport) {
                 echo '<td style="text-align:center;">'
-                    .'<input type="image" src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME TASK"'
-                    .' style="cursor: pointer;"'
-                    .' id="renameTask'.$row
-                    .'"/>'
-                    ."</td>\n";
+                    . '<input type="image" src="' . APP_PATH_IMAGES . 'page_white_edit.png" alt="RENAME TASK"'
+                    . ' style="cursor: pointer;"'
+                    . ' id="renameTask' . $row
+                    . '"/>'
+                    . "</td>\n";
             } else {
                 echo '<td style="text-align:center;">'
-                    .'<img src="'.APP_PATH_IMAGES.'gear.png" alt="ETL GLOBAL VARIABLES" class="disabled" />'
-                    ."</td>";
+                    . '<img src="' . APP_PATH_IMAGES . 'gear.png" alt="ETL GLOBAL VARIABLES" class="disabled" />'
+                    . "</td>";
             }
 
             #-----------------------------------------------------------
@@ -321,15 +327,15 @@ if (!empty($availableUserProjects)) {
             if ($hasPermissionToExport) {
                 $values = $module->getAccessibleConfigurationNames($projectId);
                 echo '<td style="text-align:center;">'
-                    .'<input type="image" src="'.APP_PATH_IMAGES.'page_white_edit.png" alt="RENAME TASK"'
-                    .' style="cursor: pointer;"'
-                    .' id="specifyEtlConfig'.$row
-                    .'"/>'
-                    ."</td>\n";
+                    . '<input type="image" src="' . APP_PATH_IMAGES . 'page_white_edit.png" alt="RENAME TASK"'
+                    . ' style="cursor: pointer;"'
+                    . ' id="specifyEtlConfig' . $row
+                    . '"/>'
+                    . "</td>\n";
             } else {
                 echo '<td style="text-align:center;">'
-                    .'<img src="'.APP_PATH_IMAGES.'gear.png" alt="ETL GLOBAL VARIABLES" class="disabled" />'
-                    ."</td>";
+                    . '<img src="' . APP_PATH_IMAGES . 'gear.png" alt="ETL GLOBAL VARIABLES" class="disabled" />'
+                    . "</td>";
             }
 
             #-----------------------------------------------------------
@@ -338,15 +344,15 @@ if (!empty($availableUserProjects)) {
             #-----------------------------------------------------------
             if ($hasPermissionToExport) {
                 echo '<td style="text-align:center;">'
-                    .'<input type="image" src="'.APP_PATH_IMAGES.'delete.png" alt="DELETE"'
-                    .' class="deleteConfig" style="cursor: pointer;"'
-                    .' id="deleteTask'.$row
-                    .'"/>'
-                    ."</td>\n";
+                    . '<input type="image" src="' . APP_PATH_IMAGES . 'delete.png" alt="DELETE"'
+                    . ' class="deleteConfig" style="cursor: pointer;"'
+                    . ' id="deleteTask' . $row
+                    . '"/>'
+                    . "</td>\n";
             } else {
                 echo '<td style="text-align:center;">'
-                    .'<img src="'.APP_PATH_IMAGES.'delete.png" alt="DELETE" class="disabled" />'
-                    ."</td>\n";
+                    . '<img src="' . APP_PATH_IMAGES . 'delete.png" alt="DELETE" class="disabled" />'
+                    . "</td>\n";
             }
             echo "</tr>\n";
             $row++;
@@ -376,11 +382,11 @@ if (!empty($availableUserProjects)) {
     $row = 1;
     foreach ($tasks as $key => $task) {
         $projectId = $task['projectId'];
-        echo '$("#moveTaskUp'.$row.'").click({key: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($key)
-            .'", projectId: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($projectId)
-            .'"}, moveTaskUp);'."\n";
+        echo '$("#moveTaskUp' . $row . '").click({key: "'
+            . Filter::escapeForJavaScriptInDoubleQuotes($key)
+            . '", projectId: "'
+            . Filter::escapeForJavaScriptInDoubleQuotes($projectId)
+            . '"}, moveTaskUp);' . "\n";
         $row++;
     }
     ?>
@@ -409,11 +415,11 @@ if (!empty($availableUserProjects)) {
     $row = 1;
     foreach ($tasks as $key => $task) {
         $projectId = $task['projectId'];
-        echo '$("#moveTaskDown'.$row.'").click({key: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($key)
-            .'", projectId: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($projectId)
-            .'"}, moveTaskDown);'."\n";
+        echo '$("#moveTaskDown' . $row . '").click({key: "'
+            . Filter::escapeForJavaScriptInDoubleQuotes($key)
+            . '", projectId: "'
+            . Filter::escapeForJavaScriptInDoubleQuotes($projectId)
+            . '"}, moveTaskDown);' . "\n";
         $row++;
     }
     ?>
@@ -454,11 +460,11 @@ $(function() {
     $row = 1;
     foreach ($tasks as $key => $task) {
         $projectId = $task['projectId'];
-        echo '$("#renameTask'.$row.'").click({key: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($key)
-            .'", projectId: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($projectId)
-            .'"}, renameTask);'."\n";
+        echo '$("#renameTask' . $row . '").click({key: "'
+            . Filter::escapeForJavaScriptInDoubleQuotes($key)
+            . '", projectId: "'
+            . Filter::escapeForJavaScriptInDoubleQuotes($projectId)
+            . '"}, renameTask);' . "\n";
         $row++;
     }
     ?>
@@ -522,15 +528,15 @@ $(function() {
         $projectId = $task['projectId'];
         $etlConfigs = $module->getAccessibleConfigurationNames($projectId);
         array_unshift($etlConfigs, '');
-        echo '$("#specifyEtlConfig'.$row.'").click({key: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($key)
-            .'", projectId: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($projectId)
-            .'", etlConfigs: ['
-            ."'"
-            .implode("','", $etlConfigs)
-            ."'"
-            .']}, specifyEtlConfig);'."\n";
+        echo '$("#specifyEtlConfig' . $row . '").click({key: "'
+            . Filter::escapeForJavaScriptInDoubleQuotes($key)
+            . '", projectId: "'
+            . Filter::escapeForJavaScriptInDoubleQuotes($projectId)
+            . '", etlConfigs: ['
+            . "'"
+            . implode("','", $etlConfigs)
+            . "'"
+            . ']}, specifyEtlConfig);' . "\n";
         $row++;
     }
     ?>
@@ -612,11 +618,11 @@ $(function() {
     $row = 1;
     foreach ($tasks as $key => $task) {
         $projectId = $task['projectId'];
-        echo '$("#deleteTask'.$row.'").click({key: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($key)
-            .'", projectId: "'
-            .Filter::escapeForJavaScriptInDoubleQuotes($projectId)
-            .'"}, deleteTask);'."\n";
+        echo '$("#deleteTask' . $row . '").click({key: "'
+            . Filter::escapeForJavaScriptInDoubleQuotes($key)
+            . '", projectId: "'
+            . Filter::escapeForJavaScriptInDoubleQuotes($projectId)
+            . '"}, deleteTask);' . "\n";
         $row++;
     }
     ?>

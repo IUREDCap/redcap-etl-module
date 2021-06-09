@@ -6,7 +6,7 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
-require_once __DIR__.'/../dependencies/autoload.php';
+require_once __DIR__ . '/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
@@ -21,24 +21,25 @@ $pid = PROJECT_ID;
 $username = USERID;
 
 $workflowName = Filter::escapeForHtml($_GET['workflowName']);
-if (empty($workflowName)) {
-    $workflowName = $_POST['workflowName'];  
+if (!isset($workflowName)) {
+    $workflowName = $_POST['workflowName'];
 }
 
 
 try {
-	$servers   = $module->getUserAllowedServersBasedOnAccessLevel(USERID);
-	
+    $servers   = $module->getUserAllowedServersBasedOnAccessLevel(USERID);
+    
     $excludeIncomplete = true;
     $projectWorkflows = $module->getProjectAvailableWorkflows($pid, $excludeIncomplete);
 
     $noReadyProjects = false;
-    if (empty($projectWorkflows)) { 
+    if (empty($projectWorkflows)) {
         $noReadyProjects = true;
     }
 
-    if (!empty($workflowName)) {
-        $p = array_search($workflowName, $projectWorkflows); 
+    $workflowReady = false;
+    if (isset($workflowName)) {
+        $p = array_search($workflowName, $projectWorkflows);
         $workflowReady = $p === false ? false : true;
     }
 
@@ -79,18 +80,25 @@ try {
         $workflowName = $_POST['workflowName'];
         if (empty($workflowName)) {
             $error = 'ERROR: No workflow specified.';
-        } else  {
+        } else {
             #$server = ServerConfig::EMBEDDED_SERVER_NAME;
             $isCronJob = false;
             $originatingProjectId = $pid;
             #Get projects that this user has access to
             $db = new RedCapDb();
             $userProjects = $db->getUserProjects($username);
-            $runOutput = $module->runWorkflow($workflowName, $server, $username, $userProjects, $isCronJob, $originatingProjectId);
+            $runOutput = $module->runWorkflow(
+                $workflowName,
+                $server,
+                $username,
+                $userProjects,
+                $isCronJob,
+                $originatingProjectId
+            );
         }
     }
 } catch (Exception $exception) {
-    $error = 'ERROR: '.$exception->getMessage();
+    $error = 'ERROR: ' . $exception->getMessage();
 }
 
 ?>
@@ -103,8 +111,8 @@ ob_start();
 require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    " . $link . "\n</head>", $buffer);
 echo $buffer;
 ?>
 
@@ -122,17 +130,17 @@ $module->renderProjectPageContentHeader($runUrl, $error, $warning, $success);
 
 <?php
 if ($workflowName && !$workflowReady) {
-    $msg = 'The selected workflow '.$workflowName.' is not yet ready to run. ';
-	$msg .=  'If you wish to run this workflow, return to the workflow configuration page to complete the configuration.';
-	echo '<span style="font-weight: bold;">'.$msg.'</span>';
+    $msg = 'The selected workflow ' . $workflowName . ' is not yet ready to run. '
+            . 'If you wish to run this workflow, return to the workflow configuration page '
+            . 'to complete the configuration.';
+    echo '<span style="font-weight: bold;">' . $msg . '</span>';
 } elseif ($noReadyProjects) {
-	echo '<span style="font-weight: bold;">There are no workflows with a status of READY for this project.</span>';
+    echo '<span style="font-weight: bold;">There are no workflows with a status of READY for this project.</span>';
 } else {
-	       
 #---------------------------------------
 # Configuration selection form
 #---------------------------------------
-?>
+    ?>
 <form action="<?php echo $selfUrl;?>" method="post" 
       style="padding: 4px; margin-bottom: 0px; border: 1px solid #ccc; background-color: #ccc;">
     <span style="font-weight: bold;">ETL Workflow:</span>
@@ -141,11 +149,11 @@ if ($workflowName && !$workflowReady) {
     <?php
     foreach ($projectWorkflows as $value) {
         if (strcmp($value, $workflowName) === 0) {
-            echo '<option value="'.Filter::escapeForHtmlAttribute($value).'" selected>'
-                .Filter::escapeForHtml($value)."</option>\n";
+            echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '" selected>'
+                . Filter::escapeForHtml($value) . "</option>\n";
         } else {
-            echo '<option value="'.Filter::escapeForHtmlAttribute($value).'">'
-                .Filter::escapeForHtml($value)."</option>\n";
+            echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '">'
+                . Filter::escapeForHtml($value) . "</option>\n";
         }
     }
     ?>
@@ -156,9 +164,9 @@ if ($workflowName && !$workflowReady) {
 <br />
 
 <!-- Run form -->
-<?php
+    <?php
 #$allowEmbeddedServer = $adminConfig->getAllowEmbeddedServer();
-?>
+    ?>
 <form action="<?php echo $selfUrl;?>" method="post">
     <fieldset style="border: 2px solid #ccc; border-radius: 7px; padding: 7px;">
         <legend style="font-weight: bold;">Run Now</legend>
@@ -172,21 +180,21 @@ if ($workflowName && !$workflowReady) {
             on
        <?php
         
-       echo '<select name="server" id="serverId">'."\n";
-       echo '<option value=""></option>'."\n";
-       foreach ($servers as $serverName) {
-           $serverConfig = $module->getServerConfig($serverName);
-           if (isset($serverConfig) && $serverConfig->getIsActive()) {
-               $selected = '';
-               if ($serverName === $server) {
-                   $selected = 'selected';
-               }
-               echo '<option value="'.Filter::escapeForHtmlAttribute($serverName).'" '.$selected.'>'
-                   .Filter::escapeForHtml($serverName)."</option>\n";
-           }
-       }
-       echo "</select>\n";
-       ?>
+        echo '<select name="server" id="serverId">' . "\n";
+        echo '<option value=""></option>' . "\n";
+        foreach ($servers as $serverName) {
+            $serverConfig = $module->getServerConfig($serverName);
+            if (isset($serverConfig) && $serverConfig->getIsActive()) {
+                $selected = '';
+                if ($serverName === $server) {
+                    $selected = 'selected';
+                }
+                echo '<option value="' . Filter::escapeForHtmlAttribute($serverName) . '" ' . $selected . '>'
+                   . Filter::escapeForHtml($serverName) . "</option>\n";
+            }
+        }
+        echo "</select>\n";
+        ?>
        <p><pre id="runOutput"><?php echo Filter::escapeForHtml($runOutput);?></pre></p>
   </fieldset>
     <?php Csrf::generateFormToken(); ?>

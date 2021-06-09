@@ -6,7 +6,7 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
-require_once __DIR__.'/../dependencies/autoload.php';
+require_once __DIR__ . '/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Authorization;
@@ -65,7 +65,7 @@ try {
         if (empty($configName)) {
             $error = 'ERROR: No ETL configuration specified.';
         } elseif (!isset($configuration)) {
-            $error = 'ERROR: No ETL configuration found for '.$configName.'.';
+            $error = 'ERROR: No ETL configuration found for ' . $configName . '.';
         } else {
             $configuration->validateForRunning();
             $isCronJob = false;
@@ -73,7 +73,7 @@ try {
         }
     }
 } catch (Exception $exception) {
-    $error = 'ERROR: '.$exception->getMessage();
+    $error = 'ERROR: ' . $exception->getMessage();
 }
 
 ?>
@@ -86,8 +86,8 @@ ob_start();
 require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    " . $link . "\n</head>", $buffer);
 echo $buffer;
 ?>
 
@@ -121,11 +121,11 @@ $module->renderProjectPageContentHeader($runUrl, $error, $warning, $success);
     array_unshift($values, '');
     foreach ($values as $value) {
         if (strcmp($value, $configName) === 0) {
-            echo '<option value="'.Filter::escapeForHtmlAttribute($value).'" selected>'
-                .Filter::escapeForHtml($value)."</option>\n";
+            echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '" selected>'
+                . Filter::escapeForHtml($value) . "</option>\n";
         } else {
-            echo '<option value="'.Filter::escapeForHtmlAttribute($value).'">'
-                .Filter::escapeForHtml($value)."</option>\n";
+            echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '">'
+                . Filter::escapeForHtml($value) . "</option>\n";
         }
     }
     ?>
@@ -152,8 +152,8 @@ $module->renderProjectPageContentHeader($runUrl, $error, $warning, $success);
         on
         <?php
         
-        echo '<select name="server" id="serverId">'."\n";
-        echo '<option value=""></option>'."\n";
+        echo '<select name="server" id="serverId">' . "\n";
+        echo '<option value=""></option>' . "\n";
         foreach ($servers as $serverName) {
             $serverConfig = $module->getServerConfig($serverName);
             if (isset($serverConfig) && $serverConfig->getIsActive()) {
@@ -161,8 +161,8 @@ $module->renderProjectPageContentHeader($runUrl, $error, $warning, $success);
                 if ($serverName === $server) {
                     $selected = 'selected';
                 }
-                echo '<option value="'.Filter::escapeForHtmlAttribute($serverName).'" '.$selected.'>'
-                    .Filter::escapeForHtml($serverName)."</option>\n";
+                echo '<option value="' . Filter::escapeForHtmlAttribute($serverName) . '" ' . $selected . '>'
+                    . Filter::escapeForHtml($serverName) . "</option>\n";
             }
         }
         echo "</select>\n";

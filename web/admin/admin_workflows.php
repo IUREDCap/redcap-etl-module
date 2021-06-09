@@ -30,12 +30,12 @@ if ($submit === 'Search') {
 }
 
 $deleteWorkflowName = Filter::sanitizeString($_POST['delete-workflow-name']);
-if (!empty($deleteWorkflowName)) {
+if (!empty($deleteWorkflowName) || $deleteWorkflowName === '0') {
     $module->deleteWorkflow($deleteWorkflowName, $username);
 }
 
 $reinstateWorkflowName = Filter::sanitizeString($_POST['reinstate-workflow-name']);
-if (!empty($reinstateWorkflowName)) {
+if (!empty($reinstateWorkflowName || $reinstateWorkflowName === '0')) {
     $module->reinstateWorkflow($reinstateWorkflowName, $username);
 }
 
@@ -90,17 +90,17 @@ Workflow name: <input type="text" id="search-text" name="search-text" size="40">
   </thead>
   <tbody>
     <?php
-    $i=0;
+    $i = 0;
     $row = 1;
-    foreach ($workflows as $workflowName=>$workflow) {
+    foreach ($workflows as $workflowName => $workflow) {
         $display = true;
-        if (!empty($searchText)) {
+        if (!empty($searchText || $searchText === '0')) {
             if (strpos(strtoupper($workflowName), strtoupper($searchText)) === false) {
-				$display = false;
+                $display = false;
             }
-	    }
-	    
-	    if ($display) {
+        }
+        
+        if ($display) {
             if ($row % 2 == 0) {
                 echo "<tr class=\"even\">\n";
             } else {
@@ -117,12 +117,18 @@ Workflow name: <input type="text" id="search-text" name="search-text" size="40">
             #-------------------------------
             # Last updated by/date
             #-------------------------------
-            $dateUpdated = substr($workflow['metadata']['dateUpdated']['date'],0,10);
-            if (empty($dateUpdated)) {$dateUpdated = substr($workflow['metadata']['dateAdded']['date'],0,10);}
+            $dateUpdated = substr($workflow['metadata']['dateUpdated']['date'], 0, 10);
+            if (empty($dateUpdated)) {
+                $dateUpdated = substr($workflow['metadata']['dateAdded']['date'], 0, 10);
+            }
 
             $updatedBy = $workflow['metadata']['updatedBy'];
-            if (empty($updatedBy)) {$updatedBy = $workflow['metadata']['addedBy'];}
-            if (!empty($updatedBy)) {$updatedBy = ' ['.$updatedBy.']';}
+            if (empty($updatedBy)) {
+                $updatedBy = $workflow['metadata']['addedBy'];
+            }
+            if (!empty($updatedBy)) {
+                $updatedBy = ' [' . $updatedBy . ']';
+            }
 
             if ($updatedBy || $dateUpdated) {
                 echo '<td>' . $dateUpdated . $updatedBy;
@@ -135,11 +141,10 @@ Workflow name: <input type="text" id="search-text" name="search-text" size="40">
             # Configure
             #-------------------------------
             #get the first project since the workflow config url requires a project id
-            $pid = array_column($workflow,'projectId')[0];
+            $pid = array_column($workflow, 'projectId')[0];
             $workflowConfigUrl = $module->getURL(RedCapEtlModule::WORKFLOW_CONFIG_PAGE
                 . '?pid=' . Filter::escapeForUrlParameter($pid)
-                . '&workflowName=' . Filter::escapeForUrlParameter($workflowName)
-            ); 
+                . '&workflowName=' . Filter::escapeForUrlParameter($workflowName));
             echo '<td style="text-align:center;">'
                 . '<a href="' . $workflowConfigUrl . '">'
                 . '<img src="' . APP_PATH_IMAGES . 'gear.png" alt="CONFIG"></a>'
@@ -219,8 +224,8 @@ Workflow name: <input type="text" id="search-text" name="search-text" size="40">
 echo "<script>\n";
 
 $row = 1;
-foreach ($workflows as $workflowName=>$workflow) {
-   echo '$("#reinstateWorkflow' . $row . '").click({workflow: "'
+foreach ($workflows as $workflowName => $workflow) {
+    echo '$("#reinstateWorkflow' . $row . '").click({workflow: "'
         . Filter::escapeForJavaScriptInDoubleQuotes($workflowName)
         . '"}, RedCapEtlModule.reinstateWorkflow);' . "\n";
     echo '$("#deleteWorkflow' . $row . '").click({workflow: "'

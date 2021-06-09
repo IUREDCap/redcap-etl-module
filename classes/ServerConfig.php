@@ -202,13 +202,13 @@ class ServerConfig implements \JsonSerializable
     
     /**
      * Run the ETL process for this server.
-     *     If boolean $runWorkflow is true, then $etlConfig is type array. 
+     *     If boolean $runWorkflow is true, then $etlConfig is type array.
      *     Otherwise, it is type Configuration.
      *
      * @param mixed $etlConfig the ETL configuration to run.
      * @param boolean $isCronJob indicates if this run is a cron job.
      */
-    public function run($etlConfig, $isCronJob = false, $moduleLog = null, $runWorkflow=false)
+    public function run($etlConfig, $isCronJob = false, $moduleLog = null, $runWorkflow = false)
     {
         if (!isset($etlConfig)) {
             $message = 'No ETL configuration specified.';
@@ -222,7 +222,7 @@ class ServerConfig implements \JsonSerializable
 
         if (!$runWorkflow) {
             $this->updateEtlConfig($etlConfig, $isCronJob);
-     	}
+        }
 
         if ($this->isEmbeddedServer()) {
             #-------------------------------------------------
@@ -230,10 +230,10 @@ class ServerConfig implements \JsonSerializable
             #-------------------------------------------------
             if ($runWorkflow) {
                 $properties = $etlConfig;
-		    } else {
+            } else {
                 $properties = $etlConfig->getPropertiesArray();
                 $properties[Configuration::PRINT_LOGGING] = false;
-	     	} 
+            }
 
             $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
             $logId = $logger->getLogId();
@@ -268,7 +268,7 @@ class ServerConfig implements \JsonSerializable
             
             if ($runWorkflow) {
                 $propertiesJson = Configuration::getRedCapEtlJsonProperties($runWorkflow, $etlConfig);
-		    } else {
+            } else {
                 $propertiesJson = $etlConfig->getRedCapEtlJsonProperties($runWorkflow);
             }
             $configFileName = 'etl_config_' . $fileNameSuffix . '.json';
@@ -531,5 +531,4 @@ class ServerConfig implements \JsonSerializable
     {
         $this->accessLevel = $accessLevel;
     }
-    
 }

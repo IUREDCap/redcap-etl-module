@@ -1092,11 +1092,11 @@ class Settings
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
 
-        if (empty($workflowName)) {
+        if (empty($workflowName) && $workflowName !== '0') {
             $message = 'When adding new workflow, no workflow name specified.';
             throw new \Exception($message);
         } elseif ($workflows->workflowExists($workflowName)) {
-            $message = 'Workflow "'.$workflowName.'" already exists.';
+            $message = 'Workflow "' . $workflowName . '" already exists.';
             throw new \Exception($message);
         }
 
@@ -1109,7 +1109,6 @@ class Settings
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
-
     }
 
     public function addProjectToWorkflow(
@@ -1212,8 +1211,8 @@ class Settings
                     if ($excludeIncomplete) {
                         if ($workflow['metadata']['workflowStatus'] !== 'Incomplete') {
                             $projectWorkflows[] = $workflowName;
-					    }
-				    } else { 
+                        }
+                    } else {
                         $projectWorkflows[] = $workflowName;
                     }
                 }
@@ -1275,12 +1274,17 @@ class Settings
         $json = $workflows->toJson();
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
 
-		$commit = true;
+        $commit = true;
         $this->db->endTransaction($commit);
     }
 
-    public function copyWorkflow($fromWorkflowName, $toWorkflowName, $username, $toExportRight = null, $transaction = true)
-    {
+    public function copyWorkflow(
+        $fromWorkflowName,
+        $toWorkflowName,
+        $username,
+        $toExportRight = null,
+        $transaction = true
+    ) {
 
         if ($fromWorkflowName == $toWorkflowName) {
             $message = 'The new workflow name must be different from the existing workflow name.';
@@ -1332,7 +1336,7 @@ class Settings
     public function moveWorkflowTask($workflowName, $direction, $moveTaskKey)
     {
         $message = 'In moving workflow task, ';
-        if (empty($workflowName)) {
+        if (empty($workflowName) && $workflowName !== '0') {
             $message .= 'no workflow name was specified.';
             throw new \Exception($message);
         } elseif (empty($direction)) {
@@ -1476,12 +1480,12 @@ class Settings
 
         if ($configValues) {
             $configuration->set($configValues, true);
-	    } else {
+        } else {
             $initialize = true;
             $configValues = $configuration->getGlobalProperties($initialize);
             $isWorkflow = true;
             $configuration->set($configValues, $isWorkflow);
-	    }		
+        }
         return $configuration;
     }
     
@@ -1489,7 +1493,7 @@ class Settings
     {
         $this->db->startTransaction();
 
-		$workflows = new Workflow();
+        $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
         $workflows->setGlobalProperties($workflowName, $properties, $username);
@@ -1504,7 +1508,7 @@ class Settings
     {
         $this->db->startTransaction();
 
-		$workflows = new Workflow();
+        $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
         $workflows->setCronSchedule($workflowName, $server, $schedule, $username);
@@ -1515,7 +1519,7 @@ class Settings
         $this->db->endTransaction($commit);
     }
     
-   public function getWorkflowSchedule($workflowName)
+    public function getWorkflowSchedule($workflowName)
     {
         $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
@@ -1526,9 +1530,9 @@ class Settings
         return $cron;
     }
 
-  public function getWorkflowCronJobs($day, $time)
+    public function getWorkflowCronJobs($day, $time)
     {
-		$workflows = new Workflow();
+        $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
         $cronJobs = $workflows->getCronJobs($day, $time);
@@ -1537,11 +1541,11 @@ class Settings
     
     public function hasPermissionsForAllTasks($workflowName, $username = USERID)
     {
-    	$hasPermissions = false;
+        $hasPermissions = false;
         $userProjects = $this->db->getUserProjects($username);
         $userProjectIds = array_column($userProjects, 'project_id');
 
-		$workflows = new Workflow();
+        $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
         $tasks = $workflows->getWorkflowTasks($workflowName);
@@ -1552,21 +1556,21 @@ class Settings
         $numCommonProjectIds = count($commonProjectIds);
 
         if ($numWorkflowProjects === $numCommonProjectIds) {
-			$hasPermissions = true;
-		}
+            $hasPermissions = true;
+        }
         return $hasPermissions;
     }
 
     public function getAllProjectTasksInAllWorkflows($projectId)
     {
-		$workflows = new Workflow();
+        $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
         $excludeIncomplete = false;
         $projectAvailableWorkflows = $this->getProjectAvailableWorkflows($projectId, $excludeIncomplete);
         return $workflows->getAllProjectTasksInAllWorkflows($projectId, $projectAvailableWorkflows);
     }
-/*    
+/*
     public function setWorkflows($workflows)
     {
         $key = self::WORKFLOWS_KEY;

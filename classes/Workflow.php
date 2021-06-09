@@ -54,7 +54,6 @@ class Workflow implements \JsonSerializable
         $workflow = $this->workflows[$workflowName];
 
         return $this->sequenceWorkflowTasks($workflowName, $workflow, null);
-
     }
     
     public function getWorkflowTasks($workflowName)
@@ -367,7 +366,7 @@ class Workflow implements \JsonSerializable
     public function renameWorkflowTask($workflowName, $taskKey, $newTaskName, $projectId, $username)
     {
         $message = 'When renaming task from workflow, ';
-        if (empty($workflowName)) {
+        if (!isset($workflowName)) {
             $message .= 'no workflow name was specified.';
             throw new \Exception($message);
         }
@@ -377,7 +376,7 @@ class Workflow implements \JsonSerializable
             throw new \Exception($message);
         }
 
-        if (empty($newTaskName)) {
+        if (!isset($newTaskName)) {
             $newTaskName = 'Task for project ' . $projectId;
         }
 
@@ -437,7 +436,7 @@ class Workflow implements \JsonSerializable
 
     public function setGlobalProperties($workflowName, $properties, $username)
     {
-       $message = 'When setting workflow global properties, ';
+        $message = 'When setting workflow global properties, ';
         if (empty($workflowName)) {
             $message .= 'no workflow name was specified.';
             throw new \Exception($message);
@@ -457,7 +456,7 @@ class Workflow implements \JsonSerializable
     
     public function setCronSchedule($workflowName, $server, $schedule, $username)
     {
-       $message = 'When setting workflow cron schdule, ';
+        $message = 'When setting workflow cron schdule, ';
         if (empty($workflowName)) {
             $message .= 'no workflow name was specified.';
             throw new \Exception($message);
@@ -483,8 +482,8 @@ class Workflow implements \JsonSerializable
     
     public function getCronJobs($day, $time)
     {
-		$cronJobs = array();
-        foreach ($this->workflows as $workflowName=>$workflow) {
+        $cronJobs = array();
+        foreach ($this->workflows as $workflowName => $workflow) {
             if (!empty($workflow["cron"])) {
                 $times  = $workflow["cron"][Configuration::CRON_SCHEDULE];
                 if (isset($times) && is_array($times)) {
@@ -499,7 +498,7 @@ class Workflow implements \JsonSerializable
                             array_push($cronJobs, $job);
                         }
                     }
-                } 
+                }
             }
         }
         return $cronJobs;
@@ -507,15 +506,15 @@ class Workflow implements \JsonSerializable
     
     public function getAllProjectTasksInAllWorkflows($project, $projectAvailableWorkflows)
     {
-		$taskNames = array();
-        foreach ($this->workflows as $workflowName=>$workflow) {
-		   unset($workflow["metadata"]);
-		   unset($workflow["cron"]);
-		   unset($workflow["properties"]);
-		   
-           $commonWorkflows = array_intersect($workflow, $projectAvailableWorkflows);
-		}
-		
+        $taskNames = array();
+        foreach ($this->workflows as $workflowName => $workflow) {
+            unset($workflow["metadata"]);
+            unset($workflow["cron"]);
+            unset($workflow["properties"]);
+           
+            $commonWorkflows = array_intersect($workflow, $projectAvailableWorkflows);
+        }
+        
         return $taskNames;
     }
     

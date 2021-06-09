@@ -6,7 +6,7 @@
 
 /** @var \IU\RedCapEtlModule\RedCapEtlModule $module */
 
-require_once __DIR__.'/../dependencies/autoload.php';
+require_once __DIR__ . '/../dependencies/autoload.php';
 
 use IU\REDCapETL\EtlRedCapProject;
 use IU\REDCapETL\Database\DbConnectionFactory;
@@ -38,7 +38,7 @@ try {
     # Check for test mode (which should only be used for development)
     #-------------------------------------------------------------------
     $testMode = false;
-    if (@file_exists(__DIR__.'/../test-config.ini')) {
+    if (@file_exists(__DIR__ . '/../test-config.ini')) {
         $testMode = true;
     }
 
@@ -51,9 +51,9 @@ try {
     }
 
     $selfUrl = $module->getUrl('web/workflow_global_properties.php')
-                   .'&workflowName='.Filter::escapeForUrlParameter($workflowName);
+                   . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
     $workflowUrl = $module->getUrl('web/workflow_configure.php')
-                       .'&workflowName='.Filter::escapeForUrlParameter($workflowName);
+                       . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
     $workflowsUrl = $module->getUrl('web/workflows.php');
     $configureUrl = $module->getUrl('web/configure.php');
 
@@ -93,26 +93,28 @@ try {
         $properties[Configuration::DB_CONNECTION] = null;
         try {
             if (strcasecmp($submitValue, 'Cancel') === 0) {
-                header('Location: '.$workflowUrl);
+                header('Location: ' . $workflowUrl);
             } elseif (strcasecmp($submitValue, 'Save') === 0) {
                 if (empty($warning) && empty($error)) {
                     $configuration->validate($isWorkflowGlobalProperties);
-                    $module->setWorkflowGlobalProperties($workflowName, $properties, USERID);  // Save configuration to database
+                    // Save configuration to database
+                    $module->setWorkflowGlobalProperties($workflowName, $properties, USERID);
                 }
             } elseif (strcasecmp($submitValue, 'Save and Exit') === 0) {
                 if (empty($warning) && empty($error)) {
                     $configuration->validate($isWorkflowGlobalProperties);
-                    $module->setWorkflowGlobalProperties($workflowName, $properties, USERID);  // Save configuration to database
-                    $location = 'Location: '.$workflowUrl;
+                    // Save configuration to database
+                    $module->setWorkflowGlobalProperties($workflowName, $properties, USERID);
+                    $location = 'Location: ' . $workflowUrl;
                     header($location);
                 }
-            } 
+            }
         } catch (\Exception $exception) {
-            $error = 'ERROR: '.$exception->getMessage();
+            $error = 'ERROR: ' . $exception->getMessage();
         }
     }  // END - if configuration is not empty
 } catch (\Exception $exception) {
-    $error = 'ERROR: '.$exception->getMessage();
+    $error = 'ERROR: ' . $exception->getMessage();
 }
 ?>
 
@@ -125,8 +127,8 @@ ob_start();
 require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 $buffer = ob_get_clean();
 $cssFile = $module->getUrl('resources/redcap-etl.css');
-$link = '<link href="'.$cssFile.'" rel="stylesheet" type="text/css" media="all">';
-$buffer = str_replace('</head>', "    ".$link."\n</head>", $buffer);
+$link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="all">';
+$buffer = str_replace('</head>', "    " . $link . "\n</head>", $buffer);
 echo $buffer;
 ?>
 

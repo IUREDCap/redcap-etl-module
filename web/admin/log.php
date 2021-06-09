@@ -212,7 +212,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     if ($entry['log_type'] !== RedCapEtlModule::WORKFLOW_RUN) {
                         $projectId = $entry['project_id'];
                         $projectUrl = APP_PATH_WEBROOT . 'index.php?pid=' . (int)$projectId;
-                    } 
+                    }
                     $cron = $entry['cron'];
                     
                     $config = $entry['config'];
@@ -229,7 +229,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                                 . '&workflowName=' . Filter::escapeForUrlParameter($config)
                             );
                         }
-				    } else {
+                    } else {
                         $configUrl = $module->getURL(
                             RedCapEtlModule::USER_ETL_CONFIG_PAGE
                             . '?pid=' . Filter::escapeForUrlParameter($projectId)
@@ -247,10 +247,12 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                         . $projectUrl . '">' . $projectId . "</a></td>\n";
                     echo "<td>" . '<a href="' . $serverUrl . '">' . Filter::escapeForHtml($server) . '</a>' . "</td>\n";
                     if ($configUrl) {
-                        echo "<td>" . '<a href="' . $configUrl . '">' . Filter::escapeForHtml($config) . '</a>' . "</td>\n";
+                        echo "<td>" . '<a href="' . $configUrl . '">'
+                        . Filter::escapeForHtml($config)
+                        . '</a>' . "</td>\n";
                     } else {
                         echo "<td>" .  Filter::escapeForHtml($config) . "</td>\n";
-				    }
+                    }
                     #--------------------------------------------
                     # User info (not available for cron jobs)
                     #--------------------------------------------

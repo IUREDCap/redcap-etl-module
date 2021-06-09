@@ -390,7 +390,7 @@ class ModuleLog
             'log_format_version' => self::LOG_FORMAT_VERSION,
             'project_id'         => null,
             'etl_server'         => $serverName,
-            'config'             => 'Workflow '.$workflowName,
+            'config'             => 'Workflow ' . $workflowName,
             'cron_log_id'        => $cronLogId
         ];
 
@@ -400,5 +400,4 @@ class ModuleLog
 
         return $logId;
     }
-   
 }
