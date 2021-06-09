@@ -41,6 +41,3 @@ test-config.ini
 # Ignore web test coverage data files, except for README
 /tests/web/coverage-data/*
 !/tests/web/coverage-data/README.md
-
-# Dependencies directory
-/dependencies
