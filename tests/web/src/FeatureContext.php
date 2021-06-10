@@ -73,7 +73,8 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         # ETL server configuration
         #----------------------------------------
         print "Initializing etl servers\n";
-        $page->clickLink('ETL Servers');
+        #$page->clickLink('ETL Servers');
+        $page->clickLink('Servers');
         EtlServersPage::followServer($session, '(embedded server)');
         $page = $session->getPage();
         $page->checkField('isActive');

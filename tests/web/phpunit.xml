@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
     <testsuites>
         <testsuite name="web">
             <file>src/ServerTest.php</file>
-            <file>src/StatusTest.php</file>
+            <file>src/StatusTest.php</file> 
         </testsuite>
     </testsuites>
 

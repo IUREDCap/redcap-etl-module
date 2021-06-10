@@ -181,65 +181,65 @@ class Configuration implements \JsonSerializable
         $this->validate($isWorkflowGlobalProperties);
 
         if (empty($this->getProperty(self::API_TOKEN_USERNAME))) {
-            throw new \Exception($preface . 'No API token specified in configuration.');
+            throw new \Exception('No API token specified in configuration.');
         }
 
         $rulesSource = $this->getProperty(self::TRANSFORM_RULES_SOURCE);
         if ($rulesSource != \IU\REDCapETL\TaskConfig::TRANSFORM_RULES_DEFAULT) {
             # If the rules source is not (dynamic) auto-generation, make sure that rules have beem specified
             if (empty($this->getProperty(self::TRANSFORM_RULES_TEXT))) {
-                throw new \Exception($preface . 'No transformation rules were specified in configuration.');
+                throw new \Exception('No transformation rules were specified in configuration.');
             }
         }
         
         if (empty($this->getProperty(self::DB_TYPE))) {
-            throw new \Exception($preface . 'No database type was specified in configuration.');
+            throw new \Exception('No database type was specified in configuration.');
         } else {
             $dbType = $this->getProperty(self::DB_TYPE);
             if ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_MYSQL) {
                 ; // OK
             } elseif ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_SQLSERVER) {
                 if (!extension_loaded('sqlsrv') || !extension_loaded('pdo_sqlsrv')) {
-                    $message = $preface . 'The extensions for running SQL Server (sqlsrv and/or pdo_sqlsrv)'
+                    $message = 'The extensions for running SQL Server (sqlsrv and/or pdo_sqlsrv)'
                         . ' have not been enabled.';
                     throw new \Exception($message);
                 }
             } elseif ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_POSTGRESQL) {
                 if (!extension_loaded('pgsql') || !extension_loaded('pdo_pgsql')) {
-                    $message = $preface . 'The extensions for running PostgreSQL (pgsql and/or pdo_pgsql)'
+                    $message = 'The extensions for running PostgreSQL (pgsql and/or pdo_pgsql)'
                         . ' have not been enabled.';
                     throw new \Exception($message);
                 }
             } else {
-                throw new \Exception($preface . 'Unrecognized database type "' . $dbType . '" specified.');
+                throw new \Exception('Unrecognized database type "' . $dbType . '" specified.');
             }
         }
 
         if (empty($this->getProperty(self::DB_HOST))) {
-            throw new \Exception($preface . 'No database host was specified in configuration.');
+            throw new \Exception('No database host was specified in configuration.');
         }
         
         if (empty($this->getProperty(self::DB_NAME))) {
-            throw new \Exception($preface . 'No database name was specified in configuration.');
+            throw new \Exception('No database name was specified in configuration.');
         }
                 
         if (empty($this->getProperty(self::DB_USERNAME))) {
-            throw new \Exception($preface . 'No database username was specified in configuration.');
+            throw new \Exception('No database username was specified in configuration.');
         }
         
         if (empty($this->getProperty(self::DB_PASSWORD))) {
-            throw new \Exception($preface . 'No database password was specified in configuration.');
+            throw new \Exception('No database password was specified in configuration.');
         }
 
         if ($this->getProperty(self::DB_FOREIGN_KEYS) && !$this->getProperty(self::DB_PRIMARY_KEYS)) {
-            throw new \Exception($preface .
+            throw new \Exception(
                 'Database foreign keys specified without database primary keys being specified.');
         }
 
         if ($this->getProperty(self::EMAIL_ERRORS) || $this->getProperty(self::EMAIL_SUMMARY)) {
             if (empty($this->getProperty(self::EMAIL_TO_LIST))) {
                 throw new \Exception(
-                    $preface . 'E-mailing of errors and/or summary specified in configuration,'
+                    'E-mailing of errors and/or summary specified in configuration,'
                     . ' but no e-mail to list address was provided.'
                 );
             }
