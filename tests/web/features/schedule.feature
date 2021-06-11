@@ -17,7 +17,7 @@ I need to be able to create, copy, rename and delete configurations
     And I follow "REDCap-ETL"
 
   Scenario: Delete existing schedule configuration (if any)
-    When I follow "ETL Configurations"
+    When I follow "ETL Tasks"
     And I delete configuration "behat-sched-test" if it exists
     Then I should not see "behat-sched-test"
     And I should not see "Error:"
@@ -40,6 +40,7 @@ I need to be able to create, copy, rename and delete configurations
 
   Scenario: Schedule configuration
     When I follow "Schedule"
+    And I select "etl" from "configureType"
     And I select "behat-sched-test" from "configName"
     And I select "(embedded server)" from "server"
     And I schedule for next hour

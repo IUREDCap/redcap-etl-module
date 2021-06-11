@@ -352,7 +352,10 @@ try {
                 $checkProperties[Configuration::EMAIL_ERRORS] = false;
                 $checkProperties[Configuration::EMAIL_SUMMARY] = false;
                 
-                $checkConfiguration = new \IU\REDCapETL\Configuration($logger, $checkProperties);
+                #$checkConfiguration = new \IU\REDCapETL\Configuration($logger, $checkProperties);
+                $checkConfiguration = new \IU\REDCapETL\TaskConfig();
+                $checkConfiguration->set($logger, $checkProperties);
+
                 $schemaGenerator = new \IU\REDCapETL\SchemaGenerator($dataProject, $checkConfiguration, $logger);
                 $rulesText = $checkConfiguration->getProperty(Configuration::TRANSFORM_RULES_TEXT);
                 list($schema, $parseResult) = $schemaGenerator->generateSchema($rulesText);

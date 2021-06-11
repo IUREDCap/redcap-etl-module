@@ -233,7 +233,8 @@ class Configuration implements \JsonSerializable
 
         if ($this->getProperty(self::DB_FOREIGN_KEYS) && !$this->getProperty(self::DB_PRIMARY_KEYS)) {
             throw new \Exception(
-                'Database foreign keys specified without database primary keys being specified.');
+                'Database foreign keys specified without database primary keys being specified.'
+            );
         }
 
         if ($this->getProperty(self::EMAIL_ERRORS) || $this->getProperty(self::EMAIL_SUMMARY)) {
