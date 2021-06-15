@@ -36,7 +36,17 @@ $etlProjectId = null;
 $username = USERID;
 $superUser = SUPER_USER;
 
-$workflowName = Filter::escapeForHtml($_GET['workflowName']);
+#$workflowName = Filter::escapeForHtml($_GET['workflowName']);
+$workflowName = Filter::stripTags($_POST['workflowName']);
+if (empty($workflowName)) {
+    $workflowName = Filter::stripTags($_GET['workflowName']);
+    if (empty($workflowName)) {
+        $workflowName = Filter::stripTags($_SESSION['workflowName']);
+    }
+}
+$_SESSION['workflowName'] = $workflowName;
+
+
 
 #Get projects that this user has access to
 $db = new RedCapDb();
@@ -44,10 +54,11 @@ $userProjects = $db->getUserProjects($username);
 $availableUserProjects = $userProjects;
 array_unshift($availableUserProjects, '');
 
-$selfUrl      = $module->getUrl('web/workflow_configure.php')
-                   . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
+$selfUrl      = $module->getUrl('web/workflow_configure.php');
+                   #. '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
 $workflowsUrl = $module->getUrl('web/workflows.php');
 $configureUrl = $module->getUrl('web/configure.php');
+$taskConfigUrl = $module->getUrl('web/task_configure.php');
 $globalPropertiesUrl = $module->getUrl('web/workflow_global_properties.php')
                    . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
 
@@ -177,13 +188,32 @@ echo $buffer;
 </div>
 
 <?php
-$module->renderProjectPageContentHeader($configureUrl, $error, $warning, $success);
+$module->renderProjectPageContentHeader($taskConfigUrl, $error, $warning, $success);
+$module->renderUserConfigSubTabs($selfUrl);
 ?>
 
 <div  style="padding: 4px; margin-bottom: 20px; border: 1px solid #ccc; background-color: #ccc;">
     <div>
-     <span style="font-weight: bold;">Workflow:</span>
-        <?php echo $workflowName ?>
+        <span style="font-weight: bold;">ETL Workflow Configuration:</span>
+
+        <?php
+        $excludeIncomplete = false;
+        $projectWorkflows = $module->getProjectAvailableWorkflows($pid, $excludeIncomplete);
+        ?>
+
+        <select name="workflowName" onchange="this.form.submit()">
+        <?php
+        foreach ($projectWorkflows as $value) {
+            if (strcmp($value, $workflowName) === 0) {
+                echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '" selected>'
+                    . Filter::escapeForHtml($value) . "</option>\n";
+            } else {
+                echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '">'
+                    . Filter::escapeForHtml($value) . "</option>\n";
+            }
+        }
+        ?>
+        </select>
      </div>
      <div>
      <span style="font-weight: bold;">Workflow Status:</span>

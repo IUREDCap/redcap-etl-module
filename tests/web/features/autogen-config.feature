@@ -115,7 +115,7 @@ I need to be able to autogenerate the transformation rules
     And I select the forms project
     And I follow "REDCap-ETL"
     And I follow "Run"
-    And I select "etl" from "configureType"
+    And I select "task" from "configType"
     And I select "behat-config-test" from "configName"
     And I select "(embedded server)" from "server"
     And I press "Run"

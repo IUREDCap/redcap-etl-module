@@ -991,7 +991,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $this->renderSubTabs($tabs, $activeUrl);
     }
     
-     /**
+    /**
      * Render sub-tabs for the admin help edit pages.
      */
     public function renderAdminHelpEditSubTabs($activeUrl = '')
@@ -1023,7 +1023,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
            . ' ETL Tasks';
 
         
-        $configUrl = $this->getUrl('web/configure.php');
+        $configUrl = $this->getUrl('web/task_configure.php');
         $configLabel = '<span style="color: #808080;" class="fas fa-cog"></span>'
            . ' Configure';
 
@@ -1073,6 +1073,28 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         
         $this->renderTabs($tabs, $activeUrl);
     }
+
+    /**
+     * Render sub-tabs for the admin help edit pages.
+     */
+    public function renderUserConfigSubTabs($activeUrl = '')
+    {
+        $taskConfigUrl = $this->getUrl(self::USER_ETL_TASK_CONFIG_PAGE);
+        $taskConfigLabel = '<span class="fas fa-cog"></span>'
+           . ' ETL Task</span>';
+
+        $workflowConfigUrl = $this->getUrl(self::WORKFLOW_CONFIG_PAGE);
+        $workflowConfigLabel = '<span class="fas fa-bars"></span>'
+           . ' ETL Workflow</span>';
+
+        $tabs = array();
+
+        $tabs[$taskConfigUrl]     = $taskConfigLabel;
+        $tabs[$workflowConfigUrl] = $workflowConfigLabel;
+
+        $this->renderSubTabs($tabs, $activeUrl);
+    }
+
 
 
     /**

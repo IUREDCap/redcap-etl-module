@@ -53,12 +53,14 @@ I need to be able to create, copy, rename and delete configurations
 
   Scenario: Run configuration
     When I follow "Run"
-    And I select "etl" from "configureType"
+    And I select "task" from "configType"
     And I select "behat-config-test" from "configName"
     And I select "(embedded server)" from "server"
     And I press "Run"
     And I wait for 4 seconds
-    Then I should see "Configuration:"
+    Then I should see "ETL Task"
+    And I should see "Run"
+    And I should see "behat-config-test"
     And I should see "Created table"
     And I should see "Number of record_ids found: 100"
     And I should see "Processing complete."

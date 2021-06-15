@@ -513,7 +513,8 @@ echo $buffer;
 
 <?php
 
-$module->renderProjectPageContentHeader($configureUrl, $error, $warning, $success);
+$module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
+$module->renderUserConfigSubTabs($selfUrl);
 ?>
 
 
@@ -524,7 +525,7 @@ $module->renderProjectPageContentHeader($configureUrl, $error, $warning, $succes
 ?>
 <form action="<?php echo $selfUrl;?>" method="post" 
       style="padding: 4px; margin-bottom: 0px; border: 1px solid #ccc; background-color: #ccc;">
-    <span style="font-weight: bold;">ETL Configuration:</span>
+    <span style="font-weight: bold;">ETL Task Configuration:</span>
     <select name="configName" onchange="this.form.submit()">
     <?php
     $values = $module->getAccessibleConfigurationNames();

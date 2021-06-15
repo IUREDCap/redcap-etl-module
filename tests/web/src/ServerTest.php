@@ -146,8 +146,8 @@ class ServerTest extends TestCase
         $element->click();
 
         $text = $page->getText();
-        $this->assertMatchesRegularExpression("/Configuration:/", $text); 
-        $this->assertMatchesRegularExpression("/Run Now/", $text); 
+        $this->assertMatchesRegularExpression("/ETL Task/", $text); 
+        $this->assertMatchesRegularExpression("/Run/", $text); 
 
         RunPage::runConfiguration(self::$session, $configName, $serverName);
         sleep(4);

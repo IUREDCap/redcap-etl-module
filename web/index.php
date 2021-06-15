@@ -108,8 +108,8 @@ $adminConfig = $module->getAdminConfig();
 $selfUrl     = $module->getUrl('web/index.php');
 $configUrl   = $module->getUrl('web/task_configure.php');
 $testUrl     = $module->getUrl('web/test.php');
-$scheduleUrl = $module->getUrl('web/task_schedule.php');
-$runUrl      = $module->getUrl('web/task_run.php');
+$scheduleUrl = $module->getUrl('web/schedule.php');
+$runUrl      = $module->getUrl('web/run.php');
 
 $userEtlProjects = $module->getUserEtlProjects();
 $projectId = $module->getProjectId();
@@ -178,8 +178,12 @@ foreach ($configurationNames as $configurationName) {
     
     $configureUrl = $configUrl . '&configName=' . Filter::escapeForUrlParameter($configurationName);
     $testingUrl = $testUrl . '&configName=' . Filter::escapeForUrlParameter($configurationName);
-    $runConfigurationUrl = $runUrl . '&configName=' . Filter::escapeForUrlParameter($configurationName);
-    $scheduleConfigUrl = $scheduleUrl . '&configName=' . Filter::escapeForUrlParameter($configurationName);
+
+    $runConfigurationUrl = $runUrl . '&configName=' . Filter::escapeForUrlParameter($configurationName)
+        . '&configType=task';
+
+    $scheduleConfigUrl = $scheduleUrl . '&configName=' . Filter::escapeForUrlParameter($configurationName)
+        . '&configType=task';
 
     $configuration = $module->getConfiguration($configurationName);
     $exportRight = $module->getConfigurationExportRight($configuration);

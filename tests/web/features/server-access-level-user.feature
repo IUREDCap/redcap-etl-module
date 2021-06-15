@@ -58,7 +58,7 @@ Feature: Server access level management
   Scenario: Log in a user who has been allowed private-level access and verify the correct servers are listed on the Run tab
     And I log in as user and access REDCap-ETL for test project
     And I follow "Run"
-    And I select "etl" from "configureType"
+    And I select "task" from "configType"
     Then the "#serverId" element should contain "(embedded server)"
     And the "#serverId" element should contain "local-server"
     But the "#serverId" element should not contain "admin-test"
@@ -67,7 +67,7 @@ Feature: Server access level management
   Scenario: Log in a user who has been allowed private-level access and verify the correct servers are listed on the Schedule tab
     When I log in as user and access REDCap-ETL for test project
     And I follow "Schedule"
-    And I select "etl" from "configureType"
+    And I select "task" from "configType"
     Then the "#serverId" element should contain "(embedded server)"
     And the "#serverId" element should contain "local-server"
     But the "#serverId" element should not contain "admin-test"
@@ -80,7 +80,7 @@ Feature: Server access level management
     And I select the test project
     And I follow "REDCap-ETL"
     And I follow "Run"
-    And I select "etl" from "configureType"
+    And I select "task" from "configType"
     Then the "#serverId" element should contain "(embedded server)"
     And the "#serverId" element should contain "local-server"
     And the "#serverId" element should contain "admin-test"
@@ -93,7 +93,7 @@ Feature: Server access level management
     And I select the test project
     And I follow "REDCap-ETL"
     And I follow "Schedule"
-    And I select "etl" from "configureType"
+    And I select "task" from "configType"
     Then the "#serverId" element should contain "(embedded server)"
     And the "#serverId" element should contain "local-server"
     And the "#serverId" element should contain "admin-test"

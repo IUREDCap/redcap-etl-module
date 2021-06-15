@@ -40,13 +40,13 @@ I need to be able to create, copy, rename and delete configurations
 
   Scenario: Schedule configuration
     When I follow "Schedule"
-    And I select "etl" from "configureType"
+    And I select "task" from "configType"
     And I select "behat-sched-test" from "configName"
     And I select "(embedded server)" from "server"
     And I schedule for next hour
     And I press "Save"
     And I wait for 4 seconds
-    Then I should see "Configuration:"
-    And I should see "Server:"
+    Then I should see "Save"
+    And I should see "ETL Server"
     And I should see "(embedded server)"
     

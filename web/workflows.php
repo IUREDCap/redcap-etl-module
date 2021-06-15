@@ -128,8 +128,8 @@ $adminConfig   = $module->getAdminConfig();
 $selfUrl       = $module->getUrl('web/workflows.php');
 $configUrl     = $module->getUrl('web/workflow_configure.php');
 $testUrl       = $module->getUrl('web/test.php');
-$scheduleUrl   = $module->getUrl('web/workflow_schedule.php');
-$runUrl        = $module->getUrl('web/workflow_run.php');
+$scheduleUrl   = $module->getUrl('web/schedule.php');
+$runUrl        = $module->getUrl('web/run.php');
 
 $userEtlProjects = $module->getUserEtlProjects();
 $projectId = $module->getProjectId();
@@ -224,7 +224,8 @@ foreach ($workflowNames as $workflowName) {
     #--------------------------------------------------------------------------------------
     if ($adminConfig->getAllowOnDemand()) {
         if ($hasPermissionToExport) {
-            $runConfigurationUrl = $runUrl . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
+            $runConfigurationUrl = $runUrl . '&workflowName=' . Filter::escapeForUrlParameter($workflowName)
+                . '&configType=workflow';
             echo '<td style="text-align:center;">'
                 . '<a href="' . $runConfigurationUrl . '"><img src="' . APP_PATH_IMAGES
                 . 'application_go.png" alt="RUN"></a>'
@@ -242,7 +243,8 @@ foreach ($workflowNames as $workflowName) {
     #--------------------------------------------------------------------------------------
     if ($adminConfig->getAllowCron()) {
         if ($hasPermissionToExport) {
-            $scheduleConfigurationUrl = $scheduleUrl . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
+            $scheduleConfigurationUrl = $scheduleUrl . '&workflowName=' . Filter::escapeForUrlParameter($workflowName)
+                . '&configType=workflow';
             echo '<td style="text-align:center;">'
                 . '<a href="' . $scheduleConfigurationUrl . '"><img src="' . APP_PATH_IMAGES
                 . 'clock_frame.png" alt="SCHEDULE"></a>'

@@ -103,6 +103,7 @@ class ServerConfig implements \JsonSerializable
                 case 'isActive':
                 case 'dbSsl':
                 case 'dbSslVerify':
+                    # NOTE: THESE CHANGES MESS UP OTHER STUFF:
                     # changed value assignment to '' instead of false
                     # because redcap-etl WorkflowConfig evaluated boolean
                     # false as true for some reason. For instance, an error
@@ -111,14 +112,14 @@ class ServerConfig implements \JsonSerializable
                     # was processed correctly by redcap-etl WorkflowConfig
                     # and no error was generated.
                     if (!array_key_exists($var, $properties)) {
-                        #$this->$var = false;
-                        $this->$var = '';
+                        $this->$var = false;
+                        ###$this->$var = '';
                     } else {
                         if ($properties[$var]) {
                             $this->$var = true;
                         } else {
-                            #$this->$var = false;
-                            $this->$var = '';
+                            $this->$var = false;
+                            ###$this->$var = '';
                         }
                     }
                     break;
