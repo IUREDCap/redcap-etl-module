@@ -115,6 +115,7 @@ I need to be able to autogenerate the transformation rules
     And I select the forms project
     And I follow "REDCap-ETL"
     And I follow "Run"
+    And I select "etl" from "configureType"
     And I select "behat-config-test" from "configName"
     And I select "(embedded server)" from "server"
     And I press "Run"
@@ -125,6 +126,6 @@ I need to be able to autogenerate the transformation rules
     But I should not see "Created table 'registration'"
 
  Scenario: Cleanup by delete configuration
-    When I follow "ETL Configurations"
+    When I follow "ETL Tasks"
     And I delete configuration "behat-config-test"
 

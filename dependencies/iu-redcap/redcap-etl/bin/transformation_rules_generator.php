@@ -148,7 +148,7 @@ try {
     $logger = new Logger($argv[0]);
     $redCapEtl = new RedCapEtl($logger, $configurationFile);
 
-    $configuration = $redCapEtl->getConfiguration();
+    $configuration = $redCapEtl->getTaskConfig(0);
     $addCompleteFields         = $addCompleteFields         || $configuration->getAutogenIncludeCompleteFields();
     $addDagFields              = $addDagFields              || $configuration->getAutogenIncludeDagFields();
     $addFileFields             = $addFileFields             || $configuration->getAutogenIncludeFileFields();
@@ -165,7 +165,9 @@ try {
         $nonRepeatingFieldsTable = '';
     }
 
-    $rules = $redCapEtl->autoGenerateRules(
+    $task = $redCapEtl->getTask(0);
+
+    $rules = $task->autoGenerateRules(
         $addCompleteFields,
         $addDagFields,
         $addFileFields,

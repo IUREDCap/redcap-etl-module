@@ -58,7 +58,7 @@ class ServerTest extends TestCase
         $this->runEtlOnRemoteServer($serverName);
     }
 
-    public function testServerWithSshKeyAuthentication()
+/*    public function testServerWithSshKeyAuthentication()
     {
         $serverName = 'ssh_key_authentication';
 
@@ -74,7 +74,7 @@ class ServerTest extends TestCase
 
         $this->runEtlOnRemoteServer($serverName);
     }
-
+*/
     public function configureEtlServer($serverName)
     {
         $serverConfig = self::$testConfig->getServerConfig($serverName);
@@ -128,7 +128,7 @@ class ServerTest extends TestCase
         $page = self::$session->getPage();
 
         # Need to create configuration
-        $page->clickLink('ETL Configurations');
+        $page->clickLink('ETL Tasks');
         $configName = 'remote-server-test';
         EtlConfigsPage::deleteConfigurationIfExists(self::$session, $configName);
         EtlConfigsPage::addConfiguration(self::$session, $configName);
@@ -138,7 +138,13 @@ class ServerTest extends TestCase
         ConfigurePage::configureConfiguration(self::$session, 'behat');
 
 
-        $page->clickLink('Run');
+        #$page->clickLink('Run');
+        $page->clickLink('ETL Tasks');
+        # Find the table row where the first element matches the configuration name,
+        # and then get the 2nd column element (the 'Run' icon') and click it
+        $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[2]");
+        $element->click();
+
         $text = $page->getText();
         $this->assertMatchesRegularExpression("/Configuration:/", $text); 
         $this->assertMatchesRegularExpression("/Run Now/", $text); 

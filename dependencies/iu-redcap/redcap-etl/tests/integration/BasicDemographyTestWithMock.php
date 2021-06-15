@@ -18,7 +18,7 @@ class BasicDemographyTestWithMock extends TestCase
 
     const CONFIG_FILE = __DIR__.'/../config/basic-demography.ini';
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
     }
 
@@ -32,7 +32,7 @@ class BasicDemographyTestWithMock extends TestCase
             $redCapEtl = new RedCapEtl(self::$logger, self::CONFIG_FILE, 'IU\REDCapETL\BasicDemographyProjectMock');
             $this->assertNotNull($redCapEtl, 'redCapEtl not null');
 
-            $config = $redCapEtl->getConfiguration();
+            $config = $redCapEtl->getTaskConfig(0);
             $this->assertNotNull($config, 'redCapEtl configuration not null');
 
             self::$csvDir = str_ireplace('CSV:', '', $config->getDbConnection());
@@ -40,8 +40,8 @@ class BasicDemographyTestWithMock extends TestCase
                 self::$csvDir .= DIRECTORY_SEPARATOR;
             }
             
-            self::$csvFile      = self::$csvDir . 'Demography.csv';
-            self::$csvLabelFile = self::$csvDir . 'Demography'.$config->getlabelViewSuffix().'.csv';
+            self::$csvFile      = self::$csvDir . 'basic_demography.csv';
+            self::$csvLabelFile = self::$csvDir . 'basic_demography'.$config->getlabelViewSuffix().'.csv';
             # Try to delete the output file in case it exists from a previous run
             if (file_exists(self::$csvFile)) {
                 unlink(self::$csvFile);
@@ -50,7 +50,7 @@ class BasicDemographyTestWithMock extends TestCase
             #----------------------------------------------
             # Test the data project
             #----------------------------------------------
-            $dataProject = $redCapEtl->getDataProject();
+            $dataProject = $redCapEtl->getDataProject(0);
             $this->assertNotNull($dataProject, 'data project not null');
             
             $isLongitudinal = $dataProject->isLongitudinal();
@@ -77,7 +77,7 @@ class BasicDemographyTestWithMock extends TestCase
         $expectedCsv = $parser2->parse();
 
         $header = $csv[0];
-        $this->assertEquals($header[1], 'record_id', 'Record id header test.');
+        $this->assertEquals($header[2], 'record_id', 'Record id header test.');
         $this->assertEquals(101, count($csv), 'Demography row count check.');
 
         $this->assertEquals($expectedCsv, $csv, 'CSV file check.');

@@ -1,3 +1,8 @@
+<!-- =================================================
+Copyright (C) 2019 The Trustees of Indiana University
+SPDX-License-Identifier: BSD-3-Clause
+================================================== -->
+
 REDCap-ETL Developer Guide
 ======================================
 
@@ -72,10 +77,17 @@ works.
     To create the a database, schema and user that match the values in the test configuration file, use:
 
         create database etl_test;
+        \connection etl_test
         create schema etl_test;
 
         create user etl_user with password 'etlPassword';
         grant all privileges on database etl_test to etl_user;
+        grant usage on schema etl_test to etl_user;
+        grant create on schema etl_test to etl_user;
+
+    To test the account created:
+
+        psql -U etl_user -h localhost -d etl_test -W
 
 
 8. **Install SQL Server**
@@ -104,6 +116,15 @@ works.
     In the top-level directory where the code was downloaded, run:
 
         composer install
+
+12. **Install phpDocumentor**
+
+    Install [phpDocumentor](https://phpdoc.org/), which is used for
+    generating API documentation from PHPDoc comments in the code.
+    It should be set up so that it can be run from the command line using:
+
+        phpdoc
+
 
 ### REDCap-ETL Directory Structure
 
@@ -236,8 +257,7 @@ in the steps for setting up integration tests, then you need to do that now.
 __SQLite Database Setup.__ You need to create SQLite test databases. Use the following commands
 
     cd tests/output
-    sqlite3 repeating-events.db
-    sqlite3 visits.db
+    sqlite3 sqliteTest.db
 
 When in the sqlite shell from executing the above sqlite3 commands, enter the following:
 
@@ -355,16 +375,20 @@ in GitHub.
 To generate the API documentation, execute the following command in the
 top-level REDCap-ETL directory:
 
-    ./vendor/bin/apigen generate
+    phpdoc
     
-To view the API documentation, open the following file with a web browser:
+To view the API documentation, open the following file (relative to the
+top-level REDCap-ETL directory) with a web browser:
 
     ./docs/api/index.html
 
-Note that the version of apigen used does not appear to work 
-with PHP 7.2.
+The configuration information for the phpdoc command is in the following file
+in the top-level REDCap-ETL directory:
+
+    phpdoc.xml
 
 ---
+
 
 Modifying the Code
 ------------------------------
@@ -388,8 +412,30 @@ to check for coding standards compliance:
 The coding standards checks that are done (by default) are configured in the file __phpcs.xml__ in the top-level directory.
 
 
+Updating Dependencies
+--------------------------
+To avoid requiring Composer to be run when the REDCap-ETL is installed, the non-development dependencies
+are copied to the __dependencies/__ directory, and this directory is committed to Git.
+To update the contents of this directory, the following commands
+can be used from the top-level directory:
 
-### REDCap-ETL Software Architecture
+    composer update
+    composer install --no-dev
+    rm -rf dependencies
+    mv vendor dependencies
+    composer install
+
+To check for out of date dependencies, use:
+
+    composer outdated --direct
+
+The "--direct" option above only checks dependencies directly used by REDCap-ETL (i.e., specified in the
+composer.json file).
+
+
+
+REDCap-ETL Software Architecture
+----------------------------------------
 
 For more information, see: [REDCap-ETL Software Architecture](SoftwareArchitecture.md)
 
@@ -410,4 +456,71 @@ do the following:
 
 ![REDCap-ETL Database Connection Classes](redcap-etl-db-connections.png)
 
+
+ETL Configuration Formats
+--------------------------------
+
+REDCap-ETL supports 3 different ETL configuration formats:
+
+1. **Array** - a PHP array with configuration data is passed to REDCap-ETL. This format is for
+programmatic access to REDCap-ETL. Specific uses include automated
+testing and use by the [REDCap-ETL External Module](https://github.com/IUREDCap/redcap-etl-module/)
+to pass data to its embedded REDCap-ETL server. The array format corresponds to the array format generated
+by calling PHP's parse_ini_file on an INI ETL configuration file.
+2. **INI** - the path of a ".ini" file is passed to REDCap-ETL. This format is intended for use
+by users of REDCap-ETL.
+3. **JSON** - the path of a ".json" file is passed to REDCap-ETL. This format is intended for programmatic
+use, although it could be used by users.
+
+Notes:
+* The task_config property can only be represented correctly in the array and JSON formats.
+* Only the JSON format can represent task names that are the same as REDCap-ETL configuration
+    property names.
+
+### JSON Configuration Format
+
+The JSON format supports the complete specification
+of a configuration, including transformation rules and pre and post-processing SQL, in a single file, 
+which is not possible with the INI format.
+
+Examples of the JSON format can be seen in the .json files in the tests/config-init/ directory.
+Below is an example of a very simple JSON configuration file for a single task
+that uses the auto-generation feature for transformation rules generation (transform_rules_source = 3).
+
+```json
+{
+    "redcap_api_url" : "http://localhost/redcap/api/",
+    "data_source_api_token" : "1235ABCA87862FF0318837CC05721348",
+    "transform_rules_source": "3",
+    "db_connection": "MySQL:127.0.0.1:etl_user:etl_password:etl_db"
+}
+```
+
+The basic structure of a JSON workflow configuration is shown below. In this example
+"task1" and "task2" are the task names for the workflow, and they can be set to arbitrary values.
+The "workflow", "global_properties" and "tasks" labels are in effect keywords that must
+appear as shown. Each property defined in "global_properties" will apply to all tasks that
+do not explicitly override the property. The "workflow_name" property can only appear in
+the "global_properties" and is required.
+
+    {
+        "workflow": {
+            "global_properties": {
+                "workflow_name": "workflow1",
+                "batch_size": 10,
+                ...
+            },
+            "tasks": {
+                "task1": {
+                    "redcap_api_url": "http://localhost/redcap/api/",
+                    "data_source_api_token": "11347CC74A8B98AC31BA9F78215814968",
+                    ...
+                },
+                "task2": {
+                    ...
+                },
+    
+            }
+        }
+    }
 

@@ -45,7 +45,7 @@ I need to be able to create, copy, rename and delete configurations
     Then I follow "Home"
 
   Scenario: Delete configuration
-    When I follow "ETL Configurations"
+    When I follow "ETL Tasks"
     And I press "deleteConfig1"
     And I press "Delete configuration"
     Then I should not see "behat-test"

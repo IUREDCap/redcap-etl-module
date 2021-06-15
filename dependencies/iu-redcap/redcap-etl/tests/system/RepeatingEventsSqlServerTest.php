@@ -23,7 +23,7 @@ class RepeatingEventsSqlServerTest extends RepeatingEventsTests
     protected static $dbh;
     protected static $logger;
 
-    public function setUp()
+    public function setUp(): void
     {
         # These tests depend on the pdo_sqlsrv driver being installed and
         # the configuration file existing.
@@ -35,13 +35,14 @@ class RepeatingEventsSqlServerTest extends RepeatingEventsTests
         }
     }
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
 
         self::$logger = new Logger('repeating_events_system_test_sql_server');
 
         if (extension_loaded('pdo_sqlsrv') && file_exists(self::CONFIG_FILE)) {
-            $configuration = new Configuration(self::$logger, self::CONFIG_FILE);
+            $configuration = new TaskConfig();
+            $configuration->set(self::$logger, self::CONFIG_FILE);
 
             $dbConnection = $configuration->getDbConnection();
             list($dbType, $dbString) = DbConnectionFactory::parseConnectionString($dbConnection);

@@ -19,12 +19,17 @@ class SqliteDbConnection extends PdoDbConnection
 {
     const AUTO_INCREMENT_TYPE = 'INTEGER PRIMARY KEY';
 
+    private $id;
+
     public function __construct($dbString, $ssl, $sslVerify, $caCertFile, $tablePrefix, $labelViewSuffix)
     {
         parent::__construct($dbString, $ssl, $sslVerify, $caCertFile, $tablePrefix, $labelViewSuffix);
 
         // Initialize error string
         $this->errorString = '';
+
+        $idValues = array(DbConnectionFactory::DBTYPE_SQLITE, $dbString);
+        $this->id = DbConnection::createConnectionString($idValues);
 
         $this->db = self::getPdoConnection($dbString);
     }
@@ -52,6 +57,25 @@ class SqliteDbConnection extends PdoDbConnection
             throw new EtlException($message, $code);
         }
         return $pdoConnection;
+    }
+
+    public function getTableColumnNames($tableName)
+    {
+        $columnNames = array();
+
+        $query = "PRAGMA table_info('{$tableName}')";
+
+        $statement = $this->db->prepare($query);
+        $statement->execute();
+
+        $columnNames = $statement->fetchAll(\PDO::FETCH_COLUMN, 1);
+
+        return $columnNames;
+    }
+
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**

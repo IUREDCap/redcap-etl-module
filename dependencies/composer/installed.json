@@ -1,17 +1,17 @@
 [
     {
         "name": "iu-redcap/phpcap",
-        "version": "1.0.5",
-        "version_normalized": "1.0.5.0",
+        "version": "1.1.1",
+        "version_normalized": "1.1.1.0",
         "source": {
             "type": "git",
             "url": "https://github.com/IUREDCap/phpcap.git",
-            "reference": "e557781aa4cfae8c4531d3e2cd81b078714d6c2a"
+            "reference": "1659f843ccf84f037df925eeb2f533287f272741"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/IUREDCap/phpcap/zipball/e557781aa4cfae8c4531d3e2cd81b078714d6c2a",
-            "reference": "e557781aa4cfae8c4531d3e2cd81b078714d6c2a",
+            "url": "https://api.github.com/repos/IUREDCap/phpcap/zipball/1659f843ccf84f037df925eeb2f533287f272741",
+            "reference": "1659f843ccf84f037df925eeb2f533287f272741",
             "shasum": ""
         },
         "require": {
@@ -20,13 +20,12 @@
             "php": ">=5.6.0"
         },
         "require-dev": {
-            "apigen/apigen": "v4.1.2",
-            "erusev/parsedown": "1.6.2",
+            "erusev/parsedown": "1.7.4",
             "kzykhys/php-csv-parser": "1.4.1",
-            "phpunit/phpunit": "6.5.8",
-            "squizlabs/php_codesniffer": "3.2.3"
+            "phpunit/phpunit": "9.5.4",
+            "squizlabs/php_codesniffer": "3.6.0"
         },
-        "time": "2019-10-01T13:28:17+00:00",
+        "time": "2021-04-22T14:26:17+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -45,33 +44,32 @@
     },
     {
         "name": "iu-redcap/redcap-etl",
-        "version": "1.5.9",
-        "version_normalized": "1.5.9.0",
+        "version": "2.0.6",
+        "version_normalized": "2.0.6.0",
         "source": {
             "type": "git",
             "url": "https://github.com/IUREDCap/redcap-etl.git",
-            "reference": "6a43e5f70c617027b8c11dc44086ce38677dfb69"
+            "reference": "19a6b51eab1cddd79d3de0f70b52bb9695b2f815"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/6a43e5f70c617027b8c11dc44086ce38677dfb69",
-            "reference": "6a43e5f70c617027b8c11dc44086ce38677dfb69",
+            "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/19a6b51eab1cddd79d3de0f70b52bb9695b2f815",
+            "reference": "19a6b51eab1cddd79d3de0f70b52bb9695b2f815",
             "shasum": ""
         },
         "require": {
             "ext-curl": "*",
             "ext-dom": "*",
             "ext-openssl": "*",
-            "iu-redcap/phpcap": "1.0.5",
+            "iu-redcap/phpcap": "1.1.1",
             "php": ">=5.6.0"
         },
         "require-dev": {
-            "apigen/apigen": "v4.1.2",
             "kzykhys/php-csv-parser": "1.4.1",
-            "phpunit/phpunit": "6.5.8",
-            "squizlabs/php_codesniffer": "3.2.3"
+            "phpunit/phpunit": "9.5.4",
+            "squizlabs/php_codesniffer": "3.6.0"
         },
-        "time": "2020-12-14T14:27:05+00:00",
+        "time": "2021-05-28T14:23:44+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {

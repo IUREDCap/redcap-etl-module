@@ -80,6 +80,7 @@ abstract class RepeatingEventsTests extends TestCase
         $sql = 'SELECT '
             .' re_all_visits_id '
             .', enrollment_id '
+            .', redcap_data_source '
             .', record_id '
             .', redcap_event_name '
             .', redcap_repeat_instrument '
@@ -109,6 +110,9 @@ abstract class RepeatingEventsTests extends TestCase
 
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 
+        SystemTestsUtil::convertMapValues($expectedData);
+        SystemTestsUtil::convertMapValues($actualData);
+
         $this->assertEquals($expectedData, $actualData);
     }
 
@@ -117,6 +121,7 @@ abstract class RepeatingEventsTests extends TestCase
         $sql = 'SELECT '
             .' re_baseline_id '
             .', enrollment_id '
+            .', redcap_data_source '
             .', record_id '
             .', redcap_event_name '
             .", ".static::WEIGHT_TIME_FIELD_DECLARATION." "
@@ -143,6 +148,9 @@ abstract class RepeatingEventsTests extends TestCase
 
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 
+        SystemTestsUtil::convertMapValues($expectedData);
+        SystemTestsUtil::convertMapValues($actualData);
+
         $this->assertEquals($expectedData, $actualData);
     }
 
@@ -152,6 +160,7 @@ abstract class RepeatingEventsTests extends TestCase
         $sql = 'SELECT '
             .' re_baseline_and_home_visits_id '
             .', enrollment_id '
+            .', redcap_data_source '
             .', record_id '
             .', redcap_event_name '
             .', redcap_repeat_instrument '
@@ -180,6 +189,9 @@ abstract class RepeatingEventsTests extends TestCase
 
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 
+        SystemTestsUtil::convertMapValues($expectedData);
+        SystemTestsUtil::convertMapValues($actualData);
+
         $this->assertEquals($expectedData, $actualData);
     }
 
@@ -189,6 +201,7 @@ abstract class RepeatingEventsTests extends TestCase
         $sql = 'SELECT '
             .' re_baseline_and_visits_id '
             .', enrollment_id '
+            .', redcap_data_source '
             .', record_id '
             .', redcap_event_name '
             .', redcap_repeat_instance '
@@ -214,6 +227,9 @@ abstract class RepeatingEventsTests extends TestCase
         $parser2 = \KzykHys\CsvParser\CsvParser::fromFile(self::TEST_DATA_DIR.'re_baseline_and_visits.csv');
         $expectedData = $parser2->parse();
 
+        SystemTestsUtil::convertMapValues($expectedData);
+        SystemTestsUtil::convertMapValues($actualData);
+
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 
         $this->assertEquals($expectedData, $actualData);
@@ -222,7 +238,8 @@ abstract class RepeatingEventsTests extends TestCase
     public function checkEnrollmentTable()
     {
         $sql = 'SELECT '
-            .' enrollment_id, record_id, registration_date, first_name, last_name, '
+            .' enrollment_id, redcap_data_source, record_id, '
+            .' registration_date, first_name, last_name, '
             .' birthdate, registration_age, gender, '
             .' race___0, race___1, race___2, race___3, race___4, race___5'
             .' FROM re_enrollment '
@@ -242,7 +259,8 @@ abstract class RepeatingEventsTests extends TestCase
     public function checkEnrollmentView()
     {
         $sql = 'SELECT '
-            .' enrollment_id, record_id, registration_date, first_name, last_name, '
+            .' enrollment_id, redcap_data_source, record_id, '
+            .' registration_date, first_name, last_name, '
             .' birthdate, registration_age, gender, '
             .' race___0, race___1, race___2, race___3, race___4, race___5'
             .' FROM re_enrollment_label_view '
@@ -264,6 +282,7 @@ abstract class RepeatingEventsTests extends TestCase
         $sql = 'SELECT '
             .' re_home_cardiovascular_visits_id '
             .', enrollment_id '
+            .', redcap_data_source'
             .', record_id '
             .', redcap_event_name '
             .', redcap_repeat_instrument '
@@ -297,6 +316,7 @@ abstract class RepeatingEventsTests extends TestCase
         $sql = 'SELECT '
             .' re_home_weight_visits_id '
             .', enrollment_id '
+            .', redcap_data_source'
             .', record_id '
             .', redcap_event_name '
             .', redcap_repeat_instrument '
@@ -315,6 +335,9 @@ abstract class RepeatingEventsTests extends TestCase
 
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 
+        SystemTestsUtil::convertMapValues($expectedData);
+        SystemTestsUtil::convertMapValues($actualData);
+
         $this->assertEquals($expectedData, $actualData);
     }
 
@@ -323,6 +346,7 @@ abstract class RepeatingEventsTests extends TestCase
         $sql = 'SELECT '
             .' re_visits_id '
             .', enrollment_id '
+            .', redcap_data_source'
             .', record_id '
             .', redcap_event_name '
             .', redcap_repeat_instance '
@@ -348,6 +372,9 @@ abstract class RepeatingEventsTests extends TestCase
         $parser2 = \KzykHys\CsvParser\CsvParser::fromFile(self::TEST_DATA_DIR.'re_visits.csv');
         $expectedData = $parser2->parse();
 
+        SystemTestsUtil::convertMapValues($expectedData);
+        SystemTestsUtil::convertMapValues($actualData);
+
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 
         $this->assertEquals($expectedData, $actualData);
@@ -359,6 +386,7 @@ abstract class RepeatingEventsTests extends TestCase
         $sql = 'SELECT '
             .' re_visits_and_home_visits_id '
             .', enrollment_id '
+            .', redcap_data_source'
             .', record_id '
             .', redcap_event_name '
             .', redcap_repeat_instrument '
@@ -388,6 +416,9 @@ abstract class RepeatingEventsTests extends TestCase
         $expectedData = $parser2->parse();
 
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
+
+        SystemTestsUtil::convertMapValues($expectedData);
+        SystemTestsUtil::convertMapValues($actualData);
 
         $this->assertEquals($expectedData, $actualData);
     }

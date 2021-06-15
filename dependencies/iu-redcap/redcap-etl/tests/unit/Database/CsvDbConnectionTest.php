@@ -117,7 +117,7 @@ class CsvDbConnectionTest extends TestCase
         $this->assertEquals($result, $expected, 'CsvDbConnection createTable successful return check');
 
         #Check to see if a file was actually created.
-        $newFile = $this->dbString . $rootTable->name . CsvDbConnection::FILE_EXTENSION;
+        $newFile = $this->dbString . $rootTable->getName() . CsvDbConnection::FILE_EXTENSION;
         $this->assertFileExists($newFile, 'CsvDbConnection createTable new file exists check');
 
         #Verify header was created as expected.
@@ -243,7 +243,7 @@ class CsvDbConnectionTest extends TestCase
         ];
         $fileContentsOK = true;
 
-        $newFile = $this->dbString . $rootTable->name . CsvDbConnection::FILE_EXTENSION;
+        $newFile = $this->dbString . $rootTable->getName() . CsvDbConnection::FILE_EXTENSION;
         $i = 0;
         $lines = file($newFile);
         foreach ($lines as $line) {
@@ -272,7 +272,7 @@ class CsvDbConnectionTest extends TestCase
         $tablePrefix = null;
         $tableName = 'insertRows';
         $keyType = new FieldTypeSpecifier(FieldType::INT, null);
-        $lookupTable = new LookupTable($lookupChoices, $tablePrefix, $keyType);
+        $lookupTable = new LookupTable($lookupChoices, $keyType);
 
         $fieldName1 = 'sex';
         $lookupTable->addLookupField($tableName, $fieldName1);
@@ -323,7 +323,7 @@ class CsvDbConnectionTest extends TestCase
             FieldType::INT,
             null
         );
-        $field7->usesLookup = 'sex';
+        $field7->setUsesLookup('sex');
         $rootTable1->addField($field7);
 
         $field8 = new Field(
@@ -331,7 +331,7 @@ class CsvDbConnectionTest extends TestCase
             FieldType::INT,
             null
         );
-        $field8->usesLookup = 'exercises___0';
+        $field8->setUsesLookup('exercises___0');
         $rootTable1->addField($field8);
 
         $field9 = new Field(
@@ -339,7 +339,7 @@ class CsvDbConnectionTest extends TestCase
             FieldType::CHECKBOX,
             null
         );
-        $field9->usesLookup = 'exercises___1';
+        $field9->setUsesLookup('exercises___1');
         $rootTable1->addField($field9);
 
         $fielda = new Field(
@@ -347,7 +347,7 @@ class CsvDbConnectionTest extends TestCase
             FieldType::CHECKBOX,
             null
         );
-        $fielda->usesLookup = 'exercises___2';
+        $fielda->setUsesLookup('exercises___2');
         $rootTable1->addField($fielda);
 
         $fieldb = new Field(
@@ -355,7 +355,7 @@ class CsvDbConnectionTest extends TestCase
             FieldType::VARCHAR,
             null
         );
-        $fieldb->usesLookup = 'employment_status';
+        $fieldb->setUsesLookup('employment_status');
         $rootTable1->addField($fieldb);
 
         # Insert two rows into the table object
@@ -411,7 +411,7 @@ class CsvDbConnectionTest extends TestCase
         ];
         $fileContentsOK = true;
 
-        $newFile = $this->dbString . $rootTable1->name . $labelViewSuffix . CsvDbConnection::FILE_EXTENSION;
+        $newFile = $this->dbString . $rootTable1->getName() . $labelViewSuffix . CsvDbConnection::FILE_EXTENSION;
         $i = 0;
         $lines = file($newFile);
         foreach ($lines as $line) {
@@ -563,7 +563,7 @@ class CsvDbConnectionTest extends TestCase
         $this->assertNull($result, 'CsvDbConnection replaceTable successful return check');
         
         #Check to see if a file was actually created.
-        $newFile = $this->dbString . $rootTable->name . $labelViewSuffix . CsvDbConnection::FILE_EXTENSION;
+        $newFile = $this->dbString . $rootTable->getName() . $labelViewSuffix . CsvDbConnection::FILE_EXTENSION;
         $this->assertFileExists($newFile, 'CsvDbConnection replaceLookupView file exists check');
 
         #Verify header was created as expected.
@@ -622,7 +622,7 @@ class CsvDbConnectionTest extends TestCase
 
         # run the createTable method to create the file so that it exists
         $csvDbConnection->createTable($rootTable, false);
-        $fileName = $this->dbString . $rootTable->name . CsvDbConnection::FILE_EXTENSION;
+        $fileName = $this->dbString . $rootTable->getName() . CsvDbConnection::FILE_EXTENSION;
         $fileCreationTime = filemtime($fileName);
 
         # Execute the tests for this method
@@ -692,7 +692,7 @@ class CsvDbConnectionTest extends TestCase
 
         # run the createTable method to create the file
         $csvDbConnection->createTable($rootTable, false);
-        $fileName = $this->dbString . $rootTable->name . CsvDbConnection::FILE_EXTENSION;
+        $fileName = $this->dbString . $rootTable->getName() . CsvDbConnection::FILE_EXTENSION;
 
         # Execute the tests for this method
         $rows = $rootTable->getRows();
@@ -709,7 +709,7 @@ class CsvDbConnectionTest extends TestCase
         ];
         $fileContentsOK = true;
 
-        $newFile = $this->dbString . $rootTable->name . CsvDbConnection::FILE_EXTENSION;
+        $newFile = $this->dbString . $rootTable->getName() . CsvDbConnection::FILE_EXTENSION;
 
         $i = 0;
         $lines = file($newFile);

@@ -53,6 +53,7 @@ I need to be able to create, copy, rename and delete configurations
 
   Scenario: Run configuration
     When I follow "Run"
+    And I select "etl" from "configureType"
     And I select "behat-config-test" from "configName"
     And I select "(embedded server)" from "server"
     And I press "Run"
@@ -64,24 +65,28 @@ I need to be able to create, copy, rename and delete configurations
     But I should not see "Error:"
 
   Scenario: Copy configuration
-    When I follow "ETL Configurations"
+    #When I follow "ETL Configurations"
+    When I follow "ETL Tasks"
     And I copy configuration "behat-config-test" to "behat-copy-test"
     Then I should see "behat-config-test"
     And I should see "behat-copy-test"
 
   Scenario: Rename configuration
-    When I follow "ETL Configurations"
+    #When I follow "ETL Configurations"
+    When I follow "ETL Tasks"
     And I rename configuration "behat-copy-test" to "behat-rename-test"
     Then I should see "behat-rename-test"
     But I should not see "behat-copy-test"
 
   Scenario: Delete renamed configuration
-    When I follow "ETL Configurations"
+    #When I follow "ETL Configurations"
+    When I follow "ETL Tasks"
     And I delete configuration "behat-rename-test"
     Then I should not see "behat-rename-test"
     But I should see "behat-config-test"
 
   Scenario: Delete configuration
-    When I follow "ETL Configurations"
+    #When I follow "ETL Configurations"
+    When I follow "ETL Tasks"
     And I delete configuration "behat-config-test"
     Then I should not see "behat-config-test"

@@ -301,7 +301,6 @@ class RulesGenerator
         } elseif (substr($validationType, 0, 6) === 'number') {
             # starts with 'number'
             $type = FieldType::FLOAT;
-            #$type = FieldType::VARCHAR . '(' . self::DEFAULT_VARCHAR_SIZE . ')';
         } elseif ($fieldType === 'dropdown' || $fieldType === 'radio') {
             # values for multiple choice can have letters
             $type = FieldType::VARCHAR . '(' . self::DEFAULT_VARCHAR_SIZE . ')';

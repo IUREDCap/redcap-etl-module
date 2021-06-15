@@ -9,7 +9,7 @@ namespace IU\REDCapETL\Database;
 use PHPUnit\Framework\TestCase;
 
 use IU\REDCapETL\RedCapEtl;
-use IU\REDCapETL\Configuration;
+use IU\REDCapETL\TaskConfig;
 use IU\REDCapETL\EtlException;
 use IU\REDCapETL\Logger;
 use IU\REDCapETL\LookupTable;
@@ -40,12 +40,12 @@ class SqlServerTest extends TestCase
     protected $rowsType = RowsType::ROOT;
     protected $recordidFieldName = 'recordid';
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$logger = new Logger('sqlserver_databases_system_test');
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         #These tests depend on the sqlsrv and pdo_sqlsrv drivers being installed.
         #If they are not loaded in PHP, all tests will be skipped.
@@ -104,7 +104,9 @@ class SqlServerTest extends TestCase
 
     public function testConnectorValidConnectionWithSsl()
     {
-        $configuration = new Configuration(self::$logger, self::CONFIG_FILE_SSL);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, self::CONFIG_FILE_SSL);
+
         $dbConnection = $configuration->getDbConnection();
         list($dbType, $dbString) = DbConnectionFactory::parseConnectionString($dbConnection);
  
@@ -137,7 +139,8 @@ class SqlServerTest extends TestCase
      */
     public function testSqlServerDbConnectionCreateTableWithPortAndEncryption()
     {
-        $configuration = new Configuration(self::$logger, self::CONFIG_FILE);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, self::CONFIG_FILE);
 
         $dbConnection = $configuration->getDbConnection();
         list($dbType, $dbString) = DbConnectionFactory::parseConnectionString($dbConnection);
@@ -326,12 +329,14 @@ class SqlServerTest extends TestCase
         $foreignKey = null;
         $suffix = null;
         $data = [
+            'redcap_data_source' => 1,
             'recordid' => 1001,
             'fullname' => 'Ima Tester'
         ];
         $rootTable->createRow($data, $foreignKey, $suffix, RowsType::BY_EVENTS);
 
         $data1 = [
+            'redcap_data_source' => 1,
             'recordid' => 1002,
             'fullname' => 'Person That Has Way TOOOOO Many Letters in Their Name'
         ];
@@ -340,7 +345,9 @@ class SqlServerTest extends TestCase
         #############################################################
         # create the table in the database
         #############################################################
-        $configuration = new Configuration(self::$logger, self::CONFIG_FILE);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, self::CONFIG_FILE);
+
         $dbConnection = $configuration->getDbConnection();
         list($dbType, $dbString) = DbConnectionFactory::parseConnectionString($dbConnection);
 
@@ -366,6 +373,7 @@ class SqlServerTest extends TestCase
         #############################################################
         #insert one row to see if it processes correctly
         $data = [
+            'redcap_data_source' => 1,
             'recordid' => 1001,
             'name' => 'Some Other Person'
         ];
@@ -418,9 +426,9 @@ class SqlServerTest extends TestCase
             'SqlServerTest, SqlServerDbConnection insertRow expected error error code check'
         );
 
-        $this->assertEquals(
-            $expectedMessage6,
-            substr($exception->getMessage(), -1*strlen($expectedMessage6)),
+        $this->assertMatchesRegularExpression(
+            '/'.$expectedMessage6.'/',
+            $exception->getMessage(),
             'SqlServerTest, SqlServerDbConnection insertRow expected error error message check'
         );
 
@@ -488,6 +496,7 @@ class SqlServerTest extends TestCase
         $suffix = null;
         #updatedate deliberately not populated in any of the rows
         $data1 = [
+            'redcap_data_source' => 1,
             'recordid' => 1001,
             'fullname' => 'Ima Tester',
             'score' => 12.3,
@@ -497,6 +506,7 @@ class SqlServerTest extends TestCase
         $rootTable->createRow($data1, $foreignKey, $suffix, RowsType::BY_EVENTS);
 
         $data2 = [
+            'redcap_data_source' => 1,
             'recordid' => 1002,
             'fullname' => 'Spider Webb',
             'score' => 4.56,
@@ -508,7 +518,9 @@ class SqlServerTest extends TestCase
         #############################################################
         # create the table in the database
         #############################################################
-        $configuration = new Configuration(self::$logger, self::CONFIG_FILE);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, self::CONFIG_FILE);
+
         $dbConnection = $configuration->getDbConnection();
         list($dbType, $dbString) = DbConnectionFactory::parseConnectionString($dbConnection);
 
@@ -599,12 +611,14 @@ class SqlServerTest extends TestCase
         $foreignKey = null;
         $suffix = null;
         $data21 = [
+            'redcap_data_source' => 1,
             'recordid' => 1001,
             'fullname' => 'Ima Tester'
         ];
         $rootTable2->createRow($data21, $foreignKey, $suffix, RowsType::BY_EVENTS);
 
         $data22 = [
+            'redcap_data_source' => 1,
             'recordid' => 1002,
             'fullname' => 'Person That Has Way TOOOOO Many Letters in Their Name'
         ];
@@ -635,9 +649,9 @@ class SqlServerTest extends TestCase
             'SqlServerTest, SqlServerDbConnection insertRows exception error code check'
         );
 
-        $this->assertEquals(
-            $expectedMessage,
-            substr($exception->getMessage(), -1*strlen($expectedMessage)),
+        $this->assertMatchesRegularExpression(
+            '/'.$expectedMessage.'/',
+            $exception->getMessage(),
             'SqlServerTest, SqlServerDbConnection insertRows exception error message check'
         );
 
@@ -653,7 +667,9 @@ class SqlServerTest extends TestCase
     public function testPdoDbProcessQueryFile()
     {
         #Create the SqlServerDbConnection object
-        $configuration = new Configuration(self::$logger, self::CONFIG_FILE);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, self::CONFIG_FILE);
+
         $dbConnection = $configuration->getDbConnection();
         list($dbType, $dbString) = DbConnectionFactory::parseConnectionString($dbConnection);
 
@@ -899,12 +915,14 @@ class SqlServerTest extends TestCase
         $foreignKey = null;
         $suffix = null;
         $data1 = [
+            'redcap_data_source' => 1,
             'recordid' => 1001,
             'fullname' => 'Ima Tester'
         ];
         $rootTable->createRow($data1, $foreignKey, $suffix, RowsType::BY_EVENTS);
 
         $data2 = [
+            'redcap_data_source' => 1,
             'recordid' => 1002,
             'fullname' => 'Spider Webb'
         ];
@@ -913,7 +931,9 @@ class SqlServerTest extends TestCase
         #############################################################
         # create the table in the database
         #############################################################
-        $configuration = new Configuration(self::$logger, self::CONFIG_FILE);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, self::CONFIG_FILE);
+
         $dbConnection = $configuration->getDbConnection();
         list($dbType, $dbString) = DbConnectionFactory::parseConnectionString($dbConnection);
 
@@ -1056,12 +1076,13 @@ class SqlServerTest extends TestCase
             FieldType::INT,
             null
         );
-        $field2->usesLookup = 'maritalstatus';
+        $field2->setUsesLookup('maritalstatus');
         $rootTable->addField($field2);
 
         $foreignKey = null;
         $suffix = null;
         $data1 = [
+            'redcap_data_source' => 1,
             'recordid' => 1001,
             'fullname' => 'Ima Tester',
             'maritalstatus' => 0
@@ -1069,6 +1090,7 @@ class SqlServerTest extends TestCase
         $rootTable->createRow($data1, $foreignKey, $suffix, RowsType::BY_EVENTS);
 
         $data2 = [
+            'redcap_data_source' => 1,
             'recordid' => 1002,
             'fullname' => 'Spider Webb',
             'maritalstatus' => 3
@@ -1084,7 +1106,7 @@ class SqlServerTest extends TestCase
         ];
         $tablePrefix = null;
         $keyType = new FieldTypeSpecifier(FieldType::INT, null);
-        $lookupTable = new LookupTable($lookupChoices, $tablePrefix, $keyType);
+        $lookupTable = new LookupTable($lookupChoices, $keyType);
 
         #identify maritalstatus as a lookup field in the data table
         $fieldName = 'maritalstatus';
@@ -1093,7 +1115,9 @@ class SqlServerTest extends TestCase
         #############################################################
         # create the data table in the database
         #############################################################
-        $configuration = new Configuration(self::$logger, self::CONFIG_FILE);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, self::CONFIG_FILE);
+
         $dbConnection = $configuration->getDbConnection();
         list($dbType, $dbString) = DbConnectionFactory::parseConnectionString($dbConnection);
 
@@ -1178,7 +1202,9 @@ class SqlServerTest extends TestCase
         );
 
         #create the SqlServerDbConnection
-        $configuration = new Configuration(self::$logger, self::CONFIG_FILE);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, self::CONFIG_FILE);
+
         $dbConnection = $configuration->getDbConnection();
         list($dbType, $dbString) = DbConnectionFactory::parseConnectionString($dbConnection);
 

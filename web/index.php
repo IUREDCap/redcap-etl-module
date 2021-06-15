@@ -10,6 +10,7 @@ require_once __DIR__ . '/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Configuration;
+use IU\RedCapEtlModule\Workflow;
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
 
@@ -105,10 +106,10 @@ $configurationNames = $module->getConfigurationNames();
 $adminConfig = $module->getAdminConfig();
 
 $selfUrl     = $module->getUrl('web/index.php');
-$configUrl   = $module->getUrl("web/configure.php");
-$testUrl     = $module->getUrl("web/test.php");
-$scheduleUrl = $module->getUrl("web/schedule.php");
-$runUrl      = $module->getUrl("web/run.php");
+$configUrl   = $module->getUrl('web/task_configure.php');
+$testUrl     = $module->getUrl('web/test.php');
+$scheduleUrl = $module->getUrl('web/task_schedule.php');
+$runUrl      = $module->getUrl('web/task_run.php');
 
 $userEtlProjects = $module->getUserEtlProjects();
 $projectId = $module->getProjectId();
@@ -138,6 +139,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 <table class="dataTable">
 <thead>
 <tr class="hrd">
+
     <th>Configuration Name</th>
     <!-- <th>Data Export</th> -->
     <th>Configure</th>
@@ -155,6 +157,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     <th>Copy</th>
     <th>Rename</th>
     <th>Delete</th>
+
 </tr>
 </thead>
 

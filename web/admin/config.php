@@ -23,7 +23,8 @@ use \IU\RedCapEtlModule\RedCapEtlModule;
 
 try {
     $selfUrl     = $module->getUrl(RedCapEtlModule::ADMIN_HOME_PAGE);
-    $cronInfoUrl = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);
+    #$cronInfoUrl = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);
+    $cronInfoUrl = $module->getUrl(RedCapEtlModule::CRON_DETAIL_TASKS_PAGE);
 
     $adminConfig = $module->getAdminConfig();
 

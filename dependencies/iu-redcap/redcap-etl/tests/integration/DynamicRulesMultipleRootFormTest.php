@@ -25,15 +25,14 @@ class DynamicRulesMultipleRootFormTest extends TestCase
     private static $locationCsvFile;
     private static $combinedFormsCsvFile;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
 
         if (file_exists(self::CONFIG_FILE)) {
             self::$logger = new Logger('dynamic_rules_multiple_test');
-            self::$config = new Configuration(
-                self::$logger,
-                self::CONFIG_FILE
-            );
+            self::$config = new TaskConfig();
+            self::$config->set(self::$logger, self::CONFIG_FILE);
+
             #-----------------------------
             # Get the CSV directory
             #-----------------------------
@@ -57,7 +56,7 @@ class DynamicRulesMultipleRootFormTest extends TestCase
         self::$combinedFormsCsvFile = self::$csvDir . 'combined_forms.csv';
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         if (!file_exists(self::CONFIG_FILE)) {
             $this->markTestSkipped("Required configuration not set for this test.");
@@ -90,7 +89,7 @@ class DynamicRulesMultipleRootFormTest extends TestCase
         try {
             $properties = self::$config->getProperties();
             $properties[ConfigProperties::DB_CONNECTION] = 'CSV:' . self::$csvDir;
-            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = Configuration::TRANSFORM_RULES_DEFAULT;
+            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = TaskConfig::TRANSFORM_RULES_DEFAULT;
             $properties[ConfigProperties::TRANSFORM_RULES_TEXT] = '';
 
             $properties[ConfigProperties::AUTOGEN_INCLUDE_COMPLETE_FIELDS] = 'false';
@@ -132,7 +131,7 @@ class DynamicRulesMultipleRootFormTest extends TestCase
         try {
             $properties = self::$config->getProperties();
             $properties[ConfigProperties::DB_CONNECTION] = 'CSV:' . self::$csvDir;
-            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = Configuration::TRANSFORM_RULES_DEFAULT;
+            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = TaskConfig::TRANSFORM_RULES_DEFAULT;
             $properties[ConfigProperties::TRANSFORM_RULES_TEXT] = '';
 
             $properties[ConfigProperties::AUTOGEN_INCLUDE_COMPLETE_FIELDS] = 'false';
@@ -156,7 +155,7 @@ class DynamicRulesMultipleRootFormTest extends TestCase
             'dynamicRulesMultipleRootForm check - combine non repeating fields, non-repeating forms file exists'
         );
 
-        $expected = '"combined_forms_id","record_id","building_number"';
+        $expected = '"combined_forms_id","redcap_data_source","record_id","building_number"';
         $expected .= "\n";
         $a = fopen(self::$combinedFormsCsvFile, 'r');
         if ($a) {

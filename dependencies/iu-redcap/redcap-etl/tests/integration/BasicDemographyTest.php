@@ -18,7 +18,7 @@ class BasicDemographyTest extends TestCase
 
     const CONFIG_FILE = __DIR__.'/../config/basic-demography.ini';
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
     }
 
@@ -32,7 +32,11 @@ class BasicDemographyTest extends TestCase
             $redCapEtl = new RedCapEtl(self::$logger, self::CONFIG_FILE);
             $this->assertNotNull($redCapEtl, 'redCapEtl not null');
 
-            $config = $redCapEtl->getConfiguration();
+            $workflow = $redCapEtl->getWorkflow();
+            $isStandaloneTask = $workflow->isStandaloneTask();
+            $this->assertTrue($isStandaloneTask, 'Standalone task check');
+
+            $config = $redCapEtl->getTaskConfig(0);
             $this->assertNotNull($config, 'redCapEtl configuration not null');
 
             self::$csvDir = str_ireplace('CSV:', '', $config->getDbConnection());
@@ -50,7 +54,7 @@ class BasicDemographyTest extends TestCase
             #----------------------------------------------
             # Test the data project
             #----------------------------------------------
-            $dataProject = $redCapEtl->getDataProject();
+            $dataProject = $redCapEtl->getDataProject(0);
             $this->assertNotNull($dataProject, 'data project not null');
             
             $isLongitudinal = $dataProject->isLongitudinal();
@@ -77,7 +81,7 @@ class BasicDemographyTest extends TestCase
         $expectedCsv = $parser2->parse();
 
         $header = $csv[0];
-        $this->assertEquals($header[1], 'record_id', 'Record id header test.');
+        $this->assertEquals($header[2], 'record_id', 'Record id header test.');
         $this->assertEquals(101, count($csv), 'Demography row count check.');
 
         $this->assertEquals($expectedCsv, $csv, 'CSV file check.');

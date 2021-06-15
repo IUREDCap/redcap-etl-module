@@ -21,7 +21,7 @@ class PdfFormsTest extends TestCase
     private static $basicDemographyProject;
     private static $longitudinalDataProject;
     
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$config = parse_ini_file(__DIR__.'/../config.ini');
         self::$basicDemographyProject = new RedCapProject(
@@ -65,7 +65,7 @@ class PdfFormsTest extends TestCase
         if (file_exists($file)) {
             unlink($file);
         }
-        $this->assertFileNotExists($file, 'PDF file deleted check.');
+        $this->assertFileDoesNotExist($file, 'PDF file deleted check.');
         
         $result = self::$longitudinalDataProject->exportPdfFileOfInstruments($file);
         
@@ -106,6 +106,39 @@ class PdfFormsTest extends TestCase
         } catch (PhpCapException $exception) {
             $code = $exception->getCode();
             $this->assertEquals(ErrorHandlerInterface::INVALID_ARGUMENT, $code, 'Exception code check.');
+            $exceptionCaught = true;
+        }
+        $this->assertTrue($exceptionCaught, 'Exception caught.');
+    }
+
+    public function testPdfFormsToFileCompact()
+    {
+        $file = __DIR__.'/../local/test-blank-compact.pdf';
+        
+        # Make sure that the file is deleted.
+        if (file_exists($file)) {
+            unlink($file);
+        }
+        $result = self::$longitudinalDataProject->exportPdfFileOfInstruments($file, null, null, null, null, true);
+        $this->assertFileExists($file, 'Compacted PDF file exsists.');
+
+        $regularSize = filesize(__DIR__.'/../local/test-blank.pdf');
+        $compactSize = filesize($file);
+        $this->assertGreaterThan($compactSize, $regularSize, 'Compacted PDF file size check.');
+    }
+
+    public function testPdfFormsToFileCompactInvalidCompactValue()
+    {
+        $exceptionCaught = false;
+        try {
+            $result = self::$longitudinalDataProject->exportPdfFileOfInstruments(null, null, null, null, null, 1);
+        } catch (PhpCapException $exception) {
+            $code = $exception->getCode();
+            $this->assertEquals(
+                ErrorHandlerInterface::INVALID_ARGUMENT,
+                $code,
+                'Compacted PDF file Exception code check.'
+            );
             $exceptionCaught = true;
         }
         $this->assertTrue($exceptionCaught, 'Exception caught.');

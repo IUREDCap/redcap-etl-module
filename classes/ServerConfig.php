@@ -103,13 +103,22 @@ class ServerConfig implements \JsonSerializable
                 case 'isActive':
                 case 'dbSsl':
                 case 'dbSslVerify':
+                    # changed value assignment to '' instead of false
+                    # because redcap-etl WorkflowConfig evaluated boolean
+                    # false as true for some reason. For instance, an error
+                    # would be generated for db_ssl_verify if it was unchecked
+                    # and set to false. But setting it to '' instead of false
+                    # was processed correctly by redcap-etl WorkflowConfig
+                    # and no error was generated.
                     if (!array_key_exists($var, $properties)) {
-                        $this->$var = false;
+                        #$this->$var = false;
+                        $this->$var = '';
                     } else {
                         if ($properties[$var]) {
                             $this->$var = true;
                         } else {
-                            $this->$var = false;
+                            #$this->$var = false;
+                            $this->$var = '';
                         }
                     }
                     break;
@@ -159,7 +168,7 @@ class ServerConfig implements \JsonSerializable
      *
      * @param Configuration the ETL configuration to modify.
      */
-    private function updateEtlConfig(&$etlConfig, $isCronJob)
+    public function updateEtlConfig(&$etlConfig, $isCronJob)
     {
         $etlConfig->setProperty(Configuration::CRON_JOB, $isCronJob);
         
@@ -193,11 +202,13 @@ class ServerConfig implements \JsonSerializable
     
     /**
      * Run the ETL process for this server.
+     *     If boolean $runWorkflow is true, then $etlConfig is type array.
+     *     Otherwise, it is type Configuration.
      *
-     * @param Configuration $etlConfig the ETL configuration to run.
+     * @param mixed $etlConfig the ETL configuration to run.
      * @param boolean $isCronJob indicates if this run is a cron job.
      */
-    public function run($etlConfig, $isCronJob = false, $moduleLog = null)
+    public function run($etlConfig, $isCronJob = false, $moduleLog = null, $runWorkflow = false)
     {
         if (!isset($etlConfig)) {
             $message = 'No ETL configuration specified.';
@@ -209,15 +220,21 @@ class ServerConfig implements \JsonSerializable
             throw new \Exception($message);
         }
 
-        $this->updateEtlConfig($etlConfig, $isCronJob);
-        
+        if (!$runWorkflow) {
+            $this->updateEtlConfig($etlConfig, $isCronJob);
+        }
+
         if ($this->isEmbeddedServer()) {
             #-------------------------------------------------
             # Embedded server
             #-------------------------------------------------
-            $properties = $etlConfig->getPropertiesArray();
-            $properties[Configuration::PRINT_LOGGING] = false;
-            
+            if ($runWorkflow) {
+                $properties = $etlConfig;
+            } else {
+                $properties = $etlConfig->getPropertiesArray();
+                $properties[Configuration::PRINT_LOGGING] = false;
+            }
+
             $logger = new \IU\REDCapETL\Logger('REDCap-ETL');
             $logId = $logger->getLogId();
 
@@ -249,7 +266,11 @@ class ServerConfig implements \JsonSerializable
             #------------------------------------------------
             $fileNameSuffix = uniqid('', true);
             
-            $propertiesJson = $etlConfig->getRedCapEtlJsonProperties();
+            if ($runWorkflow) {
+                $propertiesJson = Configuration::getRedCapEtlJsonProperties($runWorkflow, $etlConfig);
+            } else {
+                $propertiesJson = $etlConfig->getRedCapEtlJsonProperties($runWorkflow);
+            }
             $configFileName = 'etl_config_' . $fileNameSuffix . '.json';
             $configFilePath = $this->configDir . '/' . $configFileName;
 

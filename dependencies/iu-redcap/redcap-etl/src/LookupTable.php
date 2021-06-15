@@ -8,6 +8,7 @@ namespace IU\REDCapETL;
 
 use IU\REDCapETL\Schema\Field;
 use IU\REDCapETL\Schema\FieldType;
+use IU\REDCapETL\Schema\FieldTypeSpecifier;
 use IU\REDCapETL\Schema\RowsType;
 use IU\REDCapETL\Schema\Table;
 
@@ -17,7 +18,7 @@ use IU\REDCapETL\Schema\Table;
  */
 class LookupTable extends Table
 {
-    const DEFAULT_NAME      = 'Lookup';
+    const DEFAULT_NAME      = 'etl_lookup';
     
     const FIELD_PRIMARY_ID  = 'lookup_id';
     const FIELD_TABLE_NAME  = 'table_name';
@@ -25,15 +26,27 @@ class LookupTable extends Table
     const FIELD_VALUE       = 'value';
     const FIELD_LABEL       = 'label';
     
-    private $map;  // map for efficient retrieval; used internally
+    /** @var array multi-dimensional array: [table-name][field-name][value] = label.
+     *    Used internally for efficient retrieval of multiple choice labels.
+     */
+    private $map;
 
     private $lookupChoices;
-    private $lookupTableIn;  // For efficiently checking if field was already inserted
-    
-    public function __construct($lookupChoices, $tablePrefix, $keyType, $name = self::DEFAULT_NAME)
+
+    /**
+     * @parameter array $lookupChoices map from REDCap field name to a map from multiple
+     *     choice value to multiple choice label for that field.
+     *
+     * @parameter FieldTypeSpecifier $keyType the type of the primary key.
+     *
+     * @parameter string $bane the name of the table, not including the table prefix, if any.
+     */
+    public function __construct($lookupChoices, $keyType, $name = self::DEFAULT_NAME)
     {
+        $keyType = new FieldTypeSpecifier(FieldType::AUTO_INCREMENT);
+
         parent::__construct(
-            $tablePrefix . $name,
+            $name,
             self::FIELD_PRIMARY_ID,
             $keyType,
             array(RowsType::ROOT),
@@ -43,7 +56,6 @@ class LookupTable extends Table
         $this->map = array();
 
         $this->lookupChoices = $lookupChoices;
-        $this->lookupTableIn = array();
         
         #-----------------------------------------------
         # Create and add fields for the lookup table
@@ -68,14 +80,17 @@ class LookupTable extends Table
      *
      * @param string $tablename the name of the table that contains the
      *     field to be added.
-     * @param string $fieldName the name of the field to be added.
+     *
+     * @param string $redcapFieldName the name of the field to be added.
      */
-    public function addLookupField($tableName, $fieldName)
+    public function addLookupField($tableName, $redcapFieldName, $dbFieldName = null)
     {
-        if (empty($this->lookupTableIn[$tableName.':'.$fieldName])) {
-            $this->lookupTableIn[$tableName.':'.$fieldName] = true;
+        if (empty($dbFieldName)) {
+            $dbFieldName = $redcapFieldName;
+        }
 
-            foreach ($this->lookupChoices[$fieldName] as $value => $label) {
+        if (!(array_key_exists($tableName, $this->map) && array_key_exists($dbFieldName, $this->map[$tableName]))) {
+            foreach ($this->lookupChoices[$redcapFieldName] as $value => $label) {
                 # REDCap apparently converts all field names to lower-case
                 $value = strtolower($value);
                 #--------------------------------------------------------
@@ -84,7 +99,7 @@ class LookupTable extends Table
                 #--------------------------------------------------------
                 $data = array(
                     self::FIELD_TABLE_NAME => $tableName,
-                    self::FIELD_FIELD_NAME => $fieldName,
+                    self::FIELD_FIELD_NAME => $dbFieldName,
                     self::FIELD_VALUE => $value,
                     self::FIELD_LABEL => $label
                 );
@@ -99,11 +114,11 @@ class LookupTable extends Table
                     $this->map[$tableName] = array();
                 }
 
-                if (!array_key_exists($fieldName, $this->map[$tableName])) {
-                    $this->map[$tableName][$fieldName] = array();
+                if (!array_key_exists($dbFieldName, $this->map[$tableName])) {
+                    $this->map[$tableName][$dbFieldName] = array();
                 }
                 
-                $this->map[$tableName][$fieldName][$value] = $label;
+                $this->map[$tableName][$dbFieldName][$value] = $label;
             }
         }
     }
@@ -121,6 +136,7 @@ class LookupTable extends Table
     public function getLabel($tableName, $fieldName, $value)
     {
         $label = '';
+
         # if the value is not null and
         # (is not a string or is a non-blank string)
         if (isset($value)) {
@@ -150,5 +166,72 @@ class LookupTable extends Table
     {
         $valueLabelMap = $this->map[$tableName][$fieldName];
         return $valueLabelMap;
+    }
+
+    /**
+     * Returns the merge of this lookup table with the specified lookup table.
+     *
+     * @param LookupTable $table the lookup table to be merged.
+     */
+    public function merge($table, $mergeData = true, $task = null)
+    {
+        if ($this->getName() !== $table->getName()) {
+            $message = "Lookup table names \"{$this->getName()}\" and \"{$table->getName()}\" do not match.";
+            throw new EtlException($message, EtlException::INPUT_ERROR);
+        }
+
+        $mergedLookup = parent::merge($table, $mergeData);
+
+        $mergedLookup->lookupChoices = array_merge($this->lookupChoices, $table->lookupChoices);
+        ksort($mergedLookup->lookupChoices);
+
+        $mergedLookup->map = array_merge($this->map, $table->map);
+        ksort($mergedLookup->map);
+
+        #-----------------------------------------------------------------------
+        # Add back the data without duplicates and in sorted order
+        #-----------------------------------------------------------------------
+        $mergedLookup->rows = array(); # remove existing rows
+        $map = $mergedLookup->map;
+        foreach ($map as $table => $tableInfo) {
+            foreach ($tableInfo as $field => $valueInfo) {
+                foreach ($valueInfo as $value => $label) {
+                    $data = array(
+                        self::FIELD_TABLE_NAME => $table,
+                        self::FIELD_FIELD_NAME => $field,
+                        self::FIELD_VALUE => $value,
+                        self::FIELD_LABEL => $label
+                    );
+
+                    // Add the row, using no foreign key or suffix
+                    $this->createRow($data, '', '', $this->rowsType);
+                }
+                $mergedLookup->addLookupField($table, $field);
+            }
+        }
+        return $mergedLookup;
+    }
+
+
+    public function compare($mapRow1, $mapRow2)
+    {
+        $cmp = strcmp($mapRow1[0], $mapRow2[0]); // compare table name
+        if ($cmp === 0) {
+            $cmp = strcmp($mapRow1[1], $mapRow2[1]); // compare field name
+            if ($cmp === 0) {
+                $cmp = strcmp($mapRow1[2], $mapRow2[2]); // compare value
+            }
+        }
+        return $cmp;
+    }
+
+    public function getLookupChoices()
+    {
+        return $this->lookupChoices;
+    }
+
+    public function getMap()
+    {
+        return $this->map;
     }
 }

@@ -204,21 +204,38 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
             <?php
 
             $logData = $moduleLog->getData($logType, $startDate, $endDate);
-
             foreach ($logData as $entry) {
                 if ($logType === RedCapEtlModule::ETL_RUN) {
-                    $projectId = $entry['project_id'];
-                    $projectUrl = APP_PATH_WEBROOT . 'index.php?pid=' . (int)$projectId;
-                    
+                    $projectId = null;
+                    #Get the project id if this is a stand-alone ETL run.
+                    #(Workflows have more than one project id.)
+                    if ($entry['log_type'] !== RedCapEtlModule::WORKFLOW_RUN) {
+                        $projectId = $entry['project_id'];
+                        $projectUrl = APP_PATH_WEBROOT . 'index.php?pid=' . (int)$projectId;
+                    }
                     $cron = $entry['cron'];
                     
                     $config = $entry['config'];
-                    $configUrl = $module->getURL(
-                        RedCapEtlModule::USER_ETL_CONFIG_PAGE
-                        . '?pid=' . Filter::escapeForUrlParameter($projectId)
-                        . '&configName=' . Filter::escapeForUrlParameter($config)
-                    );
-                    
+                    if ($entry['log_type'] === RedCapEtlModule::WORKFLOW_RUN) {
+                        #The first project in the workflow sequence at runtime is recorded for log purposes
+                        #so that a link can be provided back to the Workflow configuration page,
+                        #which requires a pid value
+                        $pid = $entry['project_id'];
+                        $configUrl = null;
+                        if ($pid) {
+                            $configUrl = $module->getURL(
+                                RedCapEtlModule::WORKFLOW_CONFIG_PAGE
+                                . '?pid=' . Filter::escapeForUrlParameter($pid)
+                                . '&workflowName=' . Filter::escapeForUrlParameter($config)
+                            );
+                        }
+                    } else {
+                        $configUrl = $module->getURL(
+                            RedCapEtlModule::USER_ETL_CONFIG_PAGE
+                            . '?pid=' . Filter::escapeForUrlParameter($projectId)
+                            . '&configName=' . Filter::escapeForUrlParameter($config)
+                        );
+                    }
                     $server = $entry['etl_server'];
                     $serverUrl = $serverConfigUrl . '&serverName=' . Filter::escapeForUrlParameter($server);
                     
@@ -229,8 +246,13 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     echo '<td style="text-align: right;">' . '<a href="'
                         . $projectUrl . '">' . $projectId . "</a></td>\n";
                     echo "<td>" . '<a href="' . $serverUrl . '">' . Filter::escapeForHtml($server) . '</a>' . "</td>\n";
-                    echo "<td>" . '<a href="' . $configUrl . '">' . Filter::escapeForHtml($config) . '</a>' . "</td>\n";
-                    
+                    if ($configUrl) {
+                        echo "<td>" . '<a href="' . $configUrl . '">'
+                        . Filter::escapeForHtml($config)
+                        . '</a>' . "</td>\n";
+                    } else {
+                        echo "<td>" .  Filter::escapeForHtml($config) . "</td>\n";
+                    }
                     #--------------------------------------------
                     # User info (not available for cron jobs)
                     #--------------------------------------------

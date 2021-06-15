@@ -10,12 +10,11 @@
         "ext-curl" : "*",
         "ext-dom" : "*",
         "ext-openssl" : "*",
-        "iu-redcap/phpcap" : "1.0.5"
+        "iu-redcap/phpcap" : "1.1.1"
     },
     "require-dev" : {
-        "apigen/apigen" : "v4.1.2",
-        "phpunit/phpunit" : "6.5.8",
-        "squizlabs/php_codesniffer" : "3.2.3",
+        "phpunit/phpunit" : "9.5.4",
+        "squizlabs/php_codesniffer" : "3.6.0",
         "kzykhys/php-csv-parser" : "1.4.1"
     },
     "autoload" : {
@@ -33,4 +32,3 @@
         }
     }
 }
-

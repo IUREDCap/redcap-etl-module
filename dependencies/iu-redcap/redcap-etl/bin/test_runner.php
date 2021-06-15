@@ -9,9 +9,8 @@
 # Options:
 #    -c <configuration-file>  (can specify this option multiple times)
 #    -b <batch-size>          (can specify this option multiple times)
-#    -n <number-of-runs>    (the number of runs for each config file/batch size,
-#                           defaults to 1)
-#    -o <output-file>  (optional, defaults to test.csv)
+#    -n <number-of-runs>      (the number of runs for each config file/batch size, defaults to 1)
+#    -o <output-file>         (optional, defaults to test.csv)
 #
 # Example:
 #     php test_runner.php -c ../config/test.ini -b 10 -b 100 -n 3 -o test.csv
@@ -48,7 +47,7 @@ if (array_key_exists('c', $options) && array_key_exists('b', $options)) {
         $batchSizes = array($batchSizes);
     }
 } else {
-    print "Usage: test.php -c <config-file> -b <batch-size> -n <number-of-runs> -o <output-file>\n";
+    print "Usage: test_runner.php -c <config-file> -b <batch-size> -n <number-of-runs> -o <output-file>\n";
     exit(1);
 }
 
@@ -63,28 +62,30 @@ if (array_key_exists('n', $options)) {
 #------------------------------------------------------------------------
 # Run tests
 #------------------------------------------------------------------------
-$results = array();
+$fh = fopen($outputCsvFile, 'w');
+
+$header = [
+    'start time', 'config file', 'record id count', 'batch size', 'run number',
+    'REDCap version', 'REDCap-ETL version',
+    'peak memory used (bytes)', 'total time (seconds)',
+    'pre-processing time', 'extract time', 'transform time', 'load time', 'post-processing time',
+    'overhead time'
+];
+fputcsv($fh, $header);
 
 foreach ($configFiles as $configFile) {
     foreach ($batchSizes as $batchSize) {
         for ($runNumber = 1; $runNumber <= $numberOfRuns; $runNumber++) {
             print "PROCESSING CONFIG FILE: {$configFile} WITH BATCH SIZE {$batchSize} - RUN NUMBER {$runNumber}\n";
             $result = system("{$testEtl} -c {$configFile} -b {$batchSize}");
+            print "RESULT: {$result}\n";
             $result = explode(',', $result);
-            array_splice($result, 3, 0, array($runNumber));
-            array_push($results, $result);
+            array_splice($result, 4, 0, $runNumber);
+            fputcsv($fh, $result);
+            fflush($fh);
         }
+        fputcsv($fh, array('')); # Add blank line between groups of runs for same config file and batch size
     }
 }
 
-#------------------------------------------------------------
-# Output test results to a CSV file
-#------------------------------------------------------------
-$header = ['config file', 'record id count', 'batch size', 'run number', 'peak memory used (bytes)', 'time (seconds)'];
-
-$fh = fopen($outputCsvFile, 'w');
-fputcsv($fh, $header);
-foreach ($results as $result) {
-    fputcsv($fh, $result);
-}
 fclose($fh);

@@ -21,12 +21,13 @@ class RepeatingEventsMysqlTest extends RepeatingEventsTests
     protected static $logger;
 
     
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (file_exists(self::CONFIG_FILE)) {
             self::$logger = new Logger('repeating_events_system_test');
 
-            $configuration = new Configuration(self::$logger, self::CONFIG_FILE);
+            $configuration = new TaskConfig();
+            $configuration->set(self::$logger, self::CONFIG_FILE);
 
             list($dbHost, $dbUser, $dbPassword, $dbName) = $configuration->getMySqlConnectionInfo();
             $dsn = 'mysql:dbname='.$dbName.';host='.$dbHost;
@@ -38,7 +39,7 @@ class RepeatingEventsMysqlTest extends RepeatingEventsTests
         }
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         if (!file_exists(self::CONFIG_FILE)) {
             $this->markTestSkipped("Required configuration not set for this test.");

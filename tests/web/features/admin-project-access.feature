@@ -18,5 +18,5 @@ Feature: Admin-Interface
     And I search for user
     And I select the test project in new window
     And I follow "REDCap-ETL"
-    Then I should see "ETL Configurations"
+    Then I should see "ETL Tasks"
 

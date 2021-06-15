@@ -21,12 +21,13 @@ class VisitsMysqlTest extends TestCase
 
     private static $dbh;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (file_exists(self::CONFIG_FILE)) {
             $logger = new Logger('visits_test');
 
-            $configuration = new Configuration($logger, self::CONFIG_FILE);
+            $configuration = new TaskConfig();
+            $configuration->set($logger, self::CONFIG_FILE);
 
             $options = [
                 \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
@@ -40,7 +41,7 @@ class VisitsMysqlTest extends TestCase
     }
 
 
-    public function setUp()
+    public function setUp(): void
     {
         if (!file_exists(self::CONFIG_FILE)) {
             $this->markTestSkipped("Required configuration not set for this test.");

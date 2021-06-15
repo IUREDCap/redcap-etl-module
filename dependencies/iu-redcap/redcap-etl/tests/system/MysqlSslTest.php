@@ -9,7 +9,7 @@ namespace IU\REDCapETL\Database;
 use PHPUnit\Framework\TestCase;
 
 use IU\REDCapETL\RedCapEtl;
-use IU\REDCapETL\Configuration;
+use IU\REDCapETL\TaskConfig;
 use IU\REDCapETL\EtlException;
 use IU\REDCapETL\Logger;
 use IU\REDCapETL\LookupTable;
@@ -38,13 +38,13 @@ class MysqlSslTest extends TestCase
     protected $rowsType = RowsType::ROOT;
     protected $recordIdFieldName = 'record_id';
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$logger = new Logger('databases_integration_test');
     }
 
 
-    public function setUp()
+    public function setUp(): void
     {
         if (!file_exists(self::CONFIG_FILE)) {
             $this->markTestSkipped("Required configuration not set for this test.");
@@ -61,7 +61,9 @@ class MysqlSslTest extends TestCase
      */
     public function testMysqlDbConnectionConstructorWithSsl()
     {
-        $configuration = new Configuration(self::$logger, self::CONFIG_FILE);
+        $configuration = new TaskConfig();
+        $configuration->set(self::$logger, self::CONFIG_FILE);
+
         $dbInfo = $configuration->getMySqlConnectionInfo();
         $dbString = implode(":", $dbInfo);
 

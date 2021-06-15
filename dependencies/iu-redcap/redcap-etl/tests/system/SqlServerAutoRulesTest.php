@@ -20,12 +20,13 @@ class SqlServerAutoRulesTest extends TestCase
     private static $dbh;
     private static $logger;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (extension_loaded('sqlsrv') && extension_loaded('pdo_sqlsrv') && file_exists(self::CONFIG_FILE)) {
             self::$logger = new Logger('repeating_events_system_test');
 
-            $configuration = new Configuration(self::$logger, self::CONFIG_FILE);
+            $configuration = new TaskConfig();
+            $configuration->set(self::$logger, self::CONFIG_FILE);
 
             list($dbHost, $dbUser, $dbPassword, $dbName) = $configuration->getSqlServerConnectionInfo();
             $dsn = 'sqlsrv:database='.$dbName.';server='.$dbHost;
@@ -42,7 +43,7 @@ class SqlServerAutoRulesTest extends TestCase
     }
 
 
-    public function setUp()
+    public function setUp(): void
     {
         if (!extension_loaded('sqlsrv') || !extension_loaded('pdo_sqlsrv')) {
             $this->markTestSkipped('The sqlsrv and pdo_sqlsrv drivers are not available.');
@@ -70,10 +71,11 @@ class SqlServerAutoRulesTest extends TestCase
     public static function runEtl()
     {
         try {
-            $configuration = new Configuration(self::$logger, self::CONFIG_FILE);
+            $configuration = new TaskConfig();
+            $configuration->set(self::$logger, self::CONFIG_FILE);
             
             $properties = $configuration->getProperties();
-            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = Configuration::TRANSFORM_RULES_DEFAULT;
+            $properties[ConfigProperties::TRANSFORM_RULES_SOURCE] = TaskConfig::TRANSFORM_RULES_DEFAULT;
             $properties[ConfigProperties::TRANSFORM_RULES_TEXT] = '';
                     
             $redCapEtl = new RedCapEtl(self::$logger, $properties);
@@ -88,7 +90,7 @@ class SqlServerAutoRulesTest extends TestCase
     public function testEnrollmentTable()
     {
         $sql = 'SELECT '
-            .' enrollment_id, record_id, registration_date, first_name, last_name, '
+            .' enrollment_id, redcap_data_source, record_id, registration_date, first_name, last_name, '
             .' birthdate, registration_age, gender, '
             .' race___0, race___1, race___2, race___3, race___4, race___5'
             .' FROM enrollment ORDER BY record_id';
@@ -107,7 +109,7 @@ class SqlServerAutoRulesTest extends TestCase
     public function testEnrollmentView()
     {
         $sql = 'SELECT '
-            .' enrollment_id, record_id, registration_date, first_name, last_name, '
+            .' enrollment_id, redcap_data_source, record_id, registration_date, first_name, last_name, '
             .' birthdate, registration_age, gender, '
             .' race___0, race___1, race___2, race___3, race___4, race___5'
             .' FROM enrollment_label_view ORDER BY record_id';

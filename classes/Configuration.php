@@ -146,11 +146,11 @@ class Configuration implements \JsonSerializable
 
         $this->properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS] = false;
         
-        $this->properties[self::LABEL_VIEW_SUFFIX] = \IU\REDCapETL\Configuration::DEFAULT_LABEL_VIEW_SUFFIX;
+        $this->properties[self::LABEL_VIEW_SUFFIX] = \IU\REDCapETL\TaskConfig::DEFAULT_LABEL_VIEW_SUFFIX;
                 
         $this->properties[self::DB_LOGGING]         = true;
-        $this->properties[self::DB_LOG_TABLE]       = \IU\REDCapETL\Configuration::DEFAULT_DB_LOG_TABLE;
-        $this->properties[self::DB_EVENT_LOG_TABLE] = \IU\REDCapETL\Configuration::DEFAULT_DB_EVENT_LOG_TABLE;
+        $this->properties[self::DB_LOG_TABLE]       = \IU\REDCapETL\TaskConfig::DEFAULT_DB_LOG_TABLE;
+        $this->properties[self::DB_EVENT_LOG_TABLE] = \IU\REDCapETL\TaskConfig::DEFAULT_DB_EVENT_LOG_TABLE;
         
         $this->properties[self::EMAIL_ERRORS]  = false;
         $this->properties[self::EMAIL_SUMMARY] = false;
@@ -177,14 +177,15 @@ class Configuration implements \JsonSerializable
      */
     public function validateForRunning()
     {
-        $this->validate();
-        
+        $isWorkflowGlobalProperties = false;
+        $this->validate($isWorkflowGlobalProperties);
+
         if (empty($this->getProperty(self::API_TOKEN_USERNAME))) {
             throw new \Exception('No API token specified in configuration.');
         }
 
         $rulesSource = $this->getProperty(self::TRANSFORM_RULES_SOURCE);
-        if ($rulesSource != \IU\REDCapETL\Configuration::TRANSFORM_RULES_DEFAULT) {
+        if ($rulesSource != \IU\REDCapETL\TaskConfig::TRANSFORM_RULES_DEFAULT) {
             # If the rules source is not (dynamic) auto-generation, make sure that rules have beem specified
             if (empty($this->getProperty(self::TRANSFORM_RULES_TEXT))) {
                 throw new \Exception('No transformation rules were specified in configuration.');
@@ -231,7 +232,9 @@ class Configuration implements \JsonSerializable
         }
 
         if ($this->getProperty(self::DB_FOREIGN_KEYS) && !$this->getProperty(self::DB_PRIMARY_KEYS)) {
-            throw new \Exception('Database foreign keys specified without database primary keys being specified.');
+            throw new \Exception(
+                'Database foreign keys specified without database primary keys being specified.'
+            );
         }
 
         if ($this->getProperty(self::EMAIL_ERRORS) || $this->getProperty(self::EMAIL_SUMMARY)) {
@@ -247,7 +250,7 @@ class Configuration implements \JsonSerializable
     /**
      * Validate the configuration.
      */
-    public function validate()
+    public function validate($isWorkflowGlobalProperties = false)
     {
         self::validateName($this->name);
         
@@ -258,8 +261,10 @@ class Configuration implements \JsonSerializable
         self::validateApiToken($apiToken);
         
         $batchSize = $this->getProperty(self::BATCH_SIZE);
-        self::validateBatchSize($batchSize);
-        
+        if (!$isWorkflowGlobalProperties || ($isWorkflowGlobalProperties && !empty($batchSize))) {
+            self::validateBatchSize($batchSize);
+        }
+         
         $tablePrefix = $this->getProperty(self::TABLE_PREFIX);
         self::validateTablePrefix($tablePrefix);
         
@@ -419,9 +424,8 @@ class Configuration implements \JsonSerializable
         return $json;
     }
 
-    public function set($properties)
+    public function set($properties, $isWorkflow = false)
     {
-
         
         #------------------------------------------------
         # Set values
@@ -436,7 +440,15 @@ class Configuration implements \JsonSerializable
                     if ($value === true || $value === 'true' || $value === 'on') {
                         $this->properties[$name] = true;
                     } else {
-                        $this->properties[$name] = false;
+                        if ($isWorkflow) {
+                            if ($value === false || $value === 'false' || $value === 'off') {
+                                $this->properties[$name] = false;
+                            } else {
+                                $this->properties[$name] = null;
+                            }
+                        } else {
+                            $this->properties[$name] = false;
+                        }
                     }
                 } else {
                     # If this is a non-boolean property
@@ -452,7 +464,7 @@ class Configuration implements \JsonSerializable
                         $this->properties[$name] = $properties[$name];
                     }
                 }
-            } else {
+            } elseif (!$isWorkflow) {
                 if (in_array($name, $this->booleanUserProperties)) {
                     $this->properties[$name] = false;
                 }
@@ -464,10 +476,12 @@ class Configuration implements \JsonSerializable
             $dbType = $properties[self::DB_TYPE];
         }
     
-        if (empty($dbType)) {
+        if (empty($dbType) && !$isWorkflow) {
             # Originally, this property didn't exists, because the only database
             # type was MySQL, so older data will not have this, and it needs
             # to be set to the default value (MySQL).
+            # (Don't assign the default value to the workflow global parameter
+            # because it will override the db type for the task.)
             $dbType = \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_MYSQL;
         }
         
@@ -496,9 +510,11 @@ class Configuration implements \JsonSerializable
         if (!empty($dbPort)) {
             array_push($dbConnectionValues, $dbPort);
         }
-        
-        $dbConnection = \IU\REDCapETL\Database\DbConnection::createConnectionString($dbConnectionValues);
-        $this->properties[self::DB_CONNECTION] = $dbConnection;
+       
+        if (!$isWorkflow || ($isWorkflow && $dbType)) {
+            $dbConnection = \IU\REDCapETL\Database\DbConnection::createConnectionString($dbConnectionValues);
+            $this->properties[self::DB_CONNECTION] = $dbConnection;
+        }
     }
 
     public function getProperty($propertyName)
@@ -556,10 +572,20 @@ class Configuration implements \JsonSerializable
      * Gets configuration properties in JSON, formatted for use
      * by REDCap-ETL.
      */
-    public function getRedCapEtlJsonProperties()
+    public function getRedCapEtlJsonProperties($runWorkflow = false, $workflowProperties = null)
     {
-        $properties = $this->properties;
-       
+        if ($runWorkflow) {
+            if ($workflowProperties) {
+                $properties = $workflowProperties;
+            } else {
+                $msg = 'When running workflow on remote server, ';
+                $msg .= 'no workflow properties were specified when retrieving json properties.';
+                throw new \Exception($msg);
+            }
+        } else {
+            $properties = $this->properties;
+        }
+        
         #---------------------------------------
         # Remove properties that aren't used
         # by REDCap-ETL
@@ -676,5 +702,196 @@ class Configuration implements \JsonSerializable
         $reflection = new \ReflectionClass(self::class);
         $properyNames = $reflection->getConstants();
         return $properyNames;
+    }
+    
+    public function getGlobalProperties($initialize = false)
+    {
+        $properties = $this->properties;
+
+        #---------------------------------------
+        # Remove properties that aren't used
+        # in Global Properties
+        #---------------------------------------
+        unset($properties[self::REDCAP_API_URL]);
+        unset($properties[self::SSL_VERIFY]);
+        unset($properties[self::DATA_EXPORT_RIGHT]);
+        unset($properties[self::DATA_SOURCE_API_TOKEN]);
+        unset($properties[self::API_TOKEN_USERNAME]);
+        unset($properties[self::TRANSFORM_RULES_FILE]);
+        unset($properties[self::TRANSFORM_RULES_TEXT]);
+        unset($properties[self::TRANSFORM_RULES_SOURCE]);
+        unset($properties[self::CONFIG_NAME]);
+        unset($properties[self::CONFIG_API_TOKEN]);
+        unset($properties[self::CONFIG_OWNER]);
+        unset($properties[self::AUTOGEN_INCLUDE_COMPLETE_FIELDS]);
+        unset($properties[self::AUTOGEN_INCLUDE_DAG_FIELDS]);
+        unset($properties[self::AUTOGEN_INCLUDE_FILE_FIELDS]);
+        unset($properties[self::AUTOGEN_INCLUDE_SURVEY_FIELDS]);
+        unset($properties[self::AUTOGEN_REMOVE_IDENTIFIER_FIELDS]);
+        unset($properties[self::AUTOGEN_REMOVE_NOTES_FIELDS]);
+        unset($properties[self::AUTOGEN_COMBINE_NON_REPEATING_FIELDS]);
+        unset($properties[self::AUTOGEN_NON_REPEATING_FIELDS_TABLE]);
+        unset($properties[self::PROJECT_ID]);
+        unset($properties[self::EMAIL_FROM_ADDRESS]);
+        unset($properties[self::LOG_FILE]);
+        unset($properties[self::CA_CERT_FILE]);
+        unset($properties[self::DB_SSL]);
+        unset($properties[self::DB_SSL_VERIFY]);
+        unset($properties[self::PRINT_LOGGING]);
+
+
+        if ($initialize) {
+            #---------------------------------------
+            # Remove all default values
+            #---------------------------------------
+            $properties[self::CRON_JOB]   = null;
+            $properties[self::DB_TYPE] = null;
+            $properties[self::DB_HOST] = null;
+            $properties[self::DB_PORT] = null;
+            $properties[self::DB_NAME] = null;
+            $properties[self::DB_SCHEMA] = null;
+            $properties[self::DB_USERNAME] = null;
+            $properties[self::DB_PASSWORD] = null;
+            $properties[self::DB_CONNECTION] = null;
+            $properties[self::BATCH_SIZE] = null;
+            $properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS] = null;
+            $properties[self::TABLE_PREFIX] = null;
+            $properties[self::LABEL_VIEW_SUFFIX] = null;
+            $properties[self::DB_PRIMARY_KEYS] = null;
+            $properties[self::DB_FOREIGN_KEYS] = null;
+            $properties[self::DB_LOGGING] = null;
+            $properties[self::DB_LOG_TABLE]  = null;
+            $properties[self::DB_EVENT_LOG_TABLE] = null;
+            $properties[self::EMAIL_ERRORS] = null;
+            $properties[self::EMAIL_SUMMARY] = null;
+            $properties[self::EMAIL_SUBJECT] = null;
+            $properties[self::EMAIL_TO_LIST] = null;
+            $properties[self::POST_PROCESSING_SQL] = null;
+            $properties[self::PRE_PROCESSING_SQL] = null;
+            $properties[self::CRON_SERVER] = null;
+            $properties[self::CRON_SCHEDULE] = null;
+        }
+        
+        return $properties;
+    }
+
+    public function validateForRunningWorkflow($workflowName, $taskKey, $taskName, $globalProperties = null)
+    {
+        $preface = "For Workflow: $workflowName, ETL task #: $taskKey, taskName: $taskName: ";
+        $suffix = " in task configuration or global properties.";
+
+        $isGlobalWorkflowProperties = false;
+        $this->validate($isWorkflowGlobalProperties);
+
+        if (empty($this->getProperty(self::API_TOKEN_USERNAME))) {
+            throw new \Exception($preface . 'No API token specified in task configuration.');
+        }
+
+        $rulesSource = $this->getProperty(self::TRANSFORM_RULES_SOURCE);
+        if ($rulesSource != \IU\REDCapETL\TaskConfig::TRANSFORM_RULES_DEFAULT) {
+            # If the rules source is not (dynamic) auto-generation, make sure that rules have beem specified
+            if (empty($this->getProperty(self::TRANSFORM_RULES_TEXT))) {
+                throw new \Exception($preface . 'No transformation rules were specified in task configuration.');
+            }
+        }
+
+        $dbType = $this->getProperty(self::DB_TYPE);
+        if ($globalProperties) {
+            if (array_key_exists(self::DB_TYPE, $globalProperties)) {
+                $dbType = $globalProperties[self::DB_TYPE];
+            }
+        }
+        if (empty($dbType)) {
+            throw new \Exception($preface . 'No database type was specified' . $suffix);
+        } else {
+            if ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_MYSQL) {
+                ; // OK
+            } elseif ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_SQLSERVER) {
+                if (!extension_loaded('sqlsrv') || !extension_loaded('pdo_sqlsrv')) {
+                    $message = $preface . 'The extensions for running SQL Server (sqlsrv and/or pdo_sqlsrv)'
+                        . ' have not been enabled.';
+                    throw new \Exception($message);
+                }
+            } elseif ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_POSTGRESQL) {
+                if (!extension_loaded('pgsql') || !extension_loaded('pdo_pgsql')) {
+                    $message = $preface . 'The extensions for running PostgreSQL (pgsql and/or pdo_pgsql)'
+                        . ' have not been enabled.';
+                    throw new \Exception($message);
+                }
+            } else {
+                throw new \Exception($preface . 'Unrecognized database type "' . $dbType . '" specified.');
+            }
+        }
+
+        $dbHost = $this->getProperty(self::DB_HOST);
+        $dbName = $this->getProperty(self::DB_NAME);
+        $dbUsername = $this->getProperty(self::DB_USERNAME);
+        $dbPassword = $this->getProperty(self::DB_PASSWORD);
+        $dbForeignKeys = $this->getProperty(self::DB_FOREIGN_KEYS);
+        $dbPrimaryKeys = $this->getProperty(self::DB_PRIMARY_KEYS);
+        $emailErrors = $this->getProperty(self::EMAIL_ERRORS);
+        $emailSummary = $this->getProperty(self::EMAIL_SUMMARY);
+        $emailToList = $this->getProperty(self::EMAIL_TO_LIST);
+
+        if ($globalProperties) {
+            if (array_key_exists(self::DB_HOST, $globalProperties)) {
+                $dbHost = $globalProperties[self::DB_HOST];
+            }
+            if (array_key_exists(self::DB_NAME, $globalProperties)) {
+                $dbName = $globalProperties[self::DB_NAME];
+            }
+            if (array_key_exists(self::DB_USERNAME, $globalProperties)) {
+                $dbUsername = $globalProperties[self::DB_USERNAME];
+            }
+            if (array_key_exists(self::DB_PASSWORD, $globalProperties)) {
+                $dbPassword = $globalProperties[self::DB_PASSWORD];
+            }
+            if (array_key_exists(self::DB_FOREIGN_KEYS, $globalProperties)) {
+                $dbForeignKeys = $globalProperties[self::DB_FOREIGN_KEYS];
+            }
+            if (array_key_exists(self::DB_PRIMARY_KEYS, $globalProperties)) {
+                $dbPrimaryKeys = $globalProperties[self::DB_PRIMARY_KEYS];
+            }
+            if (array_key_exists(self::EMAIL_ERRORS, $globalProperties)) {
+                $emailErrors = $globalProperties[self::EMAIL_ERRORS];
+            }
+            if (array_key_exists(self::EMAIL_SUMMARY, $globalProperties)) {
+                $emailSummary = $globalProperties[self::EMAIL_SUMMARY];
+            }
+            if (array_key_exists(self::EMAIL_TO_LIST, $globalProperties)) {
+                $emailToList = $globalProperties[self::EMAIL_TO_LIST];
+            }
+        }
+
+        if (empty($dbHost)) {
+            throw new \Exception($preface . 'No database host was specified' . $suffix);
+        }
+        
+        if (empty($dbName)) {
+            throw new \Exception($preface . 'No database name was specified' . $suffix);
+        }
+                
+        if (empty($dbUsername)) {
+            throw new \Exception($preface . 'No database username was specified' . $suffix);
+        }
+        
+        if (empty($dbPassword)) {
+            throw new \Exception($preface . 'No database password was specified' . $suffix);
+        }
+
+        if ($dbForeignKeys && !$dbPrimaryKeys) {
+            throw new \Exception($preface . 'Database foreign keys specified without database '
+            . 'primary keys being specified' . $suffix);
+        }
+
+        if ($emailErrors || $emailSummary) {
+            if (empty($emailToList)) {
+                throw new \Exception(
+                    $preface . 'E-mailing of errors and/or summary specified in task configuration '
+                    . 'or global properties, but no e-mail to list address was provided either '
+                    . 'the task configuration or global properties.'
+                );
+            }
+        }
     }
 }

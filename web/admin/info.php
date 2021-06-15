@@ -24,7 +24,8 @@ use \IU\RedCapEtlModule\ServerConfig;
 $selfUrl   = $module->getUrl(RedCapEtlModule::ADMIN_INFO_PAGE);
 
 $configUrl     = $module->getUrl(RedCapEtlModule::ADMIN_HOME_PAGE);
-$cronDetailUrl = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);
+#$cronDetailUrl = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);
+$cronDetailUrl = $module->getUrl(RedCapEtlModule::CRON_DETAIL_TASKS_PAGE);
 
 $usersUrl       = $module->getUrl(RedCapEtlModule::USERS_PAGE);
 $userConfigUrl  = $module->getUrl(RedCapEtlModule::USER_CONFIG_PAGE);
@@ -36,6 +37,8 @@ $embeddedServerConfigUrl =
     $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE . '?serverName=' . ServerConfig::EMBEDDED_SERVER_NAME);
 
 $logUrl = $module->getUrl(RedCapEtlModule::LOG_PAGE);
+
+$workflowsAdminUrl = $module->getUrl(RedCapEtlModule::ADMIN_WORKFLOWS_PAGE);
 
 $adminConfig = $module->getAdminConfig();
 
@@ -166,6 +169,9 @@ The REDCap-ETL external module has the following admin pages:
     </li>
     <li><a href="<?php echo $etlServerConfigUrl;?>" style="font-weight: bold;">ETL Server Config</a>
     - ETL server configuration.
+    </li>
+    <li><a href="<?php echo $workflowsAdminUrl;?>" style="font-weight: bold;">ETL Workflows</a>
+    - Workflow search, reinstate workflows in 'Removed' status, and delete workflows.
     </li>
     <li><a href="<?php echo $logUrl;?>" style="font-weight: bold;">Log</a>
     - Log of ETL processes and cron jobs.

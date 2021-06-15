@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "790a08b5ec9b9e467ffe6d315bc454be",
+    "content-hash": "7941e175b6e1fe546b16c6a92cc253ec",
     "packages": [
         {
             "name": "iu-redcap/phpcap",
-            "version": "1.0.5",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/phpcap.git",
-                "reference": "e557781aa4cfae8c4531d3e2cd81b078714d6c2a"
+                "reference": "1659f843ccf84f037df925eeb2f533287f272741"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/phpcap/zipball/e557781aa4cfae8c4531d3e2cd81b078714d6c2a",
-                "reference": "e557781aa4cfae8c4531d3e2cd81b078714d6c2a",
+                "url": "https://api.github.com/repos/IUREDCap/phpcap/zipball/1659f843ccf84f037df925eeb2f533287f272741",
+                "reference": "1659f843ccf84f037df925eeb2f533287f272741",
                 "shasum": ""
             },
             "require": {
@@ -26,11 +26,10 @@
                 "php": ">=5.6.0"
             },
             "require-dev": {
-                "apigen/apigen": "v4.1.2",
-                "erusev/parsedown": "1.6.2",
+                "erusev/parsedown": "1.7.4",
                 "kzykhys/php-csv-parser": "1.4.1",
-                "phpunit/phpunit": "6.5.8",
-                "squizlabs/php_codesniffer": "3.2.3"
+                "phpunit/phpunit": "9.5.4",
+                "squizlabs/php_codesniffer": "3.6.0"
             },
             "type": "library",
             "autoload": {
@@ -46,34 +45,33 @@
             "keywords": [
                 "redcap"
             ],
-            "time": "2019-10-01T13:28:17+00:00"
+            "time": "2021-04-22T14:26:17+00:00"
         },
         {
             "name": "iu-redcap/redcap-etl",
-            "version": "1.5.9",
+            "version": "2.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/redcap-etl.git",
-                "reference": "6a43e5f70c617027b8c11dc44086ce38677dfb69"
+                "reference": "19a6b51eab1cddd79d3de0f70b52bb9695b2f815"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/6a43e5f70c617027b8c11dc44086ce38677dfb69",
-                "reference": "6a43e5f70c617027b8c11dc44086ce38677dfb69",
+                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/19a6b51eab1cddd79d3de0f70b52bb9695b2f815",
+                "reference": "19a6b51eab1cddd79d3de0f70b52bb9695b2f815",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "ext-dom": "*",
                 "ext-openssl": "*",
-                "iu-redcap/phpcap": "1.0.5",
+                "iu-redcap/phpcap": "1.1.1",
                 "php": ">=5.6.0"
             },
             "require-dev": {
-                "apigen/apigen": "v4.1.2",
                 "kzykhys/php-csv-parser": "1.4.1",
-                "phpunit/phpunit": "6.5.8",
-                "squizlabs/php_codesniffer": "3.2.3"
+                "phpunit/phpunit": "9.5.4",
+                "squizlabs/php_codesniffer": "3.6.0"
             },
             "type": "library",
             "autoload": {
@@ -90,7 +88,7 @@
                 "etl",
                 "redcap"
             ],
-            "time": "2020-12-14T14:27:05+00:00"
+            "time": "2021-05-28T14:23:44+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -2015,16 +2013,16 @@
         },
         {
             "name": "sebastian/type",
-            "version": "2.3.1",
+            "version": "2.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/type.git",
-                "reference": "81cd61ab7bbf2de744aba0ea61fae32f721df3d2"
+                "reference": "0d1c587401514d17e8f9258a27e23527cb1b06c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/type/zipball/81cd61ab7bbf2de744aba0ea61fae32f721df3d2",
-                "reference": "81cd61ab7bbf2de744aba0ea61fae32f721df3d2",
+                "url": "https://api.github.com/repos/sebastianbergmann/type/zipball/0d1c587401514d17e8f9258a27e23527cb1b06c1",
+                "reference": "0d1c587401514d17e8f9258a27e23527cb1b06c1",
                 "shasum": ""
             },
             "require": {
@@ -2063,7 +2061,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-10-26T13:18:59+00:00"
+            "time": "2021-06-04T13:02:07+00:00"
         },
         {
             "name": "sebastian/version",
@@ -2167,16 +2165,16 @@
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.22.1",
+            "version": "v1.23.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
-                "reference": "c6c942b1ac76c82448322025e084cadc56048b4e"
+                "reference": "46cd95797e9df938fdd2b03693b5fca5e64b01ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/c6c942b1ac76c82448322025e084cadc56048b4e",
-                "reference": "c6c942b1ac76c82448322025e084cadc56048b4e",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/46cd95797e9df938fdd2b03693b5fca5e64b01ce",
+                "reference": "46cd95797e9df938fdd2b03693b5fca5e64b01ce",
                 "shasum": ""
             },
             "require": {
@@ -2188,7 +2186,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "1.22-dev"
+                    "dev-main": "1.23-dev"
                 },
                 "thanks": {
                     "name": "symfony/polyfill",
@@ -2239,7 +2237,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-07T16:49:33+00:00"
+            "time": "2021-02-19T12:13:01+00:00"
         },
         {
             "name": "theseer/tokenizer",

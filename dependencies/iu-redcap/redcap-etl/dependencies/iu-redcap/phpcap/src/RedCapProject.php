@@ -30,7 +30,8 @@ class RedCapProject
      * Creates a REDCapProject object for the specifed project.
      *
      * Example Usage:
-     * <code>
+     * <pre>
+     * <code class="phpdocumentor-code">
      * $apiUrl = 'https://redcap.someplace.edu/api/'; # replace with your API URL
      * $apiToken = '11111111112222222222333333333344'; # replace with your API token
      * $sslVerify = true;
@@ -40,6 +41,7 @@ class RedCapProject
      *
      * $project = new RedCapProject($apiUrl, $apiToken, $sslVerify, $caCertificateFile);
      * </code>
+     * </pre>
      *
      * @param string $apiUrl the URL for the API for the REDCap site that has the project.
      * @param string $apiToken the API token for this project.
@@ -54,6 +56,7 @@ class RedCapProject
      *    connection. If this argument is specified, the $apiUrl, $sslVerify, and
      *    $caCertificateFile arguments will be ignored, and the values for these
      *    set in the connection will be used.
+     *
      * @throws PhpCapException if any of the arguments are invalid
      */
     public function __construct(
@@ -204,13 +207,15 @@ class RedCapProject
      * Exports information about the specified events.
      *
      * Example usage:
-     * <code>
+     * <pre>
+     * <code class="phpdocumentor-code">
      * #export information about all events in CSV (Comma-Separated Values) format.
      * $eventInfo = $project->exportEvents('csv');
      *
      * # export events in XML format for arms 1 and 2.
      * $eventInfo = $project->exportEvents('xml', [1, 2]);
      * </code>
+     * </pre>
      *
      * @param string $format the format for the export.
      *     <ul>
@@ -418,10 +423,11 @@ class RedCapProject
     
     /**
      * Imports the file into the field of the record
-     * with the specified event and/or repeat istance, if any.
+     * with the specified event and/or repeat instance, if any.
      *
      * Example usage:
-     * <code>
+     * <pre>
+     * <code class="phpdocumentor-code">
      * ...
      * $file     = '../data/consent1001.txt';
      * $recordId = '1001';
@@ -430,6 +436,7 @@ class RedCapProject
      * $project->importFile($file, $recordId, $field, $event);
      * ...
      * </code>
+     * </pre>
      *
      * @param string $filename the name of the file to import.
      * @param string $recordId the record ID of the record to import the file into.
@@ -513,12 +520,14 @@ class RedCapProject
      * Exports information about the instruments (data entry forms) for the project.
      *
      * Example usage:
-     * <code>
+     * <pre>
+     * <code class="phpdocumentor-code">
      * $instruments = $project->getInstruments();
      * foreach ($instruments as $instrumentName => $instrumentLabel) {
      *     print "{$instrumentName} : {$instrumentLabel}\n";
      * }
      * </code>
+     * </pre>
      *
      * @param $format string format instruments are exported in:
      *     <ul>
@@ -587,7 +596,8 @@ class RedCapProject
         $recordId = null,
         $event = null,
         $form = null,
-        $allRecords = null
+        $allRecords = null,
+        $compactDisplay = null
     ) {
         $data = array(
                 'token'       => $this->apiToken,
@@ -601,7 +611,8 @@ class RedCapProject
         $data['event']      = $this->processEventArgument($event);
         $data['instrument'] = $this->processFormArgument($form);
         $data['allRecords'] = $this->processAllRecordsArgument($allRecords);
-        
+        $data['compactDisplay'] = $this->processCompactDisplayArgument($compactDisplay);
+
         $result = $this->connection->callWithArray($data);
         
         if (isset($file)) {
@@ -616,10 +627,12 @@ class RedCapProject
      * Gets the instrument to event mapping for the project.
      *
      * For example, the following code:
-     * <code>
+     * <pre>
+     * <code class="phpdocumentor-code">
      * $map = $project->exportInstrumentEventMappings();
      * print_r($map[0]); # print first element of map
      * </code>
+     * </pre>
      * might generate the following output:
      * <pre>
      * Array
@@ -852,13 +865,15 @@ class RedCapProject
      *
      * You do not need to specify all of these fields when doing an import,
      * only the ones that you actually want to change. For example:
-     * <code>
+     * <pre>
+     * <code class="phpdocumentor-code">
      * ...
      * # Set the project to be longitudinal and enable surveys
      * $projectInfo = ['is_longitudinal' => 1, 'surveys_enabled' => 1];
      * $project->importProjectInfo($projectInfo);
      * ...
      * </code>
+     * </pre>
      *
      * @param mixed $projectInfo the project information to import. This will
      *     be a PHP associative array if no format, or 'php' format was specified,
@@ -908,7 +923,7 @@ class RedCapProject
      * @param array $recordIds array of strings with record id's that are to be retrieved.
      * @param array $fields array of field names to export
      * @param array $events array of event names for which fields should be exported
-     * @param array $filterLogic logic used to restrict the records retrieved, e.g.,
+     * @param string $filterLogic logic used to restrict the records retrieved, e.g.,
      *     "[last_name] = 'Smith'".
      * @param boolean $exportSurveyFields specifies whether survey fields should be exported.
      *     <ul>
@@ -999,11 +1014,17 @@ class RedCapProject
      * Exports the specified records.
      *
      * Example usage:
-     * <code>
+     *
+     * <pre>
+     * <code class="phpdocumentor-code">
      * $records = $project->exportRecords($format = 'csv', $type = 'flat');
      * $recordIds = [1001, 1002, 1003];
      * $records = $project->exportRecords('xml', 'eav', $recordIds);
      * </code>
+     * </pre>
+     *
+     * Note: date ranges do not work for records that were imported at
+     * the time the project was created.
      *
      * @param string $format the format in which to export the records:
      *     <ul>
@@ -1026,7 +1047,7 @@ class RedCapProject
      * @param array $fields array of field names to export
      * @param array $forms array of form names for which fields should be exported
      * @param array $events array of event names for which fields should be exported
-     * @param array $filterLogic logic used to restrict the records retrieved, e.g.,
+     * @param string $filterLogic logic used to restrict the records retrieved, e.g.,
      *         "[last_name] = 'Smith'".
      * @param string $rawOrLabel indicates what should be exported for options of multiple choice fields:
      *     <ul>
@@ -1068,6 +1089,28 @@ class RedCapProject
      *                   in a data access group.</li>
      *       <li> false - [default] don't export the data access group field.</li>
      *     </ul>
+     * @param string $dateRangeBegin specifies to return only those records
+     *      have been created or modified after the date entered. Date needs to be
+     *      in YYYY_MM-DD HH:MM:SS, e.g., '2020-01-31 00:00:00'.
+     * @param string $dateRangeEnd specifies to return only those records
+     *      have been created or modified before the date entered. Date needs to be
+     *      in YYYY_MM-DD HH:MM:SS, e.g., '2020-01-31 00:00:00'.
+     * @param string $csvDelimiter specifies what delimiter is used to separate
+     *     values in a CSV file (for CSV format only). Options are:
+     *     <ul>
+     *       <li> ',' - comma, this is the default </li>
+     *       <li> 'tab' - tab </li>
+     *       <li> ';' - semi-colon</li>
+     *       <li> '|' - pipe</li>
+     *       <li> '^' - caret</li>
+     *     </ul>
+     * @param string $decimalCharacter specifies what decimal format to apply to
+     * numeric values being returned. Options are:
+     *     <ul>
+     *       <li> '.' - dot/full stop </li>
+     *       <li> ',' - comma </li>
+     *       <li> null - numbers will be exported using the fields' native decimal format</li>
+     *     </ul>
      *
      * @return mixed If 'php' format is specified, an array of records will be returned where the format
      *     of the records depends on the 'type'parameter (see above). For other
@@ -1085,7 +1128,11 @@ class RedCapProject
         $rawOrLabelHeaders = 'raw',
         $exportCheckboxLabel = false,
         $exportSurveyFields = false,
-        $exportDataAccessGroups = false
+        $exportDataAccessGroups = false,
+        $dateRangeBegin = null,
+        $dateRangeEnd = null,
+        $csvDelimiter = ',',
+        $decimalCharacter = null
     ) {
         $data = array(
                 'token'        => $this->apiToken,
@@ -1113,6 +1160,15 @@ class RedCapProject
         
         $data['filterLogic'] = $this->processFilterLogicArgument($filterLogic);
         
+        $data['dateRangeBegin'] = $this->processDateRangeArgument($dateRangeBegin);
+        $data['dateRangeEnd'] = $this->processDateRangeArgument($dateRangeEnd);
+
+        if ($data['format'] == 'csv') {
+            $data['csvDelimiter'] = $this->processCsvDelimiterArgument($csvDelimiter, $format);
+        };
+
+        $data['decimalCharacter'] = $this->processDecimalCharacterArgument($decimalCharacter);
+
         #---------------------------------------
         # Get the records and process them
         #---------------------------------------
@@ -1130,7 +1186,8 @@ class RedCapProject
      *
      * Example usage:
      *
-     * <code>
+     * <pre>
+     * <code class="phpdocumentor-code">
      * # return all records with last name "Smith" in CSV format
      * $records = $project->exportRecordsAp(['format' => 'csv', 'filterLogic' => "[last_name] = 'Smith'"]);
      *
@@ -1140,6 +1197,7 @@ class RedCapProject
      * # export only the fields on the 'lab_data' form and field 'study_id'
      * $records = $project->exportRecordsAp(['forms' => ['lab_data'], 'fields' => ['study_id']]);
      * </code>
+     * </pre>
      *
      * @see exportRecords()
      *
@@ -1206,6 +1264,18 @@ class RedCapProject
                 case 'exportDataAccessGroups':
                     $exportDataAccessGroups = $value;
                     break;
+                case 'dateRangeBegin':
+                    $dateRangeBegin = $value;
+                    break;
+                case 'dateRangeEnd':
+                    $dateRangeEnd = $value;
+                    break;
+                case 'csvDelimiter':
+                    $csvDelimiter = $value;
+                    break;
+                case 'decimalCharacter':
+                    $decimalCharacter = $value;
+                    break;
                 default:
                     $this->errorHandler->throwException(
                         'Unrecognized argument name "' . $name . '".',
@@ -1228,7 +1298,11 @@ class RedCapProject
             isset($rawOrLabelHeaders)      ? $rawOrLabelHeaders      : 'raw',
             isset($exportCheckboxLabel)    ? $exportCheckboxLabel    : false,
             isset($exportSurveyFields)     ? $exportSurveyFields     : false,
-            isset($exportDataAccessGroups) ? $exportDataAccessGroups : false
+            isset($exportDataAccessGroups) ? $exportDataAccessGroups : false,
+            isset($dateRangeBegin)         ? $dateRangeBegin         : null,
+            isset($dateRangeEnd)           ? $dateRangeEnd           : null,
+            isset($csvDelimiter)           ? $csvDelimiter           : ',',
+            isset($decimalCharacter)       ? $decimalCharacter       : null
         );
         
         return $records;
@@ -1432,7 +1506,54 @@ class RedCapProject
         return $result;
     }
 
-    
+
+    /**
+     * Imports the repeating instruments and events.
+     *
+     * @param mixed $formsEvents for 'php' format or if no format is specified,
+     *     this will be a PHP array of associative arrays. For other formats,
+     *     this will be a string formatted in the specified format (e.g. json).
+     *
+     * @param string $format the format in which to export the records:
+     *     <ul>
+     *       <li> 'php' - [default] array of maps of values</li>
+     *       <li> 'csv' - string of CSV (comma-separated values)</li>
+     *       <li> 'json' - string of JSON encoded values</li>
+     *       <li> 'xml' - string of XML encoded data</li>
+     *     </ul>
+     *
+     * @return integer the number of repeated instruments or repeated events imported.
+     */
+    public function importRepeatingInstrumentsAndEvents($formsEvents, $format = 'php')
+    {
+        $data = array(
+            'token' => $this->apiToken,
+            'content' => 'repeatingFormsEvents',
+            'returnFormat' => 'json'
+        );
+
+        #---------------------------------------
+        # Process the arguments
+        #---------------------------------------
+        $data['data'] = $this->processImportDataArgument(
+            $formsEvents,
+            'repeating instruments/events',
+            $format
+        );
+        $legalFormats = array('php', 'csv', 'json', 'xml');
+        $data['format'] = $this->processFormatArgument($format, $legalFormats);
+        
+        #---------------------------------------
+        # Process the data
+        #---------------------------------------
+        $result = $this->connection->callWithArray($data);
+        
+        $this->processNonExportResult($result);
+        
+        return (integer) $result;
+    }
+
+
     /**
      * Gets the REDCap version number of the REDCap instance being used by the project.
      *
@@ -1486,6 +1607,22 @@ class RedCapProject
      *            unchecked checkboxes will have a value of 'Unchecked'.
      *       </li>
      *     </ul>
+     * @param string $csvDelimiter specifies what delimiter is used to separate
+     *     values in a CSV file (for CSV format only). Options are:
+     *     <ul>
+     *       <li> ',' - comma, this is the default </li>
+     *       <li> 'tab' - tab </li>
+     *       <li> ';' - semi-colon</li>
+     *       <li> '|' - pipe</li>
+     *       <li> '^' - caret</li>
+     *     </ul>
+     * @param string $decimalCharacter specifies what decimal format to apply to
+     * numeric values being returned. Options are:
+     *     <ul>
+     *       <li> '.' - dot/full stop </li>
+     *       <li> ',' - comma </li>
+     *       <li> null - numbers will be exported using the fields' native decimal format</li>
+     *     </ul>
      *
      * @return mixed the records generated by the specefied report in the specified format.
      */
@@ -1494,7 +1631,9 @@ class RedCapProject
         $format = 'php',
         $rawOrLabel = 'raw',
         $rawOrLabelHeaders = 'raw',
-        $exportCheckboxLabel = false
+        $exportCheckboxLabel = false,
+        $csvDelimiter = ',',
+        $decimalCharacter = null
     ) {
         $data = array(
                 'token' => $this->apiToken,
@@ -1513,7 +1652,11 @@ class RedCapProject
         $data['rawOrLabel']          = $this->processRawOrLabelArgument($rawOrLabel);
         $data['rawOrLabelHeaders']   = $this->processRawOrLabelHeadersArgument($rawOrLabelHeaders);
         $data['exportCheckboxLabel'] = $this->processExportCheckboxLabelArgument($exportCheckboxLabel);
-        
+        if ($data['format'] == 'csv') {
+            $data['csvDelimiter'] = $this->processCsvDelimiterArgument($csvDelimiter, $format);
+        }
+        $data['decimalCharacter'] = $this->processDecimalCharacterArgument($decimalCharacter);
+
         #---------------------------------------------------
         # Get and process records
         #---------------------------------------------------
@@ -1701,7 +1844,8 @@ class RedCapProject
      * data that is imported.
      *
      * The available field names for user import are:
-     * <code>
+     * <pre>
+     * <code class="phpdocumentor-code">
      * username, expiration, data_access_group, design,
      * user_rights, data_access_groups, data_export, reports, stats_and_charts,
      * manage_survey_participants, calendar, data_import_tool, data_comparison_tool,
@@ -1711,6 +1855,7 @@ class RedCapProject
      * lock_records_customization, lock_records, lock_records_all_forms,
      * forms
      * </code>
+     * </pre>
      *
      *
      * Privileges for fields above can be set as follows:
@@ -1775,7 +1920,8 @@ class RedCapProject
      *
      * These can be used for batch
      * processing of records exports to lessen memory requirements, for example:
-     * <code>
+     * <pre>
+     * <code class="phpdocumentor-code">
      * ...
      * # Get all the record IDs of the project in 10 batches
      * $recordIdBatches = $project->getRecordIdBatches(10);
@@ -1785,12 +1931,13 @@ class RedCapProject
      * }
      * ...
      * </code>
+     * </pre>
      *
      * @param integer $batchSize the batch size in number of record IDs.
      *     The last batch may have less record IDs. For example, if you had 500
      *     record IDs and specified a batch size of 200, the first 2 batches would have
      *     200 record IDs, and the last batch would have 100.
-     * @param array $filterLogic logic used to restrict the records retrieved, e.g.,
+     * @param string $filterLogic logic used to restrict the records retrieved, e.g.,
      *     "[last_name] = 'Smith'". This could be used for batch processing a subset
      *     of the records.
      * @param $recordIdFieldName the name of the record ID field. Specifying this is not
@@ -2206,7 +2353,7 @@ class RedCapProject
      * @param string $format
      * @throws PhpCapException
      */
-    protected function processExportResult(& $result, $format)
+    protected function processExportResult(&$result, $format)
     {
         if ($format == 'php') {
             $phpResult = json_decode($result, true); // true => return as array instead of object
@@ -2392,7 +2539,7 @@ class RedCapProject
         return $form;
     }
     
-    protected function processFormatArgument(& $format, $legalFormats)
+    protected function processFormatArgument(&$format, $legalFormats)
     {
         if (!isset($format)) {
             $format = 'php';
@@ -2497,7 +2644,7 @@ class RedCapProject
      * @param string $result a result returned from the REDCap API, which
      *     should be for a non-export method.
      */
-    protected function processNonExportResult(& $result)
+    protected function processNonExportResult(&$result)
     {
         $matches = array();
         #$hasMatch = preg_match('/^[\s]*{"error":[\s]*"(.*)"}[\s]*$/', $result, $matches);
@@ -2737,5 +2884,90 @@ class RedCapProject
             $this->errorHandler->throwException($message, $code);
         } // @codeCoverageIgnore
         return $type;
+    }
+
+    protected function processCsvDelimiterArgument($csvDelimiter, $format)
+    {
+        $legalCsvDelimiters = array(',',';','tab','|','^');
+        if ($format == 'csv') {
+            if (empty($csvDelimiter)) {
+                $csvDelimiter = ',';
+            }
+            if (gettype($csvDelimiter) !== 'string') {
+                $message = 'The csv delimiter specified has type "'.gettype($csvDelimiter)
+                    .'", but it should be a string.';
+                $code = ErrorHandlerInterface::INVALID_ARGUMENT;
+                $this->errorHandler->throwException($message, $code);
+            } // @codeCoverageIgnore
+        
+            $csvDelimiter = strtolower(trim($csvDelimiter));
+        
+            if (!in_array($csvDelimiter, $legalCsvDelimiters)) {
+                $message = 'Invalid csv delimiter "'.$csvDelimiter.'" specified.'
+                    .' Valid csv delimiter options are: "'.
+                    implode('", "', $legalCsvDelimiters).'".';
+                $code = ErrorHandlerInterface::INVALID_ARGUMENT;
+                $this->errorHandler->throwException($message, $code);
+            } // @codeCoverageIgnore
+        }
+        return $csvDelimiter;
+    }
+
+    protected function processDateRangeArgument($dateRange)
+    {
+        if (isset($dateRange)) {
+            if (trim($dateRange) === '') {
+                $dateRange = null;
+            } else {
+                $legalFormat = 'Y-m-d H:i:s';
+                $err = false;
+
+                if (gettype($dateRange) === 'string') {
+                    $dt = \DateTime::createFromFormat($legalFormat, $dateRange);
+        
+                    if (!($dt && $dt->format($legalFormat) == $dateRange)) {
+                        $err = true;
+                    }
+                } else {
+                    $err = true;
+                }
+
+                if ($err) {
+                    $errMsg = 'Invalid date format. ';
+                    $errMsg .= "The date format for export date ranges is YYYY-MM-DD HH:MM:SS, ";
+                    $errMsg .= 'e.g., 2020-01-31 00:00:00.';
+                    $code = ErrorHandlerInterface::INVALID_ARGUMENT;
+                    $this->errorHandler->throwException($errMsg, $code);
+                } // @codeCoverageIgnore
+            }
+        }
+        return $dateRange;
+    }
+
+    protected function processDecimalCharacterArgument($decimalCharacter)
+    {
+        $legalDecimalCharacters = array(',','.');
+        if ($decimalCharacter) {
+            if (!in_array($decimalCharacter, $legalDecimalCharacters)) {
+                $message = 'Invalid decimal character of "'.$decimalCharacter.'" specified.'
+                    .' Valid decimal character options are: "'.
+                    implode('", "', $legalDecimalCharacters).'".';
+                $code = ErrorHandlerInterface::INVALID_ARGUMENT;
+                $this->errorHandler->throwException($message, $code);
+            } // @codeCoverageIgnore
+        }
+        return $decimalCharacter;
+    }
+
+    protected function processCompactDisplayArgument($compactDisplay)
+    {
+        if (!isset($compactDisplay) || $compactDisplay === null) {
+            ;  // That's OK
+        } elseif (!is_bool($compactDisplay)) {
+            $message = 'The compact display argument has type "'.gettype($compactDisplay).
+            '", but it should be a boolean (true/false).';
+            $this->errorHandler->throwException($message, ErrorHandlerInterface::INVALID_ARGUMENT);
+        }
+        return $compactDisplay;
     }
 }

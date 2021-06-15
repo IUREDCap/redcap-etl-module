@@ -19,12 +19,13 @@ class VisitsSqliteCodeTest extends TestCase
     private static $dbh;
     private static $logger;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (file_exists(self::CONFIG_FILE)) {
             self::$logger = new Logger('visits_sqlite_code_test');
 
-            $configuration = new Configuration(self::$logger, self::CONFIG_FILE);
+            $configuration = new TaskConfig();
+            $configuration->set(self::$logger, self::CONFIG_FILE);
 
             $dbConnection = $configuration->getDbConnection();
             list($type, $db) = explode(':', $dbConnection, 2);
@@ -44,7 +45,7 @@ class VisitsSqliteCodeTest extends TestCase
     }
 
 
-    public function setUp()
+    public function setUp(): void
     {
         if (!file_exists(self::CONFIG_FILE)) {
             $this->markTestSkipped("Required configuration not set for this test.");

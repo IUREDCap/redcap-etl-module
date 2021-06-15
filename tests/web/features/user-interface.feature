@@ -17,25 +17,29 @@ I need to be able to view the REDCap-ETL external module pages
     And I follow "REDCap-ETL"
 
   Scenario: Access REDCap-ETL home page for test project
-    Then I should see "ETL Configurations"
-    And I should see "Configure"
-    And I should see "Run"
-    And I should see "Schedule"
-    And I should see "User Manual"
+    Then I should see tabs "ETL Tasks", "ETL Workflows", "Configure", "Run", "Schedule","User Manual"
+    #Then I should see "ETL Configurations"
+    #And I should see "Configure"
+    #And I should see "Run"
+    #And I should see "Schedule"
+    #And I should see "User Manual"
 
   Scenario: Access REDCap-ETL configure page for test project
     When I follow "Configure"
-    Then I should see "Configuration:"
+    And I select "etl" from "configureType"
+    Then I should see "REDCap-ETL configuration name:"
     But I should not see "Run Now"
 
   Scenario: Access REDCap-ETL run page for test project
     When I follow "Run"
-    Then I should see "Configuration:"
+    And I select "etl" from "configureType"
+    Then I should see "ETL Task Configuration:"
     And I should see "Run Now"
 
   Scenario: Access REDCap-ETL schedule page for test project
     When I follow "Schedule"
-    Then I should see "Configuration:"
+    And I select "etl" from "configureType"
+    Then I should see "ETL Task Configuration:"
     And I should see "Server:"
     And I should see "Sunday"
     And I should see "Monday"
@@ -51,8 +55,8 @@ I need to be able to view the REDCap-ETL external module pages
     And I should see "REDCap-ETL Configurations"
     And I should see "Running REDCap-ETL"
 
-  Scenario: Access ETL Configurations page using the tab
-    When I follow "ETL Configurations"
+  Scenario: Access ETL Tasks page using the tab
+    When I follow "ETL Tasks"
     Then I should see "REDCap-ETL configuration name:"
     And I should see "Add"
 

@@ -18,6 +18,9 @@ class ModuleLog
     const ETL_CRON_JOB    = 'ETL cron job';
     const ETL_RUN         = 'ETL run';
     const ETL_RUN_DETAILS = 'ETL run details';
+    const WORKFLOW_RUN    = 'workflow run';
+    const WORKFLOW_CRON_JOB    = 'workflow_cron_job';
+
 
     private $module;
 
@@ -47,7 +50,6 @@ class ModuleLog
         ];
 
         $logMessage = 'REDCap-ETL cron jobs run';
-
         $logId = $this->module->log($logMessage, $logParams);
 
         return $logId;
@@ -135,10 +137,13 @@ class ModuleLog
         
         if ($type === self::ETL_RUN) {
             $query .= ', log_type, cron, config, etl_username, etl_server, cron_job_log_id, cron_day, cron_hour';
+            $query .= " where (log_type = '" . Filter::escapeForMysql($type) . "'";
+            $query .= " or log_type = '" . self::WORKFLOW_RUN . "')";
         } elseif ($type === self::ETL_CRON) {
             $query .= ', log_type, cron_day, cron_hour, num_jobs';
+            $query .= " where (log_type = '" . Filter::escapeForMysql($type) . "'";
+            $query .= " or log_type = '" . self::WORKFLOW_CRON_JOB . "')";
         }
-        $query .= " where log_type = '" . Filter::escapeForMysql($type) . "'";
         
         #----------------------------------------
         # Query start date condition (if any)
@@ -246,7 +251,8 @@ class ModuleLog
     public function getCronJobs($logId)
     {
         $query = "select log_id, timestamp, ui_id, project_id, message, log_type, etl_server, config, cron_log_id";
-        $query .= " where log_type = '" . self::ETL_CRON_JOB . "'"
+        $query .= " where (log_type = '" . self::ETL_CRON_JOB . "'"
+            . " or log_type = '" . self::WORKFLOW_CRON_JOB . "')"
             . " and cron_log_id = '" . Filter::escapeForMysql($logId) . "'";
         $cronJob = $this->module->queryLogs($query);
         return $cronJob;
@@ -258,7 +264,8 @@ class ModuleLog
     public function getEtlRunLogIdForCronJob($cronLogId)
     {
         $query = "select log_id";
-        $query .= " where log_type = '" . self::ETL_RUN . "'"
+        $query .= " where (log_type = '" . self::ETL_RUN . "'"
+            . " or log_type = '" . self::WORKFLOW_RUN . "')"
             . " and cron_log_id = '" . Filter::escapeForMysql($cronLogId) . "'";
         $result = $this->module->queryLogs($query);
         
@@ -295,12 +302,16 @@ class ModuleLog
         
         $tableRows = '';
         foreach ($cronJobsData as $job) {
+            $projectId = null;
+            if ($job['log_type'] !== self::WORKFLOW_CRON_JOB) {
+                $projectId = $job['project_id'];
+            }
             $row = "<tr>";
             $row .= '<td style="text-align: right;">' . Filter::sanitizeInt($job['log_id']) . "</td>";
             $row .= '<td style="text-align: right;">' . Filter::sanitizeInt($job['cron_log_id']) . "</td>";
             $row .= "<td>" . Filter::sanitizeString($job['etl_server']) . "</td>";
             $row .= "<td>" . Filter::sanitizeString($job['config']) . "</td>";
-            $row .= '<td style="text-align: right;">' . Filter::sanitizeString($job['project_id']) . "</td>";
+            $row .= '<td style="text-align: right;">' . Filter::sanitizeString($projectId) . "</td>";
             
             $row .= "</tr>\n";
             $tableRows .= $row;
@@ -340,5 +351,53 @@ class ModuleLog
         $details .= "</table>\n";
         
         return $details;
+    }
+
+    public function logWorkflowRun(
+        $username,
+        $isCronJob,
+        $workflowName,
+        $serverName,
+        $cronJobLogId = '',
+        $cronDay = null,
+        $cronHour = null
+    ) {
+        $logParams = [
+            'log_type'           => self::WORKFLOW_RUN,
+            'log_format_version' => self::LOG_FORMAT_VERSION,
+            'project_id'         => null,
+            'etl_username'       => $username,
+            'cron'               => $isCronJob,
+            'cron_job_log_id'    => $cronJobLogId,
+            'cron_day'           => $cronDay,
+            'cron_hour'          => $cronHour,
+            'config'             => $workflowName,
+            'etl_server'         => $serverName
+        ];
+
+        $logMessage = "ETL workflow run";
+
+        $logId = $this->module->log($logMessage, $logParams);
+        $this->lastEtlRunLogId = $logId;
+
+        return $logId;
+    }
+
+    public function logWorkflowCronJob($workflowName, $serverName, $cronLogId)
+    {
+        $logParams = [
+            'log_type'           => self::WORKFLOW_CRON_JOB,
+            'log_format_version' => self::LOG_FORMAT_VERSION,
+            'project_id'         => null,
+            'etl_server'         => $serverName,
+            'config'             => 'Workflow ' . $workflowName,
+            'cron_log_id'        => $cronLogId
+        ];
+
+        $logMessage = 'REDCap-ETL Workflow cron job';
+
+        $logId = $this->module->log($logMessage, $logParams);
+
+        return $logId;
     }
 }
