@@ -1,2 +1,1 @@
-This directory must be writable by your REDCap web server for
-web test coverage statistics to be collected.
+This directory is where the combined testing code coverage information is stored.

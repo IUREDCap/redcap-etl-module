@@ -6,22 +6,32 @@
 
 require_once __DIR__.'/../../vendor/autoload.php';
 
+use SebastianBergmann\CodeCoverage\CodeCoverage;
+use SebastianBergmann\CodeCoverage\Filter;
+use SebastianBergmann\CodeCoverage\Driver\Selector;
+
 $codeCoverageId = null;
 if (array_key_exists('code-coverage-id', $_COOKIE)) {
     $codeCoverageId = $_COOKIE['code-coverage-id'];
 }
 
+
 if (!empty($codeCoverageId)) {
-    $coverage = new \SebastianBergmann\CodeCoverage\CodeCoverage();
+    $filter = new Filter;
 
     # Included files and directories
-    $coverage->filter()->addFileToWhitelist(__DIR__.'/../../RedCapEtlModule.php');
-    $coverage->filter()->addDirectoryToWhitelist(__DIR__.'/../../classes');
-    $coverage->filter()->addDirectoryToWhitelist(__DIR__.'/../../web');
+    $filter->includeFile(__DIR__.'/../../RedCapEtlModule.php');
+    $filter->includeDirectory(__DIR__.'/../../classes');
+    $filter->includeDirectory(__DIR__.'/../../web');
 
     # Excluded files
-    $coverage->filter()->removeFileFromWhitelist(__DIR__.'/../../classes/EtlExtRedCapProject.php');
-    $coverage->filter()->removeFileFromWhitelist(__DIR__.'/../../web/test.php');
+    $filter->excludeFile(__DIR__.'/../../classes/EtlExtRedCapProject.php');
+    $filter->excludeFile(__DIR__.'/../../web/test.php');
+
+
+    $selector = new Selector;
+
+    $coverage = new CodeCoverage($selector->forLineCoverage($filter), $filter);
 
     $coverage->start($codeCoverageId);
 }

@@ -24,12 +24,27 @@ I need to be able to view the REDCap-ETL external module pages
     #And I should see "Schedule"
     #And I should see "User Manual"
 
-  Scenario: Access REDCap-ETL configure page for test project
+  Scenario: Access REDCap-ETL ETL workflows page for test project
+    When I follow "ETL Workflows"
+    Then I should see "REDCap-ETL Workflow name:"
+    And I should see "Configure"
+    And I should see "Run"
+
+  Scenario: Access REDCap-ETL task configure page for test project
     When I follow "Configure"
     And I follow "ETL Task"
     Then I should see "ETL Task"
-    Then I should see "ETL Workflow"
-    Then I should see "ETL Task Configuration"
+    And I should see "ETL Workflow"
+    And I should see "ETL Task Configuration"
+
+  Scenario: Access REDCap-ETL workflow configure page for test project
+    When I follow "Configure"
+    And I follow "ETL Workflow"
+    Then I should see "ETL Task"
+    And I should see "ETL Workflow"
+    And I should see "ETL Workflow Configuration:"
+    And I should see "REDCap project:"
+    But I should not see "ETL Task Configuration:"
 
   Scenario: Access REDCap-ETL run page for test project
     When I follow "Run"

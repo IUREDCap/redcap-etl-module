@@ -7,13 +7,35 @@
 
 require_once __DIR__.'/../../vendor/autoload.php';
 
+use SebastianBergmann\CodeCoverage\CodeCoverage;
+use SebastianBergmann\CodeCoverage\Filter;
+use SebastianBergmann\CodeCoverage\Driver\Selector;
+
+
 $files = glob(__DIR__.'/coverage-data/coverage.*');
 
-$combinedCoverage = new \SebastianBergmann\CodeCoverage\CodeCoverage();
+#------------------------------------------------------
+
+$filter = new Filter;
+
+# Included files and directories
+$filter->includeFile(__DIR__.'/../../RedCapEtlModule.php');
+$filter->includeDirectory(__DIR__.'/../../classes');
+$filter->includeDirectory(__DIR__.'/../../web');
+
+# Excluded files
+$filter->excludeFile(__DIR__.'/../../classes/EtlExtRedCapProject.php');
+$filter->excludeFile(__DIR__.'/../../web/test.php');
+
+
+$selector = new Selector;
+
+# ------------------------------------------------------
+$combinedCoverage = new CodeCoverage($selector->forLineCoverage($filter), $filter);
 
 $count = 0;
 foreach ($files as $file) {
-    require $file;
+    $coverage = require $file;
     $combinedCoverage->merge($coverage); 
     $count++;
 }
