@@ -27,10 +27,9 @@ I need to be able to view the REDCap-ETL external module pages
   Scenario: Access REDCap-ETL configure page for test project
     When I follow "Configure"
     And I follow "ETL Task"
+    Then I should see "ETL Task"
+    Then I should see "ETL Workflow"
     Then I should see "ETL Task Configuration"
-    Then I should see "Save"
-    Then I should see "Save and Exit"
-    But I should not see "Run Now"
 
   Scenario: Access REDCap-ETL run page for test project
     When I follow "Run"
@@ -39,8 +38,8 @@ I need to be able to view the REDCap-ETL external module pages
 
   Scenario: Access REDCap-ETL schedule page for test project
     When I follow "Schedule"
-    Then I should see "Save"
-    And I should see "ETL Task"
+    And I wait for 10 seconds
+    Then I should see "ETL Task"
     And I should see "ETL Workflow"
     And I should see "Server:"
     And I should see "Sunday"
@@ -50,6 +49,7 @@ I need to be able to view the REDCap-ETL external module pages
     And I should see "Thursday"
     And I should see "Friday"
     And I should see "Saturday"
+    And I should see "ETL Server"
 
   Scenario: Access REDCap-ETL user manual page for test project
     When I follow "User Manual"
