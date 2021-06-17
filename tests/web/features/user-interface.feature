@@ -36,7 +36,6 @@ I need to be able to view the REDCap-ETL external module pages
     When I follow "Run"
     Then I should see "ETL Task"
     Then I should see "ETL Workflow"
-    And I should see "Run Now"
 
   Scenario: Access REDCap-ETL schedule page for test project
     When I follow "Schedule"
