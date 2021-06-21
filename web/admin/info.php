@@ -24,8 +24,7 @@ use \IU\RedCapEtlModule\ServerConfig;
 $selfUrl   = $module->getUrl(RedCapEtlModule::ADMIN_INFO_PAGE);
 
 $configUrl     = $module->getUrl(RedCapEtlModule::ADMIN_HOME_PAGE);
-#$cronDetailUrl = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);
-$cronDetailUrl = $module->getUrl(RedCapEtlModule::CRON_DETAIL_TASKS_PAGE);
+$cronDetailUrl = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);
 
 $usersUrl       = $module->getUrl(RedCapEtlModule::USERS_PAGE);
 $userConfigUrl  = $module->getUrl(RedCapEtlModule::USER_CONFIG_PAGE);

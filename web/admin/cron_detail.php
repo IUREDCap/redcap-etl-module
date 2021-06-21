@@ -22,7 +22,7 @@ use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
-$selfUrl         = $module->getUrl(RedCapEtlModule::CRON_DETAIL_TASKS_PAGE);
+$selfUrl         = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);
 $serverConfigUrl = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
 $userUrl         = $module->getURL(RedCapEtlModule::USER_CONFIG_PAGE);
 
@@ -46,7 +46,6 @@ if (empty($selectedTime)) {
 
 $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
-$cronJobs = $module->getTaskCronJobs($selectedDay, $selectedTime);
 
 /*
 if ($submitValue === 'Run') {
@@ -83,17 +82,17 @@ echo $buffer;
 <?php
 
 $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
-$module->renderAdminEtlCronDetailSubTabs($selfUrl);
 ?>
 
 <?php
+
 #---------------------------------
-# Server selection form
+# Day and time selection form
 #---------------------------------
 $days = AdminConfig::DAY_LABELS;
 $times = $adminConfig->getTimeLabels();
 ?>
-<h5 style="margin-top: 2em;">ETL Stand-alone Tasks</h5>
+<h5 style="margin-top: 10px;">ETL Cron Jobs</h5>
 <form action="<?php echo $selfUrl;?>" method="post"
       style="padding: 4px; margin-bottom: 12px; border: 1px solid #ccc; background-color: #ccc;">
     <span style="font-weight: bold;">Day:</span>
@@ -126,35 +125,70 @@ $times = $adminConfig->getTimeLabels();
 
 <table class="dataTable">
     <thead>
-        <tr> <th>Project ID</th> <th>Configuration</th> <th>Server</th> </tr>
+        <tr> <th>Job Type</th> <th>Configuration</th> <th>Server</th> <th>Project IDs</th> </tr>
     </thead>
     <tbody>
         <?php
         $row = 1;
+
+        $taskCronJobs     = $module->getTaskCronJobs($selectedDay, $selectedTime);
+        $workflowCronJobs = $module->getWorkflowCronJobs($selectedDay, $selectedTime);
+        $cronJobs = array_merge($taskCronJobs, $workflowCronJobs);
+
+        #-----------------------------------------------------
+        # Task cron jobs
+        #-----------------------------------------------------
         foreach ($cronJobs as $cronJob) {
             $server = $cronJob['server'];
             $serverUrl = $serverConfigUrl . '&serverName=' . Filter::escapeForUrlParameter($server);
             #$username  = $cronJob['username'];
-            $projectId = $cronJob['projectId'];
-            $config    = $cronJob['config'];
-            $userConfigUrl = $userUrl . '&username=' . Filter::escapeForUrlParameter($username);
-            
-            $configUrl = $module->getURL(
-                RedCapEtlModule::USER_ETL_TASK_CONFIG_PAGE
-                . '?pid=' . Filter::escapeForUrlParameter($projectId)
-                . '&configName=' . Filter::escapeForUrlParameter($config)
-            );
+
+            $configType = '';
+            if (array_key_exists('workflowName', $cronJob)) {
+                $configType = 'workflow';
+                $config     = $cronJob['workflowName'];
+                $tasks = $module->getWorkflowTasks($config);
+                $taskProjectIds = array_column($tasks, 'projectId');
+                $firstPid = $taskProjectIds[0];
+                $configUrl = $module->getURL(
+                    RedCapEtlModule::WORKFLOW_CONFIG_PAGE
+                    . '?pid=' . Filter::escapeForUrlParameter($firstPid)
+                    . '&configName=' . Filter::escapeForUrlParameter($config)
+                );
+
+                $pidLinks = '';
+                $pids = array_unique($taskProjectIds);
+                sort($pids);
+                foreach ($pids as $pid) {
+                    $pidLinks .= ' <a href="'
+                        . APP_PATH_WEBROOT . 'index.php?pid=' . (int)$pid . '">'
+                        . (int) $pid . '</a> ';
+                }
+            } else {
+                $configType = 'task';
+                $projectId = $cronJob['projectId'];
+                $config    = $cronJob['config'];
+                $configUrl = $module->getURL(
+                    RedCapEtlModule::USER_ETL_TASK_CONFIG_PAGE
+                    . '?pid=' . Filter::escapeForUrlParameter($projectId)
+                    . '&configName=' . Filter::escapeForUrlParameter($config)
+                );
+                $pidLinks = '<a href="' . APP_PATH_WEBROOT . 'index.php?pid=' . (int)$projectId . '">'
+                    . (int)$projectId . '</a>';
+            }
 
             if ($row % 2 === 0) {
                 echo '<tr class="even">' . "\n";
             } else {
                 echo '<tr class="odd">' . "\n";
             }
-            echo "<td>" . '<a href="' . APP_PATH_WEBROOT . 'index.php?pid=' . (int)$projectId . '">'
-                . (int)$projectId . '</a>' . "</td>\n";
+            echo "<td>{$configType}</td>\n";   # Job Type
+
             echo "<td>" . '<a href="' . $configUrl . '">' . Filter::escapeForHtml($config) . '</a>' . "</td>\n";
             
             echo "<td>" . '<a href="' . $serverUrl . '">' . Filter::escapeForHtml($server) . '</a>' . "</td>\n";
+
+            echo "<td>" . $pidLinks . '</a>' . "</td>\n";
             
             echo "</tr>\n";
             $row++;
@@ -162,6 +196,12 @@ $times = $adminConfig->getTimeLabels();
         ?>
     </tbody>
 </table>
+
+<?php
+        print "<hr/><pre>\n";
+        print_r($cronJobs);
+        print "</pre>\n";
+?>
 
 
 <!--

@@ -17,8 +17,9 @@ require_once(__DIR__.'/dependencies/autoload.php');
 class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 {
     const ADMIN_HOME_PAGE    = 'web/admin/config.php';
-    const CRON_DETAIL_TASKS_PAGE    = 'web/admin/cron_detail_tasks.php';
-    const CRON_DETAIL_WORKFLOWS_PAGE = 'web/admin/cron_detail_workflows.php';
+
+    const CRON_DETAIL_PAGE   = 'web/admin/cron_detail.php';
+
     const USERS_PAGE         = 'web/admin/users.php';
     const USER_CONFIG_PAGE   = 'web/admin/user_config.php';
     const SERVERS_PAGE       = 'web/admin/servers.php';
@@ -34,8 +35,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const USER_ETL_CONFIG_PAGE       = 'web/configure.php';
     const USER_ETL_TASK_CONFIG_PAGE  = 'web/task_configure.php';
 
-    const WORKFLOWS_PAGE     = 'web/workflows.php';
-    const WORKFLOW_CONFIG_PAGE       = 'web/workflow_configure.php';
+    const WORKFLOWS_PAGE       = 'web/workflows.php';
+    const WORKFLOW_CONFIG_PAGE = 'web/workflow_configure.php';
     
     # REDCap event log constants
     const RUN_LOG_ACTION    = 'REDCap-ETL Export';
@@ -902,8 +903,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $adminLabel = '<span class="fas fa-cog"></span>'
            . ' Config';
 
-        $cronTaskJobsUrl = $this->getUrl(self::CRON_DETAIL_TASKS_PAGE);
-        $cronJobsLabel = '<span class="fas fa-clock"></span>'
+        $cronDetailUrl = $this->getUrl(self::CRON_DETAIL_PAGE);
+        $cronDetailLabel = '<span class="fas fa-clock"></span>'
            . ' Cron';
            #. ' Cron Detail';
 
@@ -933,7 +934,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $tabs[$infoUrl]          = $infoLabel;
         
         $tabs[$adminUrl]         = $adminLabel;
-        $tabs[$cronTaskJobsUrl]      = $cronJobsLabel;
+        $tabs[$cronDetailUrl]    = $cronDetailLabel;
         $tabs[$usersUrl]         = $usersLabel;
         #$tabs[$configureUserUrl] = $configureUserLabel;
 
@@ -1081,11 +1082,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $taskConfigUrl = $this->getUrl(self::USER_ETL_TASK_CONFIG_PAGE);
         $taskConfigLabel = '<span class="fas fa-cog"></span>'
-           . ' ETL Task</span>';
+           . ' <span>ETL Task</span>';
 
         $workflowConfigUrl = $this->getUrl(self::WORKFLOW_CONFIG_PAGE);
         $workflowConfigLabel = '<span class="fas fa-bars"></span>'
-           . ' ETL Workflow</span>';
+           . ' <span>ETL Workflow</span>';
 
         $tabs = array();
 
@@ -1152,6 +1153,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             }
             echo '<a href="' . $url . '" ' . $style . '>' . "{$label}</a>";
         }
+        echo "&nbsp;&nbsp;&nbsp;";
         echo "</div>\n";
     }
 
@@ -1756,27 +1758,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $details = 'REDCap-ETL workflow "' . $workflowName
             . '" schedule modified by user ' . $username . '.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
-    }
-    
-   /**
-     * Render sub-tabs for the admin cron-detail pages.
-     */
-    public function renderAdminEtlCronDetailSubTabs($activeUrl = '')
-    {
-        $cronDetailTasksUrl = $this->getUrl(self::CRON_DETAIL_TASKS_PAGE);
-        $cronDetailTasksLabel = '<span class="fas fa-cube"></span>'
-           . ' Stand-alone Tasks';
-
-        $cronDetailWorkflowsUrl = $this->getUrl(self::CRON_DETAIL_WORKFLOWS_PAGE);
-        $cronDetailWorkflowsLabel = '<span class="fas fa-cubes"></span>'
-           . ' Workflows';
-
-        $tabs = array();
-
-        $tabs[$cronDetailTasksUrl]      = $cronDetailTasksLabel;
-        $tabs[$cronDetailWorkflowsUrl]  = $cronDetailWorkflowsLabel;
-
-        $this->renderSubTabs($tabs, $activeUrl);
     }
     
     public function getWorkflowSchedule($workflowName)

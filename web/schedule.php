@@ -98,8 +98,6 @@ try {
     }
 
     if (strcasecmp($submitValue, 'Save') === 0) {
-        $configuration->validateForRunning();
-        
         $server = Filter::stripTags($_POST['server']);
         
         # Saving the schedule values
@@ -114,6 +112,7 @@ try {
         $schedule[6] = Filter::sanitizeInt($_POST['Saturday']);
         
         if ($configType === 'task') {
+            $configuration->validateForRunning();
             if (empty($configName)) {
                 $error = 'ERROR: No ETL configuration specified.';
             } elseif (!isset($configuration)) {
@@ -125,6 +124,7 @@ try {
                 $success = " Schedule saved.";
             }
         } elseif ($configType === 'workflow') {
+            # validate for running!!!!!!!!!!!!!!!!!!!!! TODO
             if (!isset($workflowName)) {
                 $error = 'ERROR: No workflow specified.';
             } elseif (empty($server)) {
