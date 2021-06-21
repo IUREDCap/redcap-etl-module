@@ -197,12 +197,6 @@ $times = $adminConfig->getTimeLabels();
     </tbody>
 </table>
 
-<?php
-        print "<hr/><pre>\n";
-        print_r($cronJobs);
-        print "</pre>\n";
-?>
-
 
 <!--
 <form action="<?php #echo $selfUrl;?>" method="post" style="margin-top: 12px;">

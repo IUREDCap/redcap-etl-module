@@ -172,6 +172,9 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
         foreach (range(0, 6) as $day) {
             $name = AdminConfig::ALLOWED_CRON_TIMES . '[' . $day . '][' . $time . ']';
             $count = count($cronJobs[$day][$time]);
+
+            $workflowCronJobs = $module->getWorkflowCronJobs($day, $time);
+            $count += count($workflowCronJobs);
             
             $jobsUrl = $cronInfoUrl . '&selectedDay=' . $day . '&selectedTime=' . $time;
 
