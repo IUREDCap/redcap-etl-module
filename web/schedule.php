@@ -136,9 +136,17 @@ try {
         }
     } else {
         # Just displaying page
-        if (isset($configuration)) {
-            $server   = $configuration->getProperty(Configuration::CRON_SERVER);
-            $schedule = $configuration->getProperty(Configuration::CRON_SCHEDULE);
+        if ($configType === 'task') {
+            if (isset($configuration)) {
+                $server   = $configuration->getProperty(Configuration::CRON_SERVER);
+                $schedule = $configuration->getProperty(Configuration::CRON_SCHEDULE);
+            }
+        } elseif ($configType === 'workflow') {
+            if (!empty($workflowName)) {
+                $workflowSchedule = $module->getWorkflowSchedule($workflowName);
+                $server   = $workflowSchedule[Configuration::CRON_SERVER];
+                $schedule = $workflowSchedule[Configuration::CRON_SCHEDULE];
+            }
         }
     }
 } catch (\Exception $exception) {
@@ -174,6 +182,7 @@ echo $buffer;
 $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 ?>
 
+
 <?php
 #-------------------------------------
 # Configuration selection form
@@ -196,7 +205,8 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
                             $checked = 'checked';
                         }
                         ?>
-                        <input type="radio" name="configType" value="task" id="task" <?php echo $checked ?>/>
+                        <input type="radio" name="configType" value="task" 
+                               id="task" <?php echo $checked ?> onchange="this.form.submit()"/>
                         <label for="task">ETL Task</label>
                     </td>
                     <td>
@@ -226,7 +236,8 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
                             $checked = 'checked';
                         }
                         ?>
-                        <input type="radio" name="configType" value="workflow" id="workflow" <?php echo $checked ?>/>
+                        <input type="radio" name="configType" value="workflow" 
+                               id="workflow" <?php echo $checked ?> onchange="this.form.submit()"/>
                         <label for="workflow">ETL Workflow</label>
                         &nbsp;
                     </td>
