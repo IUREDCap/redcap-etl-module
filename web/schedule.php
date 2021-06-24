@@ -179,7 +179,8 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 # Configuration selection form
 #-------------------------------------
 ?>
-<form action="<?php echo $selfUrl;?>" method="post" style="margin-top: 4px;">
+<form action="<?php echo $selfUrl;?>" method="post" 
+    style="padding: 12px; margin-bottom: 0px; margin-right: 1em; border-radius: 10px; border: 1px solid #ccc;">
 
     <div id="input-container">
 
@@ -275,7 +276,8 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
         <!-- SAVE BUTTON -->
         <div style="float: left; margin-left: 2em;">
-        <input type="submit" name="submitValue" value="Save" style="padding: 0em 2em;">
+        <input type="submit" name="submitValue" value="Save"
+            style="padding: 0em 2em; font-weight: bold; color: rgb(45, 107, 161);">
         </div>
     </div>
 

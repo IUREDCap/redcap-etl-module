@@ -162,116 +162,121 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
 
 <?php
-#-------------------------------------
-# Configuration selection form
-#-------------------------------------
+#------------------------------------------
+# Configuration & Server selection form
+#------------------------------------------
 ?>
 <form action="<?php echo $selfUrl;?>" method="post" 
-    style="padding: 14px; margin-bottom: 0px; border: 1px solid #ccc;">
+    style="padding: 12px; margin-bottom: 0px; margin-right: 1em; border-radius: 10px; border: 1px solid #ccc;">
 
-    <div style="text-align: right">
-    Help
-    </div>
 
-    <!-- CONFIGURATION INFORMATION -->
-    <table style="margin-bottom: 12px;">
-        <!-- TASKS -->
-        <tr>
-            <td>
-                <?php
-                $checked = '';
-                if ($configType === 'task') {
-                    $checked = 'checked';
-                }
-                ?>
-                <input type="radio" name="configType" value="task" id="task" <?php echo $checked ?>/>
-                <label for="task">ETL Task</label>
-            </td>
-            <td>
-                <select name="configName" onchange="this.form.submit()">
-                <?php
-                $configNames = $module->getAccessibleConfigurationNames();
-                array_unshift($configNames, '');
-                foreach ($configNames as $value) {
-                    if (strcmp($value, $configName) === 0) {
-                        echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '" selected>'
-                            . Filter::escapeForHtml($value) . "</option>\n";
-                    } else {
-                        echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '">'
-                            . Filter::escapeForHtml($value) . "</option>\n";
+    <div id="input-container" style="padding: 0px; margin: 0px;">
+
+        <!-- CONFIGURATION INFORMATION -->
+        <div style="float: left;">
+            <table style="margin-bottom: 0px;">
+                <!-- TASKS -->
+                <tr>
+                    <td>
+                        <?php
+                        $checked = '';
+                        if ($configType === 'task') {
+                            $checked = 'checked';
+                        }
+                        ?>
+                        <input type="radio" name="configType" value="task" id="task" <?php echo $checked ?>/>
+                        <label for="task">ETL Task</label>
+                    </td>
+                    <td>
+                        <select name="configName" onchange="this.form.submit()">
+                        <?php
+                        $configNames = $module->getAccessibleConfigurationNames();
+                        array_unshift($configNames, '');
+                        foreach ($configNames as $value) {
+                            if (strcmp($value, $configName) === 0) {
+                                echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '" selected>'
+                                    . Filter::escapeForHtml($value) . "</option>\n";
+                            } else {
+                                echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '">'
+                                    . Filter::escapeForHtml($value) . "</option>\n";
+                            }
+                        }
+                        ?>
+                        </select>
+                    </td>
+                </tr>
+        
+                <tr>
+                    <td>
+                        <?php
+                        $checked = '';
+                        if ($configType === 'workflow') {
+                            $checked = 'checked';
+                        }
+                        ?>
+                        <input type="radio" name="configType" value="workflow" id="workflow" <?php echo $checked ?>/>
+                        <label for="workflow">ETL Workflow</label>
+                        &nbsp;
+                    </td>
+                    <td>
+                        <?php
+                        $excludeIncomplete = true;
+                        $projectWorkflows = $module->getProjectAvailableWorkflows($pid, $excludeIncomplete);
+                        ?>
+                        <select name="workflowName" onchange="this.form.submit()">
+                        <?php
+                        foreach ($projectWorkflows as $value) {
+                            if (strcmp($value, $workflowName) === 0) {
+                                echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '" selected>'
+                                    . Filter::escapeForHtml($value) . "</option>\n";
+                            } else {
+                                echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '">'
+                                    . Filter::escapeForHtml($value) . "</option>\n";
+                            }
+                        }
+                        ?>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- SERVER SELECTION -->
+        <div style="float: left; margin-bottom: 22px; margin-left: 2em">
+            <span style="margin-right: 4px;">ETL Server:</span>
+            <?php
+            echo '<select name="server" id="serverId">' . "\n";
+            echo '<option value=""></option>' . "\n";
+            foreach ($servers as $serverName) {
+                $serverConfig = $module->getServerConfig($serverName);
+                if (isset($serverConfig) && $serverConfig->getIsActive()) {
+                    $selected = '';
+                    if ($serverName === $server) {
+                        $selected = 'selected';
                     }
+                    echo '<option value="' . Filter::escapeForHtmlAttribute($serverName) . '" ' . $selected . '>'
+                        . Filter::escapeForHtml($serverName) . "</option>\n";
                 }
-                ?>
-                </select>
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <?php
-                $checked = '';
-                if ($configType === 'workflow') {
-                    $checked = 'checked';
-                }
-                ?>
-                <input type="radio" name="configType" value="workflow" id="workflow" <?php echo $checked ?>/>
-                <label for="workflow">ETL Workflow</label>
-                &nbsp;
-            </td>
-            <td>
-                <?php
-                $excludeIncomplete = true;
-                $projectWorkflows = $module->getProjectAvailableWorkflows($pid, $excludeIncomplete);
-                ?>
-                <select name="workflowName" onchange="this.form.submit()">
-                <?php
-                foreach ($projectWorkflows as $value) {
-                    if (strcmp($value, $workflowName) === 0) {
-                        echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '" selected>'
-                            . Filter::escapeForHtml($value) . "</option>\n";
-                    } else {
-                        echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '">'
-                            . Filter::escapeForHtml($value) . "</option>\n";
-                    }
-                }
-                ?>
-                </select>
-            </td>
-        </tr>
-    </table>
-
-    <!-- SERVER SELECTION -->
-    <div style="margin-bottom: 22px;">
-        <span style="margin-right: 4px;">ETL Server:</span>
-        <?php
-        echo '<select name="server" id="serverId">' . "\n";
-        echo '<option value=""></option>' . "\n";
-        foreach ($servers as $serverName) {
-            $serverConfig = $module->getServerConfig($serverName);
-            if (isset($serverConfig) && $serverConfig->getIsActive()) {
-                $selected = '';
-                if ($serverName === $server) {
-                    $selected = 'selected';
-                }
-                echo '<option value="' . Filter::escapeForHtmlAttribute($serverName) . '" ' . $selected . '>'
-                    . Filter::escapeForHtml($serverName) . "</option>\n";
             }
-        }
-        echo "</select>\n";
-        ?>
+            echo "</select>\n";
+            ?>
+        </div>
+    
+        <!-- RUN BUTTON -->
+        <div style="float: left; margin-left: 2em; margin-bottom: 0px;">
+            <input type="submit" name="submit" value="Run"
+                    style="color: #008000; font-weight: bold; padding: 0px 24px;"
+                    onclick='$("#runOutput").text(""); $("body").css("cursor", "progress");'/>
+        </div>
     </div>
-
-    <!-- RUN BUTTON -->
-    <div>
-        <input type="submit" name="submit" value="Run"
-                style="color: #008000; font-weight: bold; padding: 0px 24px;"
-                onclick='$("#runOutput").text(""); $("body").css("cursor", "progress");'/>
-    </div>
+    
+    <div style="clear: both;"></div>
 
     <?php Csrf::generateFormToken(); ?>
 </form>
 
-<p><pre id="runOutput"><?php echo Filter::escapeForHtml($runOutput);?></pre></p>
+<div style="margin-right: 1em; margin-top: 12px;"
+><pre id="runOutput"><?php echo Filter::escapeForHtml($runOutput);?></pre></div>
 
 
 <?php require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
