@@ -36,7 +36,7 @@ try {
         $testMode = true;
     }
 
-    $selfUrl  = $module->getUrl("web/run.php");
+    $selfUrl  = $module->getUrl("web/configure.php");
 
     $servers  = $module->getUserAllowedServersBasedOnAccessLevel(USERID);
 
@@ -64,7 +64,7 @@ try {
     }
 
     #------------------------------------------
-    # Get the workflow (configuration) name
+    # Get the workflow name
     #------------------------------------------
     $workflowName = Filter::sanitizeLabel($_POST['workflowName']);
     if (empty($workflowName)) {
@@ -73,59 +73,12 @@ try {
         $_SESSION['workflowName'] = $workflowName;
     }
 
-    #------------------------------------------
-    # Get the server
-    #------------------------------------------
-    $server = Filter::stripTags($_POST['server']);
-    if (empty($server)) {
-        $server = $_SESSION['server'];
-    } else {
-        $_SESSION['server'] = $server;
-    }
-
     #-------------------------
     # Set the submit value
     #-------------------------
     $submit = '';
     if (array_key_exists('submit', $_POST)) {
         $submit = Filter::sanitizeButtonLabel($_POST['submit']);
-    }
-
-    #-----------------------------------------
-    # Process a submit
-    #-----------------------------------------
-    $runOutput = '';
-    if (strcasecmp($submit, 'Run') === 0) {
-        if ($configType === 'task') {
-            if (empty($configName)) {
-                $error = 'ERROR: No ETL configuration specified.';
-            } elseif (!isset($configuration)) {
-                $error = 'ERROR: No ETL configuration found for ' . $configName . '.';
-            } else {
-                $configuration->validateForRunning();
-                $isCronJob = false;
-                $runOutput = $module->run($configName, $server, $isCronJob);
-            }
-        } elseif ($configType === 'workflow') {
-            if (empty($workflowName)) {
-                $error = 'ERROR: No workflow specified.';
-            } else {
-                $isCronJob = false;
-                $originatingProjectId = $pid;
-
-                #Get projects that this user has access to
-                $db = new RedCapDb();
-                $userProjects = $db->getUserProjects($username);
-                $runOutput = $module->runWorkflow(
-                    $workflowName,
-                    $server,
-                    $username,
-                    $userProjects,
-                    $isCronJob,
-                    $originatingProjectId
-                );
-            }
-        }
     }
 } catch (\Exception $exception) {
     $error = 'ERROR: ' . $exception->getMessage();
@@ -163,7 +116,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
 <?php
 #------------------------------------------
-# Configuration & Server selection form
+# Configuration selection form
 #------------------------------------------
 ?>
 <form action="<?php echo $selfUrl;?>" method="post" 
@@ -184,7 +137,8 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
                             $checked = 'checked';
                         }
                         ?>
-                        <input type="radio" name="configType" value="task" id="task" <?php echo $checked ?>/>
+                        <input type="radio" name="configType" value="task" id="task" <?php echo $checked ?>
+                               onchange="this.form.submit()"/>
                         <label for="task">ETL Task</label>
                     </td>
                     <td>
@@ -214,13 +168,14 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
                             $checked = 'checked';
                         }
                         ?>
-                        <input type="radio" name="configType" value="workflow" id="workflow" <?php echo $checked ?>/>
+                        <input type="radio" name="configType" value="workflow" id="workflow" <?php echo $checked ?>
+                               onchange="this.form.submit()"/>
                         <label for="workflow">ETL Workflow</label>
                         &nbsp;
                     </td>
                     <td>
                         <?php
-                        $excludeIncomplete = true;
+                        $excludeIncomplete = false;
                         $projectWorkflows = $module->getProjectAvailableWorkflows($pid, $excludeIncomplete);
                         ?>
                         <select name="workflowName" onchange="this.form.submit()">
@@ -241,33 +196,14 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
             </table>
         </div>
 
-        <!-- SERVER SELECTION -->
-        <div style="float: left; margin-bottom: 22px; margin-left: 2em">
-            <span style="margin-right: 4px;">ETL Server:</span>
-            <?php
-            echo '<select name="server" id="serverId">' . "\n";
-            # echo '<option value=""></option>' . "\n";
-            foreach ($servers as $serverName) {
-                $serverConfig = $module->getServerConfig($serverName);
-                if (isset($serverConfig) && $serverConfig->getIsActive()) {
-                    $selected = '';
-                    if ($serverName === $server) {
-                        $selected = 'selected';
-                    }
-                    echo '<option value="' . Filter::escapeForHtmlAttribute($serverName) . '" ' . $selected . '>'
-                        . Filter::escapeForHtml($serverName) . "</option>\n";
-                }
-            }
-            echo "</select>\n";
-            ?>
+        <!-- SAVE BUTTON -->
+        <!--
+        <div style="float: left; margin-left: 2em;">
+        <input type="submit" name="submitValue" value="Save"
+            style="padding: 0em 2em; font-weight: bold; color: rgb(45, 107, 161);">
         </div>
-    
-        <!-- RUN BUTTON -->
-        <div style="float: left; margin-left: 2em; margin-bottom: 0px;">
-            <input type="submit" name="submit" value="Run"
-                    style="color: #008000; font-weight: bold; padding: 0px 24px;"
-                    onclick='$("#runOutput").text(""); $("body").css("cursor", "progress");'/>
-        </div>
+        -->
+
     </div>
     
     <div style="clear: both;"></div>
@@ -275,9 +211,16 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     <?php Csrf::generateFormToken(); ?>
 </form>
 
-<div style="margin-right: 1em; margin-top: 12px;"
-><pre id="runOutput"><?php echo Filter::escapeForHtml($runOutput);?></pre></div>
+<?php
 
+define('ETL_CONFIG_PAGE', 1);
+if ($configType === 'task') {
+    include(__DIR__ . '/task_configure_include.php');
+} elseif ($configType === 'workflow') {
+    include(__DIR__ . '/workflow_configure_include.php');
+}
+
+?>
 
 <?php require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
 

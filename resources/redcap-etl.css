@@ -117,6 +117,12 @@ fieldset.server-config textarea {
 }
 
 /* Configuration fieldset */
+fieldset.config-container {
+    padding: 7px;
+    margin-bottom: 14px;
+    border: 1px solid #777;
+}
+
 fieldset.config {
     padding: 7px;
     margin-bottom: 14px;

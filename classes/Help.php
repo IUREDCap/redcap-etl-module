@@ -174,6 +174,15 @@ class Help
             . " need to request an API token with export rights."
             . "</p>"
         ,
+        'global-properties' =>
+            "<p>"
+            . "Global properties are used to override the values of task properties in a workflow."
+            . " If a global property is set, its value will replace"
+            . " the corresponding values for all tasks in the workflow."
+            . " This can be used, for example, to set the database,"
+            . " so that all tasks in a workflow load data to the same database."
+            . "</p>"
+        ,
         'ignore-empty-incomplete-forms' =>
             "<p>"
             . "REDCap is inconsistent in how it handles forms that have not been edited."

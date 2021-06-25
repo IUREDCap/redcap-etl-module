@@ -1024,7 +1024,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
            . ' ETL Tasks';
 
         
-        $configUrl = $this->getUrl('web/task_configure.php');
+        $configUrl = $this->getUrl(self::USER_ETL_CONFIG_PAGE);
         $configLabel = '<span style="color: #808080;" class="fas fa-cog"></span>'
            . ' Configure';
 
