@@ -4,8 +4,10 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
+use IU\REDCapETL\EtlRedCapProject;
 use IU\REDCapETL\Database\DbConnectionFactory;
 
+use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Configuration;
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
@@ -26,6 +28,98 @@ if (!defined('REDCAP_ETL_MODULE')) {
 <!-- ==============================================================================================
 GLOBAL PROPERTIES
 =============================================================================================== -->
+
+<?php
+$success = '';
+$warning = '';
+$error   = '';
+
+$parseResult = '';
+
+$workflowName = Filter::escapeForHtml($_GET['workflowName']);
+$workflowStatus = $module->getWorkflowStatus($workflowName);
+
+try {
+    #-----------------------------------------------------------
+    # Check that the user has permission to access this page
+    #-----------------------------------------------------------
+    $module->checkUserPagePermission(USERID);
+
+    #-------------------------------------------------------------------
+    # Check for test mode (which should only be used for development)
+    #-------------------------------------------------------------------
+    $testMode = false;
+    if (@file_exists(__DIR__ . '/../test-config.ini')) {
+        $testMode = true;
+    }
+
+    if (array_key_exists('success', $_GET)) {
+        $success = Filter::stripTags($_GET['success']);
+    }
+
+    if (array_key_exists('warning', $_GET)) {
+        $warning = Filter::stripTags($_GET['warning']);
+    }
+
+    $selfUrl = $module->getUrl('web/workflow_global_properties.php')
+                   . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
+    $workflowUrl = $module->getUrl('web/configure.php')
+                       . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
+    $workflowsUrl = $module->getUrl('web/workflows.php');
+    $configureUrl = $module->getUrl('web/configure.php');
+
+    $adminConfig = $module->getAdminConfig();
+
+
+    $configuration = $module->getWorkflowGlobalConfiguration($workflowName);
+
+    $properties = array();
+    $properties = $module->getWorkflowGlobalProperties($workflowName);
+
+    $redCapDb = new RedCapDb();
+
+    $isWorkflowGlobalProperties = true;
+    if (!empty($configuration)) {
+        #-------------------------
+        # Get the submit value
+        #-------------------------
+        $submitValue = '';
+        if (array_key_exists('submitValue', $_POST)) {
+            $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
+        }
+        #---------------------------------------------------------------
+        # if this is a POST other than Cancel,
+        # update the configuration properties with the POST values
+        #---------------------------------------------------------------
+        if (!empty($submitValue) && strcasecmp($submitValue, 'Cancel')) {
+            $configuration->set(Filter::stripTagsArrayRecursive($_POST), $isWorkflowGlobalProperties);
+            # Reset properties, since they may have been modified above
+            $initialize = false;
+            $properties = $configuration->getGlobalProperties($initialize);
+        }
+        
+        #------------------------------------------------------
+        # Process Actions
+        #------------------------------------------------------
+        $properties[Configuration::DB_CONNECTION] = null;
+        try {
+            if (strcasecmp($submitValue, 'Cancel') === 0) {
+                header('Location: ' . $workflowUrl);
+            } elseif (strcasecmp($submitValue, 'Save') === 0) {
+                if (empty($warning) && empty($error)) {
+                    $configuration->validate($isWorkflowGlobalProperties);
+                    // Save configuration to database
+                    $module->setWorkflowGlobalProperties($workflowName, $properties, USERID);
+                }
+            }
+        } catch (\Exception $exception) {
+            $error = 'ERROR: ' . $exception->getMessage();
+        }
+    }  // END - if configuration is not empty
+} catch (\Exception $exception) {
+    $error = 'ERROR: ' . $exception->getMessage();
+}
+?>
 
 
 <script>
