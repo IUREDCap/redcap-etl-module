@@ -265,6 +265,13 @@ class Help
             . "The transformation rules describe how REDCap-ETL should transform the data"
             . " from REDCap before loading it into the database."
             . "</p>"
+        ,
+        'workflow-tasks' =>
+            "<p>"
+            . "Workflows consist of a set of tasks, where each task represents an"
+            . " ETL configuration for a REDCap project."
+            . " The tasks of the workflow are executed sequentually in the order defined."
+            . "</p>"
     ];
 
     public static function getTitle($topic)

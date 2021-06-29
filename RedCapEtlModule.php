@@ -11,6 +11,8 @@ namespace IU\RedCapEtlModule;
 require_once(__DIR__.'/dependencies/autoload.php');
 // phpcs:enable
 
+define('REDCAP_ETL_MODULE', 1);
+
 /**
  * Main REDCap-ETL module class.
  */
@@ -33,10 +35,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const LOG_PAGE           = 'web/admin/log.php';
             
     const USER_ETL_CONFIG_PAGE       = 'web/configure.php';
-    const USER_ETL_TASK_CONFIG_PAGE  = 'web/task_configure.php';
 
     const WORKFLOWS_PAGE       = 'web/workflows.php';
-    const WORKFLOW_CONFIG_PAGE = 'web/workflow_configure.php';
     
     # REDCap event log constants
     const RUN_LOG_ACTION    = 'REDCap-ETL Export';
@@ -1075,28 +1075,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $this->renderTabs($tabs, $activeUrl);
     }
 
-    /**
-     * Render sub-tabs for the admin help edit pages.
-     */
-    public function renderUserConfigSubTabs($activeUrl = '')
-    {
-        $taskConfigUrl = $this->getUrl(self::USER_ETL_TASK_CONFIG_PAGE);
-        $taskConfigLabel = '<span class="fas fa-cog"></span>'
-           . ' <span>ETL Task</span>';
-
-        $workflowConfigUrl = $this->getUrl(self::WORKFLOW_CONFIG_PAGE);
-        $workflowConfigLabel = '<span class="fas fa-bars"></span>'
-           . ' <span>ETL Workflow</span>';
-
-        $tabs = array();
-
-        $tabs[$taskConfigUrl]     = $taskConfigLabel;
-        $tabs[$workflowConfigUrl] = $workflowConfigLabel;
-
-        $this->renderSubTabs($tabs, $activeUrl);
-    }
-
-
 
     /**
      * Renders tabs using built-in REDCap styles.
@@ -1207,6 +1185,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function renderProjectPageContentHeader($selfUrl, $errorMessage, $warningMessage, $successMessage)
     {
         $this->renderUserTabs($selfUrl);
+        $this->renderErrorMessageDiv($errorMessage);
+        $this->renderWarningMessageDiv($warningMessage);
+        $this->renderSuccessMessageDiv($successMessage);
+    }
+
+    public function renderMessages($errorMessage, $warningMessage, $successMessage)
+    {
         $this->renderErrorMessageDiv($errorMessage);
         $this->renderWarningMessageDiv($warningMessage);
         $this->renderSuccessMessageDiv($successMessage);

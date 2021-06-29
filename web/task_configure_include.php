@@ -21,7 +21,7 @@ use IU\RedCapEtlModule\RedCapEtlModule;
 # Only allow this page to be included in the user ETL Configure page,
 # and not accessed directly
 #-------------------------------------------------------------------------
-if (!defined('ETL_CONFIG_PAGE')) {
+if (!defined('REDCAP_ETL_MODULE')) {
     header($_SERVER["SERVER_PROTOCOL"] . " 403 Forbidden");
     exit;
 }
@@ -35,6 +35,11 @@ if (!defined('ETL_CONFIG_PAGE')) {
 </script>
 
 <?php
+
+$error = '';
+$warning = '';
+$success = '';
+
 $parseResult = '';
 
 try {
@@ -68,7 +73,7 @@ try {
 
     $listUrl = $module->getUrl('web/index.php');
     $configureUrl = $module->getUrl('web/configure.php');
-    $selfUrl = $module->getUrl('web/task_configure.php');
+    $selfUrl = $module->getUrl('web/configure.php');
     $generateRulesUrl = $module->getUrl('web/generate_rules.php');
 
     $adminConfig = $module->getAdminConfig();
@@ -379,6 +384,8 @@ try {
 } catch (\Exception $exception) {
     $error = 'ERROR: ' . $exception->getMessage();
 }
+
+$module->renderMessages($error, $warning, $success);
 ?>
 
 <script>
@@ -570,6 +577,8 @@ Configuration form
     <input type="hidden" name="<?php echo Configuration::TRANSFORM_RULES_SOURCE; ?>"
            value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::TRANSFORM_RULES_SOURCE]); ?>" />
      
+    <input type="hidden" name="configType" value="task">
+
     <!--<div style="padding: 10px; border: 1px solid #ccc; background-color: #f0f0f0;"> -->
 
     <fieldset class="config">

@@ -17,7 +17,7 @@ use IU\RedCapEtlModule\RedCapEtlModule;
 # Only allow this page to be included in the user ETL Configure page,
 # and not accessed directly
 #-------------------------------------------------------------------------
-if (!defined('ETL_CONFIG_PAGE')) {
+if (!defined('REDCAP_ETL_MODULE')) {
     header($_SERVER["SERVER_PROTOCOL"] . " 403 Forbidden");
     exit;
 }
@@ -158,10 +158,10 @@ GLOBAL PROPERTIES
 <div style="border: 1px solid #aaa; border-radius: 7px; padding: 1em;">
 
   <div style="float: right;">
-    <a href="#" id="load-settings-help-link" class="etl-help" title="help">?</a>
+    <a href="#" id="global-properties-help-link" class="etl-help" title="help">?</a>
   </div>
 
-  <div id="load-settings-help" title="Global Properties" style="display: none; clear: both;">
+  <div id="global-properties-help" title="Global Properties" style="display: none; clear: both;">
         <?php echo Help::getHelpWithPageLink('global-properties', $module); ?>
   </div> 
 
@@ -183,6 +183,20 @@ GLOBAL PROPERTIES
            value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::TRANSFORM_RULES_SOURCE]); ?>" />
      
     <!--<div style="padding: 10px; border: 1px solid #ccc; background-color: #f0f0f0;"> -->
+
+
+    <fieldset class="config" style="padding: 4px;">
+    <table style="width: 50%; margin: 0 auto;">
+        <tr>
+            <td style="text-align: center;">&nbsp;</td>
+            <td style="text-align: center;">
+                <input type="submit" name="submitValue" value="Save" />
+                <input type="submit" name="submitValue" value="Cancel" style="margin-left: 24px;" />
+            </td>
+            <td style="text-align: center;">&nbsp;</td>
+        </tr>
+    </table>
+    </fieldset>
 
     <fieldset class="config">
         <legend>Load Settings</legend>
@@ -529,19 +543,6 @@ GLOBAL PROPERTIES
     </fieldset>
 
 
-    <fieldset class="config">
-    <table style="width: 50%; margin: 0 auto;">
-        <tr>
-            <td style="text-align: center;">&nbsp;</td>
-            <td style="text-align: center;">
-                <input type="submit" name="submitValue" value="Save" />
-                <input type="submit" name="submitValue" value="Save and Exit" style="margin-left: 24px;"/>
-                <input type="submit" name="submitValue" value="Cancel" style="margin-left: 24px;" />
-            </td>
-            <td style="text-align: center;">&nbsp;</td>
-        </tr>
-    </table>
-    </fieldset>
 
     <?php Csrf::generateFormToken(); ?>
     </form>

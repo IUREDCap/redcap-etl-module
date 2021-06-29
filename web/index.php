@@ -106,7 +106,7 @@ $configurationNames = $module->getConfigurationNames();
 $adminConfig = $module->getAdminConfig();
 
 $selfUrl     = $module->getUrl('web/index.php');
-$configUrl   = $module->getUrl('web/task_configure.php');
+$configUrl   = $module->getUrl('web/configure.php');
 $testUrl     = $module->getUrl('web/test.php');
 $scheduleUrl = $module->getUrl('web/schedule.php');
 $runUrl      = $module->getUrl('web/run.php');
@@ -176,7 +176,9 @@ foreach ($configurationNames as $configurationName) {
         echo '<tr class="odd">' . "\n";
     }
     
-    $configureUrl = $configUrl . '&configName=' . Filter::escapeForUrlParameter($configurationName);
+    $configureUrl = $configUrl . '&configName=' . Filter::escapeForUrlParameter($configurationName)
+        . '&configType=task';
+
     $testingUrl = $testUrl . '&configName=' . Filter::escapeForUrlParameter($configurationName);
 
     $runConfigurationUrl = $runUrl . '&configName=' . Filter::escapeForUrlParameter($configurationName)

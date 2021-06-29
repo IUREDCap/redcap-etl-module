@@ -17,10 +17,28 @@ use IU\RedCapEtlModule\RedCapEtlModule;
 # Only allow this page to be included in the user ETL Configure page,
 # and not accessed directly
 #-------------------------------------------------------------------------
-if (!defined('ETL_CONFIG_PAGE')) {
+if (!defined('REDCAP_ETL_MODULE')) {
     header($_SERVER["SERVER_PROTOCOL"] . " 403 Forbidden");
     exit;
 }
+?>
+
+<script>
+    // Help dialog events
+    $(document).ready(function() {
+        $( function() {
+
+            $('#workflow-tasks-help-link').click(function () {
+                $('#workflow-tasks-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
+                    .dialog('widget').position({my: 'left top', at: 'right-420 top-190', of: $(this)})
+                    ;
+                return false;
+            });
+        });
+});
+</script>
+
+<?php
 
 $newTaskKey = null;
 $addProjectId = null;
@@ -63,7 +81,6 @@ $selfUrl      = $module->getUrl(RedCapEtlModule::USER_ETL_CONFIG_PAGE);
                    #. '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
 $workflowsUrl = $module->getUrl('web/workflows.php');
 $configureUrl = $module->getUrl('web/configure.php');
-$taskConfigUrl = $module->getUrl('web/task_configure.php');
 $globalPropertiesUrl = $module->getUrl('web/workflow_global_properties.php')
                    . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
 
@@ -186,8 +203,17 @@ $taskProjectIds = array_column($tasks, 'projectId');
 -->
 
 <div id="forms-container">
-<div id="tasks-container"
-  style="margin-right: 2em; margin-bottom: 2em; float: left; border: 1px solid #aaa; border-radius: 7px; padding: 1em;">
+
+  
+  <div id="tasks-container" class="tasks-container">
+
+  <div style="float: right;">
+    <a href="#" id="workflow-tasks-help-link" class="etl-help" title="help">?</a>
+  </div>
+
+  <div id="workflow-tasks-help" title="Workflow Tasks" style="display: none; clear: both;">
+        <?php echo Help::getHelpWithPageLink('workflow-tasks', $module); ?>
+  </div>
 
   <div style="font-weight: bold; font-size: 110%; text-align: center; margin-bottom: 20px;">Tasks</div>
 

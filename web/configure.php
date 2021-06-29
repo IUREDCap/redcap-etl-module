@@ -213,7 +213,6 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
 <?php
 
-define('ETL_CONFIG_PAGE', 1);
 if ($configType === 'task') {
     include(__DIR__ . '/task_configure_include.php');
 } elseif ($configType === 'workflow') {
