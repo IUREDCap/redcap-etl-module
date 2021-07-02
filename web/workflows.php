@@ -20,7 +20,7 @@ $error   = '';
 $warning = '';
 $success = '';
 
-$removeWorkflowName =  '';
+$deleteWorkflowName =  '';
 $copyFromWorkflowName = '';
 $copyToWorkflowName = '';
 $renameWorkflowName = '';
@@ -34,7 +34,7 @@ try {
     $module->checkUserPagePermission(USERID);
 
     #-----------------------------------------------------------------
-    # Process form submissions (workflow add/copy/remove/rename)
+    # Process form submissions (workflow add/copy/delete/rename)
     #-----------------------------------------------------------------
     $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
     if (strcasecmp($submitValue, 'Add') === 0) {
@@ -66,21 +66,21 @@ try {
                         
             $module->copyWorkflow($copyFromWorkflowName, $copyToWorkflowName);
         }
-    } elseif (strcasecmp($submitValue, 'remove') === 0) {
+    } elseif (strcasecmp($submitValue, 'delete') === 0) {
         #---------------------------------------------
-        # Remove workflow
+        # Delete workflow
         #---------------------------------------------
-        $removeWorkflowName = Filter::stripTags($_POST['removeWorkflowName']);
-        $hasPermissions = $module->hasPermissionsForAllTasks($removeWorkflowName, USERID);
-        if (isset($removeWorkflowName)) {
+        $deleteWorkflowName = Filter::stripTags($_POST['deleteWorkflowName']);
+        $hasPermissions = $module->hasPermissionsForAllTasks($deleteWorkflowName, USERID);
+        if (isset($deleteWorkflowName)) {
             # Make sure workflow name is validated before it is used
-            Configuration::validateName($removeWorkflowName);
+            Configuration::validateName($deleteWorkflowName);
 
-            $hasPermissions = $module->hasPermissionsForAllTasks($removeWorkflowName, USERID);
+            $hasPermissions = $module->hasPermissionsForAllTasks($deleteWorkflowName, USERID);
             if ($hasPermissions) {
-                $module->deleteWorkflow($removeWorkflowName, USERID);
+                $module->deleteUserWorkflow($deleteWorkflowName, USERID);
             } else {
-                $module->removeWorkflow($removeWorkflowName, USERID);
+                $module->deleteUserWorkflow($deleteWorkflowName, USERID);
             }
         }
     } elseif (strcasecmp($submitValue, 'rename') === 0) {
@@ -168,7 +168,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     ?>
     <th>Copy</th>
     <th>Rename</th>
-    <th>Remove</th>
+    <th>Delete</th>
 
 </tr>
 </thead>
@@ -296,7 +296,7 @@ foreach ($workflowNames as $workflowName) {
         echo '<td style="text-align:center;">'
             . '<input type="image" src="' . APP_PATH_IMAGES . 'delete.png" alt="REMOVE"'
             . ' class="deleteConfig" style="cursor: pointer;"'
-            . ' id="removeWorkflow' . $row . '"/>'
+            . ' id="deleteWorkflow' . $row . '"/>'
             . "</td>\n";
     } else {
         echo '<td style="text-align:center;">'
@@ -430,52 +430,52 @@ $(function() {
 
 <?php
 #--------------------------------------
-# Remove workflow dialog
+# Delete workflow dialog
 #--------------------------------------
 ?>
 <script>
 $(function() {
-    // Remove ETL workflow form
-    removeForm = $("#removeForm").dialog({
+    // Delete ETL workflow form
+    deleteForm = $("#deleteForm").dialog({
         autoOpen: false,
         height: 170,
         width: 400,
         modal: true,
         buttons: {
             Cancel: function() {$(this).dialog("close");},
-            "Remove workflow": function() {removeForm.submit();}
+            "Delete workflow": function() {deleteForm.submit();}
         },
-        title: "Remove Workflow"
+        title: "Delete Workflow"
     });
   
     <?php
-    # Set up click event handlers for the Remove Workflow buttons
+    # Set up click event handlers for the Delete Workflow buttons
     $row = 1;
     foreach ($workflowNames as $workflowName) {
-        echo '$("#removeWorkflow' . $row . '").click({workflowName: "'
+        echo '$("#deleteWorkflow' . $row . '").click({workflowName: "'
            . Filter::escapeForJavaScriptInDoubleQuotes($workflowName)
-           . '"}, removeWorkflow);' . "\n";
+           . '"}, deleteWorkflow);' . "\n";
         $row++;
     }
     ?>
     
-    function removeWorkflow(event) {
+    function deleteWorkflow(event) {
         var workflowName = event.data.workflowName;
-        $("#workflowToRemove").text('"'+workflowName+'"');
-        $('#removeWorkflowName').val(workflowName);
-        $("#removeForm").dialog("open");
+        $("#workflowToDelete").text('"'+workflowName+'"');
+        $('#deleteWorkflowName').val(workflowName);
+        $("#deleteForm").dialog("open");
     }
 });
 </script>
-<div id="removeDialog"
-    title="Workflow Remove"
+<div id="deleteDialog"
+    title="Workflow Delete"
     style="display: none;"
     >
-    <form id="removeForm" action="<?php echo $selfUrl;?>" method="post">
-    To remove the Workflow configuration <span id="workflowToRemove" style="font-weight: bold;"></span>,
-    click on the <span style="font-weight: bold;">Remove workflow</span> button.
-    <input type="hidden" name="removeWorkflowName" id="removeWorkflowName" value="">
-    <input type="hidden" name="submitValue" value="remove">
+    <form id="deleteForm" action="<?php echo $selfUrl;?>" method="post">
+    To delete the Workflow configuration <span id="workflowToDelete" style="font-weight: bold;"></span>,
+    click on the <span style="font-weight: bold;">Delete workflow</span> button.
+    <input type="hidden" name="deleteWorkflowName" id="deleteWorkflowName" value="">
+    <input type="hidden" name="submitValue" value="delete">
     <?php Csrf::generateFormToken(); ?>
     </form>
 </div>

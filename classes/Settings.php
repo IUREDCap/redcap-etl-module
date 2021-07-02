@@ -1096,7 +1096,7 @@ class Settings
             $message = 'When adding new workflow, no workflow name specified.';
             throw new \Exception($message);
         } elseif ($workflows->workflowExists($workflowName)) {
-            $message = 'Workflow "' . $workflowName . '" already exists.';
+            $message = 'A workflow with the name "' . $workflowName . '" already exists.';
             throw new \Exception($message);
         }
 
@@ -1222,7 +1222,10 @@ class Settings
         return $projectWorkflows;
     }
 
-    public function removeWorkflow($workflowName, $username, $transaction = true)
+    /**
+     * Deletes a user's workflow.
+     */
+    public function deleteUserWorkflow($workflowName, $username, $transaction = true)
     {
         $commit = true;
 

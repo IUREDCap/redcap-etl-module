@@ -1324,10 +1324,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     /**
      * Marks a workflow as 'removed'. Does not delete the workflow from the Workflows array.
      */
-    public function removeWorkflow($workflowName, $username = USERID)
+    public function deleteUserWorkflow($workflowName, $username = USERID)
     {
         if ($this->getDataExportRight()) {
-            $this->settings->removeWorkflow($workflowName, $username);
+            $this->settings->deleteUserWorkflow($workflowName, $username);
             $details = 'REDCap-ETL workflow "' . $workflowName . '" marked as removed by user ' . $username . '.';
             \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
         } else {

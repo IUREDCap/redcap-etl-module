@@ -431,6 +431,9 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         Util::selectUserFromSelect($session, $select);
     }
 
+
+    /* Configuration --------------------------------------------------------------- */
+
     /**
      * @When /^I follow configuration "([^"]*)"$/
      */
@@ -483,6 +486,74 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     {
         $session = $this->getSession();
         EtlConfigsPage::deleteConfigurationIfExists($session, $configName);
+    }
+
+    /* Workflow --------------------------------------------------------------- */
+
+    /**
+     * @When /^I follow workflow "([^"]*)"$/
+     */
+    public function iFollowWorkflow($workflowName)
+    {
+        $session = $this->getSession();
+        EtlWorkflowsPage::followWorkflow($session, $workflowName);
+    }
+
+    /**
+     * @When /^I configure workflow "([^"]*)"$/
+     */
+    public function iConfigureWorkflow($workflowName)
+    {
+        $session = $this->getSession();
+        ConfigurePage::configureWorkflow($session, $workflowName);
+    }
+
+    /**
+     * @When /^I copy workflow "([^"]*)" to "([^"]*)"$/
+     */
+    public function iCopyWorkflow($workflowName, $copyToWorkflowName)
+    {
+        $session = $this->getSession();
+        EtlWorkflowsPage::copyWorkflow($session, $workflowName, $copyToWorkflowName);
+    }
+
+    /**
+     * @When /^I rename workflow "([^"]*)" to "([^"]*)"$/
+     */
+    public function iRenameWorkflow($workflowName, $newWorkflowName)
+    {
+        $session = $this->getSession();
+        EtlWorkflowsPage::renameWorkflow($session, $workflowName, $newWorkflowName);
+    }
+
+    /**
+     * @When /^I delete workflow "([^"]*)"$/
+     */
+    public function iDeleteWorkflow($workflowName)
+    {
+        $session = $this->getSession();
+        EtlWorkflowsPage::deleteWorkflow($session, $workflowName);
+    }
+
+    /**
+     * @When /^I delete workflow "([^"]*)" if it exists$/
+     */
+    public function iDeleteWorkflowIfExists($workflowName)
+    {
+        $session = $this->getSession();
+        EtlWorkflowsPage::deleteWorkflowIfExists($session, $workflowName);
+    }
+
+
+    /* ----------------------------------------------------------------------------- */
+
+    /**
+     * @When /^I admin delete workflow "([^"]*)"$/
+     */
+    public function iAdminDeleteWorkflow($workflowName)
+    {
+        $session = $this->getSession();
+        AdminWorkflowsPage::adminDeleteWorkflow($session, $workflowName);
     }
 
 
