@@ -36,7 +36,8 @@ $error   = '';
 
 $parseResult = '';
 
-$workflowName = Filter::escapeForHtml($_GET['workflowName']);
+# $workflowName should be set by configure.php, which includes this file
+
 $workflowStatus = $module->getWorkflowStatus($workflowName);
 
 try {
