@@ -55,7 +55,7 @@ class EtlWorkflowsPage
 
         # Handle confirmation dialog
         $page->fillField("renameNewWorkflowName", $renameNewWorkflowName);
-        $page->pressButton("Rename workflow");
+        $page->pressButton("Rename Workflow");
     }
 
 
