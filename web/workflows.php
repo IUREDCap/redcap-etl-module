@@ -125,11 +125,11 @@ echo $buffer;
 $workflowNames = $module->getProjectAvailableWorkflows();
 $adminConfig   = $module->getAdminConfig();
 
-$selfUrl       = $module->getUrl('web/workflows.php');
-$configUrl     = $module->getUrl('web/workflow_configure.php');
+$selfUrl       = $module->getUrl(RedCapEtlModule::WORKFLOWS_PAGE);
+$configUrl     = $module->getUrl(RedCapEtlModule::USER_ETL_CONFIG_PAGE);
 $testUrl       = $module->getUrl('web/test.php');
 $scheduleUrl   = $module->getUrl('web/schedule.php');
-$runUrl        = $module->getUrl('web/run.php');
+$runUrl        = $module->getUrl(RedCapEtlModule::RUN_PAGE);
 
 $userEtlProjects = $module->getUserEtlProjects();
 $projectId = $module->getProjectId();
@@ -207,7 +207,10 @@ foreach ($workflowNames as $workflowName) {
     # CONFIGURE BUTTON - disable if user does not have permission to access the project
     #-------------------------------------------------------------------------------------
     if ($hasPermissionToExport) {
-        $configureUrl = $configUrl . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
+        $configureUrl = $configUrl
+            . '&workflowName=' . Filter::escapeForUrlParameter($workflowName)
+            . '&configType=workflow'
+            ;
         echo '<td style="text-align:center;">'
             . '<a href="' . $configureUrl . '">'
             . '<img alt="CONFIG" src="' . APP_PATH_IMAGES . 'gear.png"></a>'

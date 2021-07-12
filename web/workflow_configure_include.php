@@ -81,8 +81,8 @@ $selfUrl      = $module->getUrl(RedCapEtlModule::USER_ETL_CONFIG_PAGE);
                    #. '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
 $workflowsUrl = $module->getUrl('web/workflows.php');
 $configureUrl = $module->getUrl('web/configure.php');
-$globalPropertiesUrl = $module->getUrl('web/workflow_global_properties.php')
-                   . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
+#$globalPropertiesUrl = $module->getUrl('web/workflow_global_properties.php')
+#                   . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
 
 try {
     #-----------------------------------------------------------
@@ -610,6 +610,7 @@ $(function() {
     }
 });
 </script>
+
 <div id="specifyEtlConfigDialog"
     title="Specify ETL configuration"
     style="display: none;"

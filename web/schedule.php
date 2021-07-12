@@ -39,47 +39,12 @@ try {
     $servers  = $module->getUserAllowedServersBasedOnAccessLevel(USERID);
 
     #------------------------------------------
-    # Get the configuration type
+    # Get request variables
     #------------------------------------------
-    $configType = Filter::sanitizeLabel($_POST['configType']);
-    if (empty($configType)) {
-        $configType = Filter::sanitizeLabel($_GET['configType']);
-        if (empty($configType)) {
-            $configType = $_SESSION['configType'];
-        }
-    } else {
-        $_SESSION['configType'] = $configType;
-    }
-
-    #------------------------------------------
-    # Get the (task) configuration name
-    #------------------------------------------
-    $configName = Filter::sanitizeLabel($_POST['configName']);
-    if (empty($configName)) {
-        $configName = $_SESSION['configName'];
-    } else {
-        $_SESSION['configName'] = $configName;
-    }
-
-    #------------------------------------------
-    # Get the workflow (configuration) name
-    #------------------------------------------
-    $workflowName = Filter::sanitizeLabel($_POST['workflowName']);
-    if (empty($workflowName)) {
-        $workflowName = $_SESSION['workflowName'];
-    } else {
-        $_SESSION['workflowName'] = $workflowName;
-    }
-
-    #------------------------------------------
-    # Get the server
-    #------------------------------------------
-    $server = Filter::stripTags($_POST['server']);
-    if (empty($server)) {
-        $server = $_SESSION['server'];
-    } else {
-        $_SESSION['server'] = $server;
-    }
+    $configType   = $module->getRequestVar('configType', '\IU\RedCapEtlModule\Filter::sanitizeLabel');
+    $configName   = $module->getRequestVar('configName', '\IU\RedCapEtlModule\Filter::sanitizeLabel');
+    $workflowName = $module->getRequestVar('workflowName', '\IU\RedCapEtlModule\Filter::sanitizeLabel');
+    $server       = $module->getRequestVar('server', '\IU\RedCapEtlModule\Filter::stripTags');
 
     #-------------------------
     # Set the submit value

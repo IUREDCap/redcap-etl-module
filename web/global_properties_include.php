@@ -61,10 +61,14 @@ try {
         $warning = Filter::stripTags($_GET['warning']);
     }
 
-    $selfUrl = $module->getUrl('web/workflow_global_properties.php')
-                   . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
+    $selfUrl = $module->getUrl('web/configure.php')
+        . '&workflowName=' . Filter::escapeForUrlParameter($workflowName)
+        . '&configType=workflow'
+        ;
     $workflowUrl = $module->getUrl('web/configure.php')
-                       . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
+        . '&workflowName=' . Filter::escapeForUrlParameter($workflowName)
+        . '$configType=workflow'
+        ;
     $workflowsUrl = $module->getUrl('web/workflows.php');
     $configureUrl = $module->getUrl('web/configure.php');
 

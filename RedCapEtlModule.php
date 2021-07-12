@@ -34,7 +34,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     const LOG_PAGE           = 'web/admin/log.php';
             
-    const USER_ETL_CONFIG_PAGE       = 'web/configure.php';
+    const RUN_PAGE             = 'web/run.php';
+    const USER_ETL_CONFIG_PAGE = 'web/configure.php';
 
     const WORKFLOWS_PAGE       = 'web/workflows.php';
     
@@ -1885,5 +1886,29 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         }
         
         return $match;
+    }
+
+    /**
+     * Gets the named request variable by checking values in the following order: POST, GET, SESSION.
+     * In addition, if a value for the variable is found, then that value is saved to
+     * the user's SESSION.
+     *
+     * @param string $name the name of the variable to retrieve.
+     * @param function $filterFunction the function used to filter the variables value.
+     */
+    public function getRequestVar($name, $filterFunction)
+    {
+        $var = call_user_func($filterFunction, $_POST[$name]);
+        if (empty($var)) {
+            $var = call_user_func($filterFunction, $_GET[$name]);
+            if (empty($var)) {
+                $var = call_user_func($filterFunction, $_SESSION[$name]);
+            }
+        }
+
+        if (!empty($var)) {
+            $_SESSION[$name] = $var;
+        }
+        return $var;
     }
 }
