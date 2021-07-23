@@ -80,7 +80,8 @@ array_unshift($availableUserProjects, '');
 $selfUrl      = $module->getUrl(RedCapEtlModule::USER_ETL_CONFIG_PAGE);
                    #. '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
 $workflowsUrl = $module->getUrl('web/workflows.php');
-$configureUrl = $module->getUrl('web/configure.php');
+$configUrl    = $module->getUrl(RedCapEtlModule::USER_ETL_CONFIG_PAGE);
+
 #$globalPropertiesUrl = $module->getUrl('web/workflow_global_properties.php')
 #                   . '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
 
@@ -271,9 +272,13 @@ if (!empty($availableUserProjects)) {
                 echo "<th></th>";
             }
             ?>
-            <th>Task Name</th><th>PID</th><th>Project</th>
-            <th>Project ETL Config</th><th>Rename<br/>Task</th>
-            <th>Specify<br/>ETL Config</th><th>Delete<br/>Task</th>
+            <th>Task Name</th>
+            <th>PID</th>
+            <th>Project</th>
+            <th>Project ETL Config</th>
+            <th>Rename<br/>Task</th>
+            <th>Specify<br/>ETL Config</th>
+            <th>Delete<br/>Task</th>
         </tr>
     </thead>
     <tbody>
@@ -326,7 +331,16 @@ if (!empty($availableUserProjects)) {
             echo "<td>" . Filter::escapeForHtml($taskName) . "</td>\n";
             echo "<td>" . Filter::escapeForHtml($projectId) . "</td>\n";
             echo "<td>" . Filter::escapeForHtml($projectName) . "</td>\n";
-            echo "<td>" . Filter::escapeForHtml($projectEtlConfig) . "</td>\n";
+
+
+            if ($projectEtlConfig === "None specified") {
+                echo "<td>" . Filter::escapeForHtml($projectEtlConfig) . "</td>\n";
+            } else {
+                $configureUrl = $configUrl . '&configName=' . Filter::escapeForUrlParameter($projectEtlConfig)
+                    . '&configType=task';
+                echo "<td>" . '<a href="' . $configureUrl . '">'. Filter::escapeForHtml($projectEtlConfig)
+                    . '</a>' . "</td>\n";
+            }
 
             #-----------------------------------------------------------
             # RENAME TASK BUTTON - disable if user does not have the needed
