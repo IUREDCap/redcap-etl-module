@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dc46269a09e9a4f124623242ef26c7f8",
+    "content-hash": "2e62ac55fa0b451bb73f3495e79c2f16",
     "packages": [
         {
             "name": "iu-redcap/phpcap",
@@ -49,16 +49,16 @@
         },
         {
             "name": "iu-redcap/redcap-etl",
-            "version": "2.0.7",
+            "version": "2.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/redcap-etl.git",
-                "reference": "dd3ef541d936a2c7d19b31e7a65665662b4383bd"
+                "reference": "8f023ecacc0f0395546814df9aa7bdf40467c7d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/dd3ef541d936a2c7d19b31e7a65665662b4383bd",
-                "reference": "dd3ef541d936a2c7d19b31e7a65665662b4383bd",
+                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/8f023ecacc0f0395546814df9aa7bdf40467c7d1",
+                "reference": "8f023ecacc0f0395546814df9aa7bdf40467c7d1",
                 "shasum": ""
             },
             "require": {
@@ -88,7 +88,7 @@
                 "etl",
                 "redcap"
             ],
-            "time": "2021-07-09T20:41:01+00:00"
+            "time": "2021-07-22T20:05:56+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -453,16 +453,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.11.0",
+            "version": "v4.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "fe14cf3672a149364fb66dfe11bf6549af899f94"
+                "reference": "6608f01670c3cc5079e18c1dab1104e002579143"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/fe14cf3672a149364fb66dfe11bf6549af899f94",
-                "reference": "fe14cf3672a149364fb66dfe11bf6549af899f94",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/6608f01670c3cc5079e18c1dab1104e002579143",
+                "reference": "6608f01670c3cc5079e18c1dab1104e002579143",
                 "shasum": ""
             },
             "require": {
@@ -501,20 +501,20 @@
                 "parser",
                 "php"
             ],
-            "time": "2021-07-03T13:36:55+00:00"
+            "time": "2021-07-21T10:44:31+00:00"
         },
         {
             "name": "phar-io/manifest",
-            "version": "2.0.1",
+            "version": "2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phar-io/manifest.git",
-                "reference": "85265efd3af7ba3ca4b2a2c34dbfc5788dd29133"
+                "reference": "97803eca37d319dfa7826cc2437fc020857acb53"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phar-io/manifest/zipball/85265efd3af7ba3ca4b2a2c34dbfc5788dd29133",
-                "reference": "85265efd3af7ba3ca4b2a2c34dbfc5788dd29133",
+                "url": "https://api.github.com/repos/phar-io/manifest/zipball/97803eca37d319dfa7826cc2437fc020857acb53",
+                "reference": "97803eca37d319dfa7826cc2437fc020857acb53",
                 "shasum": ""
             },
             "require": {
@@ -557,7 +557,7 @@
                 }
             ],
             "description": "Component for reading phar.io manifest information from a PHP Archive (PHAR)",
-            "time": "2020-06-27T14:33:11+00:00"
+            "time": "2021-07-20T11:28:43+00:00"
         },
         {
             "name": "phar-io/version",
