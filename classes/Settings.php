@@ -1577,6 +1577,7 @@ class Settings
         $projectAvailableWorkflows = $this->getProjectAvailableWorkflows($projectId, $excludeIncomplete);
         return $workflows->getAllProjectTasksInAllWorkflows($projectId, $projectAvailableWorkflows);
     }
+
 /*
     public function setWorkflows($workflows)
     {
@@ -1593,8 +1594,8 @@ class Settings
     {
         $key = self::PROJECT_WORKFLOWS_KEY_PREFIX . $projectId;
         $json = json_encode($workflows);
-        # print "====SSSSS.Y    in Settings.php, setProjectWorkflows, ABOUT TO WRITE JSON, json for all workflows is : ";
-        # print_r($json);
+        #print "====SSSSS.Y    in Settings.php, setProjectWorkflows, ABOUT TO WRITE JSON, json for all workflows is : ";
+        #print_r($json);
 
         $this->module->setSystemSetting($key, $json);
     } */

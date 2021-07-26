@@ -1559,7 +1559,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 # Get workflow tasks and global properties
                 #---------------------------------------------
                 $tasks = $this->getWorkflowTasks($workflowName);
-                $globalProperties = array_filter($this->getWorkflowGlobalProperties($workflowName));  // Filter out empty entries
+
+                // Filter out empty values
+                $globalProperties = array_filter($this->getWorkflowGlobalProperties($workflowName));
+
                 $serverConfig->updateEtlProperties($globalProperties);
 
                 if ($serverConfig->isEmbeddedServer()) {
@@ -1626,7 +1629,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                             if (isset($etlConfig)) {
                                 #update the task ETL configuration with server values and retrieve
                                 #the task ETL properties
-                                $serverConfig->updateEtlConfig($etlConfig, $isCronJob, true);
+                                $serverConfig->updateEtlConfig($etlConfig, $isCronJob);
                                 $etlProperties = $etlConfig->getProperties();
                             } else {
                                 $msg = 'For Workflow "' . $workflowName . '", ETL task # "' . $key;

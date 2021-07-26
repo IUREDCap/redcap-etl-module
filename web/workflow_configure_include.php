@@ -338,7 +338,7 @@ if (!empty($availableUserProjects)) {
             } else {
                 $configureUrl = $configUrl . '&configName=' . Filter::escapeForUrlParameter($projectEtlConfig)
                     . '&configType=task';
-                echo "<td>" . '<a href="' . $configureUrl . '">'. Filter::escapeForHtml($projectEtlConfig)
+                echo "<td>" . '<a href="' . $configureUrl . '">' . Filter::escapeForHtml($projectEtlConfig)
                     . '</a>' . "</td>\n";
             }
 

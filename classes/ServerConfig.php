@@ -165,7 +165,7 @@ class ServerConfig implements \JsonSerializable
     
     /**
      * Modifies an ETL configuration based on this server configuration's
-     * properties. When running REDCap-ETL using the external module, 
+     * properties. When running REDCap-ETL using the external module,
      * some od the properties for an ETL configuration are
      * are server-wide properties that are set by an admin (e.g., the from e-mail address).
      * There server-wide properties need to be merged into the user
@@ -175,39 +175,36 @@ class ServerConfig implements \JsonSerializable
      * @param boolean $isCronJobs if the configuration is being run as a cron job.
      * @param boolean $isWorkflow is the configuration is a workflow.
      */
-    public function updateEtlConfig(&$etlConfig, $isCronJob, $isWorkflow)
+    public function updateEtlConfig(&$etlConfig, $isCronJob)
     {
-        #if ($isWorkflow) {
-        #} else {
-            $etlConfig->setProperty(Configuration::CRON_JOB, $isCronJob);
-        
-            $etlConfig->setProperty(Configuration::LOG_FILE, $this->logFile);
-        
-            $projectId   = $etlConfig->getProjectId();
-            $configName  = $etlConfig->getName();
-            $configOwner = $etlConfig->getUsername();
-        
-            $etlConfig->setProperty(Configuration::PROJECT_ID, $projectId);
-            $etlConfig->setProperty(Configuration::CONFIG_NAME, $configName);
-            $etlConfig->setProperty(Configuration::CONFIG_OWNER, $configOwner);
+        $etlConfig->setProperty(Configuration::CRON_JOB, $isCronJob);
 
-            $etlConfig->setProperty(Configuration::EMAIL_FROM_ADDRESS, $this->emailFromAddress);
-            # If e-mailing of errors has not been enabled for this server, make sure that
-            # the "e-mail errors" property is set to false in the ETL configuration
-            if (!$this->getEnableErrorEmail()) {
-                $etlConfig->setProperty(Configuration::EMAIL_ERRORS, false);
-            }
+        $etlConfig->setProperty(Configuration::LOG_FILE, $this->logFile);
+
+        $projectId   = $etlConfig->getProjectId();
+        $configName  = $etlConfig->getName();
+        $configOwner = $etlConfig->getUsername();
+
+        $etlConfig->setProperty(Configuration::PROJECT_ID, $projectId);
+        $etlConfig->setProperty(Configuration::CONFIG_NAME, $configName);
+        $etlConfig->setProperty(Configuration::CONFIG_OWNER, $configOwner);
+
+        $etlConfig->setProperty(Configuration::EMAIL_FROM_ADDRESS, $this->emailFromAddress);
+        # If e-mailing of errors has not been enabled for this server, make sure that
+        # the "e-mail errors" property is set to false in the ETL configuration
+        if (!$this->getEnableErrorEmail()) {
+            $etlConfig->setProperty(Configuration::EMAIL_ERRORS, false);
+        }
+
+        # If e-mailing of a summary has not been enabled for this server, make sure that
+        # the "e-mail summary" property is set to false in the ETL configuration
+        if (!$this->getEnableSummaryEmail()) {
+            $etlConfig->setProperty(Configuration::EMAIL_SUMMARY, false);
+        }
         
-            # If e-mailing of a summary has not been enabled for this server, make sure that
-            # the "e-mail summary" property is set to false in the ETL configuration
-            if (!$this->getEnableSummaryEmail()) {
-                $etlConfig->setProperty(Configuration::EMAIL_SUMMARY, false);
-            }
-        
-            $etlConfig->setProperty(Configuration::DB_SSL, $this->getDbSsl());
-            $etlConfig->setProperty(Configuration::DB_SSL_VERIFY, $this->getDbSslVerify());
-            $etlConfig->setProperty(Configuration::CA_CERT_FILE, $this->getCaCertFile());
-        #}
+        $etlConfig->setProperty(Configuration::DB_SSL, $this->getDbSsl());
+        $etlConfig->setProperty(Configuration::DB_SSL_VERIFY, $this->getDbSslVerify());
+        $etlConfig->setProperty(Configuration::CA_CERT_FILE, $this->getCaCertFile());
     }
     
     /**
@@ -246,8 +243,6 @@ class ServerConfig implements \JsonSerializable
      */
     public function run($etlConfig, $isCronJob = false, $moduleLog = null, $runWorkflow = false)
     {
-        print "<pre>IN SERVER CONFIG RUN</pre>\n";
-
         if (!isset($etlConfig)) {
             $message = 'No ETL configuration specified.';
             throw new \Exception($message);
@@ -259,7 +254,7 @@ class ServerConfig implements \JsonSerializable
         }
 
         if (!$runWorkflow) {
-            $this->updateEtlConfig($etlConfig, $isCronJob, $runWorkflow);
+            $this->updateEtlConfig($etlConfig, $isCronJob);
         }
 
         if ($this->isEmbeddedServer()) {
