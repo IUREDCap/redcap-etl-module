@@ -63,6 +63,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     const JSON_WORKFLOW_KEY          = 'workflow';
     const JSON_GLOBAL_PROPERTIES_KEY = 'global_properties';
     const JSON_TASKS_KEY             = 'tasks';
+    const TASK_CONFIG                = 'task_config';
 
     private $db;
     private $settings;
@@ -1478,6 +1479,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
          $this->settings->setWorkflowGlobalProperties($workflowName, $properties, $username);
     }
 
+
     public function runWorkflow(
         $workflowName,
         $serverName,
@@ -1513,17 +1515,17 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 $cronHour
             );
 
-              $adminConfig = $this->getAdminConfig();
+            $adminConfig = $this->getAdminConfig();
             
-              #---------------------------------------------
-              # Process workflow name
-              #---------------------------------------------
+            #---------------------------------------------
+            # Process workflow name
+            #---------------------------------------------
             if (empty($workflowName) && $workflowName !== '0') {
                 throw new \Exception('No workflow specified.');
             } else {
-              #---------------------------------------------
-              # Authorization checks
-              #---------------------------------------------
+                #---------------------------------------------
+                # Authorization checks
+                #---------------------------------------------
                 if ($isCronJob) {
                     if (!$adminConfig->getAllowCron()) {
                         # Cron jobs not allowed
@@ -1539,9 +1541,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                     }
                 }
                 
-                  #---------------------------------------------
-                  # Process ETL server name
-                  #---------------------------------------------
+                #---------------------------------------------
+                # Process ETL server name
+                #---------------------------------------------
                 if (empty($serverName)) {
                     throw new \Exception('For workflow "' . $workflowName . ':" No ETL server specified.');
                 } else {
@@ -1553,45 +1555,49 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                     }
                 }
 
-                  #---------------------------------------------
-                  # Get workflow tasks and global properties
-                  #---------------------------------------------
-                    $tasks = $this->getWorkflowTasks($workflowName);
-                    $globalProperties = array_filter($this->getWorkflowGlobalProperties($workflowName));
+                #---------------------------------------------
+                # Get workflow tasks and global properties
+                #---------------------------------------------
+                $tasks = $this->getWorkflowTasks($workflowName);
+                $globalProperties = array_filter($this->getWorkflowGlobalProperties($workflowName));  // Filter out empty entries
+                $serverConfig->updateEtlProperties($globalProperties);
+
                 if ($serverConfig->isEmbeddedServer()) {
-                    $globalProperties[Configuration::PRINT_LOGGING] = false;
+                    $globalProperties[Configuration::PRINT_LOGGING] = 0;
                     $remoteEtlServer = false;
                 } else {
                     $remoteEtlServer = true;
                 }
-                
-                  #---------------------------------------------
-                  # Create workflow properties
-                  #
-                  # Global properties are not added as an array
-                  # in the workflow properties. Instead, they are
-                  # applied to the properties for each task before sending
-                  # the workflow to be run.
-                  #
-                  # In the processing below, properties for remote server
-                  # is different from that of the embedded server because
-                  # Redcap-etl expects those two different formats.
-                  #---------------------------------------------
-                    $status = '';
-                    $message = '';
+ 
+                #---------------------------------------------
+                # Create workflow properties
+                #
+                # #Global properties are not added as an array
+                # #in the workflow properties. Instead, they are
+                # #applied to the properties for each task before sending
+                # #the workflow to be run.
+                #
+                # In the processing below, properties for remote server
+                # is different from that of the embedded server because
+                # Redcap-etl expects those two different formats.
+                #---------------------------------------------
+                $status = '';
+                $message = '';
 
                 if ($remoteEtlServer) {
-                    $workflowProperties[self::JSON_WORKFLOW_KEY][self::JSON_GLOBAL_PROPERTIES_KEY] = array();
+                    ####$workflowProperties[self::JSON_WORKFLOW_KEY][self::JSON_GLOBAL_PROPERTIES_KEY] = array();
+                    $workflowProperties[self::JSON_WORKFLOW_KEY][self::JSON_GLOBAL_PROPERTIES_KEY] = $globalProperties;
                     $workflowProperties[self::JSON_WORKFLOW_KEY][self::JSON_GLOBAL_PROPERTIES_KEY][self::WORKFLOW_NAME]
                         = $workflowName;
                     $workflowProperties[self::JSON_WORKFLOW_KEY][self::JSON_TASKS_KEY] = array();
                 } else {
+                    $workflowProperties = $globalProperties;
                     $workflowProperties[self::WORKFLOW_NAME] = $workflowName;
                 }
 
-                  #---------------------------------------------
-                  # Run each workflow ETL task
-                  #---------------------------------------------
+                #---------------------------------------------
+                # Run each workflow ETL task
+                #---------------------------------------------
                 foreach ($tasks as $key => $task) {
                     $projectId = $task['projectId'];
 
@@ -1620,7 +1626,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                             if (isset($etlConfig)) {
                                 #update the task ETL configuration with server values and retrieve
                                 #the task ETL properties
-                                $serverConfig->updateEtlConfig($etlConfig, $isCronJob);
+                                $serverConfig->updateEtlConfig($etlConfig, $isCronJob, true);
                                 $etlProperties = $etlConfig->getProperties();
                             } else {
                                 $msg = 'For Workflow "' . $workflowName . '", ETL task # "' . $key;
@@ -1634,21 +1640,40 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                         }
 
                         #update the ETL task properties with the global properties
-                        $etlProperties = $this->getWorkflowTaskProperties(
-                            $workflowName,
-                            $globalProperties,
-                            $etlProperties
-                        );
+                        #$etlProperties = $this->getWorkflowTaskProperties(
+                        #    $workflowName,
+                        #    $globalProperties,
+                        #    $etlProperties
+                        #);
+
                         $isWorkflowGlobalProperties = false;
+                        #print "<hr/>ETL _PROPERTIES:<br/><pre>\n";
+                        #print_r($etlProperties);
+                        #print "</pre>\n";
+
                         $etlConfig->set($etlProperties, $isWorkflowGlobalProperties);
 
                         $etlConfig->validateForRunning();
                         $etlProperties = $etlConfig->getProperties();
+                        #print "<hr/>ETL _PROPERTIES:<br/><pre>\n";
+                        #print_r($etlProperties);
+                        #print "</pre>\n";
+
+                        #---------------------------------------------------------------------
+                        # Move all task properties into a task config property so that
+                        # the global properties will override the task properties
+                        #---------------------------------------------------------------------
+                        $taskConfig = array();
+                        $taskConfig[self::TASK_CONFIG] = $etlProperties;
+
                         if ($remoteEtlServer) {
+                            #$workflowProperties[self::JSON_WORKFLOW_KEY][self::JSON_TASKS_KEY][$taskName]
+                            #    = $etlProperties;
                             $workflowProperties[self::JSON_WORKFLOW_KEY][self::JSON_TASKS_KEY][$taskName]
-                                = $etlProperties;
+                                = $taskConfig;
                         } else {
-                            $workflowProperties[$taskName] = $etlProperties;
+                            #$workflowProperties[$taskName] = $etlProperties;
+                            $workflowProperties[$taskName] = $taskConfig;
                         }
                         
                         #-----------------------------------------------------
@@ -1712,8 +1737,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                     } #end if (hasPermissionToExport))
                 } #next task
 
-                    $runWorkflow = true;
-                    $status = $serverConfig->run($workflowProperties, $isCronJob, $this->moduleLog, $runWorkflow);
+                $runWorkflow = true;
+                $status = $serverConfig->run($workflowProperties, $isCronJob, $this->moduleLog, $runWorkflow);
             } #end if (empty(workflowName))
         } catch (\Exception $exception) {
             $status  = "Workflow  ETL job failed: " . $exception->getMessage();

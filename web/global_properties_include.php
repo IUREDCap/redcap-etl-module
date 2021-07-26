@@ -256,6 +256,13 @@ try {
 <!-- <div id="accordion" style="margin-bottom: 22px; width: 40%;"> -->
 <div style="border: 1px solid #aaa; border-radius: 7px; padding: 1em;">
 
+<?php
+#print "<hr/>POST:<br/>\n";
+#print "<pre>\n";
+#print_r($_POST);
+#print "</pre>\n";
+?>
+
   <div style="float: right;">
     <a href="#" id="global-properties-help-link" class="etl-help" title="help">?</a>
   </div>
@@ -613,7 +620,7 @@ try {
                             $checked = ' checked ';
                         }
                         ?>
-                        <input type="checkbox" name="<?php echo Configuration::EMAIL_SUMMARY;?>" value="true"
+                        <input type="checkbox" name="<?php echo Configuration::EMAIL_SUMMARY;?>"
                             <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
                     </td>
                 </tr>
@@ -639,6 +646,19 @@ try {
         </table>
         </fieldset>
 
+    </fieldset>
+
+    <fieldset class="config" style="padding: 4px;">
+    <table style="width: 50%; margin: 0 auto;">
+        <tr>
+            <td style="text-align: center;">&nbsp;</td>
+            <td style="text-align: center;">
+                <input type="submit" name="submitValue" value="Save" />
+                <input type="submit" name="submitValue" value="Cancel" style="margin-left: 24px;" />
+            </td>
+            <td style="text-align: center;">&nbsp;</td>
+        </tr>
+    </table>
     </fieldset>
 
 

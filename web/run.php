@@ -123,6 +123,11 @@ echo $buffer;
 
 <?php
 $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
+
+#print "<pre>\n";
+#print_r($_POST);
+#print "</pre>\n";
+
 ?>
 
 

@@ -436,6 +436,12 @@ class Workflow implements \JsonSerializable
 
     public function setGlobalProperties($workflowName, $properties, $username)
     {
+        #print "<hr/>WORKFLOW: {$workflowName}<br/>\n";
+        #print "<pre>\n";
+        #print_r($properties);
+        #print "</pre>\n";
+        #print "<hr/>\n";
+
         $message = 'When setting workflow global properties, ';
         if (empty($workflowName)) {
             $message .= 'no workflow name was specified.';

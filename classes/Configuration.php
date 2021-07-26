@@ -61,7 +61,7 @@ class Configuration implements \JsonSerializable
     const BATCH_SIZE = 'batch_size';
 
     const TABLE_PREFIX = 'table_prefix';
-    
+
     const LABEL_VIEW_SUFFIX = 'label_view_suffix';
     
     const POST_PROCESSING_SQL = 'post_processing_sql';
@@ -426,7 +426,6 @@ class Configuration implements \JsonSerializable
 
     public function set($properties, $isWorkflow = false)
     {
-        
         #------------------------------------------------
         # Set values
         #------------------------------------------------
@@ -464,7 +463,7 @@ class Configuration implements \JsonSerializable
                         $this->properties[$name] = $properties[$name];
                     }
                 }
-            } elseif (!$isWorkflow) {
+            } else { // if (!$isWorkflow) {
                 if (in_array($name, $this->booleanUserProperties)) {
                     $this->properties[$name] = false;
                 }

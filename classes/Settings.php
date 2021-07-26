@@ -6,6 +6,9 @@
 
 namespace IU\RedCapEtlModule;
 
+/**
+ * Class for managing the storage and retrieval of external module settings stored in the REDCap database.
+ */
 class Settings
 {
     const ADMIN_CONFIG_KEY         = 'admin-config';
@@ -351,6 +354,7 @@ class Settings
         
         $setting = $this->module->getProjectSetting($key, $projectId);
         $configValues = json_decode($setting, true);
+
         if (isset($configValues) && is_array($configValues)) {
             $projectIdUpdated = false;
 
@@ -1579,8 +1583,8 @@ class Settings
         $key = self::WORKFLOWS_KEY;
 
         $json = json_encode($workflows);
-        print "=== SSSSS.Y    in Settings.php, setWorkflows, ABOUT TO WRITE JSON, json for all workflows is : ";
-        print_r($json);
+        # print "=== SSSSS.Y    in Settings.php, setWorkflows, ABOUT TO WRITE JSON, json for all workflows is : ";
+        # print_r($json);
 
         $this->module->setSystemSetting($key, $json);
     }
@@ -1589,8 +1593,8 @@ class Settings
     {
         $key = self::PROJECT_WORKFLOWS_KEY_PREFIX . $projectId;
         $json = json_encode($workflows);
-        print "====SSSSS.Y    in Settings.php, setProjectWorkflows, ABOUT TO WRITE JSON, json for all workflows is : ";
-        print_r($json);
+        # print "====SSSSS.Y    in Settings.php, setProjectWorkflows, ABOUT TO WRITE JSON, json for all workflows is : ";
+        # print_r($json);
 
         $this->module->setSystemSetting($key, $json);
     } */
