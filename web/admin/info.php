@@ -14,12 +14,12 @@ $module->checkAdminPagePermission();
 
 require_once __DIR__ . '/../../dependencies/autoload.php';
 
-use \IU\REDCapETL\Version;
+use IU\REDCapETL\Version;
 
-use \IU\RedCapEtlModule\AdminConfig;
-use \IU\RedCapEtlModule\Filter;
-use \IU\RedCapEtlModule\RedCapEtlModule;
-use \IU\RedCapEtlModule\ServerConfig;
+use IU\RedCapEtlModule\AdminConfig;
+use IU\RedCapEtlModule\Filter;
+use IU\RedCapEtlModule\RedCapEtlModule;
+use IU\RedCapEtlModule\ServerConfig;
 
 $selfUrl   = $module->getUrl(RedCapEtlModule::ADMIN_INFO_PAGE);
 

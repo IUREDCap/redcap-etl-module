@@ -13,16 +13,16 @@ $module->checkAdminPagePermission();
 
 require_once __DIR__ . '/../../dependencies/autoload.php';
 
-use \IU\REDCapETL\Version;
+use IU\REDCapETL\Version;
 
-use \IU\RedCapEtlModule\Csrf;
-use \IU\RedCapEtlModule\Filter;
-use \IU\RedCapEtlModule\Help;
-use \IU\RedCapEtlModule\RedCapEtlModule;
+use IU\RedCapEtlModule\Csrf;
+use IU\RedCapEtlModule\Filter;
+use IU\RedCapEtlModule\Help;
+use IU\RedCapEtlModule\RedCapEtlModule;
 
 try {
     $selfUrl     = $module->getUrl(RedCapEtlModule::HELP_LIST_PAGE);
-    
+
     $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
     if (strcasecmp($submitValue, 'Save') === 0) {
@@ -31,7 +31,7 @@ try {
 } catch (Exception $exception) {
     $error = 'ERROR: ' . $exception->getMessage();
 }
-    
+
 ?>
 
 <?php #require_once APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>
@@ -70,7 +70,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
         $row = 1;
         foreach ($topics as $topic) {
             $editUrl = $module->getUrl('web/admin/help_edit.php?topic=' . $topic);
-                    
+
             if ($row % 2 == 0) {
                 echo "<tr class=\"even\">\n";
             } else {

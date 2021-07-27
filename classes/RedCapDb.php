@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -60,8 +61,8 @@ class RedCapDb
         }
         return $projects;
     }
-    
-    
+
+
     /**
      * Gets the API tokens for the specified project and data export right
      * for users who have API export permissions and not in a DAG (Data Access Group).
@@ -79,7 +80,7 @@ class RedCapDb
         $apiToken = null;
         $isExport = false;
         $isImport = false;
-        
+
         $sql = "select username, api_token from redcap_user_rights "
             . " where project_id = " . ((int) $projectId) . " "
             . " and api_export = 1 "                            // @codeCoverageIgnore
@@ -87,7 +88,7 @@ class RedCapDb
             . " and data_export_tool = " . ((int) $exportRight) // @codeCoverageIgnore
             . " and group_id is null"                           // @codeCoverageIgnore
             ;
-        
+
         $queryResult = db_query($sql);
         while ($row = db_fetch_assoc($queryResult)) {
             $username = $row['username'];
@@ -146,7 +147,7 @@ class RedCapDb
         db_query("SET AUTOCOMMIT=0");
         db_query("BEGIN");
     }
-    
+
     /**
      * Ends a database transaction.
      *

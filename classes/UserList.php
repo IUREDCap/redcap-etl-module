@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -40,12 +41,12 @@ class UserList implements \JsonSerializable
     {
         unset($this->userList[$username]);
     }
-    
+
     public function getProjects($username)
     {
         return $this->userList[$username];
     }
-    
+
     public function addProject($username, $projectId)
     {
         if (array_key_exists($username, $this->userList)) {
@@ -59,7 +60,7 @@ class UserList implements \JsonSerializable
             unset($this->userList[$username][$projectId]);
         }
     }
-    
+
     public function fromJson($json)
     {
         if (!empty($json)) {

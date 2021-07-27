@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -24,7 +25,7 @@ namespace IU\RedCapEtlModule;
 class EtlExtRedCapProject extends \IU\REDCapETL\EtlRedCapProject
 {
     const REDCAP_XML_NAMESPACE = 'https://projectredcap.org';
-    
+
     private $projectXml = null;
 
     public function __construct(
@@ -41,7 +42,7 @@ class EtlExtRedCapProject extends \IU\REDCapETL\EtlRedCapProject
     public function exportFieldNames()
     {
         $fields = \REDCap::getExportFieldNames();
-        
+
         $fieldNames = array();
 
         foreach ($fields as $key => $value) {
@@ -59,7 +60,7 @@ class EtlExtRedCapProject extends \IU\REDCapETL\EtlRedCapProject
                 array_push($fieldNames, $fieldName);
             }
         }
-        
+
         return $fieldNames;
     }
 
@@ -123,11 +124,11 @@ class EtlExtRedCapProject extends \IU\REDCapETL\EtlRedCapProject
         $projectInfo['project_id']      = PROJECT_ID;
         $projectInfo['project_title']   = \REDCap::getProjectTitle();
         $projectInfo['is_longitudinal'] = \REDCap::isLongitudinal();
-        
+
         $projectXml = $this->getProjectXml();
         $projectXmlDom = new \DomDocument();
         $projectXmlDom->loadXML($projectXml);
-        
+
         return $projectInfo;
     }
 
@@ -143,40 +144,40 @@ class EtlExtRedCapProject extends \IU\REDCapETL\EtlRedCapProject
     #    $data = json_decode($data, true);
     #    return $data;
     #}
-    
+
     public function exportRecordsAp($parameters)
     {
         $records = null;
         $fields  = null;
         $events  = null;
-        
+
         $groups = null;
         $combineCheckboxValues  = false;
         $exportDataAccessGroups = false;
-        
+
         $exportSurveyFields = false;
         $filterLogic        = null;
-         
+
         if (array_key_exists('recordIds', $parameters)) {
             $records = $parameters['recordIds'];
         }
-        
+
         if (array_key_exists('fields', $parameters)) {
             $fields = $parameters['fields'];
         }
-        
+
         if (array_key_exists('events', $parameters)) {
             $events = $parameters['events'];
         }
-                
+
         if (array_key_exists('exportDataAccessGroups', $parameters)) {
             $exportDataAccessGroups = $parameters['exportDataAccessGroups'];
         }
-        
+
         if (array_key_exists('filterLogic', $parameters)) {
             $filterLogic = $parameters['filterLogic'];
         }
-        
+
         $data = \REDCap::getData(
             'json',
             $records,
@@ -188,11 +189,11 @@ class EtlExtRedCapProject extends \IU\REDCapETL\EtlRedCapProject
             $exportSurveyFields,
             $filterLogic
         );
-        
+
         # Note: REDCap's 'array' format returns a nested array that will not
         #     work for REDCap-ETL
         $data = json_decode($data, true);
-        
+
         return $data;
     }
 
@@ -210,7 +211,7 @@ class EtlExtRedCapProject extends \IU\REDCapETL\EtlRedCapProject
         return $recordIdFieldName;
     }
 
-    
+
     public function getProjectXml()
     {
         if (empty($this->projectXml)) {

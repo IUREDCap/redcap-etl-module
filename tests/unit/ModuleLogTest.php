@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -49,7 +50,7 @@ class ModuleLogTest extends TestCase
         ];
         $this->assertEquals($expectedParams, $params, 'Params check');
     }
-    
+
     public function testLogEtlRun()
     {
         $moduleLog = new ModuleLog($this->moduleMock);
@@ -74,12 +75,12 @@ class ModuleLogTest extends TestCase
             $cronDay,
             $cronHour
         );
-        
+
         $entry = $this->moduleMock->getLogEntry($logId);
         $this->assertNotNull($entry, 'Log entry found');
-        
+
         $this->assertEquals($message, $entry['message'], 'Message check');
-        
+
         $params = $entry['params'];
         $expectedParams = [
             'log_type'           => ModuleLog::ETL_RUN,

@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -7,7 +8,6 @@
 
 use IU\REDCapETL\EtlRedCapProject;
 use IU\REDCapETL\Database\DbConnectionFactory;
-
 use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Configuration;
 use IU\RedCapEtlModule\Csrf;
@@ -15,7 +15,6 @@ use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\Help;
 use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
-
 
 #-------------------------------------------------------------------------
 # Only allow this page to be included in the user ETL Configure page,
@@ -95,8 +94,8 @@ try {
         $exportRight  = $configuration->getDataExportRight();
         $apiTokens    = $redCapDb->getApiTokens(PROJECT_ID, $exportRight);
         $apiTokenUser = $configuration->getProperty(Configuration::API_TOKEN_USERNAME);
-        
-        
+
+
         #-------------------------
         # Get the submit value
         #-------------------------
@@ -104,7 +103,7 @@ try {
         if (array_key_exists('submitValue', $_POST)) {
             $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
         }
-        
+
         #---------------------------------------------------------------
         # if this is a POST other than Cancel,
         # update the configuration properties with the POST values
@@ -123,7 +122,7 @@ try {
             }
 
             $configuration->set(Filter::stripTagsArrayRecursive($_POST));
-            
+
             # If this is NOT a remote REDCap configuration, set SSL certificate verification
             # to the global value (this can only be set in the configuration for remote
             # REDCap configurations)
@@ -133,7 +132,7 @@ try {
             }
             $properties = $configuration->getProperties();
         }
-        
+
         #----------------------------------------------
         # Check API token specification
         #----------------------------------------------
@@ -175,11 +174,11 @@ try {
                 }
             }
         }
-        
-        
+
+
         # Reset properties, since they may have been modified above
         $properties = $configuration->getProperties();
-       
+
         #----------------------------------------------
         # Check non-repeating fields options
         #----------------------------------------------
@@ -245,12 +244,12 @@ try {
                 if (array_key_exists('autogen_include_complete_fields', $_POST)) {
                     $formCompleteFields = true;
                 }
-                
+
                 $dagFields = false;
                 if (array_key_exists('autogen_include_dag_fields', $_POST)) {
                     $dagFields = true;
                 }
-                
+
                 $fileFields = false;
                 if (array_key_exists('autogen_include_file_fields', $_POST)) {
                     $fileFields = true;
@@ -298,12 +297,12 @@ try {
                         #."</script>\n"
                         #;
                     }
-                    
+
 
                     $sslVerify  = $adminConfig->getSslVerify();
                     $caCertFile = null;
                     #$caCertFile = $adminConfig->getCaCertFile();
-                    
+
                     if ($testMode) {
                         # If module is in test mode, override the system-wide SSL verify flag
                         # and certificate authority certificate file with the configuration
@@ -332,7 +331,7 @@ try {
                             $caCertFile
                         );
                     #}
-                
+
                     $rulesGenerator = new \IU\REDCapETL\RulesGenerator();
 
                     $rulesText = $rulesGenerator->generate(
@@ -358,17 +357,17 @@ try {
                 $dataProject = new \IU\REDCapETL\EtlRedCapProject($apiUrl, $dataToken, $sslVerify, $caCertFile);
                 #$dataProject =
                 #    new \IU\RedCapEtlModule\EtlExtRedCapProject($apiUrl, $dataToken, $sslVerify, $caCertFile);
-                
+
                 $logger = new \IU\REDCapETL\Logger('rules-check');
                 $logger->setOn(false);
-                
+
                 $checkProperties = $configuration->getPropertiesArray();
                 if ($sslVerify) {
                     $checkProperties[Configuration::SSL_VERIFY] = 'true';
                 }
                 $checkProperties[Configuration::EMAIL_ERRORS] = false;
                 $checkProperties[Configuration::EMAIL_SUMMARY] = false;
-                
+
                 #$checkConfiguration = new \IU\REDCapETL\Configuration($logger, $checkProperties);
                 $checkConfiguration = new \IU\REDCapETL\TaskConfig();
                 $checkConfiguration->set($logger, $checkProperties);
@@ -703,8 +702,8 @@ Configuration form
 
                         echo "<div style=\"border: 1px solid #AAAAAA; margin-bottom: 4px;"
                             . " padding: 4px; border-radius: 4px;\">\n";
-                        
-                        
+
+
                         $apiUrl = $module->getRedCapApiUrl();
                         #--------------------------------------------------------------------------------------------
                         # If the configurations API URL doesn't match the project's API URL -

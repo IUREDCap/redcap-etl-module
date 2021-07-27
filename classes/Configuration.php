@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -18,9 +19,9 @@ class Configuration implements \JsonSerializable
     const SSL_VERIFY = 'ssl_verify';
 
     const DATA_EXPORT_RIGHT = 'data_export_right';
-    
+
     const API_TOKEN_USERNAME = 'api_token_username';
-    
+
     const TRANSFORM_RULES_FILE   = 'transform_rules_file';
     const TRANSFORM_RULES_TEXT   = 'transform_rules_text';
     const TRANSFORM_RULES_SOURCE = 'transform_rules_source';
@@ -28,13 +29,13 @@ class Configuration implements \JsonSerializable
     const CONFIG_API_TOKEN = 'config_api_token';
     const CONFIG_NAME      = 'config_name';
     const CONFIG_OWNER     = 'config_owner';
-    
+
     const CRON_JOB         = 'cron_job';
-    
+
     const DB_LOGGING         = 'db_logging';
     const DB_LOG_TABLE       = 'db_log_table';
     const DB_EVENT_LOG_TABLE = 'db_event_log_table';
-    
+
     # External module specific property names that are not in REDCap-ETL.
     # The values for these properties are combined to form REDCap-ETL's
     # DB_CONNECTION property.
@@ -47,7 +48,7 @@ class Configuration implements \JsonSerializable
     const DB_PASSWORD = 'db_password';
 
     const DB_CONNECTION = 'db_connection';
-    
+
     const DB_SSL        = 'db_ssl';
     const DB_SSL_VERIFY = 'db_ssl_verify';
 
@@ -57,22 +58,22 @@ class Configuration implements \JsonSerializable
     const CA_CERT_FILE  = 'ca_cert_file';
 
     const IGNORE_EMPTY_INCOMPLETE_FORMS = 'ignore_empty_incomplete_forms';
-    
+
     const BATCH_SIZE = 'batch_size';
 
     const TABLE_PREFIX = 'table_prefix';
 
     const LABEL_VIEW_SUFFIX = 'label_view_suffix';
-    
+
     const POST_PROCESSING_SQL = 'post_processing_sql';
     const PRE_PROCESSING_SQL  = 'pre_processing_sql';
     const PRINT_LOGGING = 'print_logging';
     const PROJECT_ID = 'project_id';
-    
 
-    
+
+
     const LOG_FILE  = 'log_file';
-    
+
     const EMAIL_ERRORS        = 'email_errors';
     const EMAIL_SUMMARY       = 'email_summary';
     const EMAIL_FROM_ADDRESS  = 'email_from_address';
@@ -90,11 +91,11 @@ class Configuration implements \JsonSerializable
     const AUTOGEN_REMOVE_IDENTIFIER_FIELDS = 'autogen_remove_identifier_fields';
     const AUTOGEN_COMBINE_NON_REPEATING_FIELDS = 'autogen_combine_non_repeating_fields';
     const AUTOGEN_NON_REPEATING_FIELDS_TABLE = 'autogen_non_repeating_fields_table';
-    
+
     private $name;
     private $username;
     private $projectId;
-    
+
     private $properties; // map from property names to property values
     private $booleanUserProperties;  // array of boolean property names that are
                                     // set in the external module user interface
@@ -117,9 +118,9 @@ class Configuration implements \JsonSerializable
             self::AUTOGEN_REMOVE_IDENTIFIER_FIELDS,
             self::AUTOGEN_COMBINE_NON_REPEATING_FIELDS
         ];
-                
+
         self::validateName($name);
-        
+
         $this->name      = $name;
         $this->username  = $username;
         $this->projectId = $projectId;
@@ -132,26 +133,26 @@ class Configuration implements \JsonSerializable
         # Set non-blank defaults
         $this->properties[self::REDCAP_API_URL] = RedCapEtlModule::getRedCapApiUrl();
         $this->properties[self::SSL_VERIFY]     = true;
-         
+
         $this->properties[self::API_TOKEN_USERNAME] = '';
 
         $this->properties[self::DATA_EXPORT_RIGHT] = 0;
-        
+
         $this->properties[self::DATA_SOURCE_API_TOKEN] = '';
-        
+
         $this->properties[self::BATCH_SIZE] = 100;
         $this->properties[self::TRANSFORM_RULES_SOURCE] = '1';
-        
+
         $this->properties[self::TABLE_PREFIX] = '';
 
         $this->properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS] = false;
-        
+
         $this->properties[self::LABEL_VIEW_SUFFIX] = \IU\REDCapETL\TaskConfig::DEFAULT_LABEL_VIEW_SUFFIX;
-                
+
         $this->properties[self::DB_LOGGING]         = true;
         $this->properties[self::DB_LOG_TABLE]       = \IU\REDCapETL\TaskConfig::DEFAULT_DB_LOG_TABLE;
         $this->properties[self::DB_EVENT_LOG_TABLE] = \IU\REDCapETL\TaskConfig::DEFAULT_DB_EVENT_LOG_TABLE;
-        
+
         $this->properties[self::EMAIL_ERRORS]  = false;
         $this->properties[self::EMAIL_SUMMARY] = false;
 
@@ -191,7 +192,7 @@ class Configuration implements \JsonSerializable
                 throw new \Exception('No transformation rules were specified in configuration.');
             }
         }
-        
+
         if (empty($this->getProperty(self::DB_TYPE))) {
             throw new \Exception('No database type was specified in configuration.');
         } else {
@@ -218,15 +219,15 @@ class Configuration implements \JsonSerializable
         if (empty($this->getProperty(self::DB_HOST))) {
             throw new \Exception('No database host was specified in configuration.');
         }
-        
+
         if (empty($this->getProperty(self::DB_NAME))) {
             throw new \Exception('No database name was specified in configuration.');
         }
-                
+
         if (empty($this->getProperty(self::DB_USERNAME))) {
             throw new \Exception('No database username was specified in configuration.');
         }
-        
+
         if (empty($this->getProperty(self::DB_PASSWORD))) {
             throw new \Exception('No database password was specified in configuration.');
         }
@@ -253,29 +254,29 @@ class Configuration implements \JsonSerializable
     public function validate($isWorkflowGlobalProperties = false)
     {
         self::validateName($this->name);
-        
+
         $redcapApiUrl =  $this->getProperty(self::REDCAP_API_URL);
         self::validateRedcapApiUrl($redcapApiUrl);
-        
+
         $apiToken =  $this->getProperty(self::DATA_SOURCE_API_TOKEN);
         self::validateApiToken($apiToken);
-        
+
         $batchSize = $this->getProperty(self::BATCH_SIZE);
         if (!$isWorkflowGlobalProperties || ($isWorkflowGlobalProperties && !empty($batchSize))) {
             self::validateBatchSize($batchSize);
         }
-         
+
         $tablePrefix = $this->getProperty(self::TABLE_PREFIX);
         self::validateTablePrefix($tablePrefix);
-        
+
         $labelViewSuffix = $this->getProperty(self::LABEL_VIEW_SUFFIX);
         self::validateLabelViewSuffix($labelViewSuffix);
-                
+
         $emailToList = $this->getProperty(self::EMAIL_TO_LIST);
         self::validateEmailToList($emailToList);
     }
-    
-    
+
+
     /**
      * Validates a configuration name.
      *
@@ -297,7 +298,7 @@ class Configuration implements \JsonSerializable
         }
         return true;
     }
-    
+
     public static function validateRedcapApiUrl($url)
     {
         if (!empty($url)) {
@@ -308,8 +309,8 @@ class Configuration implements \JsonSerializable
         }
         return true;
     }
-    
-    
+
+
     public static function validateApiToken($apiToken)
     {
         if (!empty($apiToken)) {
@@ -326,7 +327,7 @@ class Configuration implements \JsonSerializable
         }
         return true;
     }
-    
+
     public static function validateBatchSize($batchSize)
     {
         if (ctype_digit($batchSize) && intval($batchSize) > 0) {
@@ -337,8 +338,8 @@ class Configuration implements \JsonSerializable
         }
         return true;
     }
- 
-     
+
+
     public static function validateTablePrefix($tablePrefix)
     {
         $matches = array();
@@ -356,7 +357,7 @@ class Configuration implements \JsonSerializable
         return true;
     }
 
-     
+
     public static function validateLabelViewSuffix($suffix)
     {
         $matches = array();
@@ -371,22 +372,22 @@ class Configuration implements \JsonSerializable
         }
         return true;
     }
-           
+
     public static function validateEmailToList($emailToList)
     {
         if (isset($emailToList)) {
             $emailToList = trim($emailToList);
-            
+
             if (!empty($emailToList)) {
                 $emails = preg_split('/[\s]*[\s,][\s]*/', $emailToList);
                 $invalidEmails = array();
-        
+
                 foreach ($emails as $email) {
                     if (!Filter::isEmail($email)) {
                         array_push($invalidEmails, $email);
                     }
                 }
-        
+
                 if (count($invalidEmails) === 1) {
                     throw new \Exception('The following to e-mail is invalid: ' . $invalidEmails[0]);
                 } elseif (count($invalidEmails) > 1) {
@@ -400,8 +401,8 @@ class Configuration implements \JsonSerializable
         }
         return true;
     }
-    
-    
+
+
     public function jsonSerialize()
     {
         return (object) get_object_vars($this);
@@ -469,12 +470,12 @@ class Configuration implements \JsonSerializable
                 }
             }
         }
-        
+
         $dbType = null;
         if (array_key_exists(self::DB_TYPE, $properties)) {
             $dbType = $properties[self::DB_TYPE];
         }
-    
+
         if (empty($dbType) && !$isWorkflow) {
             # Originally, this property didn't exists, because the only database
             # type was MySQL, so older data will not have this, and it needs
@@ -483,7 +484,7 @@ class Configuration implements \JsonSerializable
             # because it will override the db type for the task.)
             $dbType = \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_MYSQL;
         }
-        
+
         if (!array_key_exists(self::DB_SCHEMA, $properties)) {
             $properties[self::DB_SCHEMA] = '';
         }
@@ -492,7 +493,7 @@ class Configuration implements \JsonSerializable
         $dbPort   = $properties[self::DB_PORT];
         $dbName   = $properties[self::DB_NAME];
         $dbSchema = $properties[self::DB_SCHEMA];
-        
+
         $dbUsername = $properties[self::DB_USERNAME];
         $dbPassword = $properties[self::DB_PASSWORD];
 
@@ -501,15 +502,15 @@ class Configuration implements \JsonSerializable
         # Note: the MySQL server port number, which defaults to 3306, can be included in dbHost value also
         #--------------------------------------------------------------------------------------------------
         $dbConnectionValues = [$dbType, $dbHost, $dbUsername, $dbPassword, $dbName];
-        
+
         if ($dbType == \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_POSTGRESQL && !empty($dbSchema)) {
             array_push($dbConnectionValues, $dbSchema);
         }
-        
+
         if (!empty($dbPort)) {
             array_push($dbConnectionValues, $dbPort);
         }
-       
+
         if (!$isWorkflow || ($isWorkflow && $dbType)) {
             $dbConnection = \IU\REDCapETL\Database\DbConnection::createConnectionString($dbConnectionValues);
             $this->properties[self::DB_CONNECTION] = $dbConnection;
@@ -531,14 +532,14 @@ class Configuration implements \JsonSerializable
     {
         return $this->properties;
     }
-    
+
     /**
      * Returns properties array for use in running ETL.
      */
     public function getPropertiesArray()
     {
         $properties = $this->properties;
-        
+
         #---------------------------------------
         # Remove properties that aren't used
         # by REDCap-ETL
@@ -549,12 +550,12 @@ class Configuration implements \JsonSerializable
         unset($properties[self::DB_NAME]);
         unset($properties[self::DB_USERNAME]);
         unset($properties[self::DB_PASSWORD]);
-        
+
         unset($properties[self::API_TOKEN_USERNAME]);
-                
+
         unset($properties[self::CRON_SERVER]);
         unset($properties[self::CRON_SCHEDULE]);
-                 
+
         if (is_bool($properties[self::SSL_VERIFY])) {
             if ($properties[self::SSL_VERIFY]) {
                 $properties[self::SSL_VERIFY] = 'true';
@@ -562,11 +563,11 @@ class Configuration implements \JsonSerializable
                 $properties[self::SSL_VERIFY] = 'false';
             }
         }
-        
+
         return $properties;
     }
 
-    
+
     /**
      * Gets configuration properties in JSON, formatted for use
      * by REDCap-ETL.
@@ -584,7 +585,7 @@ class Configuration implements \JsonSerializable
         } else {
             $properties = $this->properties;
         }
-        
+
         #---------------------------------------
         # Remove properties that aren't used
         # by REDCap-ETL
@@ -600,7 +601,7 @@ class Configuration implements \JsonSerializable
 
         unset($properties[self::CRON_SERVER]);
         unset($properties[self::CRON_SCHEDULE]);
-         
+
         if (is_bool($properties[self::SSL_VERIFY])) {
             if ($properties[self::SSL_VERIFY]) {
                 $properties[self::SSL_VERIFY] = 'true';
@@ -608,7 +609,7 @@ class Configuration implements \JsonSerializable
                 $properties[self::SSL_VERIFY] = 'false';
             }
         }
- 
+
         if (is_bool($properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS])) {
             if ($properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS]) {
                 $properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS] = 'true';
@@ -616,7 +617,7 @@ class Configuration implements \JsonSerializable
                 $properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS] = 'false';
             }
         }
- 
+
         # Convert the transformation rules from text to
         # an array of strings
         if (array_key_exists(self::TRANSFORM_RULES_TEXT, $properties)) {
@@ -650,16 +651,16 @@ class Configuration implements \JsonSerializable
         }
 
         $jsonProperties = json_encode($properties, JSON_PRETTY_PRINT);
-        
+
         return $jsonProperties;
     }
-    
-    
+
+
     public function usesAutoGeneratedRules()
     {
         return $this->properties[self::TRANSFORM_RULES_SOURCE] == 3;
     }
-    
+
     public function getTransformationRulesText()
     {
         return $this->properties[self::TRANSFORM_RULES_TEXT];
@@ -669,18 +670,18 @@ class Configuration implements \JsonSerializable
     {
         return $this->name;
     }
-    
+
     public function setName($name)
     {
         self::validateName($name);
         $this->name = $name;
     }
-    
+
     public function getProjectId()
     {
         return $this->projectId;
     }
-    
+
     public function getUsername()
     {
         return $this->username;
@@ -690,19 +691,19 @@ class Configuration implements \JsonSerializable
     {
         return $this->properties[self::DATA_EXPORT_RIGHT];
     }
-    
+
     public function setDataExportRight($dataExportRight)
     {
         $this->properties[self::DATA_EXPORT_RIGHT] = $dataExportRight;
     }
-    
+
     public static function getPropertyNames()
     {
         $reflection = new \ReflectionClass(self::class);
         $properyNames = $reflection->getConstants();
         return $properyNames;
     }
-    
+
     public function getGlobalProperties($initialize = false)
     {
         $properties = $this->properties;
@@ -770,7 +771,7 @@ class Configuration implements \JsonSerializable
             $properties[self::CRON_SERVER] = null;
             $properties[self::CRON_SCHEDULE] = null;
         }
-        
+
         return $properties;
     }
 
@@ -865,15 +866,15 @@ class Configuration implements \JsonSerializable
         if (empty($dbHost)) {
             throw new \Exception($preface . 'No database host was specified' . $suffix);
         }
-        
+
         if (empty($dbName)) {
             throw new \Exception($preface . 'No database name was specified' . $suffix);
         }
-                
+
         if (empty($dbUsername)) {
             throw new \Exception($preface . 'No database username was specified' . $suffix);
         }
-        
+
         if (empty($dbPassword)) {
             throw new \Exception($preface . 'No database password was specified' . $suffix);
         }

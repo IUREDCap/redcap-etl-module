@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -22,24 +23,24 @@ class Settings
     const USER_PROJECTS_KEY_PREFIX = 'user-projects:';  // append with username to make key
     const USER_SERVERS_KEY_PREFIX  = 'user-servers:';
     const PRIVATE_SERVER_USERS_KEY_PREFIX  = 'private-server-users:';
-    
+
     const WORKFLOWS_KEY               = 'workflows';
 
     const VERSION_KEY = 'version';
-    
+
     const CONFIG_SESSION_KEY = 'redcap-etl-config';
-    
+
     private $module;
-    
+
     /** @var RedCapDb $db REDCap database object. */
     private $db;
-    
+
     public function __construct($module, $db)
     {
         $this->module = $module;
         $this->db     = $db;
     }
-    
+
     /**
      * Gets the REDCap-ETL external module version number.
      */
@@ -48,12 +49,12 @@ class Settings
         $version = $this->module->getSystemSetting(self::VERSION_KEY);
         return $version;
     }
-    
-    
+
+
     #----------------------------------------------------------
     # Users settings methods
     #----------------------------------------------------------
-    
+
     public function getUsers()
     {
         // Note: only 1 database access, so don't need transaction option
@@ -63,36 +64,36 @@ class Settings
         $users = $userList->getUsers();
         return $users;
     }
-    
+
     public function addUser($username, $transaction = true)
     {
         $commit = true;
         $userList = new UserList();
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         $json = $this->module->getSystemSetting(self::USER_LIST_KEY);
         $userList->fromJson($json);
         $userList->addUser($username);
         $json = $userList->toJson();
         $this->module->setSystemSetting(self::USER_LIST_KEY, $json);
-        
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
     }
-    
+
     public function deleteUser($username, $transaction = true)
     {
         $commit = true;
         $userList = new UserList();
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         # Remove the user from the list of users
         $json = $this->module->getSystemSetting(self::USER_LIST_KEY);
         $userList->fromJson($json);
@@ -195,7 +196,7 @@ class Settings
                     unset($currentUsernames[$userKey]);
                 }
             }
-        
+
             #update the user-list for this server
             $this->setPrivateServerUsers($serverName, $currentUsernames);
 
@@ -252,11 +253,11 @@ class Settings
         $userPrivateServerNames = json_decode($json, true);
         return $userPrivateServerNames;
     }
-    
+
     #----------------------------------------------------------
     # ProjectInfo settings methods
     #----------------------------------------------------------
-    
+
     public function getProjectInfo($projectId = PROJECT_ID)
     {
         $key = self::PROJECT_INFO_KEY;
@@ -265,7 +266,7 @@ class Settings
         $projectInfo->fromJson($json);
         return $projectInfo;
     }
-    
+
     /**
      * Gets the ETL configurations for the specified project.
      *
@@ -280,13 +281,13 @@ class Settings
         $names = $projectInfo->getConfigNames();
         return $names;
     }
-    
-    
+
+
     #-------------------------------------------------------------------
     # User ETL project methods
     #-------------------------------------------------------------------
-    
-        
+
+
     public function getUserEtlProjects($username = USERID)
     {
         $key = self::USER_PROJECTS_KEY_PREFIX . $username;
@@ -294,7 +295,7 @@ class Settings
         $projects = json_decode($json, true);
         return $projects;
     }
-        
+
     /**
      * Sets the projects to which a user has permission to use ETL.
      *
@@ -307,7 +308,7 @@ class Settings
         $json = json_encode($projects);
         $this->module->setSystemSetting($key, $json);
     }
-    
+
     #/**
     # * Indicates if the project that has the specified project ID
     # * has a user who has permission to run ETL.
@@ -326,13 +327,13 @@ class Settings
     #
     #    return array_key_exists($projectId, $projectIds);
     #}
-    
-    
+
+
     #-------------------------------------------------------------------
     # (ETL) Configuration methods
     #-------------------------------------------------------------------
-    
-        
+
+
     public function getConfigurationKey($name)
     {
         $key = self::ETL_CONFIG_KEY . $name;
@@ -351,7 +352,7 @@ class Settings
     {
         $configuraion = null;
         $key = $this->getConfigurationKey($name);
-        
+
         $setting = $this->module->getProjectSetting($key, $projectId);
         $configValues = json_decode($setting, true);
 
@@ -388,8 +389,8 @@ class Settings
         }
         return $configuration;
     }
-    
-    
+
+
     /**
      * Set the specified configuration in the REDCap database.
      *
@@ -404,7 +405,7 @@ class Settings
         $json = json_encode($configuration);
         $this->module->setProjectSetting($key, $json, $projectId);
     }
-    
+
     /**
      * Sets the schedule for a configuration.
      *
@@ -422,11 +423,11 @@ class Settings
     ) {
         $commit = true;
         $errorMessage = '';
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         $configuration = $this->getConfiguration($configName, $projectId);
         if (empty($configuration)) {
             $commit = false;
@@ -436,16 +437,16 @@ class Settings
         $configuration->setProperty(Configuration::CRON_SERVER, $server);
         $configuration->setProperty(Configuration::CRON_SCHEDULE, $schedule);
         $this->setConfiguration($configuration, $username, $projectId);
-        
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
-        
+
         if (!empty($errorMessage)) {
             throw new \Exception($errorMessage);
         }
     }
-    
+
     /**
      * Adds an ETL configuration for a user.
      *
@@ -460,11 +461,11 @@ class Settings
     ) {
         $commit = true;
         $errorMessage = '';
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         try {
             # Add configuration entry for project
             $projectInfo = $this->getProjectInfo();
@@ -478,7 +479,7 @@ class Settings
                 $projectKey = self::PROJECT_INFO_KEY;
                 $this->module->setProjectSetting($projectKey, $json, $projectId);
             }
-        
+
             # Add the actual configuration
             $key = $this->getConfigurationKey($name);
             $configuration = $this->module->getProjectSetting($key);
@@ -495,12 +496,12 @@ class Settings
             $this->db->endTransaction($commit);
             throw $exception;
         }
-        
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
     }
-    
+
     /**
      * Copy configuration (only supports copying from/to same
      * user and project).
@@ -509,11 +510,11 @@ class Settings
     {
         $commit = true;
         $errorMessage = '';
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         try {
             #--------------------------------------------------------
             # Add the configuration name to the projects's information
@@ -523,7 +524,7 @@ class Settings
             $json = $projectInfo->toJson();
             $projectKey = self::PROJECT_INFO_KEY;
             $this->module->setProjectSetting($projectKey, $json);
-        
+
             #-----------------------------------------------------
             # Copy the actual configuration
             #-----------------------------------------------------
@@ -540,12 +541,12 @@ class Settings
             $this->db->endTransaction($commit);
             throw $exception;
         }
-    
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
     }
-    
+
     /**
      * Rename configuration (only supports rename from/to same
      * user and project).
@@ -554,11 +555,11 @@ class Settings
     {
         $commit = true;
         $errorMessage = '';
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         try {
             $this->copyConfiguration($configName, $newConfigName, null, false);
             $this->removeConfiguration($configName, false);
@@ -567,21 +568,21 @@ class Settings
             $this->db->endTransaction($commit);
             throw $exception;
         }
-        
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
     }
-    
+
     public function removeConfiguration($configName, $transaction = true)
     {
         $commit = true;
         $errorMessage = '';
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         #-------------------------------------------------------------
         # Remove the configuration name from the project's information
         #-------------------------------------------------------------
@@ -592,13 +593,13 @@ class Settings
             $projectKey = self::PROJECT_INFO_KEY;
             $this->module->setProjectSetting($projectKey, $json);
         }
-        
+
         #------------------------------------------------
         # Remove the actual configuration
         #------------------------------------------------
         $key = $this->getConfigurationKey($configName);
         $this->module->removeProjectSetting($key);
-                        
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
@@ -607,7 +608,7 @@ class Settings
     #-------------------------------------------------------------------
     # Cron job methods
     #-------------------------------------------------------------------
-     
+
     /**
      * Gets all the cron jobs (for all users and all projects).
      */
@@ -615,11 +616,11 @@ class Settings
     {
         $commit = true;
         $errorMessage = '';
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         $cronJobs = array();
         foreach (range(0, 6) as $day) {
             $cronJobs[$day] = array();
@@ -639,7 +640,7 @@ class Settings
             if (isset($configValues) && is_array($configValues)) {
                 $configName = $configValues['name'];
                 $username   = $configValues['username'];
-                
+
                 $config = new Configuration(
                     $configName,
                     $username,
@@ -651,7 +652,7 @@ class Settings
             if (isset($config)) {
                 $server = $config->getProperty(Configuration::CRON_SERVER);
                 $times  = $config->getProperty(Configuration::CRON_SCHEDULE);
-                    
+
                 for ($day = 0; $day < 7; $day++) {
                     $hour = $times[$day];
                     if (isset($hour)) {
@@ -666,14 +667,14 @@ class Settings
                 }
             }
         }
-                                        
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
-        
+
         return $cronJobs;
     }
-    
+
     /**
      * Gets the cron jobs for the specified day (0 = Sunday, 1 = Monday, ...)
      * and time (0 = 12am - 1am, 1 = 1am - 2am, ..., 23 = 11pm - 12am).
@@ -682,13 +683,13 @@ class Settings
     {
         $commit = true;
         $errorMessage = '';
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         $cronJobs = array();
-                
+
         # Get all ETL configuration settings
         $allEtlConfigSettings = $this->db->getEtlConfigurationsSettings($this->module);
 
@@ -701,7 +702,7 @@ class Settings
             if (isset($configValues) && is_array($configValues)) {
                 $configName = $configValues['name'];
                 $username   = $configValues['username'];
-                
+
                 $config = new Configuration(
                     $configName,
                     $username,
@@ -713,7 +714,7 @@ class Settings
             if (isset($config)) {
                 $server = $config->getProperty(Configuration::CRON_SERVER);
                 $times  = $config->getProperty(Configuration::CRON_SCHEDULE);
-                    
+
                 if (isset($times) && is_array($times)) {
                     for ($cronDay = 0; $cronDay < 7; $cronDay++) {
                         $cronTime = $times[$cronDay];
@@ -730,11 +731,11 @@ class Settings
                 }
             }
         }
-        
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
-                        
+
         return $cronJobs;
     }
 
@@ -750,17 +751,17 @@ class Settings
         $adminConfig->fromJson($setting);
         return $adminConfig;
     }
-    
+
     public function setAdminConfig($adminConfig)
     {
         $json = $adminConfig->toJson();
         $this->module->setSystemSetting(self::ADMIN_CONFIG_KEY, $json);
     }
-    
+
     #-------------------------------------------------------------------
     # Server methods
     #-------------------------------------------------------------------
-    
+
     public function getServers()
     {
         $servers = new Servers();
@@ -774,11 +775,11 @@ class Settings
     {
         $commit = true;
         $errorMessage = '';
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         if (empty($serverName)) {
             $message = 'No server name specified.';
             throw new \Exception($message);
@@ -786,7 +787,7 @@ class Settings
             $message = 'Server "' . $serverName . '" already exists.';
             throw new \Exception($message);
         }
-        
+
         # Add the server to the list of configurations
         $servers = new Servers();
         $json = $this->module->getSystemSetting(self::SERVERS_KEY, true);
@@ -794,11 +795,11 @@ class Settings
         $servers->addServer($serverName);
         $json = $servers->toJson();
         $this->module->setSystemSetting(self::SERVERS_KEY, $json);
-        
+
         # Add the server configuration
         $serverConfig = new ServerConfig($serverName);
         $this->setServerConfig($serverConfig);
-        
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
@@ -808,37 +809,37 @@ class Settings
     {
         $commit = true;
         $errorMessage = '';
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         $copyException = null;
         try {
             $fromServer = $this->getServerConfig($fromServerName);
-        
+
             $servers = new Servers();
             $json = $this->module->getSystemSetting(self::SERVERS_KEY, true);
             $servers->fromJson($json);
             $servers->addServer($toServerName, false);
             $json = $servers->toJson();
             $this->module->setSystemSetting(self::SERVERS_KEY, $json);
-        
+
             $this->copyServerConfig($fromServerName, $toServerName, false);
         } catch (\Exception $exception) {
             $commit = false;
             $copyException = $exception;
         }
-                                                
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
-        
+
         if (isset($copyException)) {
             throw $copyException;
         }
     }
-    
+
     public function renameServer($serverName, $newServerName, $transaction = true)
     {
         $commit = true;
@@ -847,7 +848,7 @@ class Settings
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         $renameException = null;
         try {
             $server = $this->getServerConfig($serverName);
@@ -858,22 +859,22 @@ class Settings
             $servers->removeServer($serverName, false);
             $json = $servers->toJson();
             $this->module->setSystemSetting(self::SERVERS_KEY, $json);
-        
+
             $this->renameServerConfig($serverName, $newServerName, false);
         } catch (\Exception $exception) {
             $commit = false;
             $renameException = $exception;
         }
-                    
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
-        
+
         if (isset($renameException)) {
             throw $renameException;
         }
     }
-    
+
     /**
      * Removes the server from the REDCap database.
      */
@@ -881,20 +882,20 @@ class Settings
     {
         $commit = true;
         $errorMessage = '';
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         $this->removeServerConfig($serverName, false);
-        
+
         $servers = new Servers();
         $json = $this->module->getSystemSetting(self::SERVERS_KEY, true);
         $servers->fromJson($json);
         $servers->removeServer($serverName, false);
         $json = $servers->toJson();
         $this->module->setSystemSetting(self::SERVERS_KEY, $json);
-        
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
@@ -904,7 +905,7 @@ class Settings
     #-------------------------------------------------------------------
     # Server Config methods
     #-------------------------------------------------------------------
-    
+
     public function serverConfigExists($name)
     {
         $exists = false;
@@ -915,12 +916,12 @@ class Settings
         }
         return $exists;
     }
-    
+
     public function getServerConfig($serverName)
     {
         $key = self::SERVER_CONFIG_KEY_PREFIX . $serverName;
         $setting = $this->module->getSystemSetting($key);
-        
+
         if (empty($setting)) {
             # If the server configuration is NOT found then
             # create it if it is the embedded server
@@ -942,71 +943,71 @@ class Settings
             $serverConfig = new ServerConfig($serverName);
             $serverConfig->fromJson($setting);
         }
-        
+
         return $serverConfig;
     }
-    
+
     public function setServerConfig($serverConfig)
     {
         $json = $serverConfig->toJson();
         $key = self::SERVER_CONFIG_KEY_PREFIX . $serverConfig->getName();
         $this->module->setSystemSetting($key, $json);
     }
-    
+
     private function copyServerConfig($fromServerName, $toServerName, $transaction = true)
     {
         $commit = true;
         $errorMessage = '';
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         $toServerConfig = $this->getServerConfig($fromServerName);
         $toServerConfig->setName($toServerName);
         $json = $toServerConfig->toJson();
         $key = self::SERVER_CONFIG_KEY_PREFIX . $toServerName;
         $this->module->setSystemSetting($key, $json);
-        
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
     }
-    
+
     public function renameServerConfig($serverName, $newServerName, $transaction = true)
     {
         $commit = true;
         $errorMessage = '';
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         $this->copyServerConfig($serverName, $newServerName, false);
         $this->removeServerConfig($serverName, false);
-        
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
     }
-    
-    
+
+
     public function removeServerConfig($serverName, $transaction = true)
     {
         $commit = true;
         $errorMessage = '';
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         $key = self::SERVER_CONFIG_KEY_PREFIX . $serverName;
         $result = $this->module->removeSystemSetting($key);
-        
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
-        
+
         return $result;
     }
 
@@ -1014,7 +1015,7 @@ class Settings
     #-------------------------------------------------------------------
     # Last run time methods
     #-------------------------------------------------------------------
-    
+
     /**
      * Gets the last time that the REDCap-ETL cron jobs were run
      */
@@ -1033,7 +1034,7 @@ class Settings
         $lastRunTime = $date . ',' . $hour . ',' . $minutes;
         $this->module->setSystemSetting(self::LAST_RUN_TIME_KEY, $lastRunTime);
     }
-    
+
     public function isLastRunTime($date, $hour)
     {
         $lastRunTime = $this->getLastRunTime();
@@ -1054,7 +1055,7 @@ class Settings
         }
         return $helpSetting;
     }
-    
+
     public function setHelpSetting($topic, $setting)
     {
         $key = Help::HELP_SETTING_PREFIX . $topic;
@@ -1067,7 +1068,7 @@ class Settings
         $customHelp = $this->module->getSystemSetting($key);
         return $customHelp;
     }
-    
+
     public function setCustomHelp($topic, $help)
     {
         $key = Help::HELP_TEXT_PREFIX . $topic;
@@ -1109,7 +1110,7 @@ class Settings
         $json = $workflows->toJson();
 
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
-      
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
@@ -1236,7 +1237,7 @@ class Settings
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
@@ -1273,7 +1274,7 @@ class Settings
     public function reinstateWorkflow($workflowName, $username)
     {
         $this->db->startTransaction();
-        
+
         $workflows = new Workflow();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
@@ -1299,7 +1300,7 @@ class Settings
         }
 
         $commit = true;
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
@@ -1321,11 +1322,11 @@ class Settings
     public function renameWorkflow($workflowName, $newWorkflowName, $username, $transaction = true)
     {
         $commit = true;
-        
+
         if ($transaction) {
             $this->db->startTransaction();
         }
-        
+
         try {
             $this->copyWorkflow($workflowName, $newWorkflowName, $username, null, false);
             $this->deleteWorkflow($workflowName, false);
@@ -1334,7 +1335,7 @@ class Settings
             $this->db->endTransaction($commit);
             throw $exception;
         }
-        
+
         if ($transaction) {
             $this->db->endTransaction($commit);
         }
@@ -1476,7 +1477,7 @@ class Settings
         $properties = $workflows->getWorkflowGlobalProperties($workflowName);
         return $properties;
     }
-    
+
     public function getWorkflowGlobalConfiguration($workflowName)
     {
         $workflows = new Workflow();
@@ -1495,7 +1496,7 @@ class Settings
         }
         return $configuration;
     }
-    
+
     public function setWorkflowGlobalProperties($workflowName, $properties, $username)
     {
         $this->db->startTransaction();
@@ -1521,11 +1522,11 @@ class Settings
         $workflows->setCronSchedule($workflowName, $server, $schedule, $username);
         $json = json_encode($workflows);
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);
-        
+
         $commit = true;
         $this->db->endTransaction($commit);
     }
-    
+
     public function getWorkflowSchedule($workflowName)
     {
         $workflows = new Workflow();
@@ -1545,7 +1546,7 @@ class Settings
         $cronJobs = $workflows->getCronJobs($day, $time);
         return $cronJobs;
     }
-    
+
     public function hasPermissionsForAllTasks($workflowName, $username = USERID)
     {
         $hasPermissions = false;

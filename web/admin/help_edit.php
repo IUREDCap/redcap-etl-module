@@ -13,19 +13,19 @@ $module->checkAdminPagePermission();
 
 require_once __DIR__ . '/../../dependencies/autoload.php';
 
-use \IU\REDCapETL\Version;
+use IU\REDCapETL\Version;
 
-use \IU\RedCapEtlModule\Csrf;
-use \IU\RedCapEtlModule\Filter;
-use \IU\RedCapEtlModule\Help;
-use \IU\RedCapEtlModule\RedCapEtlModule;
+use IU\RedCapEtlModule\Csrf;
+use IU\RedCapEtlModule\Filter;
+use IU\RedCapEtlModule\Help;
+use IU\RedCapEtlModule\RedCapEtlModule;
 
 try {
     $selfUrl     = $module->getUrl(RedCapEtlModule::HELP_EDIT_PAGE);
     $helpListUrl = $module->getUrl(RedCapEtlModule::HELP_LIST_PAGE);
 
     $helpPreviewUrl = $module->getUrl('web/admin/help_preview.php');
-    
+
     #------------------------------------------------------
     # Get and process the help topic
     #------------------------------------------------------
@@ -37,7 +37,7 @@ try {
     if (!Help::isValidTopic($topic)) {
         $topic = '';
     }
-    
+
     $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
     if (strcasecmp($submitValue, 'Save') === 0) {
@@ -48,7 +48,7 @@ try {
             $helpSetting = Filter::sanitizeInt($_POST['helpSetting']);
             $defaultHelp = Help::getDefaultHelp($topic);
             $customHelp  = Filter::sanitizeHelp($_POST['customHelp']);
-            
+
             if (Help::isValidSetting($helpSetting)) {
                 $module->setHelpSetting($topic, $helpSetting);
                 $module->setCustomHelp($topic, $customHelp);
@@ -66,7 +66,7 @@ try {
 } catch (Exception $exception) {
     $error = 'ERROR: ' . $exception->getMessage();
 }
-    
+
 ?>
 
 <?php #require_once APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>

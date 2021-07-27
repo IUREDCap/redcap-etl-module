@@ -35,7 +35,7 @@ $adminUrl      = $module->getUrl(RedCapEtlModule::ADMIN_HOME_PAGE);
 
 $adminConfigJson = $module->getSystemSetting(AdminConfig::KEY);
 $adminConfig = new AdminConfig();
-        
+
 $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
 $username = Filter::stripTags($_POST['username']);
@@ -64,7 +64,7 @@ try {
                         array_push($userEtlProjects, (int) $projectId);
                     }
                 }
-                
+
                 $accessCheckbox = $_POST['accessCheckbox'];
                 $userPrivateServerNames = array();
                 if (is_array($accessCheckbox) && !empty($accessCheckbox)) {
@@ -228,7 +228,7 @@ $(function() {
             } else {
                 echo '<tr class="odd-row">' . "\n";
             }
-            
+
             $checked = '';
             if (!empty($userPrivateServerNames) && in_array($serverName, $userPrivateServerNames)) {
                 $checked = ' checked ';
@@ -263,15 +263,15 @@ $(function() {
         $row = 1;
         foreach ($userProjects as $project) {
             $projectId = $project['project_id'];
-            
+
             $configNames = $module->getConfigurationNames($projectId);
-            
+
             if ($row % 2 == 0) {
                 echo '<tr class="even-row">' . "\n";
             } else {
                 echo '<tr class="odd-row">' . "\n";
             }
-            
+
             $checked = '';
             if (!empty($userEtlProjects) && in_array($projectId, $userEtlProjects)) {
                 $checked = ' checked ';
@@ -279,14 +279,14 @@ $(function() {
             echo '<td style="text-align: center;"><input type="checkbox" name="checkbox[' . (int)$projectId . ']" '
                 . $checked . '></td>' . "\n";
             echo '<td style="text-align: right">' . (int)$projectId . "</td>\n";
-            
+
             # Project title
             echo "<td>\n";
             echo '<a href="' . APP_PATH_WEBROOT . 'index.php?pid='
                 . Filter::escapeForUrlParameter($project['project_id']) . '" target="_blank">'
                 . Filter::escapeForHtml($project['app_title']) . "</a>\n";
             echo "</td>\n";
-            
+
             echo "<td>\n";
             $isFirst = true;
             foreach ($configNames as $configName) {
@@ -305,7 +305,7 @@ $(function() {
             }
             echo "\n";
             echo "</td>\n";
-            
+
             echo "</tr>\n";
             $row++;
         }

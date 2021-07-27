@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -72,7 +73,7 @@ class ModuleLog
 
         return $logId;
     }
-    
+
 
     /**
      * Logs high-level run information to external module log.
@@ -132,9 +133,9 @@ class ModuleLog
      */
     public function getData($type, $startDate = null, $endDate = null)
     {
-        
+
         $query = "select log_id, timestamp, ui_id, project_id, message";
-        
+
         if ($type === self::ETL_RUN) {
             $query .= ', log_type, cron, config, etl_username, etl_server, cron_job_log_id, cron_day, cron_hour';
             $query .= " where (log_type = '" . Filter::escapeForMysql($type) . "'";
@@ -144,7 +145,7 @@ class ModuleLog
             $query .= " where (log_type = '" . Filter::escapeForMysql($type) . "'";
             $query .= " or log_type = '" . self::WORKFLOW_CRON_JOB . "')";
         }
-        
+
         #----------------------------------------
         # Query start date condition (if any)
         #----------------------------------------
@@ -153,7 +154,7 @@ class ModuleLog
             $startTime = $startTime->format('Y-m-d');
             $query .= " and timestamp >= '" . Filter::escapeForMysql($startTime) . "'";
         }
-        
+
         #---------------------------------------
         # Query end date condition (if any)
         #---------------------------------------
@@ -163,12 +164,12 @@ class ModuleLog
             $endTime = $endTime->format('Y-m-d');
             $query .= " and timestamp < '" . Filter::escapeForMysql($endTime) . "'";
         }
-        
+
         $logData = $this->module->queryLogs($query);
         return $logData;
     }
-    
-    
+
+
     public function generateCsvDownload($logType, $startDate, $endDate)
     {
         header('Content-Type: text/csv; charset=utf-8');
@@ -177,19 +178,19 @@ class ModuleLog
 
         if ($logType === self::ETL_RUN) {
             header('Content-Disposition: attachment; filename=redcap-etl-runs.csv');
-                    
+
             $header = [
                 'Log ID', 'Time', 'Project ID', 'Server', 'Config',
                 'User ID', 'Username', 'Cron?', 'Cron Day', 'Cron Hour'
             ];
-            
+
             $out = fopen('php://output', 'w');
             fputcsv($out, ['REDCap-ETL Processes']);
             fputcsv($out, ['']);
             fputcsv($out, ['Start Date', $startDate]);
             fputcsv($out, ['End Date', $endDate]);
             fputcsv($out, ['']);
-                                    
+
             fputcsv($out, $header);
 
             $entries = $this->getData(self::ETL_RUN, $startDate, $endDate);
@@ -203,13 +204,13 @@ class ModuleLog
                 $csvEntry[$i++] = $entry['config'];
                 $csvEntry[$i++] = $entry['ui_id'];
                 $csvEntry[$i++] = $entry['etl_username'];
-                
+
                 if ($entry['cron']) {
                     $csvEntry[$i++] = 'yes';
                 } else {
                     $csvEntry[$i++] = 'no';
                 }
-                
+
                 $csvEntry[$i++] = $entry['cron_day'];
                 $csvEntry[$i++] = $entry['cron_hour'];
                 fputcsv($out, $csvEntry);
@@ -217,7 +218,7 @@ class ModuleLog
             fclose($out);
         } elseif ($logType === self::ETL_CRON) {
             header('Content-Disposition: attachment; filename=redcap-etl-cron-jobs.csv');
-            
+
             $header = [
                 'Log ID', 'Time', 'Cron Day', 'Cron Hour', 'Jobs'
             ];
@@ -227,9 +228,9 @@ class ModuleLog
             fputcsv($out, ['Start Date', $startDate]);
             fputcsv($out, ['End Date', $endDate]);
             fputcsv($out, ['']);
-            
+
             fputcsv($out, $header);
-            
+
             $entries = $this->getData(self::ETL_CRON, $startDate, $endDate);
             foreach ($entries as $entry) {
                 $i = 0;
@@ -257,7 +258,7 @@ class ModuleLog
         $cronJob = $this->module->queryLogs($query);
         return $cronJob;
     }
-    
+
     /**
      * Gets the log id from the ETL run of a cron job, given the Cron log ID.
      */
@@ -268,7 +269,7 @@ class ModuleLog
             . " or log_type = '" . self::WORKFLOW_RUN . "')"
             . " and cron_log_id = '" . Filter::escapeForMysql($cronLogId) . "'";
         $result = $this->module->queryLogs($query);
-        
+
         $logId = null;
         if (array_key_exists('log_id', $result)) {
             $logId = $result['log_id'];
@@ -288,7 +289,7 @@ class ModuleLog
         $etlRunDetails = $this->module->queryLogs($query);
         return $etlRunDetails;
     }
-    
+
     public function renderCronJobs($logId)
     {
         $cronJobs = '';
@@ -299,7 +300,7 @@ class ModuleLog
         $cronJobs .= "</thead>\n";
         $cronJobs .= "<tbody>\n";
         $cronJobsData = $this->getCronJobs($logId);
-        
+
         $tableRows = '';
         foreach ($cronJobsData as $job) {
             $projectId = null;
@@ -312,15 +313,15 @@ class ModuleLog
             $row .= "<td>" . Filter::sanitizeString($job['etl_server']) . "</td>";
             $row .= "<td>" . Filter::sanitizeString($job['config']) . "</td>";
             $row .= '<td style="text-align: right;">' . Filter::sanitizeString($projectId) . "</td>";
-            
+
             $row .= "</tr>\n";
             $tableRows .= $row;
         }
-        
+
         $cronJobs .= $tableRows;
         $cronJobs .= "</tbody>\n";
         $cronJobs .= "</table>\n";
-        
+
         return $cronJobs;
     }
 
@@ -345,11 +346,11 @@ class ModuleLog
             $row .= "</tr>\n";
             $tableRows .= $row;
         }
-        
+
         $details .= $tableRows;
         $details .= "</tbody>\n";
         $details .= "</table>\n";
-        
+
         return $details;
     }
 

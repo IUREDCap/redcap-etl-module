@@ -166,7 +166,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
         } elseif ($logType === RedCapEtlModule::ETL_RUN) {
             echo "ETL Processes";
         }
-        
+
         if ($startDate === $endDate) {
             echo " for {$startDate}";
         } else {
@@ -214,7 +214,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                         $projectUrl = APP_PATH_WEBROOT . 'index.php?pid=' . (int)$projectId;
                     }
                     $cron = $entry['cron'];
-                    
+
                     $config = $entry['config'];
                     if ($entry['log_type'] === RedCapEtlModule::WORKFLOW_RUN) {
                         #The first project in the workflow sequence at runtime is recorded for log purposes
@@ -238,7 +238,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     }
                     $server = $entry['etl_server'];
                     $serverUrl = $serverConfigUrl . '&serverName=' . Filter::escapeForUrlParameter($server);
-                    
+
                     echo "<tr>\n";
                     echo '<td style="text-align: right;">' . $entry['log_id'] . "</td>\n";
                     echo "<td>" . $entry['timestamp'] . "</td>\n";
@@ -258,7 +258,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     #--------------------------------------------
                     echo '<td style="text-align: right;">' . $entry['ui_id'] . "</td>\n";
                     echo "<td>" . Filter::escapeForHtml($entry['etl_username']) . "</td>\n";
-                    
+
                     #-------------------------------------
                     # Cron info
                     #-------------------------------------
@@ -269,7 +269,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     }
                     echo '<td style="text-align: right;">' . $entry['cron_day'] . "</td>\n";
                     echo '<td style="text-align: right;">' . $entry['cron_hour'] . "</td>\n";
-                    
+
                     echo '<td>';
                     if ($server === ServerConfig::EMBEDDED_SERVER_NAME) {
                         echo '<a id="etl_run_detail_' . ($entry['log_id']) . '" class="etlRunDetails"'
@@ -279,7 +279,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                         echo 'See remote server logs';
                     }
                     echo "</td>\n";
-                    
+
                     echo "</tr>\n";
                 } elseif ($logType === RedCapEtlModule::ETL_CRON) {
                     $cron = null;
@@ -291,7 +291,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     echo "<td>" . $entry['timestamp'] . "</td>\n";
                     echo '<td style="text-align: right;">' . $entry['cron_day'] . "</td>\n";
                     echo '<td style="text-align: right;">' . $entry['cron_hour'] . "</td>\n";
-                    
+
                     $numJobs = $entry['num_jobs'];
                     echo '<td style="text-align: right;">';
                     if ($numJobs > 0) {
@@ -302,7 +302,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                         echo $numJobs;
                     }
                     echo "</td>\n";
-                    
+
                     echo "</tr>\n";
                 }
             }

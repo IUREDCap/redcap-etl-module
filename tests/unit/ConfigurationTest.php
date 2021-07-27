@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -18,18 +19,18 @@ class ConfigurationTest extends TestCase
     {
         $config = new Configuration('test');
         $this->assertNotNull($config, 'Object creation test');
-        
+
         $this->assertEquals('test', $config->getName(), 'Configuration name test');
     }
-    
+
     public function testNameValidation()
     {
         $result = Configuration::validateName('test');
         $this->assertTrue($result, 'Config name "test" test.');
-        
+
         $result = Configuration::validateName('Test Configuration');
         $this->assertTrue($result, 'Config name "Test Configuration" test.');
-        
+
         $exceptionCaught = false;
         try {
             $result = Configuration::validateName('<script>alert(123);</script>');
@@ -37,7 +38,7 @@ class ConfigurationTest extends TestCase
             $exceptionCaught = true;
         }
         $this->assertTrue($exceptionCaught, 'Config name script exception)');
-        
+
         $exceptionCaught = false;
         try {
             $result = Configuration::validateName('%3CIMG');
@@ -45,7 +46,7 @@ class ConfigurationTest extends TestCase
             $exceptionCaught = true;
         }
         $this->assertTrue($exceptionCaught, 'Config % exception)');
-        
+
         $exceptionCaught = false;
         try {
             $result = Configuration::validateName('`ls -l`');
@@ -53,7 +54,7 @@ class ConfigurationTest extends TestCase
             $exceptionCaught = true;
         }
         $this->assertTrue($exceptionCaught, 'Config backtick exception)');
-        
+
         $exceptionCaught = false;
         try {
             $result = Configuration::validateName('&amp');
@@ -61,8 +62,8 @@ class ConfigurationTest extends TestCase
             $exceptionCaught = true;
         }
         $this->assertTrue($exceptionCaught, 'Config & exception)');
-        
-        
+
+
         $exceptionCaught = false;
         try {
             $result = Configuration::validateName('amp;');
@@ -163,7 +164,7 @@ class ConfigurationTest extends TestCase
         $this->assertTrue($exceptionCaught, 'Invalid batch size caught');
         $this->assertStringContainsString('positive integer', $message, 'Invalid batch size message');
     }
-    
+
     public function testDatabaseProperties()
     {
         $preSql  = 'DROP TABLE test;';
@@ -178,16 +179,16 @@ class ConfigurationTest extends TestCase
             Configuration::PRE_PROCESSING_SQL  => $preSql,
             Configuration::POST_PROCESSING_SQL => $postSql
         ];
-         
+
         $configuration = new Configuration('test');
         $configuration->set($properties);
-        
+
         $dbConnection = $configuration->getProperty(Configuration::DB_CONNECTION);
         $this->assertEquals('MySQL:localhost:etl_user:etl_password:test', $dbConnection, 'DB connection test');
-        
+
         $configPreSql = $configuration->getProperty(Configuration::PRE_PROCESSING_SQL, 'Pre-Processing SQL test');
         $this->assertEquals($preSql, $configPreSql, 'Pre-SQL test');
- 
+
         $configPostSql = $configuration->getProperty(Configuration::POST_PROCESSING_SQL, 'Post-Processing SQL test');
         $this->assertEquals($postSql, $configPostSql, 'Post-SQL test');
     }

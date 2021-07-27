@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -58,8 +59,8 @@ class Authorization
         $hasPermission = self::hasEtlConfigurationPermission($module, $configuration);
         return $hasPermission;
     }
-    
-    
+
+
     /**
      * Indicates if the current user has permission to access the specified configuration.
      */
@@ -89,7 +90,7 @@ class Authorization
         }
         return $hasPermission;
     }
-    
+
     /**
      * Indicates if the current user has the REDCap user rights
      * to access ETL for the current project (admins always have access).

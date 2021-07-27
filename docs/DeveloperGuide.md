@@ -53,9 +53,10 @@ prevented from following them by REDCap:
 
 To check for coding standards compliance, enter the following command in the top-level directory:
 
-    ./vendor/bin/phpcs
+    ./vendor/bin/phpcs -n
     
-The configuration for phpcs is in file __phpcs.xml__ in the top-level directory.
+The "-n" option eliminated warnings. The configuration for phpcs is in file __phpcs.xml__ in the top-level directory.
+
 
 
 Automated Tests

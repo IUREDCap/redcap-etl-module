@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -18,7 +19,7 @@ class Filter
         'table', 'tbody', 'td', 'th', 'thead', 'tr',
         'ul'
     ];
-        
+
     /**
      * Escape text for displaying as HTML.
      * This method only works within REDCap context.
@@ -29,7 +30,7 @@ class Filter
     {
         return \REDCap::escapeHtml($value);
     }
-    
+
     public static function escapeForHtmlAttribute($value)
     {
         return htmlspecialchars($value, ENT_QUOTES);
@@ -42,18 +43,18 @@ class Filter
     {
         return urlencode($value);
     }
-    
+
     public static function escapeForJavaScriptInDoubleQuotes($value)
     {
         # REDCap's JavaScript escape function for double quotes
         return js_escape2($value);
     }
-    
+
     public static function escapeForMysql($value)
     {
         return db_escape($value);
     }
-    
+
     public static function stripTags($value)
     {
         return trim(strip_tags($value));
@@ -71,22 +72,22 @@ class Filter
         }
         return $newValues;
     }
-    
+
     public function isEmail($value)
     {
         return filter_var($value, FILTER_VALIDATE_EMAIL);
     }
-    
+
     public function isUrl($value)
     {
         return filter_var($value, FILTER_VALIDATE_URL);
     }
-    
+
     public function sanitizeInt($value)
     {
         return filter_var($value, FILTER_SANITIZE_NUMBER_INT);
     }
-    
+
     /**
      * Removes tags and invalid characters for labels
      * (internal string values used for submit buttons, etc.).
@@ -96,7 +97,7 @@ class Filter
         $flags = FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_BACKTICK;
         return filter_var($value, FILTER_SANITIZE_STRING, $flags);
     }
-    
+
     /**
      * Removes invalid characters for internal button labels.
      */
@@ -114,7 +115,7 @@ class Filter
         $value = preg_replace('/([^0-9\-\/])/', '', $value);
         return $value;
     }
-    
+
     /**
      * Removes tags and invalid characters for strings.
      */
@@ -123,7 +124,7 @@ class Filter
         $flags = FILTER_FLAG_STRIP_LOW;
         return filter_var($value, FILTER_SANITIZE_STRING, $flags);
     }
-    
+
     /**
      * Sanitizes custom help messages.
      * Removes all tags except allowed tags, and removes all tag
@@ -137,7 +138,7 @@ class Filter
 
         # Remove trailing space from tags
         $text = preg_replace('/\s+>/', '>', $text);
-                
+
         # Close nested tags, for example, change "<a <a>" => "<a> <a>"
         $text = preg_replace('/<\s*([a-z][a-z0-9]*)([^<>]*<)/i', '<${1}>${2}', $text);
 
@@ -163,13 +164,13 @@ class Filter
         $text = preg_replace('/<' . $tempTag . '\s+/', '<a ', $text);
         return $text;
     }
-    
+
     public static function sanitizeRulesStatus($text)
     {
         $text = strip_tags($text, '<br>');
         return $text;
     }
-    
+
     public static function getAllowedHelpTagsString()
     {
         $isFirstTag = true;

@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -55,7 +56,7 @@ class Workflow implements \JsonSerializable
 
         return $this->sequenceWorkflowTasks($workflowName, $workflow, null);
     }
-    
+
     public function getWorkflowTasks($workflowName)
     {
         $workflow = $this->workflows[$workflowName];
@@ -86,7 +87,7 @@ class Workflow implements \JsonSerializable
 
         #sort project-tasks by sequence number
         array_multisort(array_column($tasks, 'taskSequenceNumber'), SORT_ASC, SORT_NUMERIC, $tasks);
-        
+
         #renumber sequence to ensure the no sequence numbers duplicated or omitted
         $i = 1;
         foreach ($tasks as $key => $task) {
@@ -129,7 +130,7 @@ class Workflow implements \JsonSerializable
             $message .= 'no workflow name was specified.';
             throw new \Exception($message);
         }
-     
+
         $metadata = null;
         if (!array_key_exists('metadata', $workflow)) {
             $metadata = $this->workflows[$workflowName]["metadata"];
@@ -137,7 +138,7 @@ class Workflow implements \JsonSerializable
 
         #sort project-tasks by sequence number
         array_multisort(array_column($workflow, 'taskSequenceNumber'), SORT_ASC, SORT_NUMERIC, $workflow);
-        
+
         #renumber sequence to ensure the no sequence numbers duplicated or omitted
         $i = 1;
         foreach ($workflow as $key => $task) {
@@ -268,14 +269,14 @@ class Workflow implements \JsonSerializable
         } else {
             $this->workflows[$workflowName]["metadata"]["workflowStatus"] = self::WORKFLOW_INCOMPLETE;
         }
-        
+
         $this->workflows[$workflowName]["metadata"]["updatedBy"] = $username;
         $now = new \DateTime();
         $now->format('Y-m-d H:i:s');
         $now->getTimestamp();
         $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
     }
-    
+
     /**
      * Marks a workflow as being removed (inactive).
      */
@@ -289,7 +290,7 @@ class Workflow implements \JsonSerializable
         $now->getTimestamp();
         $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
     }
-    
+
     public function copyWorkflow($fromWorkflowName, $toWorkflowName, $username)
     {
         $this->workflows[$toWorkflowName] = $this->workflows[$fromWorkflowName];
@@ -343,7 +344,7 @@ class Workflow implements \JsonSerializable
         }
 
         unset($this->workflows[$workflowName][$taskKey]);
- 
+
         #workflow status
         $etlConfigs = array_column($this->workflows[$workflowName], 'projectEtlConfig');
         $emptyEtlConfig = empty($etlConfigs) || in_array(null, $etlConfigs, true)
@@ -459,7 +460,7 @@ class Workflow implements \JsonSerializable
             $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
         }
     }
-    
+
     public function setCronSchedule($workflowName, $server, $schedule, $username)
     {
         $message = 'When setting workflow cron schdule, ';
@@ -480,12 +481,12 @@ class Workflow implements \JsonSerializable
             $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
         }
     }
-    
+
     public function getCronSchedule($workflowName)
     {
         return $this->workflows[$workflowName]["cron"];
     }
-    
+
     public function getCronJobs($day, $time)
     {
         $cronJobs = array();
@@ -509,7 +510,7 @@ class Workflow implements \JsonSerializable
         }
         return $cronJobs;
     }
-    
+
     public function getAllProjectTasksInAllWorkflows($project, $projectAvailableWorkflows)
     {
         $taskNames = array();
@@ -517,13 +518,13 @@ class Workflow implements \JsonSerializable
             unset($workflow["metadata"]);
             unset($workflow["cron"]);
             unset($workflow["properties"]);
-           
+
             $commonWorkflows = array_intersect($workflow, $projectAvailableWorkflows);
         }
-        
+
         return $taskNames;
     }
-    
+
     public function addProject($username, $projectId)
     {
 #delete?
@@ -539,7 +540,7 @@ class Workflow implements \JsonSerializable
             unset($this->userList[$username][$projectId]);
         }
     }
-    
+
     public function fromJson($json)
     {
         if (!empty($json)) {

@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -32,7 +33,7 @@ class ProjectInfo implements \JsonSerializable
         }
         return $has;
     }
-    
+
     public function getConfigNames()
     {
         $configNames = array_keys($this->configs);
@@ -45,7 +46,7 @@ class ProjectInfo implements \JsonSerializable
         Configuration::validateName($configName);
         $this->configs[$configName] = 1;
     }
-    
+
     public function removeConfigName($configName)
     {
         unset($this->configs[$configName]);

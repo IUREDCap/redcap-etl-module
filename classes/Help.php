@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,10 +14,10 @@ class Help
     const CUSTOM_TEXT         = 1;
     const PREPEND_CUSTOM_TEXT = 2;  // prepend custom text to default text
     const APPEND_CUSTOM_TEXT  = 3;  // append custom text to default text
-    
+
     const HELP_SETTING_PREFIX = 'help-setting:';    // Prefix for help setting for a topic
     const HELP_TEXT_PREFIX    = 'help-text:';       // Prefix for (custom) help text for a topic
-    
+
     /** @var array map from help topic to help content */
     private static $help = [
         'api-token-user' =>
@@ -285,31 +286,31 @@ class Help
         $title = str_replace('Api', 'API', $title);
         $title = str_replace('Email', 'E-mail', $title);
         $title = str_replace('Sql', 'SQL', $title);
-                
+
         return $title;
     }
-    
-    
+
+
     public static function getDefaultHelp($topic)
     {
         $help = Filter::sanitizeHelp(self::$help[$topic]);
         return $help;
     }
-    
+
     public static function getCustomHelp($topic, $module)
     {
         $help = $module->getCustomHelp($topic);
         $help = Filter::sanitizeHelp($help);
         return $help;
     }
-    
+
     public static function getHelp($topic, $module)
     {
         $help = '';
-        
+
         # Get the specified topic's help setting
         $setting = $module->getHelpSetting($topic);
-        
+
         switch ($setting) {
             case self::CUSTOM_TEXT:
                 $help = self::getCustomHelp($topic, $module);
@@ -324,10 +325,10 @@ class Help
                 $help = self::getDefaultHelp($topic);
                 break;
         }
-        
+
         return $help;
     }
-    
+
     public static function getHelpWithPageLink($topic, $module)
     {
         $help = self::getHelp($topic, $module);
@@ -339,11 +340,11 @@ class Help
             . Filter::sanitizeHelp($help);
         return $help;
     }
-    
+
     public function getHelpFromText($setting, $defaultHelp, $customHelp)
     {
         $help = '';
-        
+
         switch ($setting) {
             case self::CUSTOM_TEXT:
                 $help = Filter::sanitizeHelp($customHelp);
@@ -358,16 +359,16 @@ class Help
                 $help = Filter::sanitizeHelp($defaultHelp);
                 break;
         }
-        
+
         return $help;
     }
-    
-    
+
+
     public static function getTopics()
     {
         return array_keys(self::$help);
     }
-    
+
     /**
      * Indicates if the specified topic is a valid help topic.
      *
@@ -382,7 +383,7 @@ class Help
         }
         return $isValid;
     }
-    
+
     /**
      * Indicates if the specified help setting is valid.
      */
@@ -400,7 +401,7 @@ class Help
         }
         return $isValid;
     }
-    
+
     public static function getSettingText($setting)
     {
         $settingText = '';

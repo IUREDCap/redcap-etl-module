@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -10,30 +11,30 @@ class AdminConfig implements \JsonSerializable
 {
     const KEY = 'admin-config';
     const DAY_LABELS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    
+
     # Property constants
     const SSL_VERIFY     = 'sslVerify';
     const CA_CERT_FILE   = 'caCertFile';
-    
+
     #const ALLOW_EMBEDDED_SERVER              = 'allowEmbeddedServer';
     #const EMBEDDED_SERVER_EMAIL_FROM_ADDRESS = 'embeddedServerEmailFromAddress';
     #const EMBEDDED_SERVER_LOG_FILE           = 'embeddedServerLogFile';
-    
+
     const ALLOW_ON_DEMAND    = 'allowOnDemand';
     const ALLOW_CRON         = 'allowCron';
     const ALLOWED_CRON_TIMES = 'allowedCronTimes';
-    
+
     /** @var boolean indicates if SSL verification should be done for local REDCap */
     private $sslVerify;
-    
+
     /** @var string certificate authority certificate file used for SSL verification of REDCap. */
     private $caCertFile;
-    
+
     private $allowOnDemand;  // Allow the ETL process to be run on demand
-    
+
     private $allowCron;
     private $allowedCronTimes;
-    
+
     private $maxJobsPerTime;
 
 
@@ -41,7 +42,7 @@ class AdminConfig implements \JsonSerializable
     {
         $this->allowOnDemand = false;
         $this->allowCron     = true;
-        
+
         $this->maxJobsPerTime = 10;
 
         $this->allowedCronTimes = array();
@@ -55,7 +56,7 @@ class AdminConfig implements \JsonSerializable
                 }
             }
         }
-        
+
         $this->sslVerify = true;
     }
 
@@ -75,8 +76,8 @@ class AdminConfig implements \JsonSerializable
         $json = json_encode($this);
         return $json;
     }
-    
-    
+
+
     /**
      * Sets admin configuration properties from a map that uses the
      * property keys for this class.
@@ -103,28 +104,28 @@ class AdminConfig implements \JsonSerializable
                 }
             }
         }
-        
+
         # Set flag that indicates if users can run jobs on demand
         if (array_key_exists(self::ALLOW_ON_DEMAND, $properties)) {
             $this->allowOnDemand = true;
         } else {
             $this->allowOnDemand = false;
         }
-    
+
         # Set flag that indicates if cron (scheduled) jobs can be run by users
         if (array_key_exists(self::ALLOW_CRON, $properties)) {
             $this->allowCron = true;
         } else {
             $this->allowCron = false;
         }
-    
+
         # Set flag indicating of SSL certificate verification should be done
         if (array_key_exists(self::SSL_VERIFY, $properties)) {
             $this->sslVerify = true;
         } else {
             $this->sslVerify = false;
         }
-        
+
         # Set certificate authority certificate file
         if (array_key_exists(self::CA_CERT_FILE, $properties)) {
             $this->caCertFile = $properties[self::CA_CERT_FILE];
@@ -162,7 +163,7 @@ class AdminConfig implements \JsonSerializable
         if ($startTime > 12) {
             $startTime -= 12;
         }
-        
+
         if ($startTime < 10) {
             $startTime = "&nbsp;" . $startTime;
         }
@@ -176,11 +177,11 @@ class AdminConfig implements \JsonSerializable
         if ($endTime > 12) {
             $endTime -= 12;
         }
-            
+
         if ($endTime < 10) {
             $endTime = "&nbsp;" . $endTime;
         }
-        
+
         $label = "{$startTime}{$startTimeSuffix}&nbsp;-&nbsp;{$endTime}{$endTimeSuffix}";
 
         return $label;
@@ -210,7 +211,7 @@ class AdminConfig implements \JsonSerializable
                 if ($end < 24) {
                     $endSuffix = 'pm';
                 }
-                
+
                 if ($end > 12) {
                     $end -= 12;
                 }
@@ -229,23 +230,23 @@ class AdminConfig implements \JsonSerializable
     {
         return $this->allowOnDemand;
     }
-    
+
     public function getAllowCron()
     {
         return $this->allowCron;
     }
-    
+
     public function isAllowedCronTime($day, $time)
     {
         $isAllowed = $this->allowedCronTimes[$day][$time];
         return $isAllowed;
     }
-     
+
     public function getSslVerify()
     {
         return $this->sslVerify;
     }
-    
+
     public function getCaCertFile()
     {
         return $this->caCertFile;

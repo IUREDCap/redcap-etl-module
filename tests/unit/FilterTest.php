@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -30,7 +31,7 @@ class FilterTest extends TestCase
         $expectedResult = '123';
         $this->assertEquals($expectedResult, $sanitizedText, 'Sanitized int check');
     }
-    
+
     public function testSanitizeDate()
     {
         $date = '   12/31/2019 ';

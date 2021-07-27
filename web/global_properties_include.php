@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -6,7 +7,6 @@
 
 use IU\REDCapETL\EtlRedCapProject;
 use IU\REDCapETL\Database\DbConnectionFactory;
-
 use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Configuration;
 use IU\RedCapEtlModule\Csrf;
@@ -102,7 +102,7 @@ try {
             $initialize = false;
             $properties = $configuration->getGlobalProperties($initialize);
         }
-        
+
         #------------------------------------------------------
         # Process Actions
         #------------------------------------------------------

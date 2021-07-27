@@ -99,7 +99,7 @@ Workflow name: <input type="text" id="search-text" name="search-text" size="40">
                 $display = false;
             }
         }
-        
+
         if ($display) {
             if ($row % 2 == 0) {
                 echo "<tr class=\"even\">\n";
@@ -165,7 +165,7 @@ Workflow name: <input type="text" id="search-text" name="search-text" size="40">
             } else {
                 echo "<td> </td>\n";
             }
-         
+
             #-------------------------------
             # Delete
             #-------------------------------
@@ -174,10 +174,10 @@ Workflow name: <input type="text" id="search-text" name="search-text" size="40">
                 . ' id="deleteWorkflow' . $row . '"'
                 . ' class="deleteServer" style="cursor: pointer;">'
                 . "</td>\n";
-              
+
             echo "</tr>\n";
         }
-        
+
         $row++;
     }
     ?>

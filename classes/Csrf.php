@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -13,7 +14,7 @@ namespace IU\RedCapEtlModule;
 class Csrf
 {
     const TOKEN_NAME = 'etl_csrf_token';
-    
+
     public static function getToken()
     {
         $tokenId = null;
@@ -24,7 +25,7 @@ class Csrf
         $tokenId = $_SESSION[self::TOKEN_NAME];
         return $tokenId;
     }
-    
+
     /**
      * Generates a hidden input that contains the CSRF token.
      */
@@ -46,7 +47,7 @@ class Csrf
         }
         return $isValid;
     }
-    
+
     /**
      * Indicates if a request is valid from a CSRF perspective. If the request is a POST
      * then it has to have an ETL CSRF token in the request that corresponds to an

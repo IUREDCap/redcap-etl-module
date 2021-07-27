@@ -45,10 +45,10 @@ try {
             $error = 'ERROR: No workflow name was specified.';
         } else {
             $workflowName = Filter::stripTags($_POST['workflowName']);
-            
+
             # Make sure workflow name is validated before it is used
             Configuration::validateName($workflowName);
-            
+
             # Add workflow; an exception should be thrown if the workflow
             # already exists
             $module->addWorkflow($workflowName);
@@ -63,7 +63,7 @@ try {
             # Make sure config names are validated before it is used
             Configuration::validateName($copyFromWorkflowName);
             Configuration::validateName($copyToWorkflowName);
-                        
+
             $module->copyWorkflow($copyFromWorkflowName, $copyToWorkflowName);
         }
     } elseif (strcasecmp($submitValue, 'delete') === 0) {
@@ -93,7 +93,7 @@ try {
             # Make sure names are validated before it is used
             Configuration::validateName($renameWorkflowName);
             Configuration::validateName($renameNewWorkflowName);
-            
+
             $module->renameWorkflow($renameWorkflowName, $renameNewWorkflowName);
         }
     }
@@ -157,7 +157,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     <th>Configure</th>
     <!-- <th>Test</th> -->
     <?php
-    
+
     if ($adminConfig->getAllowOnDemand()) {
         echo "<th>Run</th>\n";
     }
@@ -200,9 +200,9 @@ foreach ($workflowNames as $workflowName) {
     } else {
         echo '<tr class="odd">' . "\n";
     }
-    
+
     echo "<td>" . Filter::escapeForHtml($workflowName) . "</td>\n";
-    
+
     #-------------------------------------------------------------------------------------
     # CONFIGURE BUTTON - disable if user does not have permission to access the project
     #-------------------------------------------------------------------------------------
@@ -220,7 +220,7 @@ foreach ($workflowNames as $workflowName) {
             . '<img src="' . APP_PATH_IMAGES . 'gear.png" alt="CONFIG" class="disabled">'
             . "</td>\n";
     }
-    
+
     #--------------------------------------------------------------------------------------
     # RUN BUTTON - display if running on demand allowed, but disable if user does not have
     # the needed data export permission to access the configuration
@@ -274,7 +274,7 @@ foreach ($workflowNames as $workflowName) {
            . '<img src="' . APP_PATH_IMAGES . 'page_copy.png" alt="COPY" class="disabled" />'
            . "</td>\n";
     }
-    
+
     #-----------------------------------------------------------
     # RENAME BUTTON - disable if user does not have the needed
     # data export permission to access the project
@@ -306,7 +306,7 @@ foreach ($workflowNames as $workflowName) {
             . '<img src="' . APP_PATH_IMAGES . 'delete.png" alt="REMOVE" class="disabled" />'
             . "</td>\n";
     }
-    
+
     echo "</tr>\n";
     $row++;
 }

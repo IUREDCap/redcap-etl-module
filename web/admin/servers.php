@@ -121,7 +121,7 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
     $row = 1;
     foreach ($servers as $server) {
         $serverConfig = $module->getServerConfig($server);
-        
+
         if ($row % 2 == 0) {
             echo "<tr class=\"even\">\n";
         } else {
@@ -130,7 +130,7 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
         echo "<td>" . Filter::escapeForHtml($server) . "</td>\n";
 
         $serverConfigureUrl = $configureUrl . '&serverName=' . Filter::escapeForUrlParameter($server);
-        
+
         #-------------------------------
         # Active
         #-------------------------------
@@ -161,7 +161,7 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
             . '<img src="' . APP_PATH_IMAGES . 'gear.png" alt="CONFIG"></a>'
             . "</td>\n";
 
-        
+
         if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
             echo "<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>\n";
         } else {
@@ -182,7 +182,7 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
                 . ' id="renameServer' . $row . '"'
                 . ' class="renameServer" style="cursor: pointer;">'
                 . "</td>\n";
-          
+
             #-------------------------------
             # Delete
             #-------------------------------
@@ -192,7 +192,7 @@ Server: <input type="text" id="server-name" name="server-name" size="40">
                 . ' class="deleteServer" style="cursor: pointer;">'
                 . "</td>\n";
         }
-              
+
         echo "</tr>\n";
         $row++;
     }

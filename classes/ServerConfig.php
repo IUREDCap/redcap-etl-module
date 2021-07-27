@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -9,22 +10,21 @@ namespace IU\RedCapEtlModule;
 use phpseclib3\Net\SFTP;
 use phpseclib3\Crypt\PublicKeyLoader;
 
-
 class ServerConfig implements \JsonSerializable
 {
     const EMBEDDED_SERVER_NAME = '(embedded server)';
-    
+
     const AUTH_METHOD_SSH_KEY  = 0;
     const AUTH_METHOD_PASSWORD = 1;
 
     const ACCESS_LEVELS = array('admin','private','public');
-    
+
     private $name;
-    
+
     /** @var boolean indicates if the server is active or not; inactive servers
                      don't show up as choices for users. */
     private $isActive;
-    
+
     private $accessLevel; #who is allowed to run the server
 
     private $serverAddress; # address of REDCap-ETL server
@@ -35,17 +35,17 @@ class ServerConfig implements \JsonSerializable
     private $sshKeyPassword;
 
     private $configDir;
-    
+
     private $etlCommand;  # full path of command to run on REDCap-ETL server
     private $etlCommandPrefix;
     private $etlCommandSuffix;
 
     private $logFile;
-    
+
     private $emailFromAddress;
     private $enableErrorEmail;
     private $enableSummaryEmail;
-    
+
     # Database SSL verification
     private $dbSsl;
     private $dbSslVerify;
@@ -55,36 +55,36 @@ class ServerConfig implements \JsonSerializable
     public function __construct($name)
     {
         self::validateName($name);
-        
+
         $this->name = $name;
-        
+
         $this->isActive = false;
 
         $this->accessLevel = 'public';
 
         $this->authMethod = self::AUTH_METHOD_SSH_KEY;
         $this->sshKeyPassword = '';
-        
+
         $this->etlCommand = '';
         $this->etlCommandPrefix = 'nohup';
         $this->etlCommandSuffix = '> /dev/null 2>&1 &';
 
         $this->logFile = '';
-            
+
         $this->emailFromAddress = '';
         $this->enableErrorEmail   = false;
         $this->enableSummaryEmail = false;
-        
+
         if ($this->isEmbeddedServer()) {
             $this->enableErrorEmail   = true;
             $this->enableSummaryEmail = true;
-        
+
             // phpcs:disable
             $homepageContactEmail = $homepage_contact_email;
             // phpcs:enable
             $this->emailFromAddress = $homepageContactEmail;
         }
-        
+
         $this->dbSsl = true;
         $this->dbSslVerify = false;
         $this->caCertFile = '';
@@ -132,7 +132,7 @@ class ServerConfig implements \JsonSerializable
             }
         }
     }
-    
+
     public function jsonSerialize()
     {
         return (object) get_object_vars($this);
@@ -161,8 +161,8 @@ class ServerConfig implements \JsonSerializable
             . $message . '. Please contact your system administrator or use another server.';
         return $errorMessage;
     }
-    
-    
+
+
     /**
      * Modifies an ETL configuration based on this server configuration's
      * properties. When running REDCap-ETL using the external module,
@@ -201,12 +201,12 @@ class ServerConfig implements \JsonSerializable
         if (!$this->getEnableSummaryEmail()) {
             $etlConfig->setProperty(Configuration::EMAIL_SUMMARY, false);
         }
-        
+
         $etlConfig->setProperty(Configuration::DB_SSL, $this->getDbSsl());
         $etlConfig->setProperty(Configuration::DB_SSL_VERIFY, $this->getDbSslVerify());
         $etlConfig->setProperty(Configuration::CA_CERT_FILE, $this->getCaCertFile());
     }
-    
+
     /**
      * Updated properties with the value set by the server. This is used
      * for updating global properties in a workflow.
@@ -221,18 +221,18 @@ class ServerConfig implements \JsonSerializable
         if (!$this->getEnableErrorEmail()) {
             $properties[Configuration::EMAIL_ERRORS] = 0;
         }
-        
+
         # If e-mailing of a summary has not been enabled for this server, make sure that
         # the "e-mail summary" property is set to false in the ETL configuration
         if (!$this->getEnableSummaryEmail()) {
             $properties[Configuration::EMAIL_SUMMARY] = 0;
         }
-        
+
         $properties[Configuration::DB_SSL]        = $this->getDbSsl();
         $properties[Configuration::DB_SSL_VERIFY] = $this->getDbSslVerify();
         $properties[Configuration::CA_CERT_FILE]  = $this->getCaCertFile();
     }
-    
+
     /**
      * Run the ETL process for this server.
      *     If boolean $runWorkflow is true, then $etlConfig is type array.
@@ -247,7 +247,7 @@ class ServerConfig implements \JsonSerializable
             $message = 'No ETL configuration specified.';
             throw new \Exception($message);
         }
-        
+
         if (!$this->getIsActive()) {
             $message = 'Server "' . $this->name . '" is set as inactive.';
             throw new \Exception($message);
@@ -308,7 +308,7 @@ class ServerConfig implements \JsonSerializable
             #-------------------------------------------------
 
             $ssh = $this->getRemoteConnection();
-                    
+
             #------------------------------------------------
             # Copy configuration file and transformation
             # rules file (if any) to the server.
@@ -335,7 +335,7 @@ class ServerConfig implements \JsonSerializable
 
                 throw new \Exception($message);
             }
-            
+
             #$ssh->setTimeout(1);
 
             $command = $this->etlCommandPrefix . ' ' . $this->etlCommand . ' '
@@ -344,16 +344,16 @@ class ServerConfig implements \JsonSerializable
             #\REDCap::logEvent('REDCap-ETL run command: '.$command);
 
             $ssh->setTimeout(1.0);  # to prevent blocking
-                    
+
             $execOutput = $ssh->exec($command);
-            
+
             $output = 'Your job has been submitted to server "' . $this->getName() . '".' . "\n";
             #\REDCap::logEvent('REDCap-ETL run output: '.$output);
         }  // End else not embedded server
-        
+
         return $output;
     }
-    
+
     /**
      * Returns an ssh/ftp connection for the server represented by this class.
      *
@@ -428,12 +428,12 @@ class ServerConfig implements \JsonSerializable
         }
         return $testOutput;
     }
-    
+
     public function validate()
     {
         self::validateName($this->name);
     }
-    
+
     public static function validateName($name)
     {
         $matches = array();
@@ -464,73 +464,73 @@ class ServerConfig implements \JsonSerializable
         }
         return $isEmbedded;
     }
-    
+
     public function getName()
     {
         return $this->name;
     }
-    
+
     public function setName($name)
     {
         $this->name = $name;
     }
-    
+
     public function getIsActive()
     {
         return $this->isActive;
     }
-    
+
     public function setIsActive($isActive)
     {
         $this->isActive = $isActive;
     }
-    
+
     public function getServerAddress()
     {
         return $this->serverAddress;
     }
-        
+
     public function getAuthMethod()
     {
         return $this->authMethod;
     }
-    
+
     public function getUsername()
     {
         return $this->username;
     }
-    
+
     public function getPassword()
     {
         return $this->password;
     }
-        
+
     public function getSshKeyFile()
     {
         return $this->sshKeyFile;
     }
-    
+
     public function getSshKeyPassword()
     {
         return $this->sshKeyPassword;
     }
-        
+
     public function getConfigDir()
     {
         return $this->configDir;
     }
-        
+
 
     public function getEtlCommand()
     {
         return $this->etlCommand;
     }
-    
+
     public function getEtlCommandPrefix()
     {
         return $this->etlCommandPrefix;
     }
-    
+
     public function getEtlCommandSuffix()
     {
         return $this->etlCommandSuffix;
@@ -540,32 +540,32 @@ class ServerConfig implements \JsonSerializable
     {
         return $this->logFile;
     }
-    
+
     public function getEmailFromAddress()
     {
         return $this->emailFromAddress;
     }
-        
+
     public function getEnableErrorEmail()
     {
         return $this->enableErrorEmail;
     }
-        
+
     public function getEnableSummaryEmail()
     {
         return $this->enableSummaryEmail;
     }
-    
+
     public function getDbSsl()
     {
         return $this->dbSsl;
     }
-    
+
     public function getDbSslVerify()
     {
         return $this->dbSslVerify;
     }
-    
+
     public function getCaCertFile()
     {
         return $this->caCertFile;
@@ -575,7 +575,7 @@ class ServerConfig implements \JsonSerializable
     {
         return $this->accessLevel;
     }
-    
+
     public function setAccessLevel($accessLevel)
     {
         $this->accessLevel = $accessLevel;

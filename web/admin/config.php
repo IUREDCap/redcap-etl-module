@@ -13,13 +13,13 @@ $module->checkAdminPagePermission();
 
 require_once __DIR__ . '/../../dependencies/autoload.php';
 
-use \IU\REDCapETL\Version;
+use IU\REDCapETL\Version;
 
-use \IU\RedCapEtlModule\AdminConfig;
-use \IU\RedCapEtlModule\Csrf;
-use \IU\RedCapEtlModule\Filter;
-use \IU\RedCapEtlModule\Help;
-use \IU\RedCapEtlModule\RedCapEtlModule;
+use IU\RedCapEtlModule\AdminConfig;
+use IU\RedCapEtlModule\Csrf;
+use IU\RedCapEtlModule\Filter;
+use IU\RedCapEtlModule\Help;
+use IU\RedCapEtlModule\RedCapEtlModule;
 
 try {
     $selfUrl     = $module->getUrl(RedCapEtlModule::ADMIN_HOME_PAGE);
@@ -31,14 +31,14 @@ try {
 
     if (strcasecmp($submitValue, 'Save') === 0) {
         $adminConfig->set(Filter::stripTagsArrayRecursive($_POST));
-        
+
         $module->setAdminConfig($adminConfig);
         $success = "Admin configuration saved.";
     }
 } catch (Exception $exception) {
     $error = 'ERROR: ' . $exception->getMessage();
 }
-    
+
 ?>
 
 <?php #require_once APP_PATH_DOCROOT . 'ControlCenter/header.php'; ?>
@@ -175,7 +175,7 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
 
             $workflowCronJobs = $module->getWorkflowCronJobs($day, $time);
             $count += count($workflowCronJobs);
-            
+
             $jobsUrl = $cronInfoUrl . '&selectedDay=' . $day . '&selectedTime=' . $time;
 
             $checked = '';

@@ -32,10 +32,10 @@ try {
             $error = 'ERROR: No configuration name was specified.';
         } else {
             $configurationName = Filter::stripTags($_POST['configurationName']);
-            
+
             # Want to make sure config name is validated before it is used
             Configuration::validateName($configurationName);
-            
+
             # Add configuration; an exception should be thrown if the configuration
             # already exists
             $module->addConfiguration($configurationName);
@@ -50,7 +50,7 @@ try {
             # Want to make sure config names are validated before it is used
             Configuration::validateName($copyFromConfigName);
             Configuration::validateName($copyToConfigName);
-                        
+
             $module->copyConfiguration($copyFromConfigName, $copyToConfigName);
         }
     } elseif (strcasecmp($submitValue, 'delete') === 0) {
@@ -61,7 +61,7 @@ try {
         if (!empty($deleteConfigName)) {
             # Want to make sure config name is validated before it is used
             Configuration::validateName($deleteConfigName);
-            
+
             $module->removeConfiguration($deleteConfigName);
         }
     } elseif (strcasecmp($submitValue, 'rename') === 0) {
@@ -74,7 +74,7 @@ try {
             # Want to make sure config names are validated before it is used
             Configuration::validateName($renameConfigName);
             Configuration::validateName($renameNewConfigName);
-            
+
             $module->renameConfiguration($renameConfigName, $renameNewConfigName);
         }
     }
@@ -119,7 +119,7 @@ $projectId = $module->getProjectId();
 <?php
 
 $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
-        
+
 ?>
 
 <?php
@@ -145,7 +145,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     <th>Configure</th>
     <!-- <th>Test</th> -->
     <?php
-    
+
     if ($adminConfig->getAllowOnDemand()) {
         echo "<th>Run</th>\n";
     }
@@ -175,7 +175,7 @@ foreach ($configurationNames as $configurationName) {
     } else {
         echo '<tr class="odd">' . "\n";
     }
-    
+
     $configureUrl = $configUrl . '&configName=' . Filter::escapeForUrlParameter($configurationName)
         . '&configType=task';
 
@@ -190,10 +190,10 @@ foreach ($configurationNames as $configurationName) {
     $configuration = $module->getConfiguration($configurationName);
     $exportRight = $module->getConfigurationExportRight($configuration);
     #$exportRightLabel = $module->getExportRightLabel($exportRight);
-    
+
     echo "<td>" . Filter::escapeForHtml($configurationName) . "</td>\n";
     #echo "<td>" . Filter::escapeForHtml($exportRightLabel) . "</td>\n";
-    
+
     #-------------------------------------------------------------------------------------
     # CONFIGURE BUTTON - disable if user does not have permission to access configuration
     #-------------------------------------------------------------------------------------
@@ -208,7 +208,7 @@ foreach ($configurationNames as $configurationName) {
             . '<img src="' . APP_PATH_IMAGES . 'gear.png" alt="CONFIG" class="disabled">'
             . "</td>\n";
     }
-    
+
     #-------------------------------------------------------------------------------------
     # TEST BUTTON - disable if user does not have permission to access configuration
     #-------------------------------------------------------------------------------------
@@ -221,7 +221,7 @@ foreach ($configurationNames as $configurationName) {
     #        .'<img src="'.APP_PATH_IMAGES.'gear.png" alt="TEST" class="disabled">'
     #        ."</td>\n";
     #}
-    
+
     #--------------------------------------------------------------------------------------
     # RUN BUTTON - display if running on demand allowed, but disable if user does not have
     # the needed data export permission to access the configuration
@@ -271,7 +271,7 @@ foreach ($configurationNames as $configurationName) {
             . '<img src="' . APP_PATH_IMAGES . 'page_copy.png" alt="COPY" class="disabled" />'
             . "</td>\n";
     }
-    
+
     #-----------------------------------------------------------
     # RENAME BUTTON - disable if user does not have the needed
     # data export permission to access the configuration
@@ -303,7 +303,7 @@ foreach ($configurationNames as $configurationName) {
             . '<img src="' . APP_PATH_IMAGES . 'delete.png" alt="DELETE" class="disabled" />'
             . "</td>\n";
     }
-    
+
     echo "</tr>\n";
     $row++;
 }

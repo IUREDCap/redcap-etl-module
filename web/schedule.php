@@ -64,10 +64,10 @@ try {
 
     if (strcasecmp($submitValue, 'Save') === 0) {
         $server = Filter::stripTags($_POST['server']);
-        
+
         # Saving the schedule values
         $schedule = array();
-        
+
         $schedule[0] = Filter::sanitizeInt($_POST['Sunday']);
         $schedule[1] = Filter::sanitizeInt($_POST['Monday']);
         $schedule[2] = Filter::sanitizeInt($_POST['Tuesday']);
@@ -75,7 +75,7 @@ try {
         $schedule[4] = Filter::sanitizeInt($_POST['Thursday']);
         $schedule[5] = Filter::sanitizeInt($_POST['Friday']);
         $schedule[6] = Filter::sanitizeInt($_POST['Saturday']);
-        
+
         if ($configType === 'task') {
             $configuration->validateForRunning();
             if (empty($configName)) {
@@ -320,13 +320,13 @@ $(function () {
         } else {
             echo '<tr>';
         }
-        
+
         echo '<td class="time-range">' . ($adminConfig->getHtmlTimeLabel($time)) . "</td>";
-        
+
         foreach (AdminConfig::DAY_LABELS as $day => $label) {
             $radioName = $label;
             $value = $time;
-            
+
             $checked = '';
             if (isset($schedule[$day]) && $schedule[$day] != '' && $schedule[$day] == $value) {
                 $checked = ' checked ';

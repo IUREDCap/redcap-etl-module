@@ -111,7 +111,7 @@ if ($accessError === RedCapEtlModule::CSRF_ERROR) {
     $userFirstName = $user_firstname;
     $userLastName  = $user_lastname;
     // phpcs:enable
-    
+
     echo "</div>\n";
 } elseif ($submitValue === $requestLabel) {
     if (empty($requestError)) {

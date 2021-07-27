@@ -1,4 +1,5 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
@@ -36,7 +37,7 @@ class Servers implements \JsonSerializable
         ServerConfig::validateName($name);
         $this->servers[$name] = 1;
     }
-    
+
     public function removeServer($serverName)
     {
         unset($this->servers[$serverName]);

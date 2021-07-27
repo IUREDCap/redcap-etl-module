@@ -1,11 +1,11 @@
 <?php
+
 #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
 use IU\REDCapETL\Database\DbConnectionFactory;
-
 use IU\RedCapEtlModule\Configuration;
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
@@ -152,7 +152,7 @@ try {
             $renameTaskKey = $_POST['renameTaskKey'];
             $renameProjectId = $_POST['renameProjectId'];
             $renameNewTaskName = $_POST['renameNewTaskName'];
-  
+
             if (isset($renameTaskKey)) {
                 #check to see if the new task name is the same as an ETL property name
                 $matchFound = $module->checkWorkflowTaskNameAgainstEtlPropertyNames(
@@ -316,7 +316,7 @@ if (!empty($availableUserProjects)) {
             } else {
                 echo '<tr class="odd-row">' . "\n";
             }
-            
+
             if ($numTasks > 1) {
                     echo '<td style="text-align:left;"> '
                         . '<input type="image" src="' . APP_PATH_IMAGES . 'arrow_down.png" alt="MOVE DOWN"'

@@ -20,7 +20,7 @@ $topic = Filter::sanitizeButtonLabel($_GET['topic']);
 if (empty($topic)) {
     $topic = Filter::sanitizeButtonLabel($_POST['topic']);
 }
-    
+
 ?>
 
 

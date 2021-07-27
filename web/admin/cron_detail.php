@@ -27,7 +27,7 @@ $serverConfigUrl = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
 $userUrl         = $module->getURL(RedCapEtlModule::USER_CONFIG_PAGE);
 
 $adminConfig = $module->getAdminConfig();
-    
+
 $selectedDay = Filter::sanitizeInt($_POST['selectedDay']);
 if (empty($selectedDay)) {
     $selectedDay = Filter::sanitizeInt($_GET['selectedDay']);
@@ -185,11 +185,11 @@ $times = $adminConfig->getTimeLabels();
             echo "<td>{$configType}</td>\n";   # Job Type
 
             echo "<td>" . '<a href="' . $configUrl . '">' . Filter::escapeForHtml($config) . '</a>' . "</td>\n";
-            
+
             echo "<td>" . '<a href="' . $serverUrl . '">' . Filter::escapeForHtml($server) . '</a>' . "</td>\n";
 
             echo "<td>" . $pidLinks . '</a>' . "</td>\n";
-            
+
             echo "</tr>\n";
             $row++;
         }
