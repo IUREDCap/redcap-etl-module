@@ -1093,7 +1093,7 @@ class Settings
             $this->db->startTransaction();
         }
 
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
 
@@ -1125,7 +1125,7 @@ class Settings
 
         $this->db->startTransaction();
 
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
 
@@ -1147,7 +1147,7 @@ class Settings
     ) {
         $this->db->startTransaction();
 
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
 
@@ -1162,7 +1162,7 @@ class Settings
 
     public function getWorkflows()
     {
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $key = self::WORKFLOWS_KEY;
         $json = $this->module->getSystemSetting($key);
         $workflows->fromJson($json);
@@ -1172,7 +1172,7 @@ class Settings
 
     public function getWorkflow($workflowName)
     {
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $key = self::WORKFLOWS_KEY;
         $json = $this->module->getSystemSetting($key);
         $workflows->fromJson($json);
@@ -1182,7 +1182,7 @@ class Settings
 
     public function getWorkflowTasks($workflowName)
     {
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $key = self::WORKFLOWS_KEY;
         $json = $this->module->getSystemSetting($key);
         $workflows->fromJson($json);
@@ -1192,7 +1192,7 @@ class Settings
 
     public function getWorkflowStatus($workflowName)
     {
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $key = self::WORKFLOWS_KEY;
         $json = $this->module->getSystemSetting($key);
         $workflows->fromJson($json);
@@ -1204,7 +1204,7 @@ class Settings
         $projectId = PROJECT_ID,
         $excludeIncomplete = false
     ) {
-        $workflowsObject = new Workflow();
+        $workflowsObject = new Workflows();
         $key = self::WORKFLOWS_KEY;
         $json = $this->module->getSystemSetting($key);
         $workflowsObject->fromJson($json);
@@ -1238,7 +1238,7 @@ class Settings
             $this->db->startTransaction();
         }
 
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
 
@@ -1258,7 +1258,7 @@ class Settings
     {
         $this->db->startTransaction();
 
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
 
@@ -1275,7 +1275,7 @@ class Settings
     {
         $this->db->startTransaction();
 
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
         $workflows->reinstateWorkflow($workflowName, $username);
@@ -1305,7 +1305,7 @@ class Settings
             $this->db->startTransaction();
         }
 
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
 
@@ -1357,7 +1357,7 @@ class Settings
 
         $this->db->startTransaction();
 
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
         $tasks = $workflows->getWorkflowTasks($workflowName);
@@ -1434,7 +1434,7 @@ class Settings
     ) {
         $this->db->startTransaction();
 
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
 
@@ -1456,7 +1456,7 @@ class Settings
     ) {
         $this->db->startTransaction();
 
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
 
@@ -1471,7 +1471,7 @@ class Settings
 
     public function getWorkflowGlobalProperties($workflowName)
     {
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
         $properties = $workflows->getWorkflowGlobalProperties($workflowName);
@@ -1480,7 +1480,7 @@ class Settings
 
     public function getWorkflowGlobalConfiguration($workflowName)
     {
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
         $configValues = $workflows->getWorkflowGlobalProperties($workflowName);
@@ -1501,7 +1501,7 @@ class Settings
     {
         $this->db->startTransaction();
 
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
         $workflows->setGlobalProperties($workflowName, $properties, $username);
@@ -1516,7 +1516,7 @@ class Settings
     {
         $this->db->startTransaction();
 
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
         $workflows->setCronSchedule($workflowName, $server, $schedule, $username);
@@ -1529,7 +1529,7 @@ class Settings
 
     public function getWorkflowSchedule($workflowName)
     {
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
 
@@ -1540,7 +1540,7 @@ class Settings
 
     public function getWorkflowCronJobs($day, $time)
     {
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
         $cronJobs = $workflows->getCronJobs($day, $time);
@@ -1553,7 +1553,7 @@ class Settings
         $userProjects = $this->db->getUserProjects($username);
         $userProjectIds = array_column($userProjects, 'project_id');
 
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
         $tasks = $workflows->getWorkflowTasks($workflowName);
@@ -1571,7 +1571,7 @@ class Settings
 
     public function getAllProjectTasksInAllWorkflows($projectId)
     {
-        $workflows = new Workflow();
+        $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
         $excludeIncomplete = false;

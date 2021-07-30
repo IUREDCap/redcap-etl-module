@@ -7,8 +7,9 @@
 
 namespace IU\RedCapEtlModule;
 
-class Workflow implements \JsonSerializable
+class Workflows implements \JsonSerializable
 {
+    /** @var array map from workflow name to workflow information */
     private $workflows;
 
     const WORKFLOW_INCOMPLETE = 'Incomplete';
