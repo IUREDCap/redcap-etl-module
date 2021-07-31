@@ -12,10 +12,6 @@ class Workflows implements \JsonSerializable
     /** @var array map from workflow name to workflow information */
     private $workflows;
 
-    const WORKFLOW_INCOMPLETE = 'Incomplete';
-    const WORKFLOW_READY  = 'Ready';
-    const WORKFLOW_REMOVED = 'Removed';
-
     public function __construct()
     {
         $this->workflows = array();
@@ -38,135 +34,28 @@ class Workflows implements \JsonSerializable
      */
     public function createWorkflow($workflowName, $username)
     {
-        $this->workflows[$workflowName] = array();
-        $this->workflows[$workflowName]["metadata"] = array();
-        $this->workflows[$workflowName]["properties"] = array(); #global properties
-        $this->workflows[$workflowName]["cron"] = array(); #cron job details
-
-        $now = new \DateTime();
-        $now->format('Y-m-d H:i:s');
-        $now->getTimestamp();
-        $this->workflows[$workflowName]["metadata"]["dateAdded"] = $now;
-        $this->workflows[$workflowName]["metadata"]["addedBy"] = $username;
-        $this->workflows[$workflowName]["metadata"]["workflowStatus"] = self::WORKFLOW_INCOMPLETE;
+        $workflow = new Workflow($username);
+        $this->workflows[$workflowName] = $workflow;
     }
 
     public function getWorkflow($workflowName)
     {
         $workflow = $this->workflows[$workflowName];
+        $username = null;
+        $workflow->sequenceTasks($username);
 
-        return $this->sequenceWorkflowTasks($workflowName, $workflow, null);
+        return $workflow;
     }
 
     public function getWorkflowTasks($workflowName)
     {
         $workflow = $this->workflows[$workflowName];
-        unset($workflow["metadata"]);
-        unset($workflow["properties"]);
-        unset($workflow["cron"]);
+        $username = null;
+        $workflow->sequenceTasks($username);
 
-        $this->sequenceWorkflowTasks($workflowName, $workflow, null);
-
-        return $workflow;
+        return $workflow->getTasks();
     }
 
-    public function sequenceWorkflowTasks($workflowName, $tasks, $username)
-    {
-
-        $metadata = null;
-        if (array_key_exists('metadata', $this->workflows[$workflowName])) {
-            $metadata = $this->workflows[$workflowName]["metadata"];
-        }
-        $properties = null;
-        if (array_key_exists('properties', $this->workflows[$workflowName])) {
-            $properties = $this->workflows[$workflowName]["properties"];
-        }
-        $cron = null;
-        if (array_key_exists('cron', $this->workflows[$workflowName])) {
-            $cron = $this->workflows[$workflowName]["cron"];
-        }
-
-        #sort project-tasks by sequence number
-        array_multisort(array_column($tasks, 'taskSequenceNumber'), SORT_ASC, SORT_NUMERIC, $tasks);
-
-        #renumber sequence to ensure the no sequence numbers duplicated or omitted
-        $i = 1;
-        foreach ($tasks as $key => $task) {
-            $task[$key]['taskSequenceNumber'] = $i;
-            ++$i;
-        }
-
-        #replace the old workflow tasks with this updated workflow
-        $this->workflows[$workflowName] = $tasks;
-
-        #add the metadata back to the updated workflow
-        if ($metadata) {
-            $this->workflows[$workflowName]["metadata"] = $metadata;
-        }
-        #add the global properties back to the updated workflow
-        if ($properties) {
-            $this->workflows[$workflowName]["properties"] = $properties;
-        }
-        #add the cron-job data back to the updated workflow
-        if ($cron) {
-            $this->workflows[$workflowName]["cron"] = $cron;
-        }
-
-        if ($username) {
-            $this->workflows[$workflowName]["metadata"]["updatedBy"] = $username;
-            $now = new \DateTime();
-            $now->format('Y-m-d H:i:s');
-            $now->getTimestamp();
-            $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
-        }
-    }
-
-
-    public function updateWorkflow($workflowName, $workflow, $workflowStatus, $username)
-    {
-#delete this??
-
-        $message = 'When updating workflow, ';
-        if (empty($workflowName)) {
-            $message .= 'no workflow name was specified.';
-            throw new \Exception($message);
-        }
-
-        $metadata = null;
-        if (!array_key_exists('metadata', $workflow)) {
-            $metadata = $this->workflows[$workflowName]["metadata"];
-        }
-
-        #sort project-tasks by sequence number
-        array_multisort(array_column($workflow, 'taskSequenceNumber'), SORT_ASC, SORT_NUMERIC, $workflow);
-
-        #renumber sequence to ensure the no sequence numbers duplicated or omitted
-        $i = 1;
-        foreach ($workflow as $key => $task) {
-            $workflow[$key]['taskSequenceNumber'] = $i;
-            ++$i;
-        }
-
-        #replace the old workflow with this updated workflow
-        $this->workflows[$workflowName] = $workflow;
-
-        #add the metadata back to the updated workflow
-        if ($metadata) {
-            $this->workflows[$workflowName]["metadata"] = $metadata;
-        }
-
-        if ($workflowStatus === 'Ready') {
-            $this->workflows[$workflowName]["metadata"]["workflowStatus"] = self::WORKFLOW_READY;
-        }
-
-        if ($username) {
-            $this->workflows[$workflowName]["metadata"]["updatedBy"] = $username;
-            $now = new \DateTime();
-            $now->format('Y-m-d H:i:s');
-            $now->getTimestamp();
-            $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
-        }
-    }
 
     /**
      * Adds a project/task to the workflow. The key for the project/task is the project ID.
@@ -178,80 +67,20 @@ class Workflows implements \JsonSerializable
      */
     public function addProjectToWorkflow($workflowName, $projectId, $username)
     {
-
         $message = 'When adding project to workflow, ';
         if (empty($workflowName)) {
             $message .= 'no workflow name was specified.';
             throw new \Exception($message);
-        }
-
-        if (empty($projectId)) {
-            $message .= 'no project id was specified.';
+        } elseif (!array_key_exists($workflowName, $this->workflows)) {
+            $message .= 'workflow "' . $workflowName . '" was not found.';
             throw new \Exception($message);
         }
 
-        $sequence = 0;
-        #If is workflow is empty, then this is the first project and the default sequenence is 1.
-        if (count($this->workflows[$workflowName]) == 0) {
-            $sequence = 1;
-
-        #otherwise, the default sequence is the number of integer keys (projectIds) plus 1.
-        } else {
-            $sequence = count(array_filter($this->workflows[$workflowName], 'is_int', ARRAY_FILTER_USE_KEY)) + 1;
-        }
-
-        #add the project to workflow
-        $workflow = array();
-        $workflow["projectId"] = $projectId;
-        $workflow["taskSequenceNumber"] = $sequence;
-        $workflow["taskName"] = 'Task for project ' . $projectId;
-        $workflow["projectEtlConfig"] = null;
-        $this->workflows[$workflowName][] = $workflow;
-
-        #Set workflow status to incomplete, since an ETL config still needs to be selected for this project.
-        $this->workflows[$workflowName]["metadata"]["workflowStatus"] = self::WORKFLOW_INCOMPLETE;
-        if ($username) {
-            $this->workflows[$workflowName]["metadata"]["updatedBy"] = $username;
-            $now = new \DateTime();
-            $now->format('Y-m-d H:i:s');
-            $now->getTimestamp();
-            $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
-        }
+        $workflow = $this->workflows[$workflowName];
+        $workflow->addProject($projectId, $username);
     }
 
-/*    public function updateWorkflowProject($workflowName, $projectId, $task, $username)
-    {
-#delete this??
 
-        $message = 'When updating workflow project, ';
-        if (empty($workflowName)) {
-            $message .= 'no workflow name was specified.';
-            throw new \Exception($message);
-        }
-
-        if (empty($projectId)) {
-            $message .= 'no project was specified.';
-            throw new \Exception($message);
-        }
-
-        if (!array_key_exists($projectId, $this->workflows[$workflowName])) {
-            $message .= 'specified project id is not part of this workflow.';
-            throw new \Exception($message);
-        }
-
-        $this->workflows[$workflowName][$projectId]["taskSequenceNumber"] = $task["taskSequenceNumber"];
-        $this->workflows[$workflowName][$projectId]["taskName"] = $task["taskName"];
-        $this->workflows[$workflowName][$projectId]["projectEtlConfig"] = $task["projectEtlConfig"];
-
-        if ($username) {
-            $this->workflows[$workflowName]["metadata"]["updatedBy"] = $username;
-            $now = new \DateTime();
-            $now->format('Y-m-d H:i:s');
-            $now->getTimestamp();
-            $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
-        }
-    }
-*/
     /**
      * Deletes a workflow from the workflows array.
      */
@@ -262,20 +91,27 @@ class Workflows implements \JsonSerializable
 
     public function reinstateWorkflow($workflowName, $username)
     {
-        $etlConfigs = array_column($this->workflows[$workflowName], 'projectEtlConfig');
+        $message = 'When reinstating workflow, ';
+        if (empty($workflowName)) {
+            $message .= 'no workflow name was specified.';
+            throw new \Exception($message);
+        } elseif (!array_key_exists($workflowName, $this->workflows)) {
+            $message .= 'workflow "' . $workflowName . '" was not found.';
+            throw new \Exception($message);
+        }
+
+        $workflow = $this->workflows[$workflowName];
+
+        $etlConfigs = $workflow->getEtlConfigs();
         $emptyEtlConfig = empty($etlConfigs) || in_array(null, $etlConfigs, true)
             || in_array('', $etlConfigs, true);
         if (!$emptyEtlConfig) {
-            $this->workflows[$workflowName]["metadata"]["workflowStatus"] = self::WORKFLOW_READY;
+            $workflow->setStatus(Workflow::WORKFLOW_READY);
         } else {
-            $this->workflows[$workflowName]["metadata"]["workflowStatus"] = self::WORKFLOW_INCOMPLETE;
+            $workflow->setStatus(Workflow::WORKFLOW_INCOMPLETE);
         }
 
-        $this->workflows[$workflowName]["metadata"]["updatedBy"] = $username;
-        $now = new \DateTime();
-        $now->format('Y-m-d H:i:s');
-        $now->getTimestamp();
-        $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
+        $workflow->setUpdatedInfo($username);
     }
 
     /**
@@ -283,34 +119,46 @@ class Workflows implements \JsonSerializable
      */
     public function removeWorkflow($workflowName, $username)
     {
-        $this->workflows[$workflowName]["metadata"]["workflowStatus"] = self::WORKFLOW_REMOVED;
-        $this->workflows[$workflowName]["metadata"]["updatedBy"] = $username;
+        $message = 'When removing workflow, ';
+        if (empty($workflowName)) {
+            $message .= 'no workflow name was specified.';
+            throw new \Exception($message);
+        } elseif (!array_key_exists($workflowName, $this->workflows)) {
+            $message .= 'workflow "' . $workflowName . '" was not found.';
+            throw new \Exception($message);
+        }
 
-        $now = new \DateTime();
-        $now->format('Y-m-d H:i:s');
-        $now->getTimestamp();
-        $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
+        $workflow = $this->workflows[$workflowName];
+        $workflow->setStatus(Workflow::WORKFLOW_REMOVED);
+        $workflow->setUpdatedInfo($username);
     }
 
     public function copyWorkflow($fromWorkflowName, $toWorkflowName, $username)
     {
-        $this->workflows[$toWorkflowName] = $this->workflows[$fromWorkflowName];
-        $this->workflows[$toWorkflowName]["metadata"]["addedBy"] = $username;
-
-        $now = new \DateTime();
-        $now->format('Y-m-d H:i:s');
-        $now->getTimestamp();
-        $this->workflows[$toWorkflowName]["metadata"]["dateAdded"] = $now;
-
-        if ($this->workflows[$toWorkflowName]["metadata"]["updatedBy"]) {
-            $this->workflows[$toWorkflowName]["metadata"]["updatedBy"] = null;
-            $this->workflows[$toWorkflowName]["metadata"]["dateUpdated"] = null;
+        $message = 'When copying workflow, ';
+        if (empty($fromWorkflowName)) {
+            $message .= 'no workflow name to copy was specified.';
+            throw new \Exception($message);
+        } elseif (!array_key_exists($fromWorkflowName, $this->workflows)) {
+            $message .= 'workflow "' . $fromWorkflowName . '" was not found.';
+            throw new \Exception($message);
         }
+
+        $this->workflows[$toWorkflowName] = $this->workflows[$fromWorkflowName]->getCopy($username);
     }
 
     public function getWorkflowStatus($workflowName)
     {
-        return $this->workflows[$workflowName]["metadata"]["workflowStatus"];
+        $message = 'When getting workflow status, ';
+        if (empty($workflowName)) {
+            $message .= 'no workflow name was specified.';
+            throw new \Exception($message);
+        } elseif (!array_key_exists($workflowName, $this->workflows)) {
+            $message .= 'workflow "' . $workflowName . '" was not found.';
+            throw new \Exception($message);
+        }
+
+        return $this->workflows[$workflowName]->getStatus();
     }
 
     public function workflowExists($workflowName)
@@ -329,6 +177,9 @@ class Workflows implements \JsonSerializable
         if (empty($workflowName)) {
             $message .= 'no workflow name was specified.';
             throw new \Exception($message);
+        } elseif (!array_key_exists($workflowName, $this->workflows)) {
+            $message .= 'workflow "' . $workflowName . '" was not found.';
+            throw new \Exception($message);
         }
 
         if (empty($taskKey) && ($taskKey != 0)) {
@@ -336,33 +187,9 @@ class Workflows implements \JsonSerializable
             throw new \Exception($message);
         }
 
-        $delSeqNum = $this->workflows[$workflowName][$taskKey]['taskSequenceNumber'];
+        $workflow = $this->workflows[$workflowName];
 
-        foreach ($this->workflows[$workflowName] as $key => $project) {
-            if ($project['taskSequenceNumber'] > $delSeqNum) {
-                --$this->workflows[$workflowName][$key]['taskSequenceNumber'];
-            }
-        }
-
-        unset($this->workflows[$workflowName][$taskKey]);
-
-        #workflow status
-        $etlConfigs = array_column($this->workflows[$workflowName], 'projectEtlConfig');
-        $emptyEtlConfig = empty($etlConfigs) || in_array(null, $etlConfigs, true)
-            || in_array('', $etlConfigs, true);
-        if (!$emptyEtlConfig) {
-            $this->workflows[$workflowName]["metadata"]["workflowStatus"] = self::WORKFLOW_READY;
-        } elseif ($this->workflows[$workflowName]["metadata"]["workflowStatus"] !== WORKFLOW_REMOVED) {
-                $this->workflows[$workflowName]["metadata"]["workflowStatus"] = self::WORKFLOW_INCOMPLETE;
-        }
-
-        if ($username) {
-            $this->workflows[$workflowName]["metadata"]["updatedBy"] = $username;
-            $now = new \DateTime();
-            $now->format('Y-m-d H:i:s');
-            $now->getTimestamp();
-            $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
-        }
+        $workflow->deleteTask($taskKey, $username);
     }
 
     public function renameWorkflowTask($workflowName, $taskKey, $newTaskName, $projectId, $username)
@@ -370,6 +197,9 @@ class Workflows implements \JsonSerializable
         $message = 'When renaming task from workflow, ';
         if (!isset($workflowName)) {
             $message .= 'no workflow name was specified.';
+            throw new \Exception($message);
+        } elseif (!array_key_exists($workflowName, $this->workflows)) {
+            $message .= 'workflow "' . $workflowName . '" was not found.';
             throw new \Exception($message);
         }
 
@@ -382,15 +212,9 @@ class Workflows implements \JsonSerializable
             $newTaskName = 'Task for project ' . $projectId;
         }
 
-        $workflow = $this->workflows[$workflowName][$taskKey]['taskName'] = $newTaskName;
+        $workflow = $this->workflows[$workflowName];
 
-        if ($username) {
-            $this->workflows[$workflowName]["metadata"]["updatedBy"] = $username;
-            $now = new \DateTime();
-            $now->format('Y-m-d H:i:s');
-            $now->getTimestamp();
-            $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
-        }
+        $workflow->renameTask($taskKey, $newTaskName, $projectId, $username);
     }
 
     public function assignWorkflowTaskEtlConfig(
@@ -404,62 +228,45 @@ class Workflows implements \JsonSerializable
         if (empty($workflowName)) {
             $message .= 'no workflow name was specified.';
             throw new \Exception($message);
+        } elseif (!array_key_exists($workflowName, $this->workflows)) {
+            $message .= 'workflow "' . $workflowName . '" was not found.';
+            throw new \Exception($message);
         } elseif (empty($taskKey) && ($taskKey != 0)) {
             $message .= 'no task key was specified.';
             throw new \Exception($message);
         }
 
-        $this->workflows[$workflowName][$taskKey]['projectEtlConfig'] = $etlConfig;
+        $workflow = $this->workflows[$workflowName];
 
-        #workflow status
-        $etlConfigs = array_column($this->workflows[$workflowName], 'projectEtlConfig');
-        $emptyEtlConfig = empty($etlConfigs) || in_array(null, $etlConfigs, true)
-            || in_array('', $etlConfigs, true);
-        if (!$emptyEtlConfig) {
-            $this->workflows[$workflowName]["metadata"]["workflowStatus"] = self::WORKFLOW_READY;
-        } elseif ($this->workflows[$workflowName]["metadata"]["workflowStatus"] !== WORKFLOW_REMOVED) {
-                $this->workflows[$workflowName]["metadata"]["workflowStatus"] = self::WORKFLOW_INCOMPLETE;
-        }
-
-        #workflow metadata
-        if ($username) {
-            $this->workflows[$workflowName]["metadata"]["updatedBy"] = $username;
-            $now = new \DateTime();
-            $now->format('Y-m-d H:i:s');
-            $now->getTimestamp();
-            $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
-        }
+        $workflow->assignWorkflowTaskEtlConfig($projectId, $taskKey, $etlConfig, $username);
     }
 
     public function getWorkflowGlobalProperties($workflowName)
     {
-        return $this->workflows[$workflowName]["properties"];
+        $message = 'When getting workflow global properties, ';
+        if (empty($workflowName)) {
+            $message .= 'no workflow name was specified.';
+            throw new \Exception($message);
+        } elseif (!array_key_exists($workflowName, $this->workflows)) {
+            $message .= 'workflow "' . $workflowName . '" was not found.';
+            throw new \Exception($message);
+        }
+
+        return $this->workflows[$workflowName]->getGlobalProperties();
     }
 
     public function setGlobalProperties($workflowName, $properties, $username)
     {
-        #print "<hr/>WORKFLOW: {$workflowName}<br/>\n";
-        #print "<pre>\n";
-        #print_r($properties);
-        #print "</pre>\n";
-        #print "<hr/>\n";
-
         $message = 'When setting workflow global properties, ';
         if (empty($workflowName)) {
             $message .= 'no workflow name was specified.';
             throw new \Exception($message);
+        } elseif (!array_key_exists($workflowName, $this->workflows)) {
+            $message .= 'workflow "' . $workflowName . '" was not found.';
+            throw new \Exception($message);
         }
 
-        $this->workflows[$workflowName]["properties"] = $properties;
-
-        #workflow metadata
-        if ($username) {
-            $this->workflows[$workflowName]["metadata"]["updatedBy"] = $username;
-            $now = new \DateTime();
-            $now->format('Y-m-d H:i:s');
-            $now->getTimestamp();
-            $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
-        }
+        $this->workflows[$workflowName]->setGlobalProperties($properties, $username);
     }
 
     public function setCronSchedule($workflowName, $server, $schedule, $username)
@@ -485,23 +292,24 @@ class Workflows implements \JsonSerializable
 
     public function getCronSchedule($workflowName)
     {
-        return $this->workflows[$workflowName]["cron"];
+        return $this->workflows[$workflowName]->getCron();
     }
 
     public function getCronJobs($day, $time)
     {
         $cronJobs = array();
         foreach ($this->workflows as $workflowName => $workflow) {
-            if (!empty($workflow["cron"])) {
-                $times  = $workflow["cron"][Configuration::CRON_SCHEDULE];
+            if (!empty($workflow->getCron())) {
+                $times = $workflow->getCronSchedule();
+
                 if (isset($times) && is_array($times)) {
                     for ($cronDay = 0; $cronDay < 7; $cronDay++) {
                         $cronTime = $times[$cronDay];
                         if (isset($cronTime) && $cronTime != "" && $time == $cronTime && $day == $cronDay) {
                             $job = array(
                                 "workflowName"  => $workflowName,
-                                "server"  => $workflow['cron'][Configuration::CRON_SERVER],
-                                "workflowStatus" => $workflow['metadata']['workflowStatus']
+                                "server"  => $workflow->getCronServer(),
+                                "workflowStatus" => $workflow->getStatus()
                             );
                             array_push($cronJobs, $job);
                         }
@@ -512,42 +320,21 @@ class Workflows implements \JsonSerializable
         return $cronJobs;
     }
 
-    public function getAllProjectTasksInAllWorkflows($project, $projectAvailableWorkflows)
-    {
-        $taskNames = array();
-        foreach ($this->workflows as $workflowName => $workflow) {
-            unset($workflow["metadata"]);
-            unset($workflow["cron"]);
-            unset($workflow["properties"]);
-
-            $commonWorkflows = array_intersect($workflow, $projectAvailableWorkflows);
-        }
-
-        return $taskNames;
-    }
-
-    public function addProject($username, $projectId)
-    {
-#delete?
-        if (array_key_exists($username, $this->userList)) {
-            $this->userList[$username][$projectId] = 1;
-        }
-    }
-
-    public function removeProject($username, $projectId)
-    {
-#delete?
-        if (array_key_exists($username, $this->userList)) {
-            unset($this->userList[$username][$projectId]);
-        }
-    }
-
     public function fromJson($json)
     {
         if (!empty($json)) {
             $values = json_decode($json, true);
-            foreach (get_object_vars($this) as $var => $value) {
-                $this->$var = $values[$var];
+
+            #print("<pre>");
+            #print_r($values);
+            #print("</pre>");
+
+            $workflows = $values['workflows'];
+
+            foreach ($workflows as $workflowName => $workflowValue) {
+                $workflow = new Workflow(null);
+                $workflow->initializeFromArray($workflowValue);
+                $this->workflows[$workflowName] = $workflow;
             }
         }
     }

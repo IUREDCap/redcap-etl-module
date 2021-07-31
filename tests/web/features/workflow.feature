@@ -60,6 +60,12 @@ I need to be able to create workflows
     Then I should see "behat-workflow-test"
     But I should not see "Error:"
 
+    #  Scenario: Run workflow on embedded server
+    #When I follow "Run"
+    #And I wait for 20 seconds
+    #And I select "behat-workflow-test" from "workflowName"
+    #And I wait for 20 seconds
+
   Scenario: Delete workflow as admin
     When I log out
     And I access the admin interface

@@ -240,6 +240,11 @@ class ServerConfig implements \JsonSerializable
      *
      * @param mixed $etlConfig the ETL configuration to run.
      * @param boolean $isCronJob indicates if this run is a cron job.
+     * @param ModuleLog $moduleLog Logging object for the REDCap external module log.
+     *      A method from this object is passed to the REDCap-ETL logger to be used
+     *      as a callback when logging is done so that the logger will  also log to
+     *      the REDCap external module log.
+     * @param boolean $runWorkflow indicates if a workflow is being run.
      */
     public function run($etlConfig, $isCronJob = false, $moduleLog = null, $runWorkflow = false)
     {

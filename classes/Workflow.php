@@ -1,0 +1,332 @@
+<?php
+
+#-------------------------------------------------------
+# Copyright (C) 2021 The Trustees of Indiana University
+# SPDX-License-Identifier: BSD-3-Clause
+#-------------------------------------------------------
+
+namespace IU\RedCapEtlModule;
+
+class Workflow implements \JsonSerializable
+{
+    # Workflow status constants
+    const WORKFLOW_INCOMPLETE = 'Incomplete';
+    const WORKFLOW_READY  = 'Ready';
+    const WORKFLOW_REMOVED = 'Removed';
+
+    private $metadata;
+    private $globalProperties;
+    private $cron;
+    private $tasks;
+
+    public function __construct($username)
+    {
+        $this->metadata         = array();
+        $this->globalProperties = array();
+        $this->cron             = array(); # cron job details
+        $this->tasks            = array(); # map from task name to task properties
+
+        # Set metadata
+        $this->metadata['workflowStatus'] = self::WORKFLOW_INCOMPLETE;
+        $now = new \DateTime();
+        $now->format('Y-m-d H:i:s');
+        $now->getTimestamp();
+        $this->metadata['dateAdded']      = $now;
+        $this->metadata['addedBy']        = $username;
+        $this->metadata['updatedBy']      = null;
+        $this->metadata['dateUpdated']    = null;
+    }
+
+    public function initializeFromArray($workflowArray)
+    {
+        foreach (get_object_vars($this) as $var => $value) {
+            $this->$var = $workflowArray[$var];
+        }
+    }
+
+    public function jsonSerialize()
+    {
+        return (object) get_object_vars($this);
+    }
+
+    public function getTasks()
+    {
+        return $this->tasks;
+    }
+
+    public function sequenceTasks($username)
+    {
+        #sort project-tasks by sequence number
+        array_multisort(array_column($this->tasks, 'taskSequenceNumber'), SORT_ASC, SORT_NUMERIC, $this->tasks);
+
+        #renumber sequence to ensure the no sequence numbers duplicated or omitted
+        $i = 1;
+        foreach ($this->tasks as $key => $task) {
+            $this->tasks[$key]['taskSequenceNumber'] = $i;
+            ++$i;
+        }
+
+        if ($username) {
+            $this->metadata['updatedBy'] = $username;
+            $now = new \DateTime();
+            $now->format('Y-m-d H:i:s');
+            $now->getTimestamp();
+            $this->metadata['dateUpdated'] = $now;
+        }
+    }
+
+
+    /**
+     * Adds a project/task to the workflow. The key for the project/task is the project ID.
+     * Project/task data includes:
+     *     - a task sequence number: This is a default sequence number based on the number of project ids
+     *       already in the workflow. Project IDs are assumed to be integer values.
+     *     - a task name: This is a default task name that includes the project ID
+     *     - the etl configuration to use: This is set to a default of null.
+     */
+    public function addProject($projectId, $username)
+    {
+        $message = 'When adding project to workflow, ';
+
+        if (empty($projectId)) {
+            $message .= 'no project id was specified.';
+            throw new \Exception($message);
+        }
+
+        $sequence = 0;
+
+        # If is workflow is empty, then this is the first project and the default sequenence is 1.
+        if (count($this->tasks) == 0) {
+            $sequence = 1;
+        } else {
+            # the default sequence is the number of integer keys (projectIds) plus 1.
+            $sequence = count(array_filter($this->tasks, 'is_int', ARRAY_FILTER_USE_KEY)) + 1;
+        }
+
+        # add the project to workflow
+        $task = array();
+        $task["projectId"] = $projectId;
+        $task["taskSequenceNumber"] = $sequence;
+        $task["taskName"] = 'Task for project ' . $projectId;
+        $task["projectEtlConfig"] = null;
+        $this->tasks[] = $task;
+
+        #Set workflow status to incomplete, since an ETL config still needs to be selected for this project.
+        $this->metadata['workflowStatus'] = self::WORKFLOW_INCOMPLETE;
+        if ($username) {
+            $this->setUpdatedInfo($username);
+        }
+    }
+
+    public function getStatus()
+    {
+        return $this->metadata['workflowStatus'];
+    }
+
+    public function setStatus($status)
+    {
+        return $this->metadata['workflowStatus'] = $status;
+    }
+
+    public function setUpdatedInfo($username)
+    {
+        $this->metadata['updatedBy'] = $username;
+
+        $now = new \DateTime();
+        $now->format('Y-m-d H:i:s');
+        $now->getTimestamp();
+        $this->metadata["dateUpdated"] = $now;
+    }
+
+    public function getCopy($username)
+    {
+        $copy = new Workflow($username);
+
+        $copy->setStatus($this->getStatus());
+
+        $copy->globalProperties = $this->globalProperties;
+        $copy->cron             = $this->cron;
+        $copy->tasks            = $this->tasks;
+
+        return $copy;
+    }
+
+    public function deleteTask($taskKey, $username)
+    {
+        $message = 'When deleting task from workflow, ';
+
+        if (empty($taskKey) && ($taskKey != 0)) {
+            $message .= 'no task key was specified.';
+            throw new \Exception($message);
+        }
+
+        $delSeqNum = $this->tasks[$taskKey]['taskSequenceNumber'];
+
+        foreach ($this->tasks as $key => $project) {
+            if ($project['taskSequenceNumber'] > $delSeqNum) {
+                --$this->tasks[$key]['taskSequenceNumber'];
+            }
+        }
+
+        unset($this->tasks[$taskKey]);
+
+        #workflow status
+        $etlConfigs = array_column($this->tasks, 'projectEtlConfig');
+        $emptyEtlConfig = empty($etlConfigs) || in_array(null, $etlConfigs, true)
+            || in_array('', $etlConfigs, true);
+        if (!$emptyEtlConfig) {
+            $this->metadata['workflowStatus'] = self::WORKFLOW_READY;
+        } elseif ($this->metadata['workflowStatus'] !== WORKFLOW_REMOVED) {
+            $this->metadata['workflowStatus'] = self::WORKFLOW_INCOMPLETE;
+        }
+
+        if ($username) {
+            $this->wmetadata['updatedBy'] = $username;
+            $now = new \DateTime();
+            $now->format('Y-m-d H:i:s');
+            $now->getTimestamp();
+            $this->metadata['dateUpdated'] = $now;
+        }
+    }
+
+    public function renameTask($taskKey, $newTaskName, $projectId, $username)
+    {
+        $message = 'When renaming task from workflow, ';
+
+        if (empty($taskKey) && ($taskKey != 0)) {
+            $message .= 'no task key was specified.';
+            throw new \Exception($message);
+        }
+
+        if (!isset($newTaskName)) {
+            $newTaskName = 'Task for project ' . $projectId;
+        }
+
+        $workflow = $this->tasks[$taskKey]['taskName'] = $newTaskName;
+
+        if ($username) {
+            $this->metadata['updatedBy'] = $username;
+            $now = new \DateTime();
+            $now->format('Y-m-d H:i:s');
+            $now->getTimestamp();
+            $this->metadata['dateUpdated'] = $now;
+        }
+    }
+
+    public function assignWorkflowTaskEtlConfig(
+        $projectId,
+        $taskKey,
+        $etlConfig,
+        $username
+    ) {
+        $message = 'When assigning ETL config to workflow, ';
+
+        if (empty($taskKey) && ($taskKey != 0)) {
+            $message .= 'no task key was specified.';
+            throw new \Exception($message);
+        }
+
+        $this->tasks[$taskKey]['projectEtlConfig'] = $etlConfig;
+
+        #workflow status
+        $etlConfigs = array_column($this->tasks, 'projectEtlConfig');
+
+        $emptyEtlConfig = empty($etlConfigs) || in_array(null, $etlConfigs, true)
+            || in_array('', $etlConfigs, true);
+        if (!$emptyEtlConfig) {
+            $this->metadata['workflowStatus'] = self::WORKFLOW_READY;
+        } elseif ($this->metadata['workflowStatus'] !== WORKFLOW_REMOVED) {
+                $this->metadata['workflowStatus'] = self::WORKFLOW_INCOMPLETE;
+        }
+
+        #workflow metadata
+        if ($username) {
+            $this->metadata['updatedBy'] = $username;
+            $now = new \DateTime();
+            $now->format('Y-m-d H:i:s');
+            $now->getTimestamp();
+            $this->metadata['dateUpdated'] = $now;
+        }
+    }
+
+    public function getGlobalProperties()
+    {
+        return $this->globalProperties;
+    }
+
+    public function setGlobalProperties($properties, $username)
+    {
+        $this->globalProperties = $properties;
+
+        #workflow metadata
+        if ($username) {
+            $this->metadata['updatedBy'] = $username;
+            $now = new \DateTime();
+            $now->format('Y-m-d H:i:s');
+            $now->getTimestamp();
+            $this->metadata['dateUpdated'] = $now;
+        }
+    }
+
+    public function setCronSchedule($server, $schedule, $username)
+    {
+        $this->cron[Configuration::CRON_SERVER] = $server;
+        $this->cron[Configuration::CRON_SCHEDULE] = $schedule;
+
+        #workflow metadata
+        if ($username) {
+            $this->metadata['updatedBy'] = $username;
+            $now = new \DateTime();
+            $now->format('Y-m-d H:i:s');
+            $now->getTimestamp();
+            $this->metadata['dateUpdated'] = $now;
+        }
+    }
+
+    public function getCron()
+    {
+        return $this->cron;
+    }
+
+    public function getCronServer()
+    {
+        return $this->cron[Configuration::CRON_SERVER];
+    }
+
+    public function getCronSchedule()
+    {
+        return $this->cron[Configuration::CRON_SCHEDULE];
+    }
+
+    public function getEtlConfigs()
+    {
+        $etlConfigs = array_column($this->tasks, 'projectEtlConfig');
+        return $etlConfigs;
+    }
+
+    public function getProjectIds()
+    {
+        $projectIds = array_column($this->tasks, 'projectId');
+        return $projectIds;
+    }
+
+    public function getDateAddedDate()
+    {
+        return $this->metadata['dateAdded']['date'];
+    }
+
+    public function getAddedBy()
+    {
+        return $this->metadata['addedBy'];
+    }
+
+    public function getDateUpdatedDate()
+    {
+        return $this->metadata['dateUpdated']['date'];
+    }
+
+    public function getUpdatedBy()
+    {
+        return $this->metadata['updatedBy'];
+    }
+}

@@ -27,6 +27,8 @@ SPDX-License-Identifier: BSD-3-Clause
       <file>tests/unit/ServerConfigTest.php</file>
       <file>tests/unit/ServersTest.php</file>
       <file>tests/unit/UserListTest.php</file>
+      <file>tests/unit/WorkflowTest.php</file>
+      <file>tests/unit/WorkflowsTest.php</file>
     </testsuite>
   </testsuites>
 </phpunit>

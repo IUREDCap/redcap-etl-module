@@ -111,20 +111,20 @@ Workflow name: <input type="text" id="search-text" name="search-text" size="40">
             #-------------------------------
             # Status
             #-------------------------------
-            $status = $workflow['metadata']['workflowStatus'];
+            $status = $workflow->getStatus();
             echo '<td style="text-align:center;">' . $status . "</td>\n";
 
             #-------------------------------
             # Last updated by/date
             #-------------------------------
-            $dateUpdated = substr($workflow['metadata']['dateUpdated']['date'], 0, 10);
+            $dateUpdated = substr($workflow->getDateUpdatedDate(), 0, 10);
             if (empty($dateUpdated)) {
-                $dateUpdated = substr($workflow['metadata']['dateAdded']['date'], 0, 10);
+                $dateUpdated = substr($workflow->getDateAddedDate(), 0, 10);
             }
 
-            $updatedBy = $workflow['metadata']['updatedBy'];
+            $updatedBy = $workflow->getUpdatedBy();
             if (empty($updatedBy)) {
-                $updatedBy = $workflow['metadata']['addedBy'];
+                $updatedBy = $workflow->getAddedBy();
             }
             if (!empty($updatedBy)) {
                 $updatedBy = ' [' . $updatedBy . ']';

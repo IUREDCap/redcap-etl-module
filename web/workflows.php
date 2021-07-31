@@ -123,6 +123,9 @@ echo $buffer;
 <?php
 
 $workflowNames = $module->getProjectAvailableWorkflows();
+#print("<pre>\n");
+#print_r($workflowNames);
+#print("</pre>\n");
 $adminConfig   = $module->getAdminConfig();
 
 $selfUrl       = $module->getUrl(RedCapEtlModule::WORKFLOWS_PAGE);

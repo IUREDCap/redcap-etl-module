@@ -1207,14 +1207,20 @@ class Settings
         $workflowsObject = new Workflows();
         $key = self::WORKFLOWS_KEY;
         $json = $this->module->getSystemSetting($key);
+        #print("<hr/>JSON: {$json}\n");
         $workflowsObject->fromJson($json);
         $workflows = $workflowsObject->getWorkflows();
+
+        #print("<hr/>WORKFLOWS:<br/><pre>\n");
+        #print_r($workflows);
+        #print("</pre>\n");
+
         $projectWorkflows = array();
         foreach ($workflows as $workflowName => $workflow) {
-            if ($workflow['metadata']['workflowStatus'] !== 'Removed') {
-                if (in_array($projectId, array_column($workflow, 'projectId'))) {
+            if ($workflow->getStatus() !== Workflow::WORKFLOW_REMOVED) {
+                if (in_array($projectId, $workflow->getProjectIds())) {
                     if ($excludeIncomplete) {
-                        if ($workflow['metadata']['workflowStatus'] !== 'Incomplete') {
+                        if ($workflow->getStatus() !== Workflow::WORKFLOW_INCOMPLETE) {
                             $projectWorkflows[] = $workflowName;
                         }
                     } else {
@@ -1567,16 +1573,6 @@ class Settings
             $hasPermissions = true;
         }
         return $hasPermissions;
-    }
-
-    public function getAllProjectTasksInAllWorkflows($projectId)
-    {
-        $workflows = new Workflows();
-        $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
-        $workflows->fromJson($json);
-        $excludeIncomplete = false;
-        $projectAvailableWorkflows = $this->getProjectAvailableWorkflows($projectId, $excludeIncomplete);
-        return $workflows->getAllProjectTasksInAllWorkflows($projectId, $projectAvailableWorkflows);
     }
 
 /*
