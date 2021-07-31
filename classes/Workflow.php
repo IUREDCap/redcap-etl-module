@@ -24,7 +24,7 @@ class Workflow implements \JsonSerializable
         $this->metadata         = array();
         $this->globalProperties = array();
         $this->cron             = array(); # cron job details
-        $this->tasks            = array(); # map from task name to task properties
+        $this->tasks            = array(); # map from task name to task info
 
         # Set metadata
         $this->metadata['workflowStatus'] = self::WORKFLOW_INCOMPLETE;
@@ -107,7 +107,7 @@ class Workflow implements \JsonSerializable
         $task = array();
         $task["projectId"] = $projectId;
         $task["taskSequenceNumber"] = $sequence;
-        $task["taskName"] = 'Task for project ' . $projectId;
+        $task["taskName"] = $this->getDefaultTaskName($projectId);
         $task["projectEtlConfig"] = null;
         $this->tasks[] = $task;
 
@@ -116,6 +116,17 @@ class Workflow implements \JsonSerializable
         if ($username) {
             $this->setUpdatedInfo($username);
         }
+    }
+
+    public function getDefaultTaskName($projectId)
+    {
+        $taskNumber = 1;
+        $taskName = 'Project ' . $projectId . ' task';
+        while ($this->hasTaskName($taskName)) {
+            $taskNumber++;
+            $taskName = 'Project ' . $projectId . ' task ' . $taskNumber;
+        }
+        return $taskName;
     }
 
     public function getStatus()
@@ -308,6 +319,19 @@ class Workflow implements \JsonSerializable
     {
         $projectIds = array_column($this->tasks, 'projectId');
         return $projectIds;
+    }
+
+    public function getTaskNames()
+    {
+        $taskNames = array_column($this->tasks, 'taskName');
+        return $taskNames;
+    }
+
+    public function hasTaskName($taskName)
+    {
+        $taskNames = array_column($this->tasks, 'taskName');
+        $hasTaskName = in_array($taskName, $taskNames);
+        return $hasTaskName;
     }
 
     public function getDateAddedDate()
