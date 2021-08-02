@@ -264,7 +264,7 @@ if (!empty($availableUserProjects)) {
 ?>
 
 <p>WORKFLOW TASKS</p>
-<table class="user-projects">
+<table id="workflowTasks" name="workflowTasks" class="user-projects">
     <thead>
         <tr>
             <?php
