@@ -178,10 +178,7 @@ try {
     $error = 'ERROR: ' . $exception->getMessage();
 }
 
-print "<hr/>WORKFLOW NAME: {$workflowName}<hr/>\n";
 $workflowStatus = $module->getWorkflowStatus($workflowName);
-print "<hr/>WORKFLOW NAME: {$workflowName}<hr/>\n";
-
 
 #Get the workflow's updated tasks list
 $tasks = $module->getWorkflowTasks($workflowName);
