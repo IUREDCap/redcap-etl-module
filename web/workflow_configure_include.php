@@ -330,7 +330,15 @@ if (!empty($availableUserProjects)) {
 
             echo "<td>" . Filter::escapeForHtml($taskName) . "</td>\n";
             echo "<td>" . Filter::escapeForHtml($projectId) . "</td>\n";
-            echo "<td>" . Filter::escapeForHtml($projectName) . "</td>\n";
+            # echo "<td>" . Filter::escapeForHtml($projectName) . "</td>\n";
+
+            # Project title with link to project
+            echo "<td>\n";
+            echo '<a href="' . APP_PATH_WEBROOT . 'index.php?pid='
+                . Filter::escapeForUrlParameter($projectId) . '" target="_blank">'
+                . Filter::escapeForHtml($projectName) . "</a>\n";
+            echo "</td>\n";
+
 
 
             if ($projectEtlConfig === "None specified") {
@@ -338,7 +346,7 @@ if (!empty($availableUserProjects)) {
             } else {
                 $configureUrl = $configUrl . '&configName=' . Filter::escapeForUrlParameter($projectEtlConfig)
                     . '&configType=task';
-                echo "<td>" . '<a href="' . $configureUrl . '">' . Filter::escapeForHtml($projectEtlConfig)
+                echo "<td>" . '<a href="' . $configureUrl . '" target="_blank">' . Filter::escapeForHtml($projectEtlConfig)
                     . '</a>' . "</td>\n";
             }
 
