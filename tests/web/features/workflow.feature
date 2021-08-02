@@ -63,8 +63,13 @@ I need to be able to create workflows
   Scenario: Configure workflow
     When I follow "ETL Workflows"
     And I follow workflow "behat-workflow-test"
+    And I rename task 1 to "Task1"
+    #And I wait for 5 seconds
     And I add task for workflow
-    And I wait for 20 seconds
+    # And I wait for 720 seconds
+    And I rename task 2 to "Task2"
+    Then I should see "Task1"
+    And I should see "Task2"
     
 
 #  Scenario: Run workflow on embedded server

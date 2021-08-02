@@ -499,6 +499,18 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         ConfigureWorkflowPage::addTaskForTestProject($session);
     }
 
+    /**
+     * @When /^I rename task (\d+) to "([^"]*)"$/
+     *
+     * @param int $taskNumber the task number using one-based indexing, i.e.,
+     *     the first task is task number 1.
+     */
+    public function iRenameTask($taskNumber, $newTaskName)
+    {
+        $session = $this->getSession();
+        ConfigureWorkflowPage::renameTask($session, $taskNumber, $newTaskName);
+    }
+
     /* Workflows --------------------------------------------------------------- */
 
     /**
