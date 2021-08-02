@@ -488,7 +488,18 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         EtlConfigsPage::deleteConfigurationIfExists($session, $configName);
     }
 
-    /* Workflow --------------------------------------------------------------- */
+    /* Workflow Configurations --------------------------------------------------------------- */
+
+    /**
+     * @When /^I add task for workflow$/
+     */
+    public function iAddTaskForWorkflow()
+    {
+        $session = $this->getSession();
+        ConfigureWorkflowPage::addTaskForTestProject($session);
+    }
+
+    /* Workflows --------------------------------------------------------------- */
 
     /**
      * @When /^I follow workflow "([^"]*)"$/
@@ -497,15 +508,6 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     {
         $session = $this->getSession();
         EtlWorkflowsPage::followWorkflow($session, $workflowName);
-    }
-
-    /**
-     * @When /^I configure workflow "([^"]*)"$/
-     */
-    public function iConfigureWorkflow($workflowName)
-    {
-        $session = $this->getSession();
-        ConfigurePage::configureWorkflow($session, $workflowName);
     }
 
     /**

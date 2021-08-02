@@ -1,5 +1,5 @@
 #-------------------------------------------------------
-# Copyright (C) 2019 The Trustees of Indiana University
+# Copyright (C) 2021 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
@@ -55,12 +55,19 @@ I need to be able to create workflows
 
   Scenario: Create workflow
     When I follow "ETL Workflows"
-    When I fill in "workflowName" with "behat-workflow-test"
+    And I fill in "workflowName" with "behat-workflow-test"
     And I press "Add"
     Then I should see "behat-workflow-test"
     But I should not see "Error:"
 
-    #  Scenario: Run workflow on embedded server
+  Scenario: Configure workflow
+    When I follow "ETL Workflows"
+    And I follow workflow "behat-workflow-test"
+    And I add task for workflow
+    And I wait for 20 seconds
+    
+
+#  Scenario: Run workflow on embedded server
     #When I follow "Run"
     #And I wait for 20 seconds
     #And I select "behat-workflow-test" from "workflowName"
