@@ -126,6 +126,6 @@ I need to be able to autogenerate the transformation rules
     But I should not see "Created table 'registration'"
 
  Scenario: Cleanup by delete configuration
-    When I follow "ETL Tasks"
+    When I follow "ETL Configurations"
     And I delete configuration "behat-config-test"
 

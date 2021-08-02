@@ -1024,7 +1024,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $listUrl = $this->getUrl('web/index.php');
         $listLabel = '<span class="fas fa-list"></span>'
-           . ' ETL Tasks';
+           . ' ETL Configurations';
 
 
         $configUrl = $this->getUrl(self::USER_ETL_CONFIG_PAGE);

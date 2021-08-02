@@ -80,12 +80,12 @@ I need to be able to create workflows
     And I admin delete workflow "behat-workflow-test"
 
   Scenario: Delete config1 for workflow
-    When I follow "ETL Tasks"
+    When I follow "ETL Configurations"
     And I delete configuration "behat-workflow-config1-test"
     Then I should not see "behat-workflow-config1-test"
 
   Scenario: Delete config2 for workflow
-    When I follow "ETL Tasks"
+    When I follow "ETL Configurations"
     And I delete configuration "behat-workflow-config2-test"
     Then I should not see "behat-workflow-config2-test"
 

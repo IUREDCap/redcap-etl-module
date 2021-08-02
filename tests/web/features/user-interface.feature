@@ -17,7 +17,7 @@ I need to be able to view the REDCap-ETL external module pages
     And I follow "REDCap-ETL"
 
   Scenario: Access REDCap-ETL home page for test project
-    Then I should see tabs "ETL Tasks", "ETL Workflows", "Configure", "Run", "Schedule","User Manual"
+    Then I should see tabs "ETL Configurations", "ETL Workflows", "Configure", "Run", "Schedule","User Manual"
     #Then I should see "ETL Configurations"
     #And I should see "Configure"
     #And I should see "Run"
@@ -61,8 +61,8 @@ I need to be able to view the REDCap-ETL external module pages
     And I should see "REDCap-ETL Configurations"
     And I should see "Running REDCap-ETL"
 
-  Scenario: Access ETL Tasks page using the tab
-    When I follow "ETL Tasks"
+  Scenario: Access ETL Configurations page using the tab
+    When I follow "ETL Configurations"
     Then I should see "REDCap-ETL configuration name:"
     And I should see "Add"
 

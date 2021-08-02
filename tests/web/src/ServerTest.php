@@ -128,7 +128,7 @@ class ServerTest extends TestCase
         $page = self::$session->getPage();
 
         # Need to create configuration
-        $page->clickLink('ETL Tasks');
+        $page->clickLink('ETL Configurations');
         $configName = 'remote-server-test';
         EtlConfigsPage::deleteConfigurationIfExists(self::$session, $configName);
         EtlConfigsPage::addConfiguration(self::$session, $configName);
@@ -139,7 +139,7 @@ class ServerTest extends TestCase
 
 
         #$page->clickLink('Run');
-        $page->clickLink('ETL Tasks');
+        $page->clickLink('ETL Configurations');
         # Find the table row where the first element matches the configuration name,
         # and then get the 2nd column element (the 'Run' icon') and click it
         $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[2]");

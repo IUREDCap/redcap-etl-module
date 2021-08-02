@@ -63,7 +63,7 @@ class StatusTest extends TestCase
         $page->clickLink('REDCap-ETL');
         $text = $page->getText();
         #$this->assertMatchesRegularExpression("/ETL Configurations/", $text); 
-        $this->assertMatchesRegularExpression("/ETL Tasks/", $text); 
+        $this->assertMatchesRegularExpression("/ETL Configurations/", $text); 
 
         // Test logout
         $page->clickLink('Log out');
