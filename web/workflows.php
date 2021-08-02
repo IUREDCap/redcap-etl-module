@@ -123,6 +123,8 @@ echo $buffer;
 <?php
 
 $workflowNames = $module->getProjectAvailableWorkflows();
+sort($workflowNames);
+
 #print("<pre>\n");
 #print_r($workflowNames);
 #print("</pre>\n");
