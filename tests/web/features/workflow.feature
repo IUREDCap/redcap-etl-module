@@ -64,19 +64,23 @@ I need to be able to create workflows
     When I follow "ETL Workflows"
     And I follow workflow "behat-workflow-test"
     And I rename task 1 to "Task1"
-    #And I wait for 5 seconds
+    And I specify etl-configuration "behat-workflow-config1-test" for task "Task1"
+
     And I add task for workflow
-    # And I wait for 720 seconds
     And I rename task 2 to "Task2"
+    And I specify etl-configuration "behat-workflow-config2-test" for task "Task2"
+
     Then I should see "Task1"
     And I should see "Task2"
     
-
-#  Scenario: Run workflow on embedded server
-    #When I follow "Run"
-    #And I wait for 20 seconds
-    #And I select "behat-workflow-test" from "workflowName"
-    #And I wait for 20 seconds
+  Scenario: Run workflow on embedded server
+    When I follow "Run"
+    And I select "workflow" from "configType"
+    And I select "behat-workflow-test" from "workflowName"
+    And I select "(embedded server)" from "server"
+    And I press "Run"
+    Then I should see "[Task1] Processing complete."
+    And I should see "[Task2] Processing complete."
 
   Scenario: Delete workflow as admin
     When I log out

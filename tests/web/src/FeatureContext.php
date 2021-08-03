@@ -511,6 +511,17 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         ConfigureWorkflowPage::renameTask($session, $taskNumber, $newTaskName);
     }
 
+    /**
+     * @When /^I specify etl-configuration "([^"]*)" for task "([^"]*)"$/
+     */
+    public function iSpecifyConfigForTask($configName, $taskName)
+    {
+        $session = $this->getSession();
+        ConfigureWorkflowPage::specifyEtlConfig($session, $taskName, $configName);
+    }
+
+
+
     /* Workflows --------------------------------------------------------------- */
 
     /**

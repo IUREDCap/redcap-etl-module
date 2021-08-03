@@ -46,6 +46,7 @@ class ConfigureWorkflowPage
 
         # Check the first column header to see if this table has
         # the sort column (more then 1 task) or not (1 task)
+        # so the rename column can be set
         $xpath = "//table[@id='workflowTasks']/thead/tr[1]/th[1]";
         $element = $page->find("xpath", $xpath);
         if ($element->getText() === 'Task Name') {
@@ -56,8 +57,8 @@ class ConfigureWorkflowPage
         }
 
         # Find the table row for the specified task number, and then get the
-        # rename (5th column) element and click it
-        $xpath = "//table[@id='workflowTasks']/tbody/tr[".$taskNumber."]/td[".$renameColumn."]";
+        # rename element and click it
+        $xpath = "//table[@id='workflowTasks']/tbody/tr[{$taskNumber}]/td[{$renameColumn}]";
         $element = $page->find("xpath", $xpath);
         $element->click();
 
@@ -69,23 +70,13 @@ class ConfigureWorkflowPage
     public static function specifyEtlConfig($session, $taskName, $configName)
     {
         $page = $session->getPage();
-                $page = $session->getPage();
-
-        # Check the first column header to see if this table has
-        # the sort column (more then 1 task) or not (1 task)
-        $xpath = "//table[@id='workflowTasks']/thead/tr[1]/th[1]";
-        $element = $page->find("xpath", $xpath);
-        if ($element->getText() === 'Task Name') {
-            $specifyColumn = 6;
-        } else {
-            # There is more than one task, so there is an extra first sorting column
-            $specifyColumn = 7;
-        }
 
         # Find the table row where the first element matches the task name, and then get the
-        # 6th column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$taskName."']/following-sibling::td[".($specifyColumn - 1)."]");
+        # 5th column element to the right and click it
+        $element = $page->find("xpath", "//tr/td[text()='".$taskName."']/following-sibling::td[5]");
         $element->click();
+
+        $page = $session->getPage();
 
         # Handle the ETL Config specification dialog
         $page->selectFieldOption("projectEtlConfigSelect", $configName);
