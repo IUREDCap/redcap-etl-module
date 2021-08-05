@@ -26,13 +26,6 @@ if (!defined('REDCAP_ETL_MODULE')) {
 }
 ?>
 
-<script>
-// Need to check if this works with Save (don't want to have db password not saved)
-//    $(window).bind('beforeunload', function(){
-//        $("#dbPassword").val("");
-//    });
-</script>
-
 <?php
 
 $error = '';
@@ -40,6 +33,8 @@ $warning = '';
 $success = '';
 
 $parseResult = '';
+
+$dbPasswordMask = "********";
 
 try {
     #-----------------------------------------------------------
@@ -83,8 +78,6 @@ try {
 
     $redCapDb = new RedCapDb();
 
-
-
     if (!empty($configuration)) {
         #--------------------------------------------------------------
         # Get the API tokens for this project with export permission,
@@ -121,6 +114,15 @@ try {
                 }
             }
 
+            # if the database password is equal to the make value, it means that it
+            # wasn't changed, so unset this value (since you son't want the mask value
+            # stored in the configuration
+            if ($_POST[Configuration::DB_PASSWORD] === $dbPasswordMask) {
+                unset($_POST[Configuration::DB_PASSWORD]);
+            }
+            #print("<pre>");
+            #print_r($_POST);
+            #print("</pre>");
             $configuration->set(Filter::stripTagsArrayRecursive($_POST));
 
             # If this is NOT a remote REDCap configuration, set SSL certificate verification
@@ -390,6 +392,18 @@ $module->renderMessages($error, $warning, $success);
 <script>
     // Help dialog events
     $(document).ready(function() {
+
+        // Blank out db password input field so stupid browsers will not prompt to save password
+        $(window).bind('beforeunload', function(){
+            // This seems to work for all cases except form submit
+            $("#dbPassword").val("");
+        });
+
+        $("#dbPassword").focus(function(event){
+            $("#dbPassword").val("");
+        });
+
+
         $( function() {
             
             $('#db_primary_keys').click(function () {
@@ -564,8 +578,10 @@ $(function() {
 <!-- ====================================
 Configuration form
 ===================================== -->
-<form action="<?php echo $selfUrl;?>" method="post"
+<form id="configForm" action="<?php echo $selfUrl;?>" method="post"
     enctype="multipart/form-data" style="margin-top: 17px;" autocomplete="off">
+
+    <input type="hidden" id="submitFlag" name="submitFlag" value="false" />
 
     <input type="hidden" name="configName"
         value="<?php echo Filter::escapeForHtmlAttribute($configName); ?>" />
@@ -1040,7 +1056,7 @@ Configuration form
                 <tr>
                     <td style="padding-right: 1em;">Database username</td>
                     <td><input type="text" name="<?php echo Configuration::DB_USERNAME;?>"
-                        value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_USERNAME])?>"/>
+                        value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_USERNAME]);?>"/>
                     </td>
                 </tr>
 
@@ -1048,8 +1064,11 @@ Configuration form
                 <tr>
                     <td style="padding-right: 1em;">Database password</td>
                     <td>
+                        <?php
+                            # value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_PASSWORD])
+                        ?>
                         <input type="password" name="<?php echo Configuration::DB_PASSWORD;?>"
-                            value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_PASSWORD])?>"
+                            value="<?php echo Filter::escapeForHtmlAttribute($dbPasswordMask); ?>"
                             id="dbPassword" autocomplete="off"/>
                     </td>
                 </tr>
@@ -1354,9 +1373,9 @@ Configuration form
         <tr>
             <td style="text-align: center;">&nbsp;</td>
             <td style="text-align: center;">
-                <input type="submit" name="submitValue" value="Save" />
-                <input type="submit" name="submitValue" value="Save and Exit" style="margin-left: 24px;"/>
-                <input type="submit" name="submitValue" value="Cancel" style="margin-left: 24px;" />
+                <input style="font-weight: bold;" type="submit" name="submitValue" value="Save"/>
+                <input style="font-weight: bold;" type="submit" name="submitValue" value="Save and Exit" style="margin-left: 24px;"/>
+                <input style="font-weight: bold;" type="submit" name="submitValue" value="Cancel" style="margin-left: 24px;" />
             </td>
             <td style="text-align: center;">&nbsp;</td>
         </tr>
@@ -1414,8 +1433,6 @@ Configuration form
 #------------------------------------------------------
 }
 ?>
-
-
 
 
 <?php

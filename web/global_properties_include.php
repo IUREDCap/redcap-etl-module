@@ -261,6 +261,10 @@ try {
 #print "<pre>\n";
 #print_r($_POST);
 #print "</pre>\n";
+#print "<hr/>properties:<br/>\n";
+#print "<pre>\n";
+#print_r($properties);
+#print "</pre>\n";
 ?>
 
   <div style="float: right;">
