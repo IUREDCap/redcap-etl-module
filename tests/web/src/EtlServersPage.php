@@ -66,7 +66,7 @@ class EtlServersPage
 
 
     /**
-     * Deletes the specified server from the ETL servers list page
+     * Deletes the specified server from the ETL servers list page if it exsits.
      *
      * @param string $serverName the name of the server to delete.
      */

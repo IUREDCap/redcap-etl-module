@@ -75,11 +75,11 @@ class EtlServerConfigPage
 
         $page->fillField('emailFromAddress', $serverConfig['email_from_address']);
 
-        if ($serverConfig['enable_error_email'] === 'true' || $serverConfig['enable_error_email'] === '1') {
+        if ($serverConfig['enable_error_email'] === 'true' || $serverConfig['enable_error_email'] === '1' || $serverConfig['enable_error_email'] === true) {
             $page->checkField('enableErrorEmail');
         }
 
-        if ($serverConfig['enable_summary_email'] === 'true' || $serverConfig['enable_summary_email'] === '1') {
+        if ($serverConfig['enable_summary_email'] === 'true' || $serverConfig['enable_summary_email'] === '1' || $serverConfig['enable_summary_email'] === true) {
             $page->checkField('enableSummaryEmail');
         }
 

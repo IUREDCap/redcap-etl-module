@@ -185,6 +185,38 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @Then /^Print element "([^"]*)" value$/
+     */
+    public function printValueText($css)
+    {
+        $session = $this->getSession();
+        $page = $session->getPage();
+        $element = $page->find('css', $css);
+        $value = $element->getValue();
+        print "{$value}\n";
+    }
+
+    /**
+     * @Then /^Field "([^"]*)" should contain value "([^"]*)"$/
+     */
+    public function fieldShouldContainValue($fieldLocator, $value)
+    {
+        $session = $this->getSession();
+        $page = $session->getPage();
+        $element = $page->findField($fieldLocator);
+        if (!isset($element)) {
+            throw new \Exception("Fiel \"{$css}\" not found.");
+        }
+
+        $fieldValue = $element->getValue();
+
+        if (strpos($fieldValue, $value) === false) {
+            throw new \Exception("Fiel \"{$css}\" does not contain value \"{$value}\".");
+        }
+    }
+
+    /**
+    /**
      * @Then /^Print select "([^"]*)" text$/
      */
     public function printSelectText($selectCss)
@@ -488,6 +520,23 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         EtlConfigsPage::deleteConfigurationIfExists($session, $configName);
     }
 
+    /**
+     * @When /^I fill in "([^"]*)" with the user e-mail$/
+     *
+     * Fills in the specified text field with the user e-mail from the test configuration file.
+     */
+    public function iFileInWithTheUserEmail($field)
+    {
+        $session = $this->getSession();
+        $page = $session->getPage();
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
+        $userEmail = $testConfig->getUser()['email'];
+        $page->fillField($field, $userEmail);
+    }
+
+
+    /* Workflow Configurations --------------------------------------------------------------- */
+
     /* Workflow Configurations --------------------------------------------------------------- */
 
     /**
@@ -579,6 +628,15 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     {
         $session = $this->getSession();
         AdminWorkflowsPage::adminDeleteWorkflow($session, $workflowName);
+    }
+
+    /**
+     * @When /^I admin delete workflow "([^"]*)" if it exists$/
+     */
+    public function iAdminDeleteWorkflowIfItExists($workflowName)
+    {
+        $session = $this->getSession();
+        AdminWorkflowsPage::adminDeleteWorkflowIfExists($session, $workflowName);
     }
 
 

@@ -15,6 +15,24 @@ I need to be able to create workflows
     When I select the test project
     And I follow "REDCap-ETL"
 
+  # Need to delete workflow as admin to really get rid of it,
+  # otherwise it will exist as a "re-instateable" workflow.
+  Scenario: Delete workflow as admin
+    When I log out
+    And I access the admin interface
+    When I follow "Workflows"
+    And I admin delete workflow "behat-workflow-test" if it exists
+
+  Scenario: Delete config1 for workflow
+    When I follow "ETL Configurations"
+    And I delete configuration "behat-workflow-config1-test" if it exists
+    Then I should not see "behat-workflow-config1-test"
+
+  Scenario: Delete config2 for workflow
+    When I follow "ETL Configurations"
+    And I delete configuration "behat-workflow-config2-test" if it exists
+    Then I should not see "behat-workflow-config2-test"
+
   Scenario: Create config1 for workflow
     When I fill in "configurationName" with "behat-workflow-config1-test"
     And I press "Add"
@@ -82,19 +100,27 @@ I need to be able to create workflows
     Then I should see "[Task1] Processing complete."
     And I should see "[Task2] Processing complete."
 
-  Scenario: Delete workflow as admin
-    When I log out
-    And I access the admin interface
-    When I follow "Workflows"
-    And I admin delete workflow "behat-workflow-test"
+  Scenario: Workflow global properties configuration
+    When I follow "ETL Workflows"
+    And I follow workflow "behat-workflow-test"
+    And I check "E-mail errors"
+    And I check "E-mail summary"
+    And I fill in "E-mail subject" with "Automated workflow test"
+    And I fill in "E-mail to list" with the user e-mail
+    And I press "Save"
+    Then the "E-mail errors" checkbox should be checked
+    And the "E-mail summary" checkbox should be checked
+    And Field "E-mail subject" should contain value "Automated workflow test"
 
-  Scenario: Delete config1 for workflow
-    When I follow "ETL Configurations"
-    And I delete configuration "behat-workflow-config1-test"
-    Then I should not see "behat-workflow-config1-test"
-
-  Scenario: Delete config2 for workflow
-    When I follow "ETL Configurations"
-    And I delete configuration "behat-workflow-config2-test"
-    Then I should not see "behat-workflow-config2-test"
+  Scenario: Schedule configuration
+    When I follow "Schedule"
+    And I select "workflow" from "configType"
+    And I select "behat-workflow-test" from "workflowName"
+    And I select "(embedded server)" from "server"
+    And I schedule for next hour
+    And I press "Save"
+    And I should see "behat-workflow-test"
+    And I should see "ETL Server"
+    And I should see "(embedded server)"
+    And I should not see "Error:"
 

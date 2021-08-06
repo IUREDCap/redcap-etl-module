@@ -614,7 +614,7 @@ try {
                 
                 <!-- E-MAIL ERRORS -->      
                 <tr>
-                    <td>E-mail errors</td>
+                    <td><label for="<?php echo Configuration::EMAIL_ERRORS;?>">E-mail errors<label></td>
                     <td>
                         <?php
                         $checked = '';
@@ -622,8 +622,9 @@ try {
                             $checked = ' checked ';
                         }
                         ?>
-                        <input type="checkbox" name="<?php echo Configuration::EMAIL_ERRORS;?>" value="true"
-                            <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
+                        <input type="checkbox" id="<?php echo Configuration::EMAIL_ERRORS;?>"
+                               name="<?php echo Configuration::EMAIL_ERRORS;?>" value="true"
+                               <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
                     </td>
                     <td>
                         <!-- E-MAIL NOTIFICATION HELP BUTTON -->
@@ -636,7 +637,9 @@ try {
 
                 <!-- E-MAIL SUMMARY -->
                 <tr>
-                    <td style="padding-right: 1em;">E-mail summary</td>
+                    <td style="padding-right: 1em;">
+                        <label for="<?php echo Configuration::EMAIL_SUMMARY;?>">E-mail summary</label>
+                    </td>
                     <td>
                         <?php
                         $checked = '';
@@ -644,25 +647,30 @@ try {
                             $checked = ' checked ';
                         }
                         ?>
-                        <input type="checkbox" name="<?php echo Configuration::EMAIL_SUMMARY;?>"
-                            <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
+                        <input type="checkbox" id="<?php echo Configuration::EMAIL_SUMMARY;?>"
+                               name="<?php echo Configuration::EMAIL_SUMMARY;?>"
+                               <?php echo $checked;?> style="vertical-align: middle; margin: 0;">
                     </td>
                 </tr>
                 
                 <!-- E-MAIL SUBJECT -->
                 <tr>
-                    <td>E-mail subject</td>
-                    <td><input type="text" name="<?php echo Configuration::EMAIL_SUBJECT;?>" size="32"
-                        value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::EMAIL_SUBJECT]);?>"
+                    <td><label for="<?php echo Configuration::EMAIL_SUBJECT;?>">E-mail subject</label></td>
+                    <td><input type="text"
+                               id="<?php echo Configuration::EMAIL_SUBJECT;?>"
+                               name="<?php echo Configuration::EMAIL_SUBJECT;?>" size="32"
+                               value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::EMAIL_SUBJECT]);?>"
                         />
                     </td>
                 </tr>
                 
                 <!-- E-MAIL TO LIST -->
                 <tr>
-                    <td>E-mail to list</td>
-                    <td><input type="text" name="<?php echo Configuration::EMAIL_TO_LIST;?>" size="32"
-                        value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::EMAIL_TO_LIST]);?>"
+                    <td><label for="<?php echo Configuration::EMAIL_TO_LIST;?>">E-mail to list</label></td>
+                    <td><input type="text"
+                               id="<?php echo Configuration::EMAIL_TO_LIST;?>"
+                               name="<?php echo Configuration::EMAIL_TO_LIST;?>" size="32"
+                               value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::EMAIL_TO_LIST]);?>"
                         />                  
                     </td>
                 </tr>
