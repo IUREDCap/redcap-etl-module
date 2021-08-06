@@ -100,7 +100,7 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
 
 
 <form action="<?php echo $selfUrl;?>" method="post" style="margin-bottom: 12px;">
-Server: <input type="text" id="server-name" name="server-name" size="40">
+<label for="server-name">Server:</label> <input type="text" id="server-name" name="server-name" size="40">
 <input type="submit" name="submit" value="Add Server"><br />
 <?php Csrf::generateFormToken(); ?>
 </form>

@@ -141,7 +141,8 @@ Workflow name: <input type="text" id="search-text" name="search-text" size="40">
             # Configure
             #-------------------------------
             #get the first project since the workflow config url requires a project id
-            $pid = array_column($workflow, 'projectId')[0];
+            $projectIds = $workflow->getProjectIds();
+            $pid = $projectIds[0];
             $workflowConfigUrl = $module->getURL(
                 RedCapEtlModule::USER_ETL_CONFIG_PAGE
                 . '?pid=' . Filter::escapeForUrlParameter($pid)
