@@ -58,7 +58,7 @@ class ServerTest extends TestCase
         $this->runEtlOnRemoteServer($serverName);
     }
 
-/*    public function testServerWithSshKeyAuthentication()
+    public function testServerWithSshKeyAuthentication()
     {
         $serverName = 'ssh_key_authentication';
 
@@ -74,7 +74,7 @@ class ServerTest extends TestCase
 
         $this->runEtlOnRemoteServer($serverName);
     }
-*/
+
     public function configureEtlServer($serverName)
     {
         $serverConfig = self::$testConfig->getServerConfig($serverName);
