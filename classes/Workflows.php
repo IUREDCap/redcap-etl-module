@@ -277,17 +277,7 @@ class Workflows implements \JsonSerializable
             throw new \Exception($message);
         }
 
-        $this->workflows[$workflowName]["cron"][Configuration::CRON_SERVER] = $server;
-        $this->workflows[$workflowName]["cron"][Configuration::CRON_SCHEDULE] = $schedule;
-
-        #workflow metadata
-        if ($username) {
-            $this->workflows[$workflowName]["metadata"]["updatedBy"] = $username;
-            $now = new \DateTime();
-            $now->format('Y-m-d H:i:s');
-            $now->getTimestamp();
-            $this->workflows[$workflowName]["metadata"]["dateUpdated"] = $now;
-        }
+        $this->workflows[$workflowName]->setCronSchedule($server, $schedule, $user);
     }
 
     public function getCronSchedule($workflowName)
