@@ -151,8 +151,9 @@ $times = $adminConfig->getTimeLabels();
                 $taskProjectIds = array_column($tasks, 'projectId');
                 $firstPid = $taskProjectIds[0];
                 $configUrl = $module->getURL(
-                    RedCapEtlModule::WORKFLOW_CONFIG_PAGE
+                    RedCapEtlModule::USER_ETL_CONFIG_PAGE
                     . '?pid=' . Filter::escapeForUrlParameter($firstPid)
+                    . '&configType=workflow'
                     . '&configName=' . Filter::escapeForUrlParameter($config)
                 );
 
@@ -169,8 +170,9 @@ $times = $adminConfig->getTimeLabels();
                 $projectId = $cronJob['projectId'];
                 $config    = $cronJob['config'];
                 $configUrl = $module->getURL(
-                    RedCapEtlModule::USER_ETL_TASK_CONFIG_PAGE
+                    RedCapEtlModule::USER_ETL_CONFIG_PAGE
                     . '?pid=' . Filter::escapeForUrlParameter($projectId)
+                    . '&configType=task'
                     . '&configName=' . Filter::escapeForUrlParameter($config)
                 );
                 $pidLinks = '<a href="' . APP_PATH_WEBROOT . 'index.php?pid=' . (int)$projectId . '">'
