@@ -36,6 +36,8 @@ $error   = '';
 
 $parseResult = '';
 
+$dbPasswordMask = "********";
+
 # $workflowName should be set by configure.php, which includes this file
 
 $workflowStatus = $module->getWorkflowStatus($workflowName);
@@ -97,6 +99,13 @@ try {
         # update the configuration properties with the POST values
         #---------------------------------------------------------------
         if (!empty($submitValue) && strcasecmp($submitValue, 'Cancel')) {
+            # if the database password is equal to the make value, it means that it
+            # wasn't changed, so unset this value (since you son't want the mask value
+            # stored in the configuration
+            if ($_POST[Configuration::DB_PASSWORD] === $dbPasswordMask) {
+                unset($_POST[Configuration::DB_PASSWORD]);
+            }
+
             $configuration->set(Filter::stripTagsArrayRecursive($_POST), $isWorkflowGlobalProperties);
             # Reset properties, since they may have been modified above
             $initialize = false;
@@ -130,6 +139,17 @@ try {
 <script>
     // Help dialog events
     $(document).ready(function() {
+
+        // Blank out db password input field so stupid browsers will not prompt to save password
+        $(window).bind('beforeunload', function(){
+            // This seems to work for all cases except form submit
+            $("#dbPassword").val("");
+        });
+
+        $("#dbPassword").focus(function(event){
+            $("#dbPassword").val("");
+        });
+
         $( function() {
             
             $('#db_primary_keys').click(function () {
@@ -418,7 +438,7 @@ try {
                     <td style="padding-right: 1em;">Database password</td>
                     <td>
                         <input type="password" name="<?php echo Configuration::DB_PASSWORD;?>"
-                            value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_PASSWORD])?>"
+                            value="<?php echo Filter::escapeForHtmlAttribute($dbPasswordMask); ?>"
                             id="dbPassword"/>
                     </td>
                 </tr>
