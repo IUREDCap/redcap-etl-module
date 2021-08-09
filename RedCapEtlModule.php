@@ -1562,23 +1562,24 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 $workflow = $this->getWorkflow($workflowName);
                 $tasks = $workflow->getTasks();
 
-                //$serverConfig->updateEtlProperties($globalProperties);
-
                 if ($serverConfig->isEmbeddedServer()) {
-                    ### OLD CODE: $globalProperties[Configuration::PRINT_LOGGING] = 0;
-                    $workflow->setGlobalProperty(Configuration::PRINT_LOGGING, 0);   # NEW CODE
+                    $workflow->setGlobalProperty(Configuration::PRINT_LOGGING, 'false');   # NEW CODE
                     $remoteEtlServer = false;
                 } else {
                     $remoteEtlServer = true;
                 }
 
                 #--------------------------------------------------------------------------
-                # Create the workflow configuration and add the global variables to it.
+                # Create the workflow configuration and add the global properties to it.
                 #--------------------------------------------------------------------------
                 $globalProperties = array_filter($workflow->getGlobalProperties()); // Filter out empty values
+                #error_log(print_r($globalProperties, true), 3, __DIR__.'/globalProperties.txt');
                 $workflowConfig = new WorkflowConfig();
                 $globalPropertiesConfig = new Configuration('global_properties');
+                $globalPropertiesConfig->setProperties($globalProperties);
                 $globalPropertiesConfig->setProperty(self::WORKFLOW_NAME, $workflowName);
+                #error_log(print_r($globalPropertiesConfig->getProperties(), true), 3,
+                #    __DIR__.'/globalPropertiesConfig.txt');
                 $serverConfig->updateEtlConfig($globalPropertiesConfig, $isCronJob);
                 $workflowConfig->setGlobalPropertiesConfig($globalPropertiesConfig);
 
@@ -1597,20 +1598,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 $status = '';
                 $message = '';
 
-                # OLD CODE:
-                #if ($remoteEtlServer) {
-                #    ####$workflowProperties[self::JSON_WORKFLOW_KEY][self::JSON_GLOBAL_PROPERTIES_KEY] = array();
-                #    $workflowProperties[self::JSON_WORKFLOW_KEY][self::JSON_GLOBAL_PROPERTIES_KEY] = $globalProperties;
-                #    $workflowProperties[self::JSON_WORKFLOW_KEY][self::JSON_GLOBAL_PROPERTIES_KEY][self::WORKFLOW_NAME]
-                #        = $workflowName;
-                #    $workflowProperties[self::JSON_WORKFLOW_KEY][self::JSON_TASKS_KEY] = array();
-                #} else {
-                #    $workflowProperties = $globalProperties;
-                #    $workflowProperties[self::WORKFLOW_NAME] = $workflowName;
-                #}
-
-                ### NEW CODE:
-                $workflow->setGlobalProperty(self::WORKFLOW_NAME, $workflowName);
 
                 #---------------------------------------------
                 # Process each workflow ETL task

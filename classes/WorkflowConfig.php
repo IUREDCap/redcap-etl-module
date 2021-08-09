@@ -72,7 +72,7 @@ class WorkflowConfig implements \JsonSerializable
         ];
 
         foreach ($this->taskConfigs as $taskName => $taskConfig) {
-            $workflowArray['tasks'][$taskName] = $taskConfig->getPropertiesArray();
+            $workflowArray['workflow']['tasks'][$taskName] = $taskConfig->getPropertiesArray();
         }
 
         $json = json_encode($workflowArray, JSON_PRETTY_PRINT);
@@ -81,6 +81,7 @@ class WorkflowConfig implements \JsonSerializable
             throw new \Exception('Unable to convert workflow to JSON.');
         }
 
+        #error_log("{$json}", 3, __DIR__.'/../workflow.json');
         return $json;
     }
 
@@ -95,7 +96,7 @@ class WorkflowConfig implements \JsonSerializable
             $workflowArray[$taskName] = $taskConfig->getPropertiesArray();
         }
 
-        # error_log(print_r($workflowArray, true), 3, __DIR__.'/../workflow.log');
+        #error_log(print_r($workflowArray, true), 3, __DIR__.'/../workflow.txt');
         return $workflowArray;
     }
 
