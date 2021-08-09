@@ -533,6 +533,11 @@ class Configuration implements \JsonSerializable
         return $this->properties;
     }
 
+    public function setProperties($properties)
+    {
+        $this->properties = $properties;
+    }
+
     /**
      * Returns properties array for use in running ETL.
      */

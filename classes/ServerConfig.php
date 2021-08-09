@@ -166,7 +166,7 @@ class ServerConfig implements \JsonSerializable
     /**
      * Modifies an ETL configuration based on this server configuration's
      * properties. When running REDCap-ETL using the external module,
-     * some od the properties for an ETL configuration are
+     * some of the properties for an ETL configuration are
      * are server-wide properties that are set by an admin (e.g., the from e-mail address).
      * There server-wide properties need to be merged into the user
      * properties.
@@ -246,7 +246,7 @@ class ServerConfig implements \JsonSerializable
      *      the REDCap external module log.
      * @param boolean $runWorkflow indicates if a workflow is being run.
      */
-    public function run($etlConfig, $isCronJob = false, $moduleLog = null, $runWorkflow = false)
+    public function run($etlConfig, $isCronJob = false, $moduleLog = null, $runWorkflow = false, $excludedTasks = [])
     {
         if (!isset($etlConfig)) {
             $message = 'No ETL configuration specified.';
@@ -258,8 +258,11 @@ class ServerConfig implements \JsonSerializable
             throw new \Exception($message);
         }
 
+        $workflowConfig = null;
         if (!$runWorkflow) {
             $this->updateEtlConfig($etlConfig, $isCronJob);
+        } else {
+            $workflowConfig = $etlConfig;
         }
 
         if ($this->isEmbeddedServer()) {
@@ -267,12 +270,15 @@ class ServerConfig implements \JsonSerializable
             # Embedded server
             #-------------------------------------------------
             if ($runWorkflow) {
-                $properties = $etlConfig;
-                $properties[Configuration::PRINT_LOGGING] = false;
+                ### OLD CODE:
+                ###$properties = $etlConfig;
+                ###$properties[Configuration::PRINT_LOGGING] = false;
                 #print "<hr/>SERVER CONFIG PROPERTIES:<br/>\n";
                 #print "<pre>\n";
                 #print_r($properties);
                 #print "</pre>\n";
+                ### NEW CODE:
+                $properties = $workflowConfig->toArray();
             } else {
                 $properties = $etlConfig->getPropertiesArray();
                 $properties[Configuration::PRINT_LOGGING] = false;
@@ -303,7 +309,7 @@ class ServerConfig implements \JsonSerializable
 
             if ($runWorkflow) {
                 // If this is a workflow, reset the logger to the workflow logger.
-                $logger = $redCapEtl->getWorkFlowConfig()->getLogger();
+                $logger = $redCapEtl->getWorkflowConfig()->getLogger();
             }
 
             $output = implode("\n", $logger->getLogArray());
@@ -319,7 +325,8 @@ class ServerConfig implements \JsonSerializable
             # rules file (if any) to the server.
             #------------------------------------------------
             if ($runWorkflow) {
-                $propertiesJson = Configuration::getRedCapEtlJsonProperties($runWorkflow, $etlConfig);
+                ## OLD CODE: $propertiesJson = Configuration::getRedCapEtlJsonProperties($runWorkflow, $etlConfig);
+                $propertiesJson = $workflowConfig->toJson();
             } else {
                 $propertiesJson = $etlConfig->getRedCapEtlJsonProperties($runWorkflow);
             }
