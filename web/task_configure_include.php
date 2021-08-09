@@ -1374,8 +1374,10 @@ Configuration form
             <td style="text-align: center;">&nbsp;</td>
             <td style="text-align: center;">
                 <input style="font-weight: bold;" type="submit" name="submitValue" value="Save"/>
-                <input style="font-weight: bold;" type="submit" name="submitValue" value="Save and Exit" style="margin-left: 24px;"/>
-                <input style="font-weight: bold;" type="submit" name="submitValue" value="Cancel" style="margin-left: 24px;" />
+                <input style="font-weight: bold;" type="submit" name="submitValue"
+                       value="Save and Exit" style="margin-left: 24px;"/>
+                <input style="font-weight: bold;" type="submit" name="submitValue"
+                       value="Cancel" style="margin-left: 24px;" />
             </td>
             <td style="text-align: center;">&nbsp;</td>
         </tr>

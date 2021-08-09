@@ -655,22 +655,28 @@ try {
                 
                 <!-- E-MAIL SUBJECT -->
                 <tr>
+                    <?php
+                        $emailSubject = $properties[Configuration::EMAIL_SUBJECT];
+                    ?>"
                     <td><label for="<?php echo Configuration::EMAIL_SUBJECT;?>">E-mail subject</label></td>
                     <td><input type="text"
                                id="<?php echo Configuration::EMAIL_SUBJECT;?>"
                                name="<?php echo Configuration::EMAIL_SUBJECT;?>" size="32"
-                               value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::EMAIL_SUBJECT]);?>"
+                               value="<?php echo Filter::escapeForHtmlAttribute($emailSubject); ?>"
                         />
                     </td>
                 </tr>
                 
                 <!-- E-MAIL TO LIST -->
                 <tr>
+                    <?php
+                        $emailToList = $properties[Configuration::EMAIL_TO_LIST];
+                    ?>"
                     <td><label for="<?php echo Configuration::EMAIL_TO_LIST;?>">E-mail to list</label></td>
                     <td><input type="text"
                                id="<?php echo Configuration::EMAIL_TO_LIST;?>"
                                name="<?php echo Configuration::EMAIL_TO_LIST;?>" size="32"
-                               value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::EMAIL_TO_LIST]);?>"
+                               value="<?php echo Filter::escapeForHtmlAttribute($emailToList);?>"
                         />                  
                     </td>
                 </tr>
