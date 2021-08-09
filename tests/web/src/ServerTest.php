@@ -115,7 +115,10 @@ class ServerTest extends TestCase
     public function checkEtlServer()
     {
         $page = self::$session->getPage();
+        #print "\nPAGE:\n";
+        #print_r($page);
         $page->pressButton('Test Server Connection');
+        sleep(10);
         $testOutput = $page->findById("testOutput")->getValue();
         $this->assertMatchesRegularExpression("/SUCCESS/", $testOutput); 
         $this->assertMatchesRegularExpression("/output of hostname command:/", $testOutput); 

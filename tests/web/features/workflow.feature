@@ -112,7 +112,7 @@ I need to be able to create workflows
     And the "E-mail summary" checkbox should be checked
     And Field "E-mail subject" should contain value "Automated workflow test"
 
-  Scenario: Schedule configuration
+  Scenario: Schedule configuration on embedded server
     When I follow "Schedule"
     And I select "workflow" from "configType"
     And I select "behat-workflow-test" from "workflowName"
@@ -123,4 +123,29 @@ I need to be able to create workflows
     And I should see "ETL Server"
     And I should see "(embedded server)"
     And I should not see "Error:"
+
+  Scenario: Create remote server for testing workflows
+    When I log out
+    And I access the admin interface
+    And I follow "Servers"
+    And I delete server "remote-server-workflow-test"
+    And I fill in "Server:" with "remote-server-workflow-test"
+    And I press "Add Server"
+    And I follow server "remote-server-workflow-test"
+    And I configure server "password_authentication"
+    Then I should see "remote-server-workflow-test"
+    And I should not see "Error:"
+
+  Scenario: Run workflow on remote server
+    When I follow "ETL Workflows"
+    And I follow workflow "behat-workflow-test"
+    And I fill in "E-mail subject" with "Automated workflow test on remote server"
+    And I press "Save"
+    And I follow "Run"
+    And I select "workflow" from "configType"
+    And I select "behat-workflow-test" from "workflowName"
+    And I select "remote-server-workflow-test" from "server"
+    And I press "Run"
+    # Need to check e-mail for this test
+
 
