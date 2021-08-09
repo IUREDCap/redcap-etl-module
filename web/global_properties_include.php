@@ -30,11 +30,9 @@ GLOBAL PROPERTIES
 =============================================================================================== -->
 
 <?php
-$success = '';
-$warning = '';
-$error   = '';
-
-$parseResult = '';
+#$success = '';
+#$warning = '';
+#$error   = '';
 
 $dbPasswordMask = "********";
 
@@ -47,22 +45,6 @@ try {
     # Check that the user has permission to access this page
     #-----------------------------------------------------------
     $module->checkUserPagePermission(USERID);
-
-    #-------------------------------------------------------------------
-    # Check for test mode (which should only be used for development)
-    #-------------------------------------------------------------------
-    $testMode = false;
-    if (@file_exists(__DIR__ . '/../test-config.ini')) {
-        $testMode = true;
-    }
-
-    if (array_key_exists('success', $_GET)) {
-        $success = Filter::stripTags($_GET['success']);
-    }
-
-    if (array_key_exists('warning', $_GET)) {
-        $warning = Filter::stripTags($_GET['warning']);
-    }
 
     $selfUrl = $module->getUrl('web/configure.php')
         . '&workflowName=' . Filter::escapeForUrlParameter($workflowName)
@@ -78,15 +60,13 @@ try {
     $adminConfig = $module->getAdminConfig();
 
 
-    $configuration = $module->getWorkflowGlobalConfiguration($workflowName);
+    $globalPropertiesConfig = $module->getWorkflowGlobalConfiguration($workflowName);
 
     $properties = array();
     $properties = $module->getWorkflowGlobalProperties($workflowName);
 
-    $redCapDb = new RedCapDb();
-
     $isWorkflowGlobalProperties = true;
-    if (!empty($configuration)) {
+    if (!empty($globalPropertiesConfig)) {
         #-------------------------
         # Get the submit value
         #-------------------------
@@ -94,45 +74,39 @@ try {
         if (array_key_exists('submitValue', $_POST)) {
             $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
         }
-        #---------------------------------------------------------------
-        # if this is a POST other than Cancel,
-        # update the configuration properties with the POST values
-        #---------------------------------------------------------------
-        if (!empty($submitValue) && strcasecmp($submitValue, 'Cancel')) {
-            # if the database password is equal to the make value, it means that it
-            # wasn't changed, so unset this value (since you son't want the mask value
-            # stored in the configuration
-            if ($_POST[Configuration::DB_PASSWORD] === $dbPasswordMask) {
-                unset($_POST[Configuration::DB_PASSWORD]);
-            }
-
-            $configuration->set(Filter::stripTagsArrayRecursive($_POST), $isWorkflowGlobalProperties);
-            # Reset properties, since they may have been modified above
-            $initialize = false;
-            $properties = $configuration->getGlobalProperties($initialize);
-        }
 
         #------------------------------------------------------
         # Process Actions
         #------------------------------------------------------
         $properties[Configuration::DB_CONNECTION] = null;
-        try {
-            if (strcasecmp($submitValue, 'Cancel') === 0) {
-                header('Location: ' . $workflowUrl);
-            } elseif (strcasecmp($submitValue, 'Save') === 0) {
-                if (empty($warning) && empty($error)) {
-                    $configuration->validate($isWorkflowGlobalProperties);
-                    // Save configuration to database
-                    $module->setWorkflowGlobalProperties($workflowName, $properties, USERID);
+        if (strcasecmp($submitValue, 'Cancel') === 0) {
+            header('Location: ' . $workflowUrl);
+        } elseif (strcasecmp($submitValue, 'Save') === 0) {
+            if (empty($warning) && empty($error)) {
+                # if the database password is equal to the make value, it means that it
+                # wasn't changed, so unset this value (since you won't want the mask value
+                # stored in the configuration
+                if ($_POST[Configuration::DB_PASSWORD] === $dbPasswordMask) {
+                    unset($_POST[Configuration::DB_PASSWORD]);
                 }
+
+                $globalPropertiesConfig->set(Filter::stripTagsArrayRecursive($_POST), $isWorkflowGlobalProperties);
+                $globalPropertiesConfig->validate($isWorkflowGlobalProperties);
+
+                # Reset properties, since they may have been modified above
+                $initialize = false;
+                $properties = $globalPropertiesConfig->getGlobalProperties($initialize);
+
+                // Save configuration to database
+                $module->setWorkflowGlobalProperties($workflowName, $properties, USERID);
             }
-        } catch (\Exception $exception) {
-            $error = 'ERROR: ' . $exception->getMessage();
         }
     }  // END - if configuration is not empty
 } catch (\Exception $exception) {
     $error = 'ERROR: ' . $exception->getMessage();
 }
+
+$module->renderMessages($error, $warning, $success);
 ?>
 
 

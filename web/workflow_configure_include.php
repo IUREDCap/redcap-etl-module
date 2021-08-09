@@ -206,6 +206,15 @@ $taskProjectIds = array_column($tasks, 'projectId');
 <div id="forms-container">
 
   
+
+    <?php
+    $module->renderMessages($error, $warning, $success);
+    $error   = '';
+    $warning = '';
+    $success = '';
+    ?>
+
+
   <div id="tasks-container" class="tasks-container">
 
   <div style="float: right;">

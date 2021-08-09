@@ -331,7 +331,7 @@ class Workflows implements \JsonSerializable
 
     public function toJson()
     {
-        $json = json_encode($this);
+        $json = json_encode($this, JSON_PRETTY_PRINT);
         return $json;
     }
 }

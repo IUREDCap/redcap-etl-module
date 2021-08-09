@@ -240,6 +240,13 @@ class Workflow implements \JsonSerializable
             throw new \Exception($message);
         }
 
+        if (count($this->tasks) === 1) {
+            $message = 'Attempt to delete task from workflow that has only one task.'
+               . ' All workflows must contain at least one task so that they are associated with'
+               . ' a project and can be accessed.';
+            throw new \Exception($message);
+        }
+
         $delSeqNum = $this->tasks[$taskKey]['taskSequenceNumber'];
 
         foreach ($this->tasks as $key => $project) {
