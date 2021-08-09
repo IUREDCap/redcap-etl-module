@@ -105,12 +105,12 @@ I need to be able to create workflows
     And I follow workflow "behat-workflow-test"
     And I check "E-mail errors"
     And I check "E-mail summary"
-    And I fill in "E-mail subject" with "Automated workflow test"
+    And I fill in "E-mail subject" with "Automated workflow schedule test"
     And I fill in "E-mail to list" with the user e-mail
     And I press "Save"
     Then the "E-mail errors" checkbox should be checked
     And the "E-mail summary" checkbox should be checked
-    And Field "E-mail subject" should contain value "Automated workflow test"
+    And Field "E-mail subject" should contain value "Automated workflow schedule test"
 
   Scenario: Schedule configuration on embedded server
     When I follow "Schedule"
@@ -139,13 +139,30 @@ I need to be able to create workflows
   Scenario: Run workflow on remote server
     When I follow "ETL Workflows"
     And I follow workflow "behat-workflow-test"
-    And I fill in "E-mail subject" with "Automated workflow test on remote server"
+    And I fill in "E-mail subject" with "Automated workflow run test on remote server"
     And I press "Save"
     And I follow "Run"
     And I select "workflow" from "configType"
     And I select "behat-workflow-test" from "workflowName"
     And I select "remote-server-workflow-test" from "server"
     And I press "Run"
+    # Need to check e-mail for this test
+
+  Scenario: Schedule configuration on remote server
+    When I follow "ETL Workflows"
+    And I follow workflow "behat-workflow-test"
+    And I fill in "E-mail subject" with "Automated workflow schedule test on remote server"
+    And I press "Save"
+    When I follow "Schedule"
+    And I select "workflow" from "configType"
+    And I select "behat-workflow-test" from "workflowName"
+    And I select "remote-server-workflow-test" from "server"
+    And I schedule for next hour
+    And I press "Save"
+    And I should see "behat-workflow-test"
+    And I should see "ETL Server"
+    And I should see "remote-server-workflow-test"
+    And I should not see "Error:"
     # Need to check e-mail for this test
 
 
