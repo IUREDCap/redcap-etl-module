@@ -6,7 +6,7 @@
 Feature: User-Interface
 In order to use REDCap-ETL
 As a non-admin user
-I need to be able to create workflows
+I need to be able to create, run and schedule workflows
 
   Background:
     Given I am on "/"
@@ -119,7 +119,7 @@ I need to be able to create workflows
     And I select "(embedded server)" from "server"
     And I schedule for next hour
     And I press "Save"
-    And I should see "behat-workflow-test"
+    Then I should see "behat-workflow-test"
     And I should see "ETL Server"
     And I should see "(embedded server)"
     And I should not see "Error:"
@@ -146,6 +146,9 @@ I need to be able to create workflows
     And I select "behat-workflow-test" from "workflowName"
     And I select "remote-server-workflow-test" from "server"
     And I press "Run"
+    Then I should see "Your job has been submitted to server"
+    And I should see "remote-server-workflow-test"
+    And I should not see "Error:"
     # Need to check e-mail for this test
 
   Scenario: Schedule configuration on remote server
@@ -153,16 +156,22 @@ I need to be able to create workflows
     And I follow workflow "behat-workflow-test"
     And I fill in "E-mail subject" with "Automated workflow schedule test on remote server"
     And I press "Save"
-    When I follow "Schedule"
+    And I follow "Schedule"
     And I select "workflow" from "configType"
     And I select "behat-workflow-test" from "workflowName"
     And I select "remote-server-workflow-test" from "server"
     And I schedule for next hour
     And I press "Save"
-    And I should see "behat-workflow-test"
+    Then I should see "behat-workflow-test"
     And I should see "ETL Server"
     And I should see "remote-server-workflow-test"
     And I should not see "Error:"
     # Need to check e-mail for this test
 
+  Scenario: Check that workflow runs were logged in the admin interface
+    When I log out
+    And I access the admin interface
+    And I follow "Log"
+    Then I should see "behat-workflow-test"
+    And I should not see "Error:"
 
