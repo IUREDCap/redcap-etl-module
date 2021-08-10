@@ -224,7 +224,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                         $configUrl = null;
                         if ($pid) {
                             $configUrl = $module->getURL(
-                                RedCapEtlModule::WORKFLOW_CONFIG_PAGE
+                                RedCapEtlModule::USER_ETL_CONFIG_PAGE
                                 . '?pid=' . Filter::escapeForUrlParameter($pid)
                                 . '&workflowName=' . Filter::escapeForUrlParameter($config)
                             );
