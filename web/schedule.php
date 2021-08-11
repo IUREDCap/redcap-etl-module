@@ -172,7 +172,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
                         ?>
                         <input type="radio" name="configType" value="task" 
                                id="task" <?php echo $checked ?> onchange="this.form.submit()"/>
-                        <label for="task">ETL Task</label>
+                        <label for="task">ETL Configuration</label>
                     </td>
                     <td>
                         <select name="configName" onchange="this.form.submit()">

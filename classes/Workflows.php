@@ -41,18 +41,12 @@ class Workflows implements \JsonSerializable
     public function getWorkflow($workflowName)
     {
         $workflow = $this->workflows[$workflowName];
-        $username = null;
-        $workflow->sequenceTasks($username);
-
         return $workflow;
     }
 
     public function getWorkflowTasks($workflowName)
     {
         $workflow = $this->workflows[$workflowName];
-        $username = null;
-        $workflow->sequenceTasks($username);
-
         return $workflow->getTasks();
     }
 
@@ -60,8 +54,6 @@ class Workflows implements \JsonSerializable
     /**
      * Adds a project/task to the workflow. The key for the project/task is the project ID.
      * Project/task data includes:
-     *     - a task sequence number: This is a default sequence number based on the number of project ids
-     *       already in the workflow. Project IDs are assumed to be integer values.
      *     - a task name: This is a default task name that includes the project ID
      *     - the etl configuration to use: This is set to a default of null.
      */

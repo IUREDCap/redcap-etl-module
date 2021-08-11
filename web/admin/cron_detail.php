@@ -154,7 +154,7 @@ $times = $adminConfig->getTimeLabels();
                     RedCapEtlModule::USER_ETL_CONFIG_PAGE
                     . '?pid=' . Filter::escapeForUrlParameter($firstPid)
                     . '&configType=workflow'
-                    . '&configName=' . Filter::escapeForUrlParameter($config)
+                    . '&workflowName=' . Filter::escapeForUrlParameter($config)
                 );
 
                 $pidLinks = '';

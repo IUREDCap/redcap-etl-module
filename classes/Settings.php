@@ -1366,63 +1366,12 @@ class Settings
         $workflows = new Workflows();
         $json = $this->module->getSystemSetting(self::WORKFLOWS_KEY);
         $workflows->fromJson($json);
-        $tasks = $workflows->getWorkflowTasks($workflowName);
-        $keys = array_keys($tasks);
-        $keysIndex = array_search($moveTaskKey, $keys);
-        $numberOfTasks = count($tasks);
 
         if ($direction === 'up') {
-            if ($keysIndex === 0) {
-               #assign the sequence for the task being moved to be the last in the sequence
-                $tasks[$moveTaskKey]['taskSequenceNumber'] = $numberOfTasks;
-
-               #assign the sequence for the task being displaced
-               #$switchTaskKey = key(array_slice($tasks, -1, 1, true));
-
-               #move all of the others sequences down by one
-                foreach ($tasks as $key => $task) {
-                    if ($key != $moveTaskKey) {
-                        --$tasks[$key]['taskSequenceNumber'];
-                    }
-                }
-            } else {
-               #assign the sequence for the task being moved
-                --$tasks[$moveTaskKey]['taskSequenceNumber'];
-
-               #assign the sequence for the task being displaced
-                $switchPosition = $keysIndex - 1;
-                if (isset($keys[$switchPosition])) {
-                    $switchTaskKey = $keys[$switchPosition];
-                    ++$tasks[$switchTaskKey]['taskSequenceNumber'];
-                }
-            }
+            $workflow =  $workflows->getWorkflow($workflowName)->moveTaskUp($moveTaskKey);
         } elseif ($direction === 'down') {
-            $lastIndex = $numberOfTasks - 1;
-            if ($keysIndex === $lastIndex) {
-               #assign the sequence for the task being moved to be the first in the sequence
-                $tasks[$moveTaskKey]['taskSequenceNumber'] = 1;
-
-               #move all of the others sequences up by one
-                foreach ($tasks as $key => $task) {
-                    if ($key != $moveTaskKey) {
-                        ++$tasks[$key]['taskSequenceNumber'];
-                    }
-                }
-            } else {
-               #assign the sequence for the task being moved
-                ++$tasks[$moveTaskKey]['taskSequenceNumber'];
-
-               #assign the sequence for the task being displaced
-                $switchPosition = $keysIndex + 1;
-                if (isset($keys[$switchPosition])) {
-                    $switchTaskKey = $keys[$switchPosition];
-                    --$tasks[$switchTaskKey]['taskSequenceNumber'];
-                }
-            }
+            $workflows->getWorkflow($workflowName)->moveTaskDown($moveTaskKey);
         }
-
-        #make sure the task sequences in sequential order
-        $workflows->sequenceWorkflowTasks($workflowName, $tasks, $username);
 
         $json = $workflows->toJson();
         $this->module->setSystemSetting(self::WORKFLOWS_KEY, $json);

@@ -94,9 +94,9 @@ try {
     #-----------------------------------------------------------------
     # Process form submissions
     #-----------------------------------------------------------------
-    $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
+    $configSubmitValue = Filter::sanitizeButtonLabel($_POST['configSubmitValue']);
 
-    if (strcasecmp($submitValue, 'add task') === 0) {
+    if (strcasecmp($configSubmitValue, 'add task') === 0) {
         #--------------------------------------
         # Add task
         #--------------------------------------
@@ -107,15 +107,15 @@ try {
             $addProjectId = $availableUserProjects[$newTaskKey];
             $module->addProjectToWorkflow($workflowName, $addProjectId, $username);
         }
-    } elseif ((strcasecmp($submitValue, 'up') === 0) || (strcasecmp($submitValue, 'down') === 0)) {
+    } elseif ((strcasecmp($configSubmitValue, 'up') === 0) || (strcasecmp($configSubmitValue, 'down') === 0)) {
         #----------------------------------------------
         # Move task
         #----------------------------------------------
         $moveTaskKey = Filter::stripTags($_POST['moveTaskKey']);
         if (!empty($moveTaskKey) || ($moveTaskKey == 0)) {
-            $module->moveWorkflowTask($workflowName, $submitValue, $moveTaskKey);
+            $module->moveWorkflowTask($workflowName, $configSubmitValue, $moveTaskKey);
         }
-    } elseif (strcasecmp($submitValue, 'delete') === 0) {
+    } elseif (strcasecmp($configSubmitValue, 'delete') === 0) {
         #----------------------------------------------
         # Delete task
         #----------------------------------------------
@@ -126,7 +126,7 @@ try {
                 $module->deleteTaskfromWorkflow($workflowName, $deleteTaskKey, $deleteProjectId, $username);
             }
         }
-    } elseif (strcasecmp($submitValue, 'etlConfig') === 0) {
+    } elseif (strcasecmp($configSubmitValue, 'etlConfig') === 0) {
         if (empty($warning) && empty($error)) {
             #----------------------------------------------
             # Specify ETL Config
@@ -144,7 +144,7 @@ try {
                 );
             }
         }
-    } elseif (strcasecmp($submitValue, 'rename') === 0) {
+    } elseif (strcasecmp($configSubmitValue, 'rename') === 0) {
         if (empty($warning) && empty($error)) {
             #----------------------------------------------
             # Rename task
@@ -250,7 +250,7 @@ if (!empty($availableUserProjects)) {
     }
     ?>
     </select>
-    <input type="submit" name="submitValue" value="Add Task" />
+    <input type="submit" name="configSubmitValue" value="Add Task" />
     <br />&nbsp;
     <!--</fieldset> -->
     <?php Csrf::generateFormToken(); ?>
@@ -418,7 +418,7 @@ if (!empty($availableUserProjects)) {
     </tbody>
 </table>
 <input type="hidden" name="moveTaskKey" id="moveTaskKey" value="">
-<input type="hidden" name="submitValue" id="moveTask" value="">
+<input type="hidden" name="configSubmitValue" id="moveTask" value="">
 <p>
 <div style="clear: both;"></div>
 </p>
@@ -464,7 +464,7 @@ include(__DIR__ . '/global_properties_include.php');
 
     function moveTaskUp(event) {
         var key = event.data.key;
-        var submitValue = document.getElementsByName("submitValue");
+        var configSubmitValue = document.getElementsByName("configSubmitValue");
         event.preventDefault();
         $('#moveTaskKey').val(key);
         $('#moveTask').val('"up"');
@@ -497,7 +497,7 @@ include(__DIR__ . '/global_properties_include.php');
 
     function moveTaskDown(event) {
         var key = event.data.key;
-        var submitValue = document.getElementsByName("submitValue");
+        var configSubmitValue = document.getElementsByName("configSubmitValue");
         event.preventDefault();
         $('#moveTaskKey').val(key);
         $('#moveTask').val('"down"');
@@ -566,7 +566,7 @@ $(function() {
     </p>
     <input type="hidden" name="renameTaskKey" id="renameTaskKey" value="">
     <input type="hidden" name="renameProjectId" id="renameProjectId" value="">
-    <input type="hidden" name="submitValue" value="rename">
+    <input type="hidden" name="configSubmitValue" value="rename">
     <?php Csrf::generateFormToken(); ?>
     </form>
 </div>
@@ -660,7 +660,7 @@ $(function() {
     </p>
     <input type="hidden" name="etlTaskKey" id="etlTaskKey" value="">
     <input type="hidden" name="etlProjectId" id="etlProjectId" value="">
-    <input type="hidden" name="submitValue" value="etlConfig">
+    <input type="hidden" name="configSubmitValue" value="etlConfig">
     <?php Csrf::generateFormToken(); ?>
     </form>
 </div>
@@ -719,7 +719,7 @@ $(function() {
     click on the <span style="font-weight: bold;">Delete project</span> button.
     <input type="hidden" name="deleteTaskKey" id="deleteTaskKey" value="">
     <input type="hidden" name="deleteProjectId" id="deleteProjectId" value="">
-    <input type="hidden" name="submitValue" value="delete">
+    <input type="hidden" name="configSubmitValue" value="delete">
     <?php Csrf::generateFormToken(); ?>
     </form>
 </div>

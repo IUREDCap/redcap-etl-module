@@ -32,18 +32,18 @@ I need to be able to view the REDCap-ETL external module pages
 
   Scenario: Access REDCap-ETL configure page for test project
     When I follow "Configure"
-    Then I should see "ETL Task"
+    Then I should see "ETL Configuration"
     And I should see "ETL Workflow"
 
   Scenario: Access REDCap-ETL run page for test project
     When I follow "Run"
-    Then I should see "ETL Task"
+    Then I should see "ETL Configuration"
     Then I should see "ETL Workflow"
 
   Scenario: Access REDCap-ETL schedule page for test project
     When I follow "Schedule"
     And I wait for 10 seconds
-    Then I should see "ETL Task"
+    Then I should see "ETL Configuration"
     And I should see "ETL Workflow"
     And I should see "Server:"
     And I should see "Sunday"

@@ -123,33 +123,10 @@ class Workflow implements \JsonSerializable
         return $this->tasks;
     }
 
-    public function sequenceTasks($username)
-    {
-        #sort project-tasks by sequence number
-        array_multisort(array_column($this->tasks, 'taskSequenceNumber'), SORT_ASC, SORT_NUMERIC, $this->tasks);
-
-        #renumber sequence to ensure the no sequence numbers duplicated or omitted
-        $i = 1;
-        foreach ($this->tasks as $key => $task) {
-            $this->tasks[$key]['taskSequenceNumber'] = $i;
-            ++$i;
-        }
-
-        if ($username) {
-            $this->metadata['updatedBy'] = $username;
-            $now = new \DateTime();
-            $now->format('Y-m-d H:i:s');
-            $now->getTimestamp();
-            $this->metadata['dateUpdated'] = $now;
-        }
-    }
-
 
     /**
      * Adds a project/task to the workflow. The key for the project/task is the project ID.
      * Project/task data includes:
-     *     - a task sequence number: This is a default sequence number based on the number of project ids
-     *       already in the workflow. Project IDs are assumed to be integer values.
      *     - a task name: This is a default task name that includes the project ID
      *     - the etl configuration to use: This is set to a default of null.
      */
@@ -162,20 +139,10 @@ class Workflow implements \JsonSerializable
             throw new \Exception($message);
         }
 
-        $sequence = 0;
-
-        # If is workflow is empty, then this is the first project and the default sequenence is 1.
-        if (count($this->tasks) == 0) {
-            $sequence = 1;
-        } else {
-            # the default sequence is the number of integer keys (projectIds) plus 1.
-            $sequence = count(array_filter($this->tasks, 'is_int', ARRAY_FILTER_USE_KEY)) + 1;
-        }
 
         # add the project to workflow
         $task = array();
         $task["projectId"] = $projectId;
-        $task["taskSequenceNumber"] = $sequence;
         $task["taskName"] = $this->getDefaultTaskName($projectId);
         $task["projectEtlConfig"] = null;
         $this->tasks[] = $task;
@@ -413,5 +380,29 @@ class Workflow implements \JsonSerializable
     public function getUpdatedBy()
     {
         return $this->metadata['updatedBy'];
+    }
+
+    /**
+     * Moves task "up" in the array (to lower index)
+     */
+    public function moveTaskUp($upTaskKey)
+    {
+        if ($upTaskKey > 0 && $upTaskKey < count($this->tasks)) {
+            $temp = $this->tasks[$upTaskKey - 1];
+            $this->tasks[$upTaskKey - 1] = $this->tasks[$upTaskKey];
+            $this->tasks[$upTaskKey] = $temp;
+        }
+    }
+
+    /**
+     * Moves task "down" in the array (to higher index)
+     */
+    public function moveTaskDown($downTaskKey)
+    {
+        if ($downTaskKey >= 0 && $downTaskKey < count($this->tasks) - 1) {
+            $temp = $this->tasks[$downTaskKey + 1];
+            $this->tasks[$downTaskKey + 1] = $this->tasks[$downTaskKey];
+            $this->tasks[$downTaskKey] = $temp;
+        }
     }
 }

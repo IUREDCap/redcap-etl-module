@@ -207,8 +207,8 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
             foreach ($logData as $entry) {
                 if ($logType === RedCapEtlModule::ETL_RUN) {
                     $projectId = null;
-                    #Get the project id if this is a stand-alone ETL run.
-                    #(Workflows have more than one project id.)
+                    # Get the project id if this is a stand-alone ETL run.
+                    # (Workflows have more than one project id.)
                     if ($entry['log_type'] !== RedCapEtlModule::WORKFLOW_RUN) {
                         $projectId = $entry['project_id'];
                         $projectUrl = APP_PATH_WEBROOT . 'index.php?pid=' . (int)$projectId;
@@ -217,9 +217,9 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
 
                     $config = $entry['config'];
                     if ($entry['log_type'] === RedCapEtlModule::WORKFLOW_RUN) {
-                        #The first project in the workflow sequence at runtime is recorded for log purposes
-                        #so that a link can be provided back to the Workflow configuration page,
-                        #which requires a pid value
+                        # The first project in the workflow sequence at runtime is recorded for log purposes
+                        # so that a link can be provided back to the Workflow configuration page,
+                        # which requires a pid value
                         $pid = $entry['project_id'];
                         $configUrl = null;
                         if ($pid) {

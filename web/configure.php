@@ -170,14 +170,6 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
             </table>
         </div>
 
-        <!-- SAVE BUTTON -->
-        <!--
-        <div style="float: left; margin-left: 2em;">
-        <input type="submit" name="submitValue" value="Save"
-            style="padding: 0em 2em; font-weight: bold; color: rgb(45, 107, 161);">
-        </div>
-        -->
-
     </div>
     
     <div style="clear: both;"></div>

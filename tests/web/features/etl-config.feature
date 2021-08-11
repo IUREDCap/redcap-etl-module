@@ -58,7 +58,7 @@ I need to be able to create, copy, rename and delete configurations
     And I select "(embedded server)" from "server"
     And I press "Run"
     And I wait for 4 seconds
-    Then I should see "ETL Task"
+    Then I should see "ETL Configuration"
     And I should see "Run"
     And I should see "behat-config-test"
     And I should see "Created table"
