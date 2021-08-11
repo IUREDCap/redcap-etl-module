@@ -588,7 +588,7 @@ $module->renderMessages($error, $warning, $success);
                 
                 <!-- E-MAIL ERRORS -->      
                 <tr>
-                    <td><label for="<?php echo Configuration::EMAIL_ERRORS;?>">E-mail errors<label></td>
+                    <td><label for="<?php echo Configuration::EMAIL_ERRORS; ?>">E-mail errors</label></td>
                     <td>
                         <?php
                         $checked = '';
@@ -631,7 +631,7 @@ $module->renderMessages($error, $warning, $success);
                 <tr>
                     <?php
                         $emailSubject = $properties[Configuration::EMAIL_SUBJECT];
-                    ?>"
+                    ?>
                     <td><label for="<?php echo Configuration::EMAIL_SUBJECT;?>">E-mail subject</label></td>
                     <td><input type="text"
                                id="<?php echo Configuration::EMAIL_SUBJECT;?>"
@@ -645,7 +645,7 @@ $module->renderMessages($error, $warning, $success);
                 <tr>
                     <?php
                         $emailToList = $properties[Configuration::EMAIL_TO_LIST];
-                    ?>"
+                    ?>
                     <td><label for="<?php echo Configuration::EMAIL_TO_LIST;?>">E-mail to list</label></td>
                     <td><input type="text"
                                id="<?php echo Configuration::EMAIL_TO_LIST;?>"
