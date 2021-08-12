@@ -715,6 +715,17 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @Then /^Workflow "([^"]*)" should have status "([^"]*)"$/
+     *
+     * Assumes you are on the admin Workflows page.
+     */
+    public function adminWorkflowShouldHaveStatus($workflowName, $status)
+    {
+        $session = $this->getSession();
+        AdminWorkflowsPage::adminWorkflowHasStatus($session, $workflowName, $status);
+    }
+
+    /**
      * @When /^I check mailinator for "([^"]*)"$/
      */
     public function iCheckMailinatorFor($emailPrefix)

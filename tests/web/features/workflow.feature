@@ -175,3 +175,11 @@ I need to be able to create, run and schedule workflows
     Then I should see "behat-workflow-test"
     And I should not see "Error:"
 
+  Scenario: Check that the workflow is on the admin workflows page
+    When I log out
+    And I access the admin interface
+    And I follow "Workflows"
+    Then I should see "behat-workflow-test"
+    And Workflow "behat-workflow-test" should have status "Ready"
+    And I should not see "Error:"
+
