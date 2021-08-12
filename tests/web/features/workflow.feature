@@ -88,8 +88,7 @@ I need to be able to create, run and schedule workflows
     And I rename task 2 to "Task2"
     And I specify etl-configuration "behat-workflow-config2-test" for task "Task2"
 
-    Then I should see "Task1"
-    And I should see "Task2"
+    Then I should see tasks "Task1", "Task2"
     
   Scenario: Run workflow on embedded server
     When I follow "Run"

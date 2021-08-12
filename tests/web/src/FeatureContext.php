@@ -857,6 +857,27 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @Then /^I should see tasks? ("([^"]*)"(,(\s)*"([^"]*)")*)$/
+     */
+    public function iShouldSeeTasks($tasks)
+    {
+        $tasks = explode(',', $tasks);
+        for ($i = 0; $i < count($tasks); $i++) {
+            # trim standard character plus quotes
+            $tasks[$i] = trim($tasks[$i], " \t\n\r\0\x0B\"");
+        }
+
+        $session = $this->getSession();
+
+        $actualTasks = ConfigureWorkflowPage::getTaskNames($session);
+        if ($tasks !== $actualTasks) {
+            $message = 'Tasks "' . join(", ", $actualTasks) . '" do not match expected tasks "'
+                . join(", ", $tasks) . '".';
+            throw new \Exception($message);
+        }
+    }
+
+    /**
      * @When I confirm the popup [nal WIP: was in the process of trying to get this to work]
      */
     #public function iConfirmThePopup()

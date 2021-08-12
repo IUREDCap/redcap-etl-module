@@ -82,4 +82,23 @@ class ConfigureWorkflowPage
         $page->selectFieldOption("projectEtlConfigSelect", $configName);
         $page->pressButton("Specify ETL");
     }
+
+    public static function getTaskNames($session)
+    {
+        $taskNames = array();
+
+        $page = $session->getPage();
+        $taskRows = $page->findAll('css', 'table#workflowTasks tbody tr');
+
+        foreach ($taskRows as $taskRow) {
+            $tds = $taskRow->findAll('css', 'td');
+            if (count($taskRows) === 1) {
+                $taskName = $tds[0]->getText();
+            } else {
+                $taskName = $tds[1]->getText();
+            }
+            $taskNames[] = $taskName;
+        }
+        return $taskNames;
+    }
 }
