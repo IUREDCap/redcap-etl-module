@@ -1065,10 +1065,15 @@ Configuration form
                     <td style="padding-right: 1em;">Database password</td>
                     <td>
                         <?php
-                            # value="<?php echo Filter::escapeForHtmlAttribute($properties[Configuration::DB_PASSWORD])
+                        $dbPassword = $properties[Configuration::DB_PASSWORD];
+                        if ($dbPassword == null || trim($dbPassword) === '') {
+                            $dbPassword = '';
+                        } else {
+                            $dbPassword = $dbPasswordMask;
+                        }
                         ?>
                         <input type="password" name="<?php echo Configuration::DB_PASSWORD;?>"
-                            value="<?php echo Filter::escapeForHtmlAttribute($dbPasswordMask); ?>"
+                            value="<?php echo Filter::escapeForHtmlAttribute($dbPassword); ?>"
                             id="dbPassword" autocomplete="off"/>
                     </td>
                 </tr>

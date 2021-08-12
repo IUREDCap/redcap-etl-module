@@ -411,6 +411,14 @@ $module->renderMessages($error, $warning, $success);
                 <tr>
                     <td style="padding-right: 1em;">Database password</td>
                     <td>
+                        <?php
+                        $dbPassword = $properties[Configuration::DB_PASSWORD];
+                        if ($dbPassword == null || trim($dbPassword) === '') {
+                            $dbPassword = '';
+                        } else {
+                            $dbPassword = $dbPasswordMask;
+                        }
+                        ?>
                         <input type="password" name="<?php echo Configuration::DB_PASSWORD;?>"
                             value="<?php echo Filter::escapeForHtmlAttribute($dbPasswordMask); ?>"
                             id="dbPassword"/>
