@@ -166,8 +166,8 @@ There are 2 options for logging the results of your ETL processes, and they can 
 </div>
 
 <h4 style="font-weight: bold;">REDCap-ETL Workflows</h4>
-<p>Workflows allow you to combine multiple ETL processes into a unified process. Workflows
-can be run immediately or scheduled to run as a cron job.</p>
+<p>Workflows allow you to combine multiple ETL configurations into a unified process. Workflows
+can be run immediately or scheduled to run on a daily or weekly basis.</p>
 <p><b>Tasks.</b> Each task in a workflow corresponds to a REDCap project and utilizes an ETL 
 configuration that was specified for that project. Workflow tasks run sequentially. A project 
 can be used in more than one workflow task. For example, if there are two ETL configurations 

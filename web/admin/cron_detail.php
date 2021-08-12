@@ -125,7 +125,7 @@ $times = $adminConfig->getTimeLabels();
 
 <table class="dataTable">
     <thead>
-        <tr> <th>Job Type</th> <th>Configuration</th> <th>Server</th> <th>Project IDs</th> </tr>
+        <tr> <th>Job Type</th> <th>Config/Workflow Name</th> <th>Server</th> <th>Project IDs</th> </tr>
     </thead>
     <tbody>
         <?php
@@ -184,7 +184,12 @@ $times = $adminConfig->getTimeLabels();
             } else {
                 echo '<tr class="odd">' . "\n";
             }
-            echo "<td>{$configType}</td>\n";   # Job Type
+
+            $displayConfigType = $configType;
+            if ($displayConfigType === 'task') {
+                $displayConfigType = 'configuration';
+            }
+            echo "<td>{$displayConfigType}</td>\n";   # Job Type
 
             echo "<td>" . '<a href="' . $configUrl . '">' . Filter::escapeForHtml($config) . '</a>' . "</td>\n";
 
