@@ -180,6 +180,17 @@ I need to be able to create, run and schedule workflows
     And I access the admin interface
     And I follow "Workflows"
     Then I should see "behat-workflow-test"
-    And Workflow "behat-workflow-test" should have status "Ready"
+    And Workflow "behat-workflow-test" should have status "Ready" in admin workflows
+    And I should not see "Error:"
+
+  Scenario: Check that the workflow configuration on the admin workflows page goes to the right page
+    When I log out
+    And I access the admin interface
+    And I follow "Workflows"
+    When I configure workflow "behat-workflow-test" in admin workflows
+    Then I should see "behat-workflow-test"
+    And I should see "Configure"
+    And I should see "Task1"
+    And I should see "Task2"
     And I should not see "Error:"
 

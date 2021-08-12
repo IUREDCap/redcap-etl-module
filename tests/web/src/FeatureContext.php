@@ -715,7 +715,7 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
-     * @Then /^Workflow "([^"]*)" should have status "([^"]*)"$/
+     * @Then /^Workflow "([^"]*)" should have status "([^"]*)" in admin workflows$/
      *
      * Assumes you are on the admin Workflows page.
      */
@@ -723,6 +723,17 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     {
         $session = $this->getSession();
         AdminWorkflowsPage::adminWorkflowHasStatus($session, $workflowName, $status);
+    }
+
+    /**
+     * @When /^I configure workflow "([^"]*)" in admin workflows$/
+     *
+     * Assumes you are on the admin Workflows page.
+     */
+    public function adminXonfigureWorkflow($workflowName)
+    {
+        $session = $this->getSession();
+        AdminWorkflowsPage::adminConfigureWorkflow($session, $workflowName);
     }
 
     /**
