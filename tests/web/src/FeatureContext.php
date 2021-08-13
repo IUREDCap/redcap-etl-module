@@ -912,4 +912,25 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     #{
     #    $this->getSession()->getDriver()->getWebDriverSession()->accept_alert();
     #}
+    #
+
+    #---------------------------------
+    # DATABASE CHECKS
+    #---------------------------------
+
+    /**
+     * @Then /^database table "([^"]*)" should contain (\d+) rows?$/
+     */
+    public function databaseTableShouldContainRows($tableName, $numRows)
+    {
+        $db = new Database();
+
+        $actualNumRows = $db->getNumberOfTableRows($tableName);
+
+        if ($actualNumRows != $numRows) {
+            $message = 'Database table "' . $tableName . '" has ' . $actualNumRows
+                . ' when it was expected to have ' . $numRows . '.';
+            throw new \Exception($message);
+        }
+    }
 }

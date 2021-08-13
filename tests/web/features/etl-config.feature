@@ -64,7 +64,10 @@ I need to be able to create, copy, rename and delete configurations
     And I should see "Created table"
     And I should see "Number of record_ids found: 100"
     And I should see "Processing complete."
+    And database table "enrollment" should contain 100 rows
+    And database table "redcap_project_info" should contain 1 row
     But I should not see "Error:"
+
 
   Scenario: Copy configuration
     #When I follow "ETL Configurations"
