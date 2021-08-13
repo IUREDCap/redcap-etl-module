@@ -83,6 +83,21 @@ class ConfigureWorkflowPage
         $page->pressButton("Specify ETL");
     }
 
+    public static function deleteTask($session, $taskName)
+    {
+        $page = $session->getPage();
+        $table = $page->find('css', 'table#workflowTasks');
+        $element = $table->find("xpath", "//tr/td[text()='".$taskName."']/following-sibling::td[6]");
+
+        if ($element == null) {
+            $message = 'Task "' . $taskName .'" not found in workflow for deletion.';
+            throw new \Exception($message);
+        }
+
+        $element->click();
+        $page->pressButton("Delete task");
+    }
+
     public static function getTaskNames($session)
     {
         $taskNames = array();

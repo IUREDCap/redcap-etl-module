@@ -549,6 +549,25 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @When /^I move task "([^"]*)" up$/
+     */
+    public function iMoveTaskUp($taskName)
+    {
+        $session = $this->getSession();
+        ConfigureWorkflowPage::moveTask($session, $taskName, 'up');
+    }
+
+    /**
+     * @When /^I move task "([^"]*)" down$/
+     */
+    public function iMoveTaskDown($taskName)
+    {
+        $session = $this->getSession();
+        ConfigureWorkflowPage::moveTask($session, $taskName, 'down');
+    }
+
+
+    /**
      * @When /^I rename task (\d+) to "([^"]*)"$/
      *
      * @param int $taskNumber the task number using one-based indexing, i.e.,
@@ -570,23 +589,13 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
-     * @When /^I move task "([^"]*)" up$/
+     * @When /^I delete task "([^"]*)"$/
      */
-    public function iMoveTaskUp($taskName)
+    public function iDeleteTask($taskName)
     {
         $session = $this->getSession();
-        ConfigureWorkflowPage::moveTask($session, $taskName, 'up');
+        ConfigureWorkflowPage::deleteTask($session, $taskName);
     }
-
-    /**
-     * @When /^I move task "([^"]*)" down$/
-     */
-    public function iMoveTaskDown($taskName)
-    {
-        $session = $this->getSession();
-        ConfigureWorkflowPage::moveTask($session, $taskName, 'down');
-    }
-
 
 
 

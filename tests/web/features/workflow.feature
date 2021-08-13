@@ -95,6 +95,14 @@ I need to be able to create, run and schedule workflows
     When I move task "Task2" down
     Then I should see tasks "Task1", "Task2"
     
+    When I add task for workflow
+    And I rename task 3 to "Task3"
+    Then I should see tasks "Task1", "Task2", "Task3"
+    And I should not see "Error:"
+    When I delete task "Task3"
+    Then I should see tasks "Task1", "Task2"
+    And I should not see "Error:"
+
   Scenario: Run workflow on embedded server
     When I follow "Run"
     And I select "workflow" from "configType"
