@@ -1,12 +1,12 @@
 {
     "require-dev": {
-        "phpunit/phpunit": "9.5.2",
+        "phpunit/phpunit": "9.5.8",
         "behat/behat": "3.8.1",
         "behat/mink": "^1.7",
         "behat/mink-extension": "^2.3",
         "behat/mink-goutte-driver": "^1.2",
         "behat/mink-selenium2-driver": "^1.3",
-        "dmore/chrome-mink-driver": "^2.7",
+        "dmore/chrome-mink-driver": "^2.8",
         "dmore/behat-chrome-extension": "^1.3"
     },
     "autoload-dev" : {
