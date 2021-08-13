@@ -52,8 +52,8 @@ try {
     # Set the submit value
     #-------------------------
     $submit = '';
-    if (array_key_exists('submit', $_POST)) {
-        $submit = Filter::sanitizeButtonLabel($_POST['submit']);
+    if (array_key_exists('submitValue', $_POST)) {
+        $submit = Filter::sanitizeButtonLabel($_POST['submitValue']);
     }
 
     #-----------------------------------------
@@ -73,7 +73,7 @@ try {
             }
         } elseif ($configType === 'workflow') {
             if (empty($workflowName)) {
-                $error = 'ERROR: No workflow specified.';
+                $error = 'ERROR: No ETL workflow specified.';
             } else {
                 $isCronJob = false;
                 $originatingProjectId = $pid;
@@ -136,7 +136,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 # Configuration & Server selection form
 #------------------------------------------
 ?>
-<form action="<?php echo $selfUrl;?>" method="post" 
+<form action="<?php echo $selfUrl;?>" name="runForm" method="post" 
     style="padding: 12px; margin-bottom: 0px; margin-right: 1em; border-radius: 10px; border: 1px solid #ccc;">
 
 
@@ -154,15 +154,16 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
                             $checked = 'checked';
                         }
                         ?>
-                        <input type="radio" name="configType" value="task" id="task" <?php echo $checked ?>/>
+                        <input type="radio" name="configType" value="task"
+                               id="task" <?php echo $checked ?> onchange="this.form.submit()"/>
                         <label for="task">ETL Configuration</label>
                         &nbsp;
                     </td>
                     <td>
-                        <select name="configName" onchange="this.form.submit()">
+                        <select name="configName" id="configName" onchange="this.form.submit()">
                         <?php
                         $configNames = $module->getAccessibleConfigurationNames();
-                        array_unshift($configNames, '');
+                        #array_unshift($configNames, '');
                         foreach ($configNames as $value) {
                             if (strcmp($value, $configName) === 0) {
                                 echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '" selected>'
@@ -185,7 +186,9 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
                             $checked = 'checked';
                         }
                         ?>
-                        <input type="radio" name="configType" value="workflow" id="workflow" <?php echo $checked ?>/>
+                        <input type="radio" name="configType" value="workflow" id="workflow" <?php echo $checked ?>
+                               onchange="this.form.submit()"
+                        />
                         <label for="workflow">ETL Workflow</label>
                     </td>
                     <td>
@@ -195,8 +198,9 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
                         #----------------------------------------------------------------
                         $excludeIncomplete = true;
                         $projectWorkflows = $module->getProjectAvailableWorkflows($pid, $excludeIncomplete);
+                        #array_unshift($projectWorkflows, '');
                         ?>
-                        <select name="workflowName" onchange="this.form.submit()">
+                        <select name="workflowName" id="workflowName" onchange="this.form.submit()">
                         <?php
                         foreach ($projectWorkflows as $value) {
                             if (strcmp($value, $workflowName) === 0) {
@@ -237,7 +241,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     
         <!-- RUN BUTTON -->
         <div style="float: left; margin-left: 2em; margin-bottom: 0px;">
-            <input type="submit" name="submit" value="Run"
+            <input type="submit" name="submitValue" value="Run"
                     style="color: #008000; font-weight: bold; padding: 0px 24px;"
                     onclick='$("#runOutput").text(""); $("body").css("cursor", "progress");'/>
         </div>
@@ -247,6 +251,22 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
     <?php Csrf::generateFormToken(); ?>
 </form>
+
+<?php
+if ($configType === 'task') {
+    echo ""
+        . "<script>\n"
+        . '$("#configName").prop("disabled", false);' . "\n"
+        . '$("#workflowName").prop("disabled", true);' . "\n"
+        .  "</script>\n";
+} elseif ($configType === 'workflow') {
+    echo ""
+        . "<script>\n"
+        . '$("#configName").prop("disabled", true);' . "\n"
+        . '$("#workflowName").prop("disabled", false);' . "\n"
+       .  "</script>\n";
+}
+?>
 
 <div style="margin-right: 1em; margin-top: 12px;"
 ><pre id="runOutput"><?php echo Filter::escapeForHtml($runOutput);?></pre></div>

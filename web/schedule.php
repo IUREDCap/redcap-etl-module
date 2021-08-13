@@ -176,10 +176,10 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
                         &nbsp;
                     </td>
                     <td>
-                        <select name="configName" onchange="this.form.submit()">
+                        <select name="configName" id="configName" onchange="this.form.submit()">
                         <?php
                         $configNames = $module->getAccessibleConfigurationNames();
-                        array_unshift($configNames, '');
+                        #array_unshift($configNames, '');
                         foreach ($configNames as $value) {
                             if (strcmp($value, $configName) === 0) {
                                 echo '<option value="' . Filter::escapeForHtmlAttribute($value) . '" selected>'
@@ -210,8 +210,9 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
                         <?php
                         $excludeIncomplete = true;
                         $projectWorkflows = $module->getProjectAvailableWorkflows($pid, $excludeIncomplete);
+                        #array_unshift($projectWorkflows, '');
                         ?>
-                        <select name="workflowName" onchange="this.form.submit()">
+                        <select name="workflowName" id="workflowName" onchange="this.form.submit()">
                         <?php
                         foreach ($projectWorkflows as $value) {
                             if (strcmp($value, $workflowName) === 0) {
@@ -350,5 +351,21 @@ $(function () {
   <!-- </fieldset> -->
     <?php Csrf::generateFormToken(); ?>
 </form>
+
+<?php
+if ($configType === 'task') {
+    echo ""
+        . "<script>\n"
+        . '$("#configName").prop("disabled", false);' . "\n"
+        . '$("#workflowName").prop("disabled", true);' . "\n"
+        .  "</script>\n";
+} elseif ($configType === 'workflow') {
+    echo ""
+        . "<script>\n"
+        . '$("#configName").prop("disabled", true);' . "\n"
+        . '$("#workflowName").prop("disabled", false);' . "\n"
+       .  "</script>\n";
+}
+?>
 
 <?php require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
