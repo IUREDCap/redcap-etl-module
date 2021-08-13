@@ -89,6 +89,11 @@ I need to be able to create, run and schedule workflows
     And I specify etl-configuration "behat-workflow-config2-test" for task "Task2"
 
     Then I should see tasks "Task1", "Task2"
+
+    When I move task "Task2" up
+    Then I should see tasks "Task2", "Task1"
+    When I move task "Task2" down
+    Then I should see tasks "Task1", "Task2"
     
   Scenario: Run workflow on embedded server
     When I follow "Run"

@@ -569,6 +569,25 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         ConfigureWorkflowPage::specifyEtlConfig($session, $taskName, $configName);
     }
 
+    /**
+     * @When /^I move task "([^"]*)" up$/
+     */
+    public function iMoveTaskUp($taskName)
+    {
+        $session = $this->getSession();
+        ConfigureWorkflowPage::moveTask($session, $taskName, 'up');
+    }
+
+    /**
+     * @When /^I move task "([^"]*)" down$/
+     */
+    public function iMoveTaskDown($taskName)
+    {
+        $session = $this->getSession();
+        ConfigureWorkflowPage::moveTask($session, $taskName, 'down');
+    }
+
+
 
 
     /* Workflows --------------------------------------------------------------- */

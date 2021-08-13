@@ -118,7 +118,7 @@ class ServerTest extends TestCase
         #print "\nPAGE:\n";
         #print_r($page);
         $page->pressButton('Test Server Connection');
-        sleep(10);
+        sleep(4);
         $testOutput = $page->findById("testOutput")->getValue();
         $this->assertMatchesRegularExpression("/SUCCESS/", $testOutput); 
         $this->assertMatchesRegularExpression("/output of hostname command:/", $testOutput); 

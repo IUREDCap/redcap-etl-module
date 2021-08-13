@@ -1,6 +1,6 @@
 <?php
 #-------------------------------------------------------
-# Copyright (C) 2019 The Trustees of Indiana University
+# Copyright (C) 2021 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
@@ -100,5 +100,44 @@ class ConfigureWorkflowPage
             $taskNames[] = $taskName;
         }
         return $taskNames;
+    }
+
+    /**
+     * @param string $direction the direction to move the task: 'up' or 'down'.
+     */
+    public static function moveTask($session, $taskName, $direction)
+    {
+        $page = $session->getPage();
+        $taskRows = $page->findAll('css', 'table#workflowTasks tbody tr');
+
+        if (count($taskRows)  > 1) {
+            $taskRow = null;
+
+            # Find the row that contains the task
+            foreach ($taskRows as $row) {
+                $tds = $row->findAll('css', 'td');
+                if ($tds[1]->getText() === $taskName) {
+                    $taskRow = $row;
+                    break;
+                }
+            }
+
+            if ($taskRow == null) {
+                $message = 'Task "' . $taskName .'" not found in workflow.';
+                throw new \Exception($message);
+            }
+
+            $fields = $taskRow->findAll('css', 'td');
+
+            $inputs = ($fields[0])->findAll('css', 'input');
+
+            if (strcasecmp($direction, 'up') === 0) {
+                ($inputs[1])->click();
+            } elseif (strcasecmp($direction, 'down') === 0) {
+                ($inputs[0])->click();
+            } else {
+                throw new \Exception('Unrecognized direction "' . $direction . '" for task move.');
+            }
+        }
     }
 }
