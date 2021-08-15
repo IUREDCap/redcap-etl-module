@@ -5,6 +5,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
+# Note: $workflowName should be set by the page that includes this one.
+
 use IU\REDCapETL\Database\DbConnectionFactory;
 use IU\RedCapEtlModule\Configuration;
 use IU\RedCapEtlModule\Csrf;
@@ -59,18 +61,6 @@ $etlProjectId = null;
 $username = USERID;
 $superUser = SUPER_USER;
 
-#$workflowName = Filter::escapeForHtml($_GET['workflowName']);
-$workflowName = Filter::stripTags($_POST['workflowName']);
-if (empty($workflowName)) {
-    $workflowName = Filter::stripTags($_GET['workflowName']);
-    if (empty($workflowName)) {
-        $workflowName = Filter::stripTags($_SESSION['workflowName']);
-    }
-}
-$_SESSION['workflowName'] = $workflowName;
-
-
-
 #Get projects that this user has access to
 $db = new RedCapDb();
 $userProjects = $db->getUserProjects($username);
@@ -79,7 +69,6 @@ array_unshift($availableUserProjects, '');
 
 $selfUrl      = $module->getUrl(RedCapEtlModule::USER_ETL_CONFIG_PAGE);
                    #. '&workflowName=' . Filter::escapeForUrlParameter($workflowName);
-$workflowsUrl = $module->getUrl('web/workflows.php');
 $configUrl    = $module->getUrl(RedCapEtlModule::USER_ETL_CONFIG_PAGE);
 
 #$globalPropertiesUrl = $module->getUrl('web/workflow_global_properties.php')
@@ -293,6 +282,7 @@ if (!empty($availableUserProjects)) {
     <tbody>
         <?php
         $row = 1;
+        $accessToAllProjects = true;
         foreach ($tasks as $taskKey => $task) {
             $projectId = $task['projectId'];
             if (empty($projectId) && $projectId !== 0) {
@@ -304,19 +294,22 @@ if (!empty($availableUserProjects)) {
             $hasPermissionToExport = false;
             $projectName = null;
 
+            $projectName = $projectName ? $projectName : $db->getProjectName($projectId);
+            $projectEtlConfig = $task['projectEtlConfig'] ? $task['projectEtlConfig'] : "None specified";
+
             if ($pKey || $pKey === 0) {
                 $isAssignedUser = true;
                 $hasPermissionToExport = $userProjects[$pKey]['data_export_tool'] == 1 ? true : false;
-                $projectName = $userProjects[$pKey]['app_title'];
-                $projectEtlConfig = $task['projectEtlConfig'] ? $task['projectEtlConfig'] : "None specified";
+                #$projectName = $userProjects[$pKey]['app_title'];
+                # $projectEtlConfig = $task['projectEtlConfig'] ? $task['projectEtlConfig'] : "None specified";
             } else {
-                $projectName = "(You are not a listed user on this project)";
-                $projectEtlConfig = null;
+                ;
+                #$projectEtlConfig = null;
             }
 
             if ($superUser) {
                 $hasPermissionToExport = true;
-                $projectName = $projectName ? $projectName : $db->getProjectName($projectId);
+                #$projectName = $projectName ? $projectName : $db->getProjectName($projectId);
                 $projectEtlConfig = $task['projectEtlConfig'] ? $task['projectEtlConfig'] : "None specified";
             }
 
@@ -341,23 +334,40 @@ if (!empty($availableUserProjects)) {
             echo "<td>" . Filter::escapeForHtml($projectId) . "</td>\n";
             # echo "<td>" . Filter::escapeForHtml($projectName) . "</td>\n";
 
-            # Project title with link to project
+            #-------------------------------------------------------------------------
+            # Project title with link to project if user has permission to access it
+            #-------------------------------------------------------------------------
             echo "<td>\n";
-            echo '<a href="' . APP_PATH_WEBROOT . 'index.php?pid='
-                . Filter::escapeForUrlParameter($projectId) . '" target="_blank">'
-                . Filter::escapeForHtml($projectName) . "</a>\n";
+            if ($isAssignedUser || $superUSer) {
+                echo '<a href="' . APP_PATH_WEBROOT . 'index.php?pid='
+                    . Filter::escapeForUrlParameter($projectId) . '" target="_blank">'
+                    . Filter::escapeForHtml($projectName) . "</a>\n";
+            } else {
+                $accessToAllProjects = false;
+                echo '<span style="float: left;">' . Filter::escapeForHtml($projectName) . '</span>'
+                    . '&nbsp;<span style="float: right; margin-top: 4px; color: #E9594D;" class="fas fa-ban"></span>'
+                    . '<div style="clear: both;"></div>' . "\n"
+                    ;
+            }
             echo "</td>\n";
 
 
 
+            #--------------------------------------------------------------------------
+            # Project's ETL configuration for the task
+            #--------------------------------------------------------------------------
             if ($projectEtlConfig === "None specified") {
                 echo "<td>" . Filter::escapeForHtml($projectEtlConfig) . "</td>\n";
             } else {
-                $configureUrl = $configUrl . '&configName=' . Filter::escapeForUrlParameter($projectEtlConfig)
-                    . '&configType=task';
-                echo "<td>" . '<a href="' . $configureUrl . '" target="_blank">'
-                    . Filter::escapeForHtml($projectEtlConfig)
-                    . '</a>' . "</td>\n";
+                if ($isAssignedUser || $superUSer) {
+                    $configureUrl = $configUrl . '&configName=' . Filter::escapeForUrlParameter($projectEtlConfig)
+                        . '&configType=task';
+                    echo "<td>" . '<a href="' . $configureUrl . '" target="_blank">'
+                        . Filter::escapeForHtml($projectEtlConfig)
+                        . '</a>' . "</td>\n";
+                } else {
+                    echo "<td>" . Filter::escapeForHtml($projectEtlConfig) . "</td>\n";
+                }
             }
 
             #-----------------------------------------------------------
@@ -417,6 +427,16 @@ if (!empty($availableUserProjects)) {
         ?>
     </tbody>
 </table>
+
+<?php
+if (!$accessToAllProjects) {
+    echo "<p>\n";
+    echo '<span style="color: #E9594D;" class="fas fa-ban"></span>';
+    echo "&nbsp;- you do not have permission to access this project.\n";
+    echo "</p>\n";
+}
+?>
+
 <input type="hidden" name="moveTaskKey" id="moveTaskKey" value="">
 <input type="hidden" name="configSubmitValue" id="moveTask" value="">
 <p>

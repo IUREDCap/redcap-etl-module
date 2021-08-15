@@ -186,6 +186,7 @@ if ($configType === 'task') {
         . '$("#configName").prop("disabled", false);' . "\n"
         . '$("#workflowName").prop("disabled", true);' . "\n"
         .  "</script>\n";
+
     include(__DIR__ . '/task_configure_include.php');
 } elseif ($configType === 'workflow') {
     echo ""
@@ -193,6 +194,17 @@ if ($configType === 'task') {
         . '$("#configName").prop("disabled", true);' . "\n"
         . '$("#workflowName").prop("disabled", false);' . "\n"
        .  "</script>\n";
+
+    #-------------------------------------------------------------------------------------------------
+    # Check to make sure the workflow belongs to this project (it could have been
+    # set in the user's session from viewing a previous project)
+    #-------------------------------------------------------------------------------------------------
+    $workflowNames = $module->getProjectAvailableWorkflows();
+    if (!in_array($workflowName, $workflowNames)) {
+        $workflowName = '';
+        $_SESSION[$workflowName] = '';
+    }
+
     if (!empty($workflowName)) {
         include(__DIR__ . '/workflow_configure_include.php');
     }
