@@ -1200,7 +1200,7 @@ class Settings
         return $workflows->getWorkflowStatus($workflowName);
     }
 
-    public function validateWorkflowForRunning($workflowName, $icCron = false)
+    public function validateWorkflowForRunning($workflowName, $isCron = false)
     {
         $workflow = $this->getWorkflow($workflowName);
 
