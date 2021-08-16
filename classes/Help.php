@@ -271,7 +271,7 @@ class Help
             "<p>"
             . "Workflows consist of a set of tasks, where each task represents an"
             . " ETL configuration for a REDCap project."
-            . " The tasks of the workflow are executed sequentually in the order defined."
+            . " The tasks of the workflow are executed sequentially in the order defined."
             . "</p>"
     ];
 
