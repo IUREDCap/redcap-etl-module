@@ -359,9 +359,11 @@ $(function() {
                  Remove<br />
                     <?php
                     foreach ($privateUsers as $username) {
-                        echo '<input type="checkbox" name="removeUserCheckbox[' . $username . ']" '
-                          . 'style="vertical-align: middle; margin: 0px 10px 0px 25px;"'  . ">\n";
-                        echo '<label for="removeUserCheckbox[' . $username . ']">' . $username . "</label>\n<br />";
+                        echo '<input type="checkbox" name="removeUserCheckbox['
+                            . Filter::escapeForHtmlAttribute($username) . ']" '
+                            . 'style="vertical-align: middle; margin: 0px 10px 0px 25px;"'  . ">\n";
+                        echo '<label for="removeUserCheckbox[' . Filter::escapeForHtmlAttribute($username) . ']">'
+                            . Filter::escapeForHtml($username) . "</label>\n<br />";
                     }
                     ?>
               </div>
