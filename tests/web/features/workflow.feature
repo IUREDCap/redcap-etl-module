@@ -113,6 +113,7 @@ I need to be able to create, run and schedule workflows
     And I should see "[Task2] Processing complete."
     And database table "redcap_project_info" should contain 2 rows
     And database table "enrollment" should contain 200 rows
+    But I should not see "Error:"
 
   Scenario: Workflow global properties configuration
     When I follow "ETL Workflows"

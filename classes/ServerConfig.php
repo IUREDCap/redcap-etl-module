@@ -263,6 +263,9 @@ class ServerConfig implements \JsonSerializable
             $this->updateEtlConfig($etlConfig, $isCronJob);
         } else {
             $workflowConfig = $etlConfig;
+
+            $this->updateEtlConfig($workflowConfig->getGlobalPropertiesConfig(), $isCronJob);
+
             foreach ($workflowConfig->getTaskConfigs() as $etlConfig) {
                 $this->updateEtlConfig($etlConfig, $isCronJob);
             }
