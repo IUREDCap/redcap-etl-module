@@ -320,7 +320,6 @@ class ServerConfig implements \JsonSerializable
                 $logger->log('Processing failed.');
                 $output = "ERROR: " . $exception->getMessage();
             }
-
         } else {
             #-------------------------------------------------
             # Remote server
