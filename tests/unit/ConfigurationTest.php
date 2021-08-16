@@ -155,7 +155,7 @@ class ConfigurationTest extends TestCase
         # Negative batch size
         $exceptionCaught = false;
         try {
-            $result = Configuration::validateBatchSize(-10);
+            $result = Configuration::validateBatchSize("-10");
         } catch (\Exception $exception) {
             $message = $exception->getMessage();
             $exceptionCaught = true;

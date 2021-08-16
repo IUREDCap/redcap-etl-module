@@ -75,6 +75,10 @@ try {
             if (empty($workflowName)) {
                 $error = 'ERROR: No ETL workflow specified.';
             } else {
+                # If the workflow is mot valid for running, and exception will be thrown,
+                # and the workflow will not run.
+                $module->validateWorkflowForRunning($workflowName);
+
                 $isCronJob = false;
                 $originatingProjectId = $pid;
 
@@ -196,7 +200,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
                         #----------------------------------------------------------------
                         # Worflow Selection
                         #----------------------------------------------------------------
-                        $excludeIncomplete = true;
+                        $excludeIncomplete = false;
                         $projectWorkflows = $module->getProjectAvailableWorkflows($pid, $excludeIncomplete);
                         #array_unshift($projectWorkflows, '');
                         ?>

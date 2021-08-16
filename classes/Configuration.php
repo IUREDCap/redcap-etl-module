@@ -330,7 +330,7 @@ class Configuration implements \JsonSerializable
 
     public static function validateBatchSize($batchSize)
     {
-        if (ctype_digit($batchSize) && intval($batchSize) > 0) {
+        if (preg_match('/^[1-9][0-9]*$/', $batchSize) === 1) {
             ; // OK
         } else {
             $message = 'The batch size "' . $batchSize . '" needs to be a positive integer.';

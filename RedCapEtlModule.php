@@ -1481,6 +1481,11 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     }
 
 
+    public function validateWorkflowForRunning($workflowName)
+    {
+        $this->settings->validateWorkflowForRunning($workflowName);
+    }
+
     public function runWorkflow(
         $workflowName,
         $serverName,

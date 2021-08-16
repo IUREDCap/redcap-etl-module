@@ -1200,6 +1200,63 @@ class Settings
         return $workflows->getWorkflowStatus($workflowName);
     }
 
+    public function validateWorkflowForRunning($workflowName, $icCron = false)
+    {
+        $workflow = $this->getWorkflow($workflowName);
+
+        $messagePrefix = 'Workflow cannot be run';
+        if ($isCron) {
+            $messagePrefix = 'Workflow cannot be scheduled';
+        }
+
+        #------------------------------------------------------------------
+        # Check for a removed workflow
+        #------------------------------------------------------------------
+        if ($workflow->getStatus() === Workflow::WORKFLOW_REMOVED) {
+            $message = $messagePrefix . ", because it has been removed.";
+            throw new \Exception($message);
+        }
+
+        #----------------------------------------------------------------
+        # Check for tasks that do NOt have an ETL configuration set
+        #----------------------------------------------------------------
+        $incompleteTasks = array();
+        foreach ($workflow->getTasks() as $task) {
+            if (empty($task['projectEtlConfig'])) {
+                $incompleteTasks[] = $task['taskName'];
+            }
+        }
+
+        if (count($incompleteTasks) === 1) {
+            $message = $messagePrefix . ', because task "' . $incompleteTasks[0] . '"'
+                . ' has no ETL configuration set.';
+            throw new \Exception($message);
+        } elseif (count($incompleteTasks) > 1) {
+            $message = $messagePrefix . ', because the following tasks do not have'
+                . ' ETL configurations set: "' . implode('", "', $incompleteTasks) . '".';
+            throw new \Exception($message);
+        }
+
+        #----------------------------------------------------------------
+        # Validate each of the ETL configurations for this workflow
+        #----------------------------------------------------------------
+        foreach ($workflow->getTasks() as $task) {
+            $etlConfigName = $task['projectEtlConfig'];
+            $projectId     = $task['projectId'];
+            $taskName      = $task['taskName'];
+
+            $etlConfig = $this->getConfiguration($etlConfigName, $projectId);
+            try {
+                $etlConfig->validateForRunning();
+            } catch (\Exception $exception) {
+                $message = $messagePrefix . ", because ETL configuration \"{$etlConfigName}\" "
+                    . " for task \"{$taskName}\" has the following error: "
+                    . $exception->getMessage();
+                throw new \Exception($message);
+            }
+        }
+    }
+
     public function getProjectAvailableWorkflows(
         $projectId = PROJECT_ID,
         $excludeIncomplete = false

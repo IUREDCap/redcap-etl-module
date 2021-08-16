@@ -24,7 +24,7 @@ class Workflow implements \JsonSerializable
         $this->metadata         = array();
         $this->globalProperties = array();
         $this->cron             = array(); # cron job details
-        $this->tasks            = array(); # map from task name to task info
+        $this->tasks            = array(); # array of task info
 
         # Set metadata
         $this->metadata['workflowStatus'] = self::WORKFLOW_INCOMPLETE;
@@ -35,74 +35,6 @@ class Workflow implements \JsonSerializable
         $this->metadata['addedBy']        = $username;
         $this->metadata['updatedBy']      = null;
         $this->metadata['dateUpdated']    = null;
-    }
-
-
-    /**
-     * Convert workflow to JSON, and exclude specified tasks (if any).
-     *
-     * Example workflow JSON:
-     *
-     *    {
-     *        "workflow": {
-     *            "global_properties": {
-     *                "workflow_name": "workflow1",
-     *                "batch_size": 10,
-     *                ...
-     *            },
-     *            "tasks": {
-     *                "task1": {
-     *                    "redcap_api_url": "http://localhost/redcap/api/",
-     *                    "data_source_api_token": "11347CC74A8B98AC31BA9F78215814968",
-     *                    ...
-     *                },
-     *                "task2": {
-     *                    ...
-     *                },
-     *
-     *            }
-     *        }
-     *    }
-     */
-    public function toJson($excludedTaskNames = [])
-    {
-        $workflowArray = [
-            "workflow" => [
-                "global_properties" => $this->globalProperties,
-                "tasks"             => array()
-            ]
-        ];
-
-        foreach ($this->tasks as $taskName => $taskProperties) {
-            if (in_array($taskName, $excludedTaskNames)) {
-                ; // task is excluded, so skip it
-            } else {
-                $workflowArray['tasks'][$taskName] = $taskProperties;
-            }
-        }
-
-        $json = json_encode($workflowArray);
-
-        if ($json === false) {
-            throw new \Exception('Unable to convert workflow to JSON.');
-        }
-
-        return $json;
-    }
-
-    public function toArray($excludedTaskNames = [])
-    {
-        $workflowArray = $this->globalProperties;
-
-        foreach ($this->tasks as $taskName => $taskProperties) {
-            if (in_array($taskName, $excludedTaskNames)) {
-                ; // task is excluded, so skip it
-            } else {
-                $workflowArray[$taskName] = $taskProperties;
-            }
-        }
-
-        return $workflowArray;
     }
 
 

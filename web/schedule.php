@@ -89,12 +89,16 @@ try {
                 $success = " Schedule saved.";
             }
         } elseif ($configType === 'workflow') {
-            # validate for running!!!!!!!!!!!!!!!!!!!!! TODO
             if (!isset($workflowName)) {
                 $error = 'ERROR: No workflow specified.';
             } elseif (empty($server)) {
                 $error = 'ERROR: No server specified.';
             } else {
+                # Check that the workflow can run. If it can't, an exception will be thrown,
+                # and the schedule will not be set
+                $isCron = true;
+                $module->validateWorkflowForRunning($workflowName, $isCron);
+
                 $module->setWorkflowSchedule($workflowName, $server, $schedule, $username);
                 $success = " Schedule saved.";
             }
@@ -208,7 +212,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
                     </td>
                     <td>
                         <?php
-                        $excludeIncomplete = true;
+                        $excludeIncomplete = false;
                         $projectWorkflows = $module->getProjectAvailableWorkflows($pid, $excludeIncomplete);
                         #array_unshift($projectWorkflows, '');
                         ?>
