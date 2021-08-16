@@ -402,7 +402,7 @@ class Settings
     {
         $key = $this->getConfigurationKey($configuration->getName());
 
-        $json = json_encode($configuration);
+        $json = json_encode($configuration, JSON_PRETTY_PRINT);
         $this->module->setProjectSetting($key, $json, $projectId);
     }
 
@@ -1247,12 +1247,13 @@ class Settings
 
             $etlConfig = $this->getConfiguration($etlConfigName, $projectId);
             try {
+                if (!isset($etlConfig)) {
+                    $message = $messagePrefix . ", because ETL configuration \"{$etlConfigName}\" "
+                        . " for task \"{$taskName}\" could not be found.";
+                    throw new \Exception($message);
+                }
                 $etlConfig->validateForRunning();
             } catch (\Exception $exception) {
-                $message = $messagePrefix . ", because ETL configuration \"{$etlConfigName}\" "
-                    . " for task \"{$taskName}\" has the following error: "
-                    . $exception->getMessage();
-                throw new \Exception($message);
             }
         }
     }

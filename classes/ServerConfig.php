@@ -308,17 +308,19 @@ class ServerConfig implements \JsonSerializable
 
                 $redCapEtl = new \IU\REDCapETL\RedCapEtl($logger, $properties, null, $redcapProjectClass);
                 $redCapEtl->run();
+
+                if ($runWorkflow) {
+                    // If this is a workflow, reset the logger to the workflow logger.
+                    $logger = $redCapEtl->getWorkflowConfig()->getLogger();
+                }
+
+                $output = implode("\n", $logger->getLogArray());
             } catch (\Exception $exception) {
                 $logger->logException($exception);
                 $logger->log('Processing failed.');
+                $output = "ERROR: " . $exception->getMessage();
             }
 
-            if ($runWorkflow) {
-                // If this is a workflow, reset the logger to the workflow logger.
-                $logger = $redCapEtl->getWorkflowConfig()->getLogger();
-            }
-
-            $output = implode("\n", $logger->getLogArray());
         } else {
             #-------------------------------------------------
             # Remote server
