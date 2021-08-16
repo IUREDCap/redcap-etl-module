@@ -9,6 +9,9 @@ namespace IU\RedCapEtlModule;
 
 class WorkflowConfig implements \JsonSerializable
 {
+    /** @var workflow status */
+    private $status;
+
     /** @var Configuration Configuration object of global properties. */
     private $globalPropertiesConfig;
 
@@ -17,8 +20,19 @@ class WorkflowConfig implements \JsonSerializable
 
     public function __construct()
     {
+        $this->status           = Workflow::WORKFLOW_INCOMPLETE;
         $this->globalProperties = null; # Configuration
         $this->taskConfigs      = array(); # map from task name to Configuration
+    }
+
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    public function setStatus($status)
+    {
+        return $this->status = $status;
     }
 
     /**

@@ -246,7 +246,7 @@ class ServerConfig implements \JsonSerializable
      *      the REDCap external module log.
      * @param boolean $runWorkflow indicates if a workflow is being run.
      */
-    public function run($etlConfig, $isCronJob = false, $moduleLog = null, $runWorkflow = false, $excludedTasks = [])
+    public function run($etlConfig, $isCronJob = false, $moduleLog = null, $runWorkflow = false)
     {
         if (!isset($etlConfig)) {
             $message = 'No ETL configuration specified.';
@@ -263,6 +263,9 @@ class ServerConfig implements \JsonSerializable
             $this->updateEtlConfig($etlConfig, $isCronJob);
         } else {
             $workflowConfig = $etlConfig;
+            foreach ($workflowConfig->getTaskConfigs() as $etlConfig) {
+                $this->updateEtlConfig($etlConfig, $isCronJob);
+            }
         }
 
         if ($this->isEmbeddedServer()) {
