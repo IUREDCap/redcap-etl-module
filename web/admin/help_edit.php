@@ -130,7 +130,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
 
   <fieldset class="server-config" style="margin-top: 12px;">
     <legend>Help Text</legend>
-    <input type="hidden" name="topic" value="<?php echo $topic; ?>">
+    <input type="hidden" name="topic" value="<?php echo Filter::escapeForHtmlAttribute($topic); ?>">
     
     <!-- Help setting selection -->
     <select id="helpSetting" name="helpSetting">
@@ -199,7 +199,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
 </form>
 
 
-<div id="previewDialog" title="<?php echo 'Preiview: ' . $topic; ?>" style="display: none;">
+<div id="previewDialog" title="<?php echo 'Preiview: ' . Filter::escapeForHtml($topic); ?>" style="display: none;">
     <?php echo Help::getHelp($topic, $module); ?>
 </div>
 
@@ -209,7 +209,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
     $(document).ready(function() {
         $( function() {
             $('#previewButton').click(function () {
-                var $topic = "<?php echo Help::getTitle($topic); ?>";
+                var $topic = "<?php echo Filter::escapeForHtml(Help::getTitle($topic)); ?>";
                 var $url = '<?php echo $helpPreviewUrl; ?>';
                 var $dialog;
                 $dialog = $('<div></div>')
@@ -240,7 +240,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
 #print "<pre>\n"; print_r($cronJobs); print "</pre>\n";
 ?>
 
-<div id="helpPreview" title="<?php echo Help::getTitle($topic); ?>" style="display: none;">
+<div id="helpPreview" title="<?php echo Filter::escapeForHtml(Help::getTitle($topic)); ?>" style="display: none;">
     <?php echo Help::getHelp($topic, $module); ?>
 </div>
                     

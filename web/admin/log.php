@@ -142,11 +142,11 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
     <div style="margin-bottom: 12px;">
         <span>Start Date:</span>
         <input type="text" id="startDate" name="startDate" class="x-form-text x-form-field" style="width: 90px;"
-            value="<?php echo $startDate; ?>">
+            value="<?php echo Filter::escapeForHtml($startDate); ?>">
         
         <span style="margin-left: 7px;">End Date:</span>
         <input type="text" id="endDate" name="endDate" class="x-form-text x-form-field" style="width: 90px;"
-            value="<?php echo $endDate; ?>">
+            value="<?php echo Filter::escapeForHtml($endDate); ?>">
         </input>
     
         <input type="submit" value="Display" name="submitValue" style="margin-left: 7px;">
@@ -168,9 +168,9 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
         }
 
         if ($startDate === $endDate) {
-            echo " for {$startDate}";
+            echo " for " . Filter::escapeForHtml($startDate);
         } else {
-            echo " for {$startDate} to {$endDate}";
+            echo " for " . Filter::escapeForHtml($startDate) . " to " . Filter::escapeForHtml($endDate);
         }
         echo "\n";
         ?>

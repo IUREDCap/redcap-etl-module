@@ -233,7 +233,8 @@ $(function() {
             if (!empty($userPrivateServerNames) && in_array($serverName, $userPrivateServerNames)) {
                 $checked = ' checked ';
             }
-            echo '<td style="text-align: center;"><input type="checkbox" name="accessCheckbox[' . Filter::escapeForHtmlAttribute($serverName) . ']" '
+            echo '<td style="text-align: center;"><input type="checkbox" name="accessCheckbox['
+                . Filter::escapeForHtmlAttribute($serverName) . ']" '
                 . $checked . '></td>' . "\n";
             echo '<td style="text-align: left">' . Filter::escapeForHtml($serverName) . "</td>\n";
             echo "</tr>\n";

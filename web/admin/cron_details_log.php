@@ -21,4 +21,4 @@ $moduleLog = new ModuleLog($module);
 
 $logInfo = $moduleLog->renderCronJobs($cronLogId);
 
-echo $logInfo;
+echo Filter::escapeForHtml($logInfo);

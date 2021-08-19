@@ -40,7 +40,7 @@ $htmlPage->PrintHeaderExt();
 <?php
 
 if (Help::isValidTopic($topic)) {
-    echo '<h3 style="color: #286090;">' . Help::getTitle($topic) . "</h3>\n";
+    echo '<h3 style="color: #286090;">' . Filter::escapeForHtml(Help::getTitle($topic)) . "</h3>\n";
     echo Help::getHelp($topic, $module);
 } else {
     echo 'No help was found for topic "' . Filter::escapeForHtml($topic) . '".';
