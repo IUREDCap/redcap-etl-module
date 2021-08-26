@@ -461,7 +461,7 @@ class Configuration implements \JsonSerializable
                         #--------------------------------------------------------------
                         $this->properties[$name] = RedCapEtlModule::getRedCapApiUrl();
                     } else {
-                        $this->properties[$name] = $properties[$name];
+                        $this->properties[$name] = Filter::stripTags($properties[$name]);
                     }
                 }
             } else { // if (!$isWorkflow) {

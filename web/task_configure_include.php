@@ -24,9 +24,6 @@ if (!defined('REDCAP_ETL_MODULE')) {
     header($_SERVER["SERVER_PROTOCOL"] . " 403 Forbidden");
     exit;
 }
-?>
-
-<?php
 
 $error = '';
 $warning = '';
@@ -231,12 +228,10 @@ try {
                     }
                 }
             } elseif (strcasecmp($submitValue, 'Download CSV file') === 0) {
-                $downloadFileName = 'rules.csv';
-                header('Content-Type: text/csv');
-                //header("Content-Transfer-Encoding: Binary");
-                header("Content-disposition: attachment; filename=\"" . $downloadFileName . "\"");
-                echo $properties[Configuration::TRANSFORM_RULES_TEXT];
-                return;
+                ;
+                # This is handled in including file now, because it needs to be
+                # done before any output has been generated. So, this condition
+                # should never be reached.
             } elseif (strcasecmp($submitValue, 'Auto-Generate') === 0) {
                 $formCompleteFields = false;
 #print "\n\n_POST is \n\n";

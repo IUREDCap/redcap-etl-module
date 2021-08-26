@@ -8,6 +8,7 @@
 
 require_once __DIR__ . '/../dependencies/autoload.php';
 
+use IU\RedCapEtlModule\Configuration;
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapDb;
@@ -53,6 +54,26 @@ try {
     $submit = '';
     if (array_key_exists('submit', $_POST)) {
         $submit = Filter::sanitizeButtonLabel($_POST['submit']);
+    }
+
+    #------------------------------------------------------------------------------------
+    # Process included page actions that need to be done before output is generated
+    #------------------------------------------------------------------------------------
+    $submitValue = '';
+    if (array_key_exists('submitValue', $_POST)) {
+        $submitValue = Filter::sanitizeButtonLabel($_POST['submitValue']);
+    }
+
+    if ($configType === 'task') {
+        if (strcasecmp($submitValue, 'Download CSV file') === 0) {
+            header('Content-Type: text/plain');
+            header('Content-disposition: attachment; filename="rules.csv"');
+            $rulesText = $configuration->getProperty(Configuration::TRANSFORM_RULES_TEXT);
+            $rulesText = Filter::stripTags($rulesText);
+            $fh = fopen('php://output', 'w');
+            fwrite($fh, $rulesText);
+            exit();
+        }
     }
 } catch (\Exception $exception) {
     $error = 'ERROR: ' . $exception->getMessage();
