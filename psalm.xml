@@ -11,9 +11,7 @@
     <projectFiles>
         <directory name="." />
         <ignoreFiles>
-            <directory name="dependencies" />
             <directory name="vendor" />
-            <directory name="tests" />
         </ignoreFiles>
     </projectFiles>
 </psalm>
