@@ -58,6 +58,19 @@ To check for coding standards compliance, enter the following command in the top
 The "-n" option eliminated warnings. The configuration for phpcs is in file __phpcs.xml__ in the top-level directory.
 
 
+Static Code Analyzer
+--------------------------
+
+Starting with version 2.0.2, the Vimeo Psalm scanner was added to the development dependencies.
+This scanner is a static code analyzer, so it
+does not require a running instance of the REDCap-ETL external module to work.
+This scanner has been adopted by Vanderbilt
+as a security scanner for REDCap external module submissions. To scan the REDCap-ETL external module, use the following
+command in the top-level directory of the project:
+
+    ./vendor/bin/psalm
+
+A configuration file (psalm.xml) has been created that will cause Psalm to run in security analysis mode.
 
 Automated Tests
 --------------------------
