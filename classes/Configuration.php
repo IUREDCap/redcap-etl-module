@@ -460,6 +460,8 @@ class Configuration implements \JsonSerializable
                         # that this module can be migrated or cloned to a new server
                         #--------------------------------------------------------------
                         $this->properties[$name] = RedCapEtlModule::getRedCapApiUrl();
+                    } elseif (is_array($properties[$name])) {
+                        $this->properties[$name] = Filter::stripTagsArray($properties[$name]);
                     } else {
                         $this->properties[$name] = Filter::stripTags($properties[$name]);
                     }

@@ -60,6 +60,15 @@ class Filter
         return trim(strip_tags($value));
     }
 
+    public static function stripTagsArray($values)
+    {
+        $newValues = $values;
+        foreach ($values as $key => $value) {
+            $newValues[$key] = strip_tags($value);
+        }
+        return $newValues;
+    }
+
     public static function stripTagsArrayRecursive($values)
     {
         $newValues = $values;
