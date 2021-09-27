@@ -109,7 +109,7 @@ class Authorization
 
             # Users need to have project design permission and "full data set" data export permission
             # and not belong to a data access group (DAG)
-            if ($rights['design'] && $rights['data_export_tool'] == 1 && !isset($rights['group_id'])) {
+            if ($rights['design'] && $rights['data_export_tool'] == 1 && empty($rights['group_id'])) {
                 $hasPermission = true;
             }
         }
