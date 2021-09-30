@@ -19,7 +19,7 @@ use Behat\Behat\Context\SnippetAcceptingContext;
  */
 class ConfigurePage
 {
-    public static function configureConfiguration($session, $configName)
+    public static function configureConfiguration($session, $configName, $emailSubject = null)
     {
         $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
 
@@ -53,7 +53,13 @@ class ConfigurePage
         if ($etlConfig['email_summary'] === "1" || $etlConfig['email_summary'] === "true") {
             $page->checkField('email_summary');
         }
-        $page->fillField('email_subject', $etlConfig['email_subject']);
+
+        if (empty($emailSubject)) {
+            $page->fillField('email_subject', $etlConfig['email_subject']);
+        } else {
+            $page->fillField('email_subject', $emailSubject);
+        }
+
         $page->fillField('email_to_list', $etlConfig['email_to_list']);
 
         #------------------------------

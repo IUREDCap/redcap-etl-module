@@ -485,6 +485,15 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @When /^I configure configuration "([^"]*)" with email subject "([^"])"$/
+     */
+    public function iConfigureConfigurationWithEmailSubject($configName, $emailSubject)
+    {
+        $session = $this->getSession();
+        ConfigurePage::configureConfiguration($session, $configName, $emailSubject);
+    }
+
+    /**
      * @When /^I copy configuration "([^"]*)" to "([^"]*)"$/
      */
     public function iCopyConfiguration($configName, $copyToConfigName)

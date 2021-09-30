@@ -31,6 +31,7 @@ I need to be able to create, copy, rename and delete configurations
     When I follow configuration "behat-sched-test"
     And I configure configuration "behat"
     And I fill in "Table name prefix" with "sched_"
+    And I fill in "email_subject" with "REDCap-ETL Module web test 1/3: schedule ETL configuration"
     And I check "email_errors"
     And I check "email_summary"
     And I press "Save"

@@ -120,12 +120,12 @@ I need to be able to create, run and schedule workflows
     And I follow workflow "behat-workflow-test"
     And I check "E-mail errors"
     And I check "E-mail summary"
-    And I fill in "E-mail subject" with "Automated workflow schedule test"
+    And I fill in "E-mail subject" with "REDCap-ETL Module workflow configuration test"
     And I fill in "E-mail to list" with the user e-mail
     And I press "Save"
     Then the "E-mail errors" checkbox should be checked
     And the "E-mail summary" checkbox should be checked
-    And Field "E-mail subject" should contain value "Automated workflow schedule test"
+    And Field "E-mail subject" should contain value "REDCap-ETL Module workflow configuration test"
 
   Scenario: Schedule configuration on embedded server
     When I follow "Schedule"
@@ -154,7 +154,7 @@ I need to be able to create, run and schedule workflows
   Scenario: Run workflow on remote server
     When I follow "ETL Workflows"
     And I follow workflow "behat-workflow-test"
-    And I fill in "E-mail subject" with "Automated workflow run test on remote server"
+    And I fill in "E-mail subject" with "REDCap-ETL Module web test 2/3: run workflow on remote server"
     And I press "Save"
     And I follow "Run"
     And I select "workflow" from "configType"
@@ -169,7 +169,7 @@ I need to be able to create, run and schedule workflows
   Scenario: Schedule configuration on remote server
     When I follow "ETL Workflows"
     And I follow workflow "behat-workflow-test"
-    And I fill in "E-mail subject" with "Automated workflow schedule test on remote server"
+    And I fill in "E-mail subject" with "REDCap-ETL Module web test 3/3: schedule workflow on remote server"
     And I press "Save"
     And I follow "Schedule"
     And I select "workflow" from "configType"

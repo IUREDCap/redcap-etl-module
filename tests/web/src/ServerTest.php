@@ -55,7 +55,7 @@ class ServerTest extends TestCase
 
         Util::logout(self::$session);   # logout as admin
 
-        $this->runEtlOnRemoteServer($serverName);
+        $this->runEtlOnRemoteServer($serverName, 'REDCap-ETL PHPUnit web test 1/2');
     }
 
     public function testServerWithSshKeyAuthentication()
@@ -72,7 +72,7 @@ class ServerTest extends TestCase
 
         Util::logout(self::$session);
 
-        $this->runEtlOnRemoteServer($serverName);
+        $this->runEtlOnRemoteServer($serverName, 'REDCap-ETL PHPUnit web test 2/2');
     }
 
     public function configureEtlServer($serverName)
@@ -124,7 +124,7 @@ class ServerTest extends TestCase
         $this->assertMatchesRegularExpression("/output of hostname command:/", $testOutput); 
     }
 
-    public function runEtlOnRemoteServer($serverName)
+    public function runEtlOnRemoteServer($serverName, $emailSubject)
     {
 
         Util::logInAsUserAndAccessRedCapEtlForTestProject(self::$session);
@@ -138,7 +138,7 @@ class ServerTest extends TestCase
 
         EtlConfigsPage::followConfiguration(self::$session, $configName);
 
-        ConfigurePage::configureConfiguration(self::$session, 'behat');
+        ConfigurePage::configureConfiguration(self::$session, 'behat', $emailSubject);
 
 
         #$page->clickLink('Run');
