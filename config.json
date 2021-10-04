@@ -2,6 +2,7 @@
    "name": "REDCap-ETL Module",
    "namespace": "IU\\RedCapEtlModule", 
    "description": "REDCap-ETL module for extracting REDCap data and storing it in a database.",
+   "framework-version": 1,
    "authors": [
        {
            "name": "Jim Mullen",
