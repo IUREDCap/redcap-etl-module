@@ -171,7 +171,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $projectId = PROJECT_ID,
         $cronJobLogId = null,
         $cronDay = null,
-        $cronHour = null
+        $cronHour = null,
+        $dataTarget = DataTarget::DB
     ) {
 
         try {
@@ -301,7 +302,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             #    $status = $serverConfig->run($etlConfig, $isCronJob);
             #}
 
-            $status = $serverConfig->run($etlConfig, $isCronJob, $this->moduleLog);
+            #$status = $serverConfig->run($etlConfig, $isCronJob, $this->moduleLog);
+            $status = $serverConfig->run($etlConfig, $isCronJob, $this->moduleLog, false, $dataTarget);
         } catch (\Exception $exception) {
             $status = "ETL job failed: " . $exception->getMessage();
             $details = "ETL job failed\n" . $details

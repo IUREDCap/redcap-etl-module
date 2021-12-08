@@ -24,6 +24,8 @@ use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\ServerConfig;
 use IU\RedCapEtlModule\RedCapEtlModule;
 
+use IU\RedCapEtlModule\DataTarget;
+
 $selfUrl      = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
 $serversUrl   = $module->getUrl(RedCapEtlModule::SERVERS_PAGE);
 $configureUserUrl = $module->getUrl(RedCapEtlModule::USER_CONFIG_PAGE);
@@ -499,6 +501,25 @@ $(function() {
     </table>
     </fieldset>
         <?php
+    } else {
+        $maxZipDownloadSize = $serverConfig->getMaxZipDownloadFileSize();
+        if (is_null($maxZipDownloadSize) || $maxZipDownloadSize === '') {
+            $maxZipDownloadSize = DataTarget::DEFAULT_MAX_ZIP_DOWNLOAD_FILESIZE;
+        }
+        ?>
+        <!-- CSV ZIP DOWNLOAD SETTING -->
+            <fieldset class="server-config">
+            <legend>CSV ZIP Download</legend>
+            <table>
+              <tr>
+                <td>Max file size (MB):</td>
+                <td><input type="text" name="maxZipDownloadFileSize"
+                     value="<?php echo Filter::escapeForHtmlAttribute($maxZipDownloadSize);?>" size="60">
+                </td>
+              </tr>
+            </table>
+            </fieldset>
+            <?php
     } // end if not embedded server
     ?>
   

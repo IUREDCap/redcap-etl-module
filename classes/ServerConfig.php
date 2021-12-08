@@ -51,6 +51,8 @@ class ServerConfig implements \JsonSerializable
     private $dbSslVerify;
     private $caCertFile;
 
+    private $maxZipDownloadFileSize;
+
 
     public function __construct($name)
     {
@@ -88,6 +90,8 @@ class ServerConfig implements \JsonSerializable
         $this->dbSsl = true;
         $this->dbSslVerify = false;
         $this->caCertFile = '';
+
+        $this->maxZipDownloadFileSize = DataTarget::DEFAULT_MAX_ZIP_DOWNLOAD_FILESIZE;
     }
 
     /**
@@ -246,8 +250,13 @@ class ServerConfig implements \JsonSerializable
      *      the REDCap external module log.
      * @param boolean $runWorkflow indicates if a workflow is being run.
      */
-    public function run($etlConfig, $isCronJob = false, $moduleLog = null, $runWorkflow = false)
-    {
+    public function run(
+        $etlConfig,
+        $isCronJob = false,
+        $moduleLog = null,
+        $runWorkflow = false,
+        $dataTarget = DataTarget::DB
+    ) {
         if (!isset($etlConfig)) {
             $message = 'No ETL configuration specified.';
             throw new \Exception($message);
@@ -288,6 +297,27 @@ class ServerConfig implements \JsonSerializable
             } else {
                 $properties = $etlConfig->getPropertiesArray();
                 $properties[Configuration::PRINT_LOGGING] = false;
+
+                #--------------------------------------------------
+                # If CSV Zip file, update db_type and db_connection.
+                #--------------------------------------------------
+                if ($dataTarget === DataTarget::CSV_ZIP) {
+                    $properties[Configuration::DB_TYPE] = DataTarget::DBTYPE_CSV;
+
+                    # Create temporary directory to store CSV files in
+                    $tempDir = sys_get_temp_dir();
+                    # If the directory doesn't end with a separator, add one
+                    if (substr($tempDir, -strlen(DIRECTORY_SEPARATOR)) !== DIRECTORY_SEPARATOR) {
+                        $tempDir .= DIRECTORY_SEPARATOR;
+                    }
+                    $tempDir .= uniqid('etl-csv-', true) . DIRECTORY_SEPARATOR;
+                    $result = mkdir($tempDir, 0700);
+                    if ($result === false) {
+                        $message = 'Unable to create directory for CSV files.';
+                        throw new EtlException($message, EtlException::FILE_ERROR);
+                    }
+                    $properties[Configuration::DB_CONNECTION] = DataTarget::DBTYPE_CSV . ':' . $tempDir;
+                }
             }
 
             #print("<pre>\n");
@@ -305,16 +335,44 @@ class ServerConfig implements \JsonSerializable
             try {
                 #$redcapProjectClass = EtlExtRedCapProject::class;
                 $redcapProjectClass = null;
+                $baseDir = null;
 
-                $redCapEtl = new \IU\REDCapETL\RedCapEtl($logger, $properties, null, $redcapProjectClass);
+                $redCapEtl = new \IU\REDCapETL\RedCapEtl($logger, $properties, $redcapProjectClass, $baseDir);
                 $redCapEtl->run();
 
                 if ($runWorkflow) {
+                    #$redCapEtl->run();
                     // If this is a workflow, reset the logger to the workflow logger.
                     $logger = $redCapEtl->getWorkflowConfig()->getLogger();
-                }
+                    $output = implode("\n", $logger->getLogArray());
+                } else {
+                    switch ($dataTarget) {
+                        case DataTarget::DB:
+                            #$redCapEtl->run();
+                            $output = implode("\n", $logger->getLogArray());
+                            break;
+                        case DataTarget::CSV_ZIP:
+                            #$redCapEtl->run();
+                            $pid = $properties['project_id'];
+                            $dt = new DataTarget;
+                            $result = $dt->exportEtlCsvZip($tempDir, $pid);
 
-                $output = implode("\n", $logger->getLogArray());
+                            #If the filesize is larger than the allowable filesize, then send
+                            #a message instead of the zip file.
+                            $fileSize = filesize($result);
+                            $fsMb = $fileSize / 1024 / 1024;
+                            $maxFsMb = $this->getMaxZipDownloadFileSize();
+                            if (is_null($maxFsMb) || ($maxFsMb === '')) {
+                                $maxFsMb = $dt::DEFAULT_MAX_ZIP_DOWNLOAD_FILESIZE;
+                            }
+                            if ($fsMb > $maxFsMb) {
+                                $output = "ERROR: CSV zip file size exceeds max of $maxFsMb MB. Cannot download.";
+                            } else {
+                                $output = $result;
+                            }
+                            break;
+                    }
+                }
             } catch (\Exception $exception) {
                 $logger->logException($exception);
                 $logger->log('Processing failed.');
@@ -598,5 +656,13 @@ class ServerConfig implements \JsonSerializable
     public function setAccessLevel($accessLevel)
     {
         $this->accessLevel = $accessLevel;
+    }
+    public function getMaxZipDownloadFileSize()
+    {
+        return $this->maxZipDownloadFileSize;
+    }
+    public function setMaxZipDownloadFileSize($maxZipDownloadFileSize)
+    {
+        $this->maxZipDownloadFileSize = $maxZipDownloadFileSize;
     }
 }

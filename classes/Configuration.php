@@ -92,6 +92,8 @@ class Configuration implements \JsonSerializable
     const AUTOGEN_COMBINE_NON_REPEATING_FIELDS = 'autogen_combine_non_repeating_fields';
     const AUTOGEN_NON_REPEATING_FIELDS_TABLE = 'autogen_non_repeating_fields_table';
 
+    const DATA_TARGET = 'data_target';
+
     private $name;
     private $username;
     private $projectId;
