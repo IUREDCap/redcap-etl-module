@@ -38,12 +38,12 @@ class DataTarget
             throw new EtlException($message, EtlException::FILE_ERROR);
         }
 
-        $pattern = $tempDir.'*'.\IU\REDCapETL\Database\CsvDbConnection::FILE_EXTENSION;
+        $pattern = $tempDir . '*' . \IU\REDCapETL\Database\CsvDbConnection::FILE_EXTENSION;
         $options = ['remove_all_path' => true];
         $zip->addGlob($pattern, null, $options);
         $zip->close();
 
-        $files = glob($tempDir.'*'.\IU\REDCapETL\Database\CsvDbConnection::FILE_EXTENSION);
+        $files = glob($tempDir . '*' . \IU\REDCapETL\Database\CsvDbConnection::FILE_EXTENSION);
         foreach ($files as $file) {
             if (file_exists($file)) {
                 unlink($file);

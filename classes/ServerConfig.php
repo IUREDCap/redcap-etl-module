@@ -354,7 +354,7 @@ class ServerConfig implements \JsonSerializable
                         case DataTarget::CSV_ZIP:
                             #$redCapEtl->run();
                             $pid = $properties['project_id'];
-                            $dt = new DataTarget;
+                            $dt = new DataTarget();
                             $result = $dt->exportEtlCsvZip($tempDir, $pid);
 
                             #If the filesize is larger than the allowable filesize, then send
