@@ -513,7 +513,7 @@ $(function() {
             <table>
               <tr>
                 <td>Max file size (MB):</td>
-                <td><input type="text" name="maxZipDownloadFileSize"
+                <td><input type="text" name="maxZipDownloadFileSize" id="maxZipDownloadFileSize"
                      value="<?php echo Filter::escapeForHtmlAttribute($maxZipDownloadSize);?>" size="60">
                 </td>
               </tr>

@@ -147,6 +147,7 @@ I need to be able to create, run and schedule workflows
     And I fill in "Server:" with "remote-server-workflow-test"
     And I press "Add Server"
     And I follow server "remote-server-workflow-test"
+    And I check "isActive"
     And I configure server "password_authentication"
     Then I should see "remote-server-workflow-test"
     And I should not see "Error:"

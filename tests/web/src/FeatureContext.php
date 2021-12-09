@@ -942,4 +942,17 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
             throw new \Exception($message);
         }
     }
+
+    /**
+     * @Then a downloaded file should be found
+     */
+    public function aDownloadedFileShouldBeFound()
+    {
+        $found = Util::findDownloadedFile();
+        if (!$found) {
+            $message = 'Downloaded CSV file redcap-etl.zip not found.';
+            throw new \Exception($message);
+        }
+    }
+
 }

@@ -271,7 +271,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
         if ($configType === 'task' && $server === $serverConfig::EMBEDDED_SERVER_NAME) {
             echo '
                 <div style="float: left; margin-bottom: 22px; margin-left: 2em">
-                    <select name="dataTarget" style="margin-left: 1em;">
+                    <select name="dataTarget" id="dataTarget" style="margin-left: 1em;">
                         <option value="' . DataTarget::DB . '">Load data into database </option>
                         <option value="' . DataTarget::CSV_ZIP . '">Export data as CSV zip file</option>
                     </select>
