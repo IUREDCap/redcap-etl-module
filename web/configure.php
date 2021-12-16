@@ -171,7 +171,19 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
                     <td>
                         <?php
                         $excludeIncomplete = false;
-                        $projectWorkflows = $module->getProjectAvailableWorkflows($pid, $excludeIncomplete);
+                        $excludeRemoved    = true;
+
+                        # For admins - get list of workflows that include "removed" workflows
+                        # (removed by user but not actually deleted from system)
+                        if (defined('SUPER_USER') && SUPER_USER) {
+                            $excludeRemoved = false;
+                        }
+                        $projectWorkflows = $module->getProjectAvailableWorkflows(
+                            $pid,
+                            $excludeIncomplete,
+                            $excludeRemoved
+                        );
+
                         #array_unshift($projectWorkflows, '');
                         ?>
                         <select name="workflowName" id="workflowName" onchange="this.form.submit()">
@@ -220,7 +232,8 @@ if ($configType === 'task') {
     # Check to make sure the workflow belongs to this project (it could have been
     # set in the user's session from viewing a previous project)
     #-------------------------------------------------------------------------------------------------
-    $workflowNames = $module->getProjectAvailableWorkflows();
+    # $workflowNames = $module->getProjectAvailableWorkflows();
+    $workflowNames = $module->getProjectAvailableWorkflows($pid, $excludeIncomplete, $excludeRemoved);
     if (!in_array($workflowName, $workflowNames)) {
         $workflowName = '';
         $_SESSION[$workflowName] = '';

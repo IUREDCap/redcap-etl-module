@@ -1258,9 +1258,13 @@ class Settings
         }
     }
 
+    /**
+     * Gets the names of the workflows for a project.
+     */
     public function getProjectAvailableWorkflows(
         $projectId = PROJECT_ID,
-        $excludeIncomplete = false
+        $excludeIncomplete = false,
+        $excludeRemoved = true
     ) {
         $workflowsObject = new Workflows();
         $key = self::WORKFLOWS_KEY;
@@ -1275,7 +1279,7 @@ class Settings
 
         $projectWorkflows = array();
         foreach ($workflows as $workflowName => $workflow) {
-            if ($workflow->getStatus() !== Workflow::WORKFLOW_REMOVED) {
+            if (!$excludeRemoved || $workflow->getStatus() !== Workflow::WORKFLOW_REMOVED) {
                 if (in_array($projectId, $workflow->getProjectIds())) {
                     if ($excludeIncomplete) {
                         if ($workflow->getStatus() !== Workflow::WORKFLOW_INCOMPLETE) {
@@ -1290,6 +1294,7 @@ class Settings
 
         return $projectWorkflows;
     }
+
 
     /**
      * Deletes a user's workflow.

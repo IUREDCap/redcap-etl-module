@@ -1319,9 +1319,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
          return $this->settings->getWorkflowStatus($workflowName);
     }
 
-    public function getProjectAvailableWorkflows($projectId = PROJECT_ID, $excludeIncomplete = false)
-    {
-         return $this->settings->getProjectAvailableWorkflows($projectId, $excludeIncomplete);
+    public function getProjectAvailableWorkflows(
+        $projectId = PROJECT_ID,
+        $excludeIncomplete = false,
+        $excludeRemoved = true
+    ) {
+         return $this->settings->getProjectAvailableWorkflows($projectId, $excludeIncomplete, $excludeRemoved);
     }
 
     /**
@@ -1535,7 +1538,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 if ($isCronJob) {
                     if (!$adminConfig->getAllowCron()) {
                         # Cron jobs not allowed
-                        $message = "Cron job failed - cron jobs not allowed\n" . $details;
+                        $message = "REDCap-ETL cron did not run, because REDCap-ETL cron jobs are not enabled.";
                         throw new \Exception($message);
                     }
                 } else {
@@ -1565,154 +1568,183 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 # Get workflow tasks and global properties
                 #---------------------------------------------
                 $workflow = $this->getWorkflow($workflowName);
-
-                $tasks = $workflow->getTasks();
-
-                if ($serverConfig->isEmbeddedServer()) {
-                    $workflow->setGlobalProperty(Configuration::PRINT_LOGGING, 'false');   # NEW CODE
-                    $remoteEtlServer = false;
-                } else {
-                    $remoteEtlServer = true;
+                if (!isset($workflow)) {
+                    throw new \Exception("Workflow \"{$workflowName}\" could not be found.");
                 }
 
-                #--------------------------------------------------------------------------
-                # Create the workflow configuration and add the global properties to it.
-                #--------------------------------------------------------------------------
-                $workflowConfig = new WorkflowConfig();
-
-                $globalProperties = array_filter($workflow->getGlobalProperties()); // Filter out empty values
-                $globalPropertiesConfig = new Configuration('global_properties');
-                $globalPropertiesConfig->setProperties($globalProperties);
-                $globalPropertiesConfig->setProperty(self::WORKFLOW_NAME, $workflowName);
-
-                # note: moved to server config: //$serverConfig->updateEtlConfig($globalPropertiesConfig, $isCronJob);
-                $workflowConfig->setGlobalPropertiesConfig($globalPropertiesConfig);
-
-                $status = '';
-                $message = '';
 
                 #---------------------------------------------
-                # Process each workflow ETL task
+                # Check workflow status
                 #---------------------------------------------
-                foreach ($tasks as $key => $task) {
-                    $projectId = $task['projectId'];
+                $workflowStatus = $workflow->getStatus();
 
-                    #check to see if the user has permissions to export for this project
-                    $hasPermissionToExport = false;
-                    if ($superUser || $isCronJob) {
-                        $hasPermissionToExport = true;
+                if ($workflowStatus === Workflow::WORKFLOW_INCOMPLETE) {
+                    $message = 'Workflow cannot be run, because it has status "' . $workflowStatus . '".'
+                        . ' Additional configuration is required for this workflow.';
+                    throw new \Exception($message);
+                } elseif ($workflowStatus === Workflow::WORKFLOW_REMOVED) {
+                    # Skip - this workflow has been removed by the user, but not yet
+                    # deleted from the system by an admin
+                    $details = "Workflow \"{$workflowName}\" could not be run as a cron job,"
+                        . " because it has been removed.";
+                    \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
+                } elseif ($workflowStatus !== Workflow::WORKFLOW_READY) {
+                    $message = 'Workflow cannot be run, because it has an unrecognized status "'
+                        . $workflowStatus . '".';
+                    throw new \Exception($message);
+                } else {
+                    #---------------------------------------------
+                    # If workflow status is "Ready"
+                    #---------------------------------------------
+                    $tasks = $workflow->getTasks();
+
+                    if ($serverConfig->isEmbeddedServer()) {
+                        $workflow->setGlobalProperty(Configuration::PRINT_LOGGING, 'false');   # NEW CODE
+                        $remoteEtlServer = false;
                     } else {
-                        $pKey = array_search($projectId, array_column($userProjects, 'project_id'));
-                        if ($pKey || $pKey === 0) {
-                            $hasPermissionToExport = $userProjects[$pKey]['data_export_tool'] == 1 ? true : false;
-                        }
+                        $remoteEtlServer = true;
                     }
-                    if ($hasPermissionToExport) {
-                        $taskName = $task['taskName'];
 
-                        $configName = $task['projectEtlConfig'];
-                        if (!empty($configName)) {
-                            Configuration::validateName($configName);  # throw exception if invalid
-                            $etlConfig = $this->getConfiguration($configName, $projectId);
-                            if (isset($etlConfig)) {
-                                #update the task ETL configuration with server values and retrieve
-                                #the task ETL properties
-                                $serverConfig->updateEtlConfig($etlConfig, $isCronJob);
-                                $etlProperties = $etlConfig->getProperties();
+                    #--------------------------------------------------------------------------
+                    # Create the workflow configuration and add the global properties to it.
+                    #--------------------------------------------------------------------------
+                    $workflowConfig = new WorkflowConfig();
+
+                    $globalProperties = array_filter($workflow->getGlobalProperties()); // Filter out empty values
+                    $globalPropertiesConfig = new Configuration('global_properties');
+                    $globalPropertiesConfig->setProperties($globalProperties);
+                    $globalPropertiesConfig->setProperty(self::WORKFLOW_NAME, $workflowName);
+
+                    # note: moved to server config: $serverConfig->updateEtlConfig($globalPropertiesConfig, $isCronJob);
+                    $workflowConfig->setGlobalPropertiesConfig($globalPropertiesConfig);
+
+                    $status = '';
+                    $message = '';
+
+                    #---------------------------------------------
+                    # Process each workflow ETL task
+                    #---------------------------------------------
+                    foreach ($tasks as $key => $task) {
+                        $projectId = $task['projectId'];
+
+                        #check to see if the user has permissions to export for this project
+                        $hasPermissionToExport = false;
+                        if ($superUser || $isCronJob) {
+                            $hasPermissionToExport = true;
+                        } else {
+                            $pKey = array_search($projectId, array_column($userProjects, 'project_id'));
+                            if ($pKey || $pKey === 0) {
+                                $hasPermissionToExport = $userProjects[$pKey]['data_export_tool'] == 1 ? true : false;
+                            }
+                        }
+                        if ($hasPermissionToExport) {
+                            $taskName = $task['taskName'];
+
+                            $configName = $task['projectEtlConfig'];
+                            if (!empty($configName)) {
+                                Configuration::validateName($configName);  # throw exception if invalid
+                                $etlConfig = $this->getConfiguration($configName, $projectId);
+                                if (isset($etlConfig)) {
+                                    #update the task ETL configuration with server values and retrieve
+                                    #the task ETL properties
+                                    $serverConfig->updateEtlConfig($etlConfig, $isCronJob);
+                                    $etlProperties = $etlConfig->getProperties();
+                                } else {
+                                    $msg = 'For Workflow "' . $workflowName . '", ETL task # "' . $key;
+                                    $msg .= '", Configuration "' . $configName
+                                        . '" not found for project ID ' . $projectId;
+                                    throw new \Exception($msg);
+                                }
                             } else {
-                                $msg = 'For Workflow "' . $workflowName . '", ETL task # "' . $key;
-                                $msg .= '", Configuration "' . $configName . '" not found for project ID ' . $projectId;
+                                $msg   =  'No configuration name provided for Workflow "' . $workflowName;
+                                $msg .=  '", ETL task # "' . $key . '", project ID ' . $projectId;
                                 throw new \Exception($msg);
                             }
+
+                            $isWorkflowGlobalProperties = false;
+
+                            $etlConfig->validateForRunning();
+
+                            #---------------------------------------------------------------------
+                            # Move all task properties into a task config property so that
+                            # the global properties will override the task properties
+                            #---------------------------------------------------------------------
+                            $etlProperties = $etlConfig->getPropertiesArray();
+                            $newEtlProperties = array();
+                            $newEtlProperties[self::TASK_CONFIG] = $etlProperties;
+                            $etlConfig->setProperties($newEtlProperties);
+
+                            #-----------------------------------------------------------
+                            # Add configuration for task to workflow configuration
+                            #-----------------------------------------------------------
+                            $serverConfig->updateEtlConfig($etlConfig, $isCronJob);
+                            $workflowConfig->addTaskConfiguration($taskName, $etlConfig);
+
+                            #-----------------------------------------------------
+                            # Set task logging information
+                            #-----------------------------------------------------
+                            $configUrl  = $etlConfig->getProperty(Configuration::REDCAP_API_URL);
+                            $details = '';
+
+                            # If being run on remote REDCap
+                            if (strcasecmp($configUrl, $this->getRedCapApiUrl()) !== 0) {
+                                $details .= "REDCap API URL: {$configUrl}\n";
+                            } else {
+                                # If local REDCap is being used, set SSL verify to the global value
+                                $sslVerify = $adminConfig->getSslVerify();
+                                $etlConfig->setProperty(Configuration::SSL_VERIFY, $sslVerify);
+                            }
+
+                            $details .= "project ID: {$projectId}\n";
+                            if (!$isCronJob) {
+                                $details .= "user: " . $username . "\n";
+                            }
+                            $details .= "configuration: {$configName}\n";
+                            $details .= "server: {$serverName}\n";
+                            if ($isCronJob) {
+                                $details .= "cron: yes\n";
+                            } else {
+                                $details .= "cron: no\n";
+                            }
+
+                            $sql    = null;
+                            $record = null;
+                            $event  = self::LOG_EVENT;
+                            $details  = "Workflow $workflowName, ETL task # $key, task name '";
+                            $details .= $taskName . "' will be submitted: \n" . $details;
+                            \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
                         } else {
-                            $msg   =  'No configuration name provided for Workflow "' . $workflowName;
-                            $msg .=  '", ETL task # "' . $key . '", project ID ' . $projectId;
-                            throw new \Exception($msg);
-                        }
+                            #skip this task because the user does not have permissions to export
 
-                        $isWorkflowGlobalProperties = false;
+                            #-----------------------------------------------------
+                            # Set task logging information
+                            #-----------------------------------------------------
+                            $details = '';
+                            $details .= "project ID: {$projectId}\n";
+                            if (!$isCronJob) {
+                                $details .= "user: " . $username . "\n";
+                            }
+                            $details .= "server: {$serverName}\n";
+                            if ($isCronJob) {
+                                $details .= "cron: yes\n";
+                            } else {
+                                $details .= "cron: no\n";
+                            }
 
-                        $etlConfig->validateForRunning();
+                            $sql    = null;
+                            $record = null;
+                            $event  = self::LOG_EVENT;
 
-                        #---------------------------------------------------------------------
-                        # Move all task properties into a task config property so that
-                        # the global properties will override the task properties
-                        #---------------------------------------------------------------------
-                        $etlProperties = $etlConfig->getPropertiesArray();
-                        $newEtlProperties = array();
-                        $newEtlProperties[self::TASK_CONFIG] = $etlProperties;
-                        $etlConfig->setProperties($newEtlProperties);
+                            $details  = "Workflow $workflowName, ETL task # $key will be SKIPPED--";
+                            $details .= "User does not have export permissions: " . "\n" . $details;
+                            \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
+                        } #end if (hasPermissionToExport))
+                    } #next task
 
-                        #-----------------------------------------------------------
-                        # Add configuration for task to workflow configuration
-                        #-----------------------------------------------------------
-                        $serverConfig->updateEtlConfig($etlConfig, $isCronJob);
-                        $workflowConfig->addTaskConfiguration($taskName, $etlConfig);
-
-                        #-----------------------------------------------------
-                        # Set task logging information
-                        #-----------------------------------------------------
-                        $configUrl  = $etlConfig->getProperty(Configuration::REDCAP_API_URL);
-                        $details = '';
-
-                        # If being run on remote REDCap
-                        if (strcasecmp($configUrl, $this->getRedCapApiUrl()) !== 0) {
-                            $details .= "REDCap API URL: {$configUrl}\n";
-                        } else {
-                            # If local REDCap is being used, set SSL verify to the global value
-                            $sslVerify = $adminConfig->getSslVerify();
-                            $etlConfig->setProperty(Configuration::SSL_VERIFY, $sslVerify);
-                        }
-
-                        $details .= "project ID: {$projectId}\n";
-                        if (!$isCronJob) {
-                            $details .= "user: " . $username . "\n";
-                        }
-                        $details .= "configuration: {$configName}\n";
-                        $details .= "server: {$serverName}\n";
-                        if ($isCronJob) {
-                            $details .= "cron: yes\n";
-                        } else {
-                            $details .= "cron: no\n";
-                        }
-
-                        $sql    = null;
-                        $record = null;
-                        $event  = self::LOG_EVENT;
-                        $details  = "Workflow $workflowName, ETL task # $key, task name '";
-                        $details .= $taskName . "' will be submitted: \n" . $details;
-                        \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
-                    } else {
-                        #skip this task because the user does not have permissions to export
-
-                        #-----------------------------------------------------
-                        # Set task logging information
-                        #-----------------------------------------------------
-                        $details = '';
-                        $details .= "project ID: {$projectId}\n";
-                        if (!$isCronJob) {
-                            $details .= "user: " . $username . "\n";
-                        }
-                        $details .= "server: {$serverName}\n";
-                        if ($isCronJob) {
-                            $details .= "cron: yes\n";
-                        } else {
-                            $details .= "cron: no\n";
-                        }
-
-                        $sql    = null;
-                        $record = null;
-                        $event  = self::LOG_EVENT;
-
-                        $details  = "Workflow $workflowName, ETL task # $key will be SKIPPED--";
-                        $details .= "User does not have export permissions: " . "\n" . $details;
-                        \REDCap::logEvent(self::RUN_LOG_ACTION, $details, $sql, $record, $event, $projectId);
-                    } #end if (hasPermissionToExport))
-                } #next task
-
-                $runWorkflow = true;
-                $status = $serverConfig->run($workflowConfig, $isCronJob, $this->moduleLog, $runWorkflow);
-            } #end if (empty(workflowName))
+                    $runWorkflow = true;
+                    $status = $serverConfig->run($workflowConfig, $isCronJob, $this->moduleLog, $runWorkflow);
+                } # end if workflow has status "Ready"
+            } # end if (empty(workflowName))
         } catch (\Exception $exception) {
             $status  = "Workflow  ETL job failed: " . $exception->getMessage();
             $details = "Workflow $workflowName ETL job failed\n" . $details
