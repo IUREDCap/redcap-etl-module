@@ -447,6 +447,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             $userPrivateServers = array();
             $userPrivateServers = $this->settings->getUserPrivateServerNames($username);
             $servers = array_merge($servers, $userPrivateServers);
+
+            # Get uniue server names. There are cases where a server can be listed twice, for example, if a private
+            # server is changed to being public, and the list of users for the private version is saved.
+            $servers = array_unique($servers);
         }
 
         return $servers;
