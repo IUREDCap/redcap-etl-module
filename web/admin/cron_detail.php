@@ -21,6 +21,7 @@ use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
+use IU\RedCapEtlModule\Workflow;
 
 $selfUrl         = $module->getUrl(RedCapEtlModule::CRON_DETAIL_PAGE);
 $serverConfigUrl = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
@@ -142,12 +143,23 @@ $times = $adminConfig->getTimeLabels();
             $server = $cronJob['server'];
             $serverUrl = $serverConfigUrl . '&serverName=' . Filter::escapeForUrlParameter($server);
             #$username  = $cronJob['username'];
+            $workflowSuperscript = '';
+            $workflowNote        = '';
 
             $configType = '';
             if (array_key_exists('workflowName', $cronJob)) {
                 $configType = 'workflow';
                 $config     = $cronJob['workflowName'];
+
                 $tasks = $module->getWorkflowTasks($config);
+
+                $workflowStatus = $module->getWorkflowStatus($config);
+                if ($workflowStatus === Workflow::WORKFLOW_REMOVED) {
+                    $workflowSuperscript = '*';
+                    $workflowNote = 'This workflow has been removed by a user and will not run in the cron job'
+                        . ' unless it is reinstated by an admin.';
+                }
+
                 $taskProjectIds = array_column($tasks, 'projectId');
                 $firstPid = $taskProjectIds[0];
                 $configUrl = $module->getURL(
@@ -191,7 +203,12 @@ $times = $adminConfig->getTimeLabels();
             }
             echo "<td>{$displayConfigType}</td>\n";   # Job Type
 
-            echo "<td>" . '<a href="' . $configUrl . '">' . Filter::escapeForHtml($config) . '</a>' . "</td>\n";
+            if (empty($workflowSuperscript)) {
+                echo "<td>" . '<a href="' . $configUrl . '">' . Filter::escapeForHtml($config) . '</a>' . "</td>\n";
+            } else {
+                echo "<td>" . '<a href="' . $configUrl . '">' . Filter::escapeForHtml($config)
+                    . '<sup>' . Filter::escapeForHtml($workflowSuperscript) . '</sup></a>' . "</td>\n";
+            }
 
             echo "<td>" . '<a href="' . $serverUrl . '">' . Filter::escapeForHtml($server) . '</a>' . "</td>\n";
 
@@ -204,6 +221,12 @@ $times = $adminConfig->getTimeLabels();
     </tbody>
 </table>
 
+
+<?php
+if (!empty($workflowNote)) {
+    echo "<p style=\"margin-top: 24px;\"><sup>{$workflowSuperscript}</sup>{$workflowNote}</p>\n";
+}
+?>
 
 <!--
 <form action="<?php #echo $selfUrl;?>" method="post" style="margin-top: 12px;">
