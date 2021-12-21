@@ -404,6 +404,10 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
+    /**
+     * Returns servers with the specified specific access level. If 'none' is
+     * specified for the specific access level, then all servera are returned.
+     */
     public function getServersViaAccessLevels($specificLevel = 'none')
     {
         #get server names

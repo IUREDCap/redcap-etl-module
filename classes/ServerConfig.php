@@ -145,6 +145,11 @@ class ServerConfig implements \JsonSerializable
             foreach (get_object_vars($this) as $var => $value) {
                 $this->$var = $object->$var;
             }
+
+            # If access level is unset, set it to public
+            if (empty($this->accessLevel)) {
+                $this->accessLevel = 'public';
+            }
         }
     }
 
