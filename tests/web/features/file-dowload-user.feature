@@ -50,6 +50,16 @@ Feature: Zipped CSV file dowload functionality
     And I wait for 4 seconds
     Then I should see "Created table 'root'"
 
+   Scenario: Set max Zip file size
+    When I log out
+    And I access the admin interface
+    And I follow "Servers"
+    And I follow server "(embedded server)"
+    And I fill in "maxZipDownloadFileSize" with "124"
+    And I press "Save"
+    And I follow server "(embedded server)"
+    Then the "maxZipDownloadFileSize" field should contain "124"
+
    Scenario: Run with zip base as target 
     When I follow "Run"
     And I select "task" from "configType"
@@ -61,7 +71,7 @@ Feature: Zipped CSV file dowload functionality
     And I wait for 6 seconds
     Then a downloaded file should be found
 
-   Scenario: Run with database as target 
+   Scenario: Run zip file as target and max file size too small
     When I log out
     And I access the admin interface
     And I follow "Servers"
@@ -88,3 +98,14 @@ Feature: Zipped CSV file dowload functionality
     When I follow "ETL Configurations"
     And I delete configuration "behat-config-test"
     Then I should not see "behat-config-test"
+
+   Scenario: Clean up max Zip file size
+    When I log out
+    And I access the admin interface
+    And I follow "Servers"
+    And I follow server "(embedded server)"
+    And I fill in "maxZipDownloadFileSize" with "124"
+    And I press "Save"
+    And I follow server "(embedded server)"
+    Then the "maxZipDownloadFileSize" field should contain "124"
+
