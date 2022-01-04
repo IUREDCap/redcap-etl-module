@@ -177,8 +177,11 @@ class Configuration implements \JsonSerializable
      * Validation for case where a user is trying to run or schedule a configuration.
      * Users may save incomplete configurations, but they should be prevented from
      * trying to run or schedule one.
+     *
+     * @param boolean checkDatabaseConnection indicates if the database connection should be checked (if the user
+     *     is downloading the results as a CSV zip file, this check is unnecessary).
      */
-    public function validateForRunning()
+    public function validateForRunning($checkDatabaseConnection = true)
     {
         $isWorkflowGlobalProperties = false;
         $this->validate($isWorkflowGlobalProperties);
@@ -195,43 +198,45 @@ class Configuration implements \JsonSerializable
             }
         }
 
-        if (empty($this->getProperty(self::DB_TYPE))) {
-            throw new \Exception('No database type was specified in configuration.');
-        } else {
-            $dbType = $this->getProperty(self::DB_TYPE);
-            if ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_MYSQL) {
-                ; // OK
-            } elseif ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_SQLSERVER) {
-                if (!extension_loaded('sqlsrv') || !extension_loaded('pdo_sqlsrv')) {
-                    $message = 'The extensions for running SQL Server (sqlsrv and/or pdo_sqlsrv)'
-                        . ' have not been enabled.';
-                    throw new \Exception($message);
-                }
-            } elseif ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_POSTGRESQL) {
-                if (!extension_loaded('pgsql') || !extension_loaded('pdo_pgsql')) {
-                    $message = 'The extensions for running PostgreSQL (pgsql and/or pdo_pgsql)'
-                        . ' have not been enabled.';
-                    throw new \Exception($message);
-                }
+        if ($checkDatabaseConnection) {
+            if (empty($this->getProperty(self::DB_TYPE))) {
+                throw new \Exception('No database type was specified in configuration.');
             } else {
-                throw new \Exception('Unrecognized database type "' . $dbType . '" specified.');
+                $dbType = $this->getProperty(self::DB_TYPE);
+                if ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_MYSQL) {
+                    ; // OK
+                } elseif ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_SQLSERVER) {
+                    if (!extension_loaded('sqlsrv') || !extension_loaded('pdo_sqlsrv')) {
+                        $message = 'The extensions for running SQL Server (sqlsrv and/or pdo_sqlsrv)'
+                            . ' have not been enabled.';
+                        throw new \Exception($message);
+                    }
+                } elseif ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_POSTGRESQL) {
+                    if (!extension_loaded('pgsql') || !extension_loaded('pdo_pgsql')) {
+                        $message = 'The extensions for running PostgreSQL (pgsql and/or pdo_pgsql)'
+                            . ' have not been enabled.';
+                        throw new \Exception($message);
+                    }
+                } else {
+                    throw new \Exception('Unrecognized database type "' . $dbType . '" specified.');
+                }
             }
-        }
 
-        if (empty($this->getProperty(self::DB_HOST))) {
-            throw new \Exception('No database host was specified in configuration.');
-        }
+            if (empty($this->getProperty(self::DB_HOST))) {
+                throw new \Exception('No database host was specified in configuration.');
+            }
 
-        if (empty($this->getProperty(self::DB_NAME))) {
-            throw new \Exception('No database name was specified in configuration.');
-        }
+            if (empty($this->getProperty(self::DB_NAME))) {
+                throw new \Exception('No database name was specified in configuration.');
+            }
 
-        if (empty($this->getProperty(self::DB_USERNAME))) {
-            throw new \Exception('No database username was specified in configuration.');
-        }
+            if (empty($this->getProperty(self::DB_USERNAME))) {
+                throw new \Exception('No database username was specified in configuration.');
+            }
 
-        if (empty($this->getProperty(self::DB_PASSWORD))) {
-            throw new \Exception('No database password was specified in configuration.');
+            if (empty($this->getProperty(self::DB_PASSWORD))) {
+                throw new \Exception('No database password was specified in configuration.');
+            }
         }
 
         if ($this->getProperty(self::DB_FOREIGN_KEYS) && !$this->getProperty(self::DB_PRIMARY_KEYS)) {

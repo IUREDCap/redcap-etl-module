@@ -71,7 +71,13 @@ try {
             } elseif (!isset($configuration)) {
                 $error = 'ERROR: No ETL configuration found for ' . $configName . '.';
             } else {
-                $configuration->validateForRunning();
+                # Check the configuration for errors that would prevent it from being run
+                $checkDatabaseConnection = true;
+                if ($dataTarget === DataTarget::CSV_ZIP) {
+                    $checkDatabaseConnection = false;
+                }
+                $configuration->validateForRunning($checkDatabaseConnection);
+
                 $isCronJob = false;
                 #$runOutput = $module->run($configName, $server, $isCronJob);
                 $runOutput = $module->run($configName, $server, $isCronJob, $pid, null, null, null, $dataTarget);
