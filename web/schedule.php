@@ -239,7 +239,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
             <span style="margin-right: 4px;">ETL Server:</span>
             <?php
             echo '<select name="server" id="serverId">' . "\n";
-            echo '<option value=""></option>' . "\n";
+            # echo '<option value=""></option>' . "\n";
             foreach ($servers as $serverName) {
                 $serverConfig = $module->getServerConfig($serverName);
                 if (isset($serverConfig) && $serverConfig->getIsActive()) {
@@ -352,6 +352,7 @@ $(function () {
     ?>
     </tbody>
   </table>
+
   <!-- </fieldset> -->
     <?php Csrf::generateFormToken(); ?>
 </form>

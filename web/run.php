@@ -11,6 +11,8 @@ require_once __DIR__ . '/../dependencies/autoload.php';
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\RedCapDb;
+use IU\RedCapEtlModule\DataTarget;
+use IU\RedCapEtlModule\ServerConfig;
 
 $error   = '';
 $warning = '';
@@ -20,6 +22,7 @@ $pid = PROJECT_ID;
 $username = USERID;
 
 $servers = array();
+$server = '';
 
 try {
     #-----------------------------------------------------------
@@ -47,6 +50,7 @@ try {
     $configName   = $module->getRequestVar('configName', '\IU\RedCapEtlModule\Filter::sanitizeLabel');
     $workflowName = $module->getRequestVar('workflowName', '\IU\RedCapEtlModule\Filter::sanitizeLabel');
     $server       = $module->getRequestVar('server', '\IU\RedCapEtlModule\Filter::stripTags');
+    $dataTarget   = $module->getRequestVar('dataTarget', '\IU\RedCapEtlModule\Filter::sanitizeLabel');
 
     #-------------------------
     # Set the submit value
@@ -67,9 +71,28 @@ try {
             } elseif (!isset($configuration)) {
                 $error = 'ERROR: No ETL configuration found for ' . $configName . '.';
             } else {
-                $configuration->validateForRunning();
+                # Check the configuration for errors that would prevent it from being run
+                $checkDatabaseConnection = true;
+                if ($dataTarget === DataTarget::CSV_ZIP) {
+                    $checkDatabaseConnection = false;
+                }
+                $configuration->validateForRunning($checkDatabaseConnection);
+
                 $isCronJob = false;
-                $runOutput = $module->run($configName, $server, $isCronJob);
+                #$runOutput = $module->run($configName, $server, $isCronJob);
+                $runOutput = $module->run($configName, $server, $isCronJob, $pid, null, null, null, $dataTarget);
+
+                if ($dataTarget === DataTarget::CSV_ZIP) {
+                    $result = $runOutput;
+                    if (is_string($result) && (substr($result, 0, 6) === 'ERROR:')) {
+                        $error = $result;
+                    } else {
+                        header('Content-Type: application/zip');
+                        header('Content-Disposition: attachment; filename="redcap-etl.zip"');
+                        header('Content-Length: ' . filesize($result));
+                        echo file_get_contents($result);
+                    }
+                }
             }
         } elseif ($configType === 'workflow') {
             if (empty($workflowName)) {
@@ -228,20 +251,39 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
             <?php
             echo '<select name="server" id="serverId">' . "\n";
             # echo '<option value=""></option>' . "\n";
+            # array_unshift($servers, '');
             foreach ($servers as $serverName) {
-                $serverConfig = $module->getServerConfig($serverName);
-                if (isset($serverConfig) && $serverConfig->getIsActive()) {
-                    $selected = '';
-                    if ($serverName === $server) {
-                        $selected = 'selected';
-                    }
-                    echo '<option value="' . Filter::escapeForHtmlAttribute($serverName) . '" ' . $selected . '>'
+                if ($serverName !== '') {
+                    $serverConfig = $module->getServerConfig($serverName);
+                    if (isset($serverConfig) && $serverConfig->getIsActive()) {
+                        $selected = '';
+                        if ($serverName === $server) {
+                            $selected = 'selected';
+                        }
+                        echo '<option value="' . Filter::escapeForHtmlAttribute($serverName) . '" ' . $selected . '>'
                         . Filter::escapeForHtml($serverName) . "</option>\n";
+                    }
+                } else {
+                    echo '<option value="" ' . '>'
+                        . "</option>\n";
                 }
             }
             echo "</select>\n";
             ?>
         </div>
+
+        <!-- DATA TARGET -->
+        <?php
+        if ($configType === 'task' && $server === $serverConfig::EMBEDDED_SERVER_NAME) {
+            echo '
+                <div style="float: left; margin-bottom: 22px; margin-left: 2em">
+                    <select name="dataTarget" id="dataTarget" style="margin-left: 1em;">
+                        <option value="' . DataTarget::DB . '">Load data into database </option>
+                        <option value="' . DataTarget::CSV_ZIP . '">Export data as CSV zip file</option>
+                    </select>
+                </div>';
+        }
+        ?>
     
         <!-- RUN BUTTON -->
         <div style="float: left; margin-left: 2em; margin-bottom: 0px;">
@@ -255,6 +297,14 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
     <?php Csrf::generateFormToken(); ?>
 </form>
+
+<script>
+$(document).ready(function(){
+    $("#serverId").change(function(){
+         runForm.submit();
+     });
+});
+</script>
 
 <?php
 if ($configType === 'task') {

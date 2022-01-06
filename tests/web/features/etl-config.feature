@@ -16,6 +16,10 @@ I need to be able to create, copy, rename and delete configurations
     When I select the test project
     And I follow "REDCap-ETL"
 
+  Scenario: Delete configuration if it exists
+    When I delete configuration "behat-config-test" if it exists
+    Then I should not see "behat-config-test"
+      
   Scenario: Create configuration
     When I fill in "configurationName" with "behat-config-test"
     And I press "Add"

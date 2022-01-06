@@ -451,4 +451,14 @@ class Util
 
         return $newWindowName;
     }
+
+    public function findDownloadedFile()
+    {
+        $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
+        $dir = $testConfig->getUser()['zip_download_directory'];
+        $files = scandir($dir);
+        $exists = array_search('redcap-etl.zip', $files);
+        return $exists;        
+    }
+
 }

@@ -62,7 +62,7 @@ class Help
             . " <em>Table name to use</em> text box."
             . "<ul>"
             . "<li>"
-            . "If your project is NOT longitudinal, any values you enter here will be"
+            . "If your project is longitudinal, any values you enter here will be"
             . " ignored."
             . "</li>"
             . "<li>"
