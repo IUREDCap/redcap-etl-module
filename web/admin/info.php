@@ -139,6 +139,50 @@ have permissions will be displayed. There are three server access-level options:
 </ol>
 <hr />
 
+<h5 style="font-weight: bold;">Databases</h5>
+
+The REDCap-ETL Module supports the following database systems for loading the extracted and transformed data from REDCap:
+
+<ul>
+    <li> MySQL </li>
+    <li> PostgreSQL </li>
+    <li> SQL Server </li>
+</ul>
+
+<p>
+However, to be able to user PostgreSQL and SQL Server, the correct PHP database extensions will need to be installed on the server
+that is running the actual ETL process, which for most users is the REDCap server (i.e., for users using the embedded REDCap-ETL
+server that comes with the REDCap-ETL Module and runs within REDCap).
+There is some documentation for doing this for
+the Ubuntu Linux operating system in the REDCap-ETL application documentation:
+</p>
+<ul>
+    <li> PostgreSQL: <a href="https://github.com/IUREDCap/redcap-etl/blob/master/docs/DeveloperGuide.md">REDCap-ETL Developer Guide</a>
+    <li> SQL Server: <a href="https://github.com/IUREDCap/redcap-etl/blob/master/docs/SqlServer.md">REDCap-ETL SQL Server Documentation</a>
+</ul>
+
+<p>
+To use a database system for REDCap-ETL, users need to have a database account that has at least the following permissions:
+</p>
+<ul>
+    <li>SELECT</li>
+    <li>INSERT</li>
+    <li>CREATE</li>
+    <li>DROP</li>
+    <li>CREATE VIEW</li>
+</ul>
+
+
+<p>
+It is also possible to download data from the ETL process into a CSV Zip file when running ETL interactively on the embedded server.
+No database is required for this option.
+</p>
+
+
+
+<hr />
+
+
 <h5 style="font-weight: bold;">Admin Pages</h5>
 
 The REDCap-ETL external module has the following admin pages:
