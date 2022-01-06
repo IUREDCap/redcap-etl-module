@@ -251,7 +251,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
             <?php
             echo '<select name="server" id="serverId">' . "\n";
             # echo '<option value=""></option>' . "\n";
-            array_unshift($servers, '');
+            # array_unshift($servers, '');
             foreach ($servers as $serverName) {
                 if ($serverName !== '') {
                     $serverConfig = $module->getServerConfig($serverName);
