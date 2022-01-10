@@ -98,7 +98,7 @@ class ConfigurationTest extends TestCase
         $configuration->set($properties);
         $exceptionCaught = false;
         try {
-            $configuration->validateForRunning();
+            $configuration->validateForRunning(ServerConfig::EMBEDDED_SERVER_NAME);
         } catch (\Exception $exception) {
             $message = $exception->getMessage();
             $exceptionCaught = true;

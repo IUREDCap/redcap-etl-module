@@ -1200,7 +1200,7 @@ class Settings
         return $workflows->getWorkflowStatus($workflowName);
     }
 
-    public function validateWorkflowForRunning($workflowName, $isCron = false)
+    public function validateWorkflowForRunning($workflowName, $serverName, $isCron = false)
     {
         $workflow = $this->getWorkflow($workflowName);
 
@@ -1252,7 +1252,7 @@ class Settings
                         . " for task \"{$taskName}\" could not be found.";
                     throw new \Exception($message);
                 }
-                $etlConfig->validateForRunning();
+                $etlConfig->validateForRunning($serverName);
             } catch (\Exception $exception) {
             }
         }

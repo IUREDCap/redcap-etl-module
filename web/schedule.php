@@ -77,7 +77,7 @@ try {
         $schedule[6] = Filter::sanitizeInt($_POST['Saturday']);
 
         if ($configType === 'task') {
-            $configuration->validateForRunning();
+            $configuration->validateForRunning($server);
             if (empty($configName)) {
                 $error = 'ERROR: No ETL configuration specified.';
             } elseif (!isset($configuration)) {
@@ -97,7 +97,7 @@ try {
                 # Check that the workflow can run. If it can't, an exception will be thrown,
                 # and the schedule will not be set
                 $isCron = true;
-                $module->validateWorkflowForRunning($workflowName, $isCron);
+                $module->validateWorkflowForRunning($workflowName, $server, $isCron);
 
                 $module->setWorkflowSchedule($workflowName, $server, $schedule, $username);
                 $success = " Schedule saved.";

@@ -1494,9 +1494,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     }
 
 
-    public function validateWorkflowForRunning($workflowName, $isCron = false)
+    public function validateWorkflowForRunning($workflowName, $serverName, $isCron = false)
     {
-        $this->settings->validateWorkflowForRunning($workflowName, $isCron);
+        $this->settings->validateWorkflowForRunning($workflowName, $serverName, $isCron);
     }
 
     public function runWorkflow(
@@ -1673,7 +1673,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
                             $isWorkflowGlobalProperties = false;
 
-                            $etlConfig->validateForRunning();
+                            $etlConfig->validateForRunning($serverName);
 
                             #---------------------------------------------------------------------
                             # Move all task properties into a task config property so that

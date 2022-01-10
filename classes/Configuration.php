@@ -181,7 +181,7 @@ class Configuration implements \JsonSerializable
      * @param boolean checkDatabaseConnection indicates if the database connection should be checked (if the user
      *     is downloading the results as a CSV zip file, this check is unnecessary).
      */
-    public function validateForRunning($checkDatabaseConnection = true)
+    public function validateForRunning($serverName, $checkDatabaseConnection = true)
     {
         $isWorkflowGlobalProperties = false;
         $this->validate($isWorkflowGlobalProperties);
@@ -206,16 +206,22 @@ class Configuration implements \JsonSerializable
                 if ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_MYSQL) {
                     ; // OK
                 } elseif ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_SQLSERVER) {
-                    if (!extension_loaded('sqlsrv') || !extension_loaded('pdo_sqlsrv')) {
-                        $message = 'The extensions for running SQL Server (sqlsrv and/or pdo_sqlsrv)'
-                            . ' have not been enabled.';
-                        throw new \Exception($message);
+                    # If running on embedded server, check that the correct extensions exist
+                    if ($serverName === ServerConfig::EMBEDDED_SERVER_NAME) {
+                        if (!extension_loaded('sqlsrv') || !extension_loaded('pdo_sqlsrv')) {
+                            $message = 'The extensions for running SQL Server (sqlsrv and/or pdo_sqlsrv)'
+                                . ' have not been enabled.';
+                            throw new \Exception($message);
+                        }
                     }
                 } elseif ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_POSTGRESQL) {
-                    if (!extension_loaded('pgsql') || !extension_loaded('pdo_pgsql')) {
-                        $message = 'The extensions for running PostgreSQL (pgsql and/or pdo_pgsql)'
-                            . ' have not been enabled.';
-                        throw new \Exception($message);
+                    # If running on embedded server, check that the correct extensions exist
+                    if ($serverName === ServerConfig::EMBEDDED_SERVER_NAME) {
+                        if (!extension_loaded('pgsql') || !extension_loaded('pdo_pgsql')) {
+                            $message = 'The extensions for running PostgreSQL (pgsql and/or pdo_pgsql)'
+                                . ' have not been enabled.';
+                            throw new \Exception($message);
+                        }
                     }
                 } else {
                     throw new \Exception('Unrecognized database type "' . $dbType . '" specified.');
@@ -787,125 +793,5 @@ class Configuration implements \JsonSerializable
         }
 
         return $properties;
-    }
-
-    public function validateForRunningWorkflow($workflowName, $taskKey, $taskName, $globalProperties = null)
-    {
-        $preface = "For Workflow: $workflowName, ETL task #: $taskKey, taskName: $taskName: ";
-        $suffix = " in task configuration or global properties.";
-
-        $isGlobalWorkflowProperties = false;
-        $this->validate($isWorkflowGlobalProperties);
-
-        if (empty($this->getProperty(self::API_TOKEN_USERNAME))) {
-            throw new \Exception($preface . 'No API token specified in task configuration.');
-        }
-
-        $rulesSource = $this->getProperty(self::TRANSFORM_RULES_SOURCE);
-        if ($rulesSource != \IU\REDCapETL\TaskConfig::TRANSFORM_RULES_DEFAULT) {
-            # If the rules source is not (dynamic) auto-generation, make sure that rules have beem specified
-            if (empty($this->getProperty(self::TRANSFORM_RULES_TEXT))) {
-                throw new \Exception($preface . 'No transformation rules were specified in task configuration.');
-            }
-        }
-
-        $dbType = $this->getProperty(self::DB_TYPE);
-        if ($globalProperties) {
-            if (array_key_exists(self::DB_TYPE, $globalProperties)) {
-                $dbType = $globalProperties[self::DB_TYPE];
-            }
-        }
-        if (empty($dbType)) {
-            throw new \Exception($preface . 'No database type was specified' . $suffix);
-        } else {
-            if ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_MYSQL) {
-                ; // OK
-            } elseif ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_SQLSERVER) {
-                if (!extension_loaded('sqlsrv') || !extension_loaded('pdo_sqlsrv')) {
-                    $message = $preface . 'The extensions for running SQL Server (sqlsrv and/or pdo_sqlsrv)'
-                        . ' have not been enabled.';
-                    throw new \Exception($message);
-                }
-            } elseif ($dbType === \IU\REDCapETL\Database\DbConnectionFactory::DBTYPE_POSTGRESQL) {
-                if (!extension_loaded('pgsql') || !extension_loaded('pdo_pgsql')) {
-                    $message = $preface . 'The extensions for running PostgreSQL (pgsql and/or pdo_pgsql)'
-                        . ' have not been enabled.';
-                    throw new \Exception($message);
-                }
-            } else {
-                throw new \Exception($preface . 'Unrecognized database type "' . $dbType . '" specified.');
-            }
-        }
-
-        $dbHost = $this->getProperty(self::DB_HOST);
-        $dbName = $this->getProperty(self::DB_NAME);
-        $dbUsername = $this->getProperty(self::DB_USERNAME);
-        $dbPassword = $this->getProperty(self::DB_PASSWORD);
-        $dbForeignKeys = $this->getProperty(self::DB_FOREIGN_KEYS);
-        $dbPrimaryKeys = $this->getProperty(self::DB_PRIMARY_KEYS);
-        $emailErrors = $this->getProperty(self::EMAIL_ERRORS);
-        $emailSummary = $this->getProperty(self::EMAIL_SUMMARY);
-        $emailToList = $this->getProperty(self::EMAIL_TO_LIST);
-
-        if ($globalProperties) {
-            if (array_key_exists(self::DB_HOST, $globalProperties)) {
-                $dbHost = $globalProperties[self::DB_HOST];
-            }
-            if (array_key_exists(self::DB_NAME, $globalProperties)) {
-                $dbName = $globalProperties[self::DB_NAME];
-            }
-            if (array_key_exists(self::DB_USERNAME, $globalProperties)) {
-                $dbUsername = $globalProperties[self::DB_USERNAME];
-            }
-            if (array_key_exists(self::DB_PASSWORD, $globalProperties)) {
-                $dbPassword = $globalProperties[self::DB_PASSWORD];
-            }
-            if (array_key_exists(self::DB_FOREIGN_KEYS, $globalProperties)) {
-                $dbForeignKeys = $globalProperties[self::DB_FOREIGN_KEYS];
-            }
-            if (array_key_exists(self::DB_PRIMARY_KEYS, $globalProperties)) {
-                $dbPrimaryKeys = $globalProperties[self::DB_PRIMARY_KEYS];
-            }
-            if (array_key_exists(self::EMAIL_ERRORS, $globalProperties)) {
-                $emailErrors = $globalProperties[self::EMAIL_ERRORS];
-            }
-            if (array_key_exists(self::EMAIL_SUMMARY, $globalProperties)) {
-                $emailSummary = $globalProperties[self::EMAIL_SUMMARY];
-            }
-            if (array_key_exists(self::EMAIL_TO_LIST, $globalProperties)) {
-                $emailToList = $globalProperties[self::EMAIL_TO_LIST];
-            }
-        }
-
-        if (empty($dbHost)) {
-            throw new \Exception($preface . 'No database host was specified' . $suffix);
-        }
-
-        if (empty($dbName)) {
-            throw new \Exception($preface . 'No database name was specified' . $suffix);
-        }
-
-        if (empty($dbUsername)) {
-            throw new \Exception($preface . 'No database username was specified' . $suffix);
-        }
-
-        if (empty($dbPassword)) {
-            throw new \Exception($preface . 'No database password was specified' . $suffix);
-        }
-
-        if ($dbForeignKeys && !$dbPrimaryKeys) {
-            throw new \Exception($preface . 'Database foreign keys specified without database '
-            . 'primary keys being specified' . $suffix);
-        }
-
-        if ($emailErrors || $emailSummary) {
-            if (empty($emailToList)) {
-                throw new \Exception(
-                    $preface . 'E-mailing of errors and/or summary specified in task configuration '
-                    . 'or global properties, but no e-mail to list address was provided either '
-                    . 'the task configuration or global properties.'
-                );
-            }
-        }
     }
 }

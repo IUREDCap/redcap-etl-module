@@ -76,7 +76,7 @@ try {
                 if ($dataTarget === DataTarget::CSV_ZIP) {
                     $checkDatabaseConnection = false;
                 }
-                $configuration->validateForRunning($checkDatabaseConnection);
+                $configuration->validateForRunning($server, $checkDatabaseConnection);
 
                 $isCronJob = false;
                 #$runOutput = $module->run($configName, $server, $isCronJob);
@@ -100,7 +100,7 @@ try {
             } else {
                 # If the workflow is mot valid for running, and exception will be thrown,
                 # and the workflow will not run.
-                $module->validateWorkflowForRunning($workflowName);
+                $module->validateWorkflowForRunning($workflowName, $server);
 
                 $isCronJob = false;
                 $originatingProjectId = $pid;
