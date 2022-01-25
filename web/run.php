@@ -52,6 +52,11 @@ try {
     $server       = $module->getRequestVar('server', '\IU\RedCapEtlModule\Filter::stripTags');
     $dataTarget   = $module->getRequestVar('dataTarget', '\IU\RedCapEtlModule\Filter::sanitizeLabel');
 
+    # If no server is specified, set it to the first of the list of servers (if there is at least 1)
+    if (empty($server) && count($servers) > 0) {
+        $server = $servers[0];
+    }
+
     #-------------------------
     # Set the submit value
     #-------------------------
