@@ -222,9 +222,13 @@ are 2 basic ways to run REDCap-ETL:
     ?>
     - You can run an ETL process on demand
     by going to the <strong>Run</strong>
-    tab. The servers for which you have permissions will be displayed in a drop-down box.
-    Select an ETL server, as well as an ETL configuration, and click the <strong>Run</strong>
-    button.
+    tab.
+    Select the ETL configuration or ETL workflow that you want to run. Select an ETL server,
+    and click the <strong>Run</strong> button. In addition, for the case where you are running
+    an ETL configuration on the "embedded server", you will have the option of downloading the
+    extracted and transformed data as a CSV (comma-separated values) zip file, instead of loading the
+    data into the database you specified in your ETL configuration (as is done for all other
+    cases).
     </li>
     <li><strong>Scheduled</strong>
     <?php
@@ -233,10 +237,11 @@ are 2 basic ways to run REDCap-ETL:
     }
     ?>
     - You can use the <strong>Schedule</strong> tab to schedule an ETL
-    job to run at specified times each week. For a given configuration, you can specify one hour per
-    day of the week for the job to run.The servers for which you have
-    permissions will be displayed in a drop-down box. Select a server,
-    specify the day(s) and time(s), and click the <strong>Save</strong> button.
+    process to run at specified times each week. For a given configuration or workflow,
+    you can specify one hour per day of the week for the process to run.
+    After you have specified an ETL configuration or workflow, an
+    ETL server, and the times the ETL process should run,
+    click the <strong>Save</strong> button to save your schedule.
     </li>
 </ol>
 </div>
@@ -245,7 +250,7 @@ are 2 basic ways to run REDCap-ETL:
 <strong>Note:</strong> REDCap-ETL deletes the tables specified in the transformation rules at the start of
 each run, and then regenerates these tables. This is done
 because there is no good way to know what data has changed in REDCap since the last time REDCap-ETL was run.
-So you would not want to use these tables as a place to manually add data. 
+So, you would not want to use these tables as a place to manually add data. 
 However, you could create <em>additional</em> tables in the database that you update manually.
 </p>
 

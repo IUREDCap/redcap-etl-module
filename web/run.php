@@ -9,9 +9,10 @@
 require_once __DIR__ . '/../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\Csrf;
-use IU\RedCapEtlModule\Filter;
-use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\DataTarget;
+use IU\RedCapEtlModule\Filter;
+use IU\RedCapEtlModule\Help;
+use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\ServerConfig;
 
 $error   = '';
@@ -23,6 +24,7 @@ $username = USERID;
 
 $servers = array();
 $server = '';
+
 
 try {
     #-----------------------------------------------------------
@@ -142,6 +144,22 @@ $link = '<link href="' . $cssFile . '" rel="stylesheet" type="text/css" media="a
 $buffer = str_replace('</head>', "    " . $link . "\n</head>", $buffer);
 echo $buffer;
 ?>
+
+<script>
+    // Help dialog events
+    $(document).ready(function() {
+
+        $( function() {
+            $('#run-help-link').click(function () {
+                $('#run-help').dialog({dialogClass: 'redcap-etl-help', width: 540, maxHeight: 440})
+                    .dialog('widget').position({my: 'left top', at: 'right+50 top+90', of: $(this)})
+                    ;
+                return false;
+            });
+        });
+    });
+
+</script>
 
 <div class="projhdr"> 
     <img style="margin-right: 7px;" src="<?php echo APP_PATH_IMAGES ?>database_table.png" alt="">REDCap-ETL
@@ -298,7 +316,15 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
         </div>
     </div>
     
+    <div style="float: right;">
+        <a href="#" id="run-help-link" class="etl-help" title="help">?</a>
+        <div id="run-help" title="Run ETL" style="display: none;">
+            <?php echo Help::getHelpWithPageLink('run', $module); ?>
+        </div>
+    </div>
+
     <div style="clear: both;"></div>
+
 
     <?php Csrf::generateFormToken(); ?>
 </form>
