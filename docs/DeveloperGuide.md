@@ -39,6 +39,11 @@ can be used from the top-level directory:
     composer install
 
 
+To check for out of date dependencies, use:
+
+    composer outdated --direct
+
+
 Coding Standards Compliance
 -----------------------------
 

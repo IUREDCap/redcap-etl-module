@@ -44,17 +44,17 @@
     },
     {
         "name": "iu-redcap/redcap-etl",
-        "version": "2.0.11",
-        "version_normalized": "2.0.11.0",
+        "version": "2.0.12",
+        "version_normalized": "2.0.12.0",
         "source": {
             "type": "git",
             "url": "https://github.com/IUREDCap/redcap-etl.git",
-            "reference": "0d03dabaaf3a84e7b7ced8afcb07c12895b69c00"
+            "reference": "3fb46d45af3f0a9db8abf5055d2e2bcb81fe868b"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/0d03dabaaf3a84e7b7ced8afcb07c12895b69c00",
-            "reference": "0d03dabaaf3a84e7b7ced8afcb07c12895b69c00",
+            "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/3fb46d45af3f0a9db8abf5055d2e2bcb81fe868b",
+            "reference": "3fb46d45af3f0a9db8abf5055d2e2bcb81fe868b",
             "shasum": ""
         },
         "require": {
@@ -69,7 +69,7 @@
             "phpunit/phpunit": "9.5.8",
             "squizlabs/php_codesniffer": "3.6.0"
         },
-        "time": "2021-11-08T17:46:40+00:00",
+        "time": "2022-01-27T19:37:54+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -89,17 +89,17 @@
     },
     {
         "name": "paragonie/constant_time_encoding",
-        "version": "v2.4.0",
-        "version_normalized": "2.4.0.0",
+        "version": "v2.5.0",
+        "version_normalized": "2.5.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/paragonie/constant_time_encoding.git",
-            "reference": "f34c2b11eb9d2c9318e13540a1dbc2a3afbd939c"
+            "reference": "9229e15f2e6ba772f0c55dd6986c563b937170a8"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/f34c2b11eb9d2c9318e13540a1dbc2a3afbd939c",
-            "reference": "f34c2b11eb9d2c9318e13540a1dbc2a3afbd939c",
+            "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/9229e15f2e6ba772f0c55dd6986c563b937170a8",
+            "reference": "9229e15f2e6ba772f0c55dd6986c563b937170a8",
             "shasum": ""
         },
         "require": {
@@ -109,7 +109,7 @@
             "phpunit/phpunit": "^6|^7|^8|^9",
             "vimeo/psalm": "^1|^2|^3|^4"
         },
-        "time": "2020-12-06T15:14:20+00:00",
+        "time": "2022-01-17T05:32:27+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -200,17 +200,17 @@
     },
     {
         "name": "phpseclib/phpseclib",
-        "version": "3.0.10",
-        "version_normalized": "3.0.10.0",
+        "version": "3.0.12",
+        "version_normalized": "3.0.12.0",
         "source": {
             "type": "git",
             "url": "https://github.com/phpseclib/phpseclib.git",
-            "reference": "62fcc5a94ac83b1506f52d7558d828617fac9187"
+            "reference": "89bfb45bd8b1abc3b37e910d57f5dbd3174f40fb"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/62fcc5a94ac83b1506f52d7558d828617fac9187",
-            "reference": "62fcc5a94ac83b1506f52d7558d828617fac9187",
+            "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/89bfb45bd8b1abc3b37e910d57f5dbd3174f40fb",
+            "reference": "89bfb45bd8b1abc3b37e910d57f5dbd3174f40fb",
             "shasum": ""
         },
         "require": {
@@ -229,7 +229,7 @@
             "ext-mcrypt": "Install the Mcrypt extension in order to speed up a few other cryptographic operations.",
             "ext-openssl": "Install the OpenSSL extension in order to speed up a wide variety of cryptographic operations."
         },
-        "time": "2021-08-16T04:24:45+00:00",
+        "time": "2021-11-28T23:46:03+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {

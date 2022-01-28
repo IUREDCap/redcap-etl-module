@@ -23,6 +23,7 @@ Feature: Zipped CSV file dowload functionality
     And I press "Save"
     And I follow "Run"
     And I select "workflow" from "configType"
+    And I wait for 2 seconds
     Then I should not see "Load data into database"
 
     When I select "task" from "configType"
