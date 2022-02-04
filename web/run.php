@@ -59,6 +59,13 @@ try {
         $server = $servers[0];
     }
 
+    # If this is not a task, or the server is not the embedded server,
+    # make sure that the data target is set to "database", because the data target
+    # may be stored in the user's session as "CSV" from a previous run
+    if ($configType !== 'task' || $server !== ServerConfig::EMBEDDED_SERVER_NAME) {
+        $dataTarget = DataTarget::DB;
+    }
+
     #-------------------------
     # Set the submit value
     #-------------------------
@@ -297,7 +304,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
         <!-- DATA TARGET -->
         <?php
-        if ($configType === 'task' && $server === $serverConfig::EMBEDDED_SERVER_NAME) {
+        if ($configType === 'task' && $server === ServerConfig::EMBEDDED_SERVER_NAME) {
             echo '
                 <div style="float: left; margin-bottom: 22px; margin-left: 2em">
                     <select name="dataTarget" id="dataTarget" style="margin-left: 1em;">
