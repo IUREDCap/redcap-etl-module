@@ -133,17 +133,25 @@ class ModuleLog
      */
     public function getData($type, $startDate = null, $endDate = null)
     {
-
         $query = "select log_id, timestamp, ui_id, project_id, message";
+        $queryParameters = array();
 
         if ($type === self::ETL_RUN) {
-            $query .= ', log_type, cron, config, etl_username, etl_server, cron_job_log_id, cron_day, cron_hour';
+            $query .= ', log_type, cron, config, etl_username, etl_server, cron_job_log_id, cron_day, cron_hour ';
             $query .= " where (log_type = '" . Filter::escapeForMysql($type) . "'";
             $query .= " or log_type = '" . self::WORKFLOW_RUN . "')";
+            # $query .= ', log_type, cron, config, etl_username, etl_server, cron_job_log_id, cron_day, cron_hour ';
+            #$query .= " where (log_type = ? or log_type = ?) ";
+            #$queryParameters[] = $type;
+            #$queryParameters[] = self::WORKFLOW_RUN;
         } elseif ($type === self::ETL_CRON) {
-            $query .= ', log_type, cron_day, cron_hour, num_jobs';
+            $query .= ', log_type, cron_day, cron_hour, num_jobs ';
             $query .= " where (log_type = '" . Filter::escapeForMysql($type) . "'";
             $query .= " or log_type = '" . self::WORKFLOW_CRON_JOB . "')";
+            #$query .= " where (log_type = '" . Filter::escapeForMysql($type) . "'";
+            #$query .= ' where (log_type = ? or log_type = ?) ';
+            #$queryParameters[] = $type;
+            #$queryParameters[] = self::WORKFLOW_CRON_JOB;
         }
 
         #----------------------------------------
@@ -153,6 +161,8 @@ class ModuleLog
             $startTime = \DateTime::createFromFormat('m/d/Y', $startDate);
             $startTime = $startTime->format('Y-m-d');
             $query .= " and timestamp >= '" . Filter::escapeForMysql($startTime) . "'";
+            #$query .= ' and timestamp >= ? ';
+            #$queryParameters[] = $startTime;
         }
 
         #---------------------------------------
@@ -163,9 +173,11 @@ class ModuleLog
             $endTime->modify('+1 day');
             $endTime = $endTime->format('Y-m-d');
             $query .= " and timestamp < '" . Filter::escapeForMysql($endTime) . "'";
+            # $query .= ' and timestamp < ? ';
+            # $queryParameters[] = $endTime;
         }
 
-        $logData = $this->module->queryLogs($query);
+        $logData = $this->module->queryLogs($query, $queryParameters);
         return $logData;
     }
 
