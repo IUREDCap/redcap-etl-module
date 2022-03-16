@@ -82,17 +82,17 @@ class Filter
         return $newValues;
     }
 
-    public function isEmail($value)
+    public static function isEmail($value)
     {
         return filter_var($value, FILTER_VALIDATE_EMAIL);
     }
 
-    public function isUrl($value)
+    public static function isUrl($value)
     {
         return filter_var($value, FILTER_VALIDATE_URL);
     }
 
-    public function sanitizeInt($value)
+    public static function sanitizeInt($value)
     {
         return filter_var($value, FILTER_SANITIZE_NUMBER_INT);
     }
@@ -101,7 +101,7 @@ class Filter
      * Removes tags and invalid characters for labels
      * (internal string values used for submit buttons, etc.).
      */
-    public function sanitizeLabel($value)
+    public static function sanitizeLabel($value)
     {
         $flags = FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_BACKTICK;
         return filter_var($value, FILTER_SANITIZE_STRING, $flags);
@@ -110,7 +110,7 @@ class Filter
     /**
      * Removes invalid characters for internal button labels.
      */
-    public function sanitizeButtonLabel($value)
+    public static function sanitizeButtonLabel($value)
     {
         $value = preg_replace('/([^a-zA-Z0-9_\- .])/', '', $value);
         return $value;
@@ -119,7 +119,7 @@ class Filter
     /**
      * Removes invalid characters from dates
      */
-    public function sanitizeDate($value)
+    public static function sanitizeDate($value)
     {
         $value = preg_replace('/([^0-9\-\/])/', '', $value);
         return $value;
@@ -128,7 +128,7 @@ class Filter
     /**
      * Removes tags and invalid characters for strings.
      */
-    public function sanitizeString($value)
+    public static function sanitizeString($value)
     {
         $flags = FILTER_FLAG_STRIP_LOW;
         return filter_var($value, FILTER_SANITIZE_STRING, $flags);

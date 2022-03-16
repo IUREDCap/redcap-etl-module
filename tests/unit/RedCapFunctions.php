@@ -12,12 +12,12 @@ class RedCapFunctions
     private static $dbQueryResults = array();
     private static $queries = array();
 
-    public function addDbQueryResult($query, $isException, $value)
+    public static function addDbQueryResult($query, $isException, $value)
     {
         self::$dbQueryResults[$query] = [$isException, $value];
     }
 
-    public function getDbQueryResult($query)
+    public static function getDbQueryResult($query)
     {
         $result = null;
         if (array_key_exists($query, self::$dbQueryResults)) {
@@ -26,12 +26,12 @@ class RedCapFunctions
         return $result;
     }
 
-    public function addQuery($query)
+    public static function addQuery($query)
     {
         self::$queries[] = $query;
     }
 
-    public function getLastQuery()
+    public static function getLastQuery()
     {
         return array_slice(self::$queries, -1)[0];
     }
