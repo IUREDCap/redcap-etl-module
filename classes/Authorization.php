@@ -109,10 +109,66 @@ class Authorization
 
             # Users need to have project design permission and "full data set" data export permission
             # and not belong to a data access group (DAG)
-            if ($rights['design'] && $rights['data_export_tool'] == 1 && empty($rights['group_id'])) {
+            $canExportAllData = false;
+
+            # If this is a newer REDCap version that has data export permissions
+            # specified at the instrument (form) level, check that the user has export
+            # permission for all instruments.
+            #
+            # Example value for data_export_instruments:
+            #     "[enrollment,1][contact_information,1][emergency_contacts,1][weight,1][cardiovascular,1]"
+            #
+
+            if ($rights['design'] && self::canExportAllInstruments($rights) && empty($rights['group_id'])) {
                 $hasPermission = true;
             }
         }
         return $hasPermission;
+    }
+
+    /**
+     * Gets individual instrument export rights, if defined.
+     *
+     * @param array $rights a user's REDCap project rights.
+     */
+    public static function getInstrumentExportRights($rights)
+    {
+        $instrumentExportRights = null;
+
+        if (array_key_exists('data_export_instruments', $rights)) {
+            $dataExportRights = $rights['data_export_rights'];
+            $dataExportRights = trim($dataExportRights, '[]');
+            $dataExportRights = explode('][', $dataExportRights);
+
+            foreach ($dataExportRights as $dataExportRight) {
+                $commaIndex = strrpos($dataExportRight, ',');
+
+                $instrument  = substr($dataExportRight, 0, $commaIndex);
+                $accessLevel = substr($dataExportRight, $commaIndex + 1);
+
+                $instrumentExportRightss[$instrument] = $accessLevel;
+            }
+        }
+        return $instrumentExportRights;
+    }
+
+    public static function canExportAllInstruments($rights)
+    {
+        $canExportAllInstruments = false;
+
+        if (array_key_exists('data_export_instruments', $rights)) {
+            $canExportAllInstruments = true;
+            $instrumentExportRights = self::getInstrumentExportRights($rights);
+            foreach ($instrumentExportRights as $instrument => $accessLevel) {
+                if ($accessLevel !== '1') {
+                    $canExportAllInstruments = false;
+                    break;
+                }
+            }
+        } elseif ($rights['data_export_tool'] == 1) {
+            $canExportAllInstruments = true;
+        }
+
+        return $canExportAllInstruments;
     }
 }

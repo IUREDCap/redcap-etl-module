@@ -37,7 +37,7 @@ class RedCapDb
     }
 
     /**
-     * Gets the projects that that the specified user has permission
+     * Gets the projects that the specified user has permission
      * to access.
      *
      * @param string username the username whose projects are returned.
@@ -47,9 +47,19 @@ class RedCapDb
     public function getUserProjects($username)
     {
         $projects = array();
+
+        // OLD CODE (before instrument data export permission change):
+        //$sql = "select u.username, p.project_id, p.app_title, "
+        //    . " if(u.api_token is null, 0, 1) as has_api_token, u.api_export "
+        //    . ", u.data_export_tool "
+        //    . " from redcap_projects p, redcap_user_rights u "
+        //    . " where u.username = '" . Filter::escapeForMysql($username) . "' "
+        //    . " and p.project_id = u.project_id and p.date_deleted is null"     // @codeCoverageIgnore
+        //    ;
+
         $sql = "select u.username, p.project_id, p.app_title, "
             . " if(u.api_token is null, 0, 1) as has_api_token, u.api_export "
-            . ", u.data_export_tool "
+            . ", u.* "
             . " from redcap_projects p, redcap_user_rights u "
             . " where u.username = '" . Filter::escapeForMysql($username) . "' "
             . " and p.project_id = u.project_id and p.date_deleted is null"     // @codeCoverageIgnore
@@ -57,7 +67,25 @@ class RedCapDb
 
         $result = db_query($sql);
         while ($row = db_fetch_assoc($result)) {
-            array_push($projects, $row);
+            $rights = $row;
+
+            $projectInfo = array();
+            $projectInfo['username']       = $row['username'];
+            $projectInfo['project_id']     = $row['project_id'];
+            $projectInfo['app_title']      = $row['app_title'];
+            $projectInfo['has_api_token']  = $row['has_api_token'];
+            $projectInfo['api_export']     = $row['api_export'];
+
+            $canExport = Authorization::canExportAllInstruments($rights);
+
+            if ($canExport) {
+                $projectInfo['data_export_tool'] = "1";
+            } else {
+                $projectInfo['data_export_tool'] = "";
+            }
+
+            # array_push($projects, $row);
+            array_push($projects, $projectInfo);
         }
         return $projects;
     }
@@ -81,19 +109,30 @@ class RedCapDb
         $isExport = false;
         $isImport = false;
 
-        $sql = "select username, api_token from redcap_user_rights "
+        # OLD CODE (didn't have data export instruments)
+        #$sql = "select username, api_token from redcap_user_rights "
+        #    . " where project_id = " . ((int) $projectId) . " "
+        #    . " and api_export = 1 "                            // @codeCoverageIgnore
+        #    . " and api_token is not null "                     // @codeCoverageIgnore
+        #    . " and data_export_tool = " . ((int) $exportRight) // @codeCoverageIgnore
+        #    . " and group_id is null"                           // @codeCoverageIgnore
+        #    ;
+
+        $sql = "select * from redcap_user_rights "
             . " where project_id = " . ((int) $projectId) . " "
             . " and api_export = 1 "                            // @codeCoverageIgnore
             . " and api_token is not null "                     // @codeCoverageIgnore
-            . " and data_export_tool = " . ((int) $exportRight) // @codeCoverageIgnore
             . " and group_id is null"                           // @codeCoverageIgnore
             ;
 
         $queryResult = db_query($sql);
         while ($row = db_fetch_assoc($queryResult)) {
-            $username = $row['username'];
-            $apiToken = $row['api_token'];
-            $tokens[$username] = $apiToken;
+            $rights = $row;
+            if (Authorization::canExportAllInstruments($rights)) {
+                $username = $row['username'];
+                $apiToken = $row['api_token'];
+                $tokens[$username] = $apiToken;
+            }
         }
         return $tokens;
     }

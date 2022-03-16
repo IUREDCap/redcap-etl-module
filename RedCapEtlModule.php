@@ -106,7 +106,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             $dataExportRight = 1; // Full data access
         } else {
             $rights = $this->getUserRights();
-            $dataExportRight = $rights['data_export_tool'];
+            // OLD: $dataExportRight = $rights['data_export_tool'];
+            $canExport = Authorization::canExportAllInstruments($rights);
+            if ($canExport) {
+                $dataExportRight = "1";
+            } else {
+                $dataExportRight = "";
+            }
         }
         return $dataExportRight;
     }
