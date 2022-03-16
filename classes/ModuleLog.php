@@ -12,15 +12,15 @@ namespace IU\RedCapEtlModule;
  */
 class ModuleLog
 {
-    const LOG_FORMAT_VERSION = 1.0;
+    public const LOG_FORMAT_VERSION = 1.0;
 
     # log type constants
-    const ETL_CRON        = 'ETL cron';   # Cron jobs run
-    const ETL_CRON_JOB    = 'ETL cron job';
-    const ETL_RUN         = 'ETL run';
-    const ETL_RUN_DETAILS = 'ETL run details';
-    const WORKFLOW_RUN    = 'workflow run';
-    const WORKFLOW_CRON_JOB    = 'workflow_cron_job';
+    public const ETL_CRON        = 'ETL cron';   # Cron jobs run
+    public const ETL_CRON_JOB    = 'ETL cron job';
+    public const ETL_RUN         = 'ETL run';
+    public const ETL_RUN_DETAILS = 'ETL run details';
+    public const WORKFLOW_RUN    = 'workflow run';
+    public const WORKFLOW_CRON_JOB    = 'workflow_cron_job';
 
 
     private $module;

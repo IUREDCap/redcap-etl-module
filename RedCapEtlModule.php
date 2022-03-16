@@ -19,52 +19,52 @@ define('REDCAP_ETL_MODULE', 1);
  */
 class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 {
-    const ADMIN_HOME_PAGE    = 'web/admin/config.php';
+    public const ADMIN_HOME_PAGE    = 'web/admin/config.php';
 
-    const CRON_DETAIL_PAGE   = 'web/admin/cron_detail.php';
+    public const CRON_DETAIL_PAGE   = 'web/admin/cron_detail.php';
 
-    const USERS_PAGE         = 'web/admin/users.php';
-    const USER_CONFIG_PAGE   = 'web/admin/user_config.php';
-    const SERVERS_PAGE       = 'web/admin/servers.php';
-    const SERVER_CONFIG_PAGE = 'web/admin/server_config.php';
-    const ADMIN_INFO_PAGE    = 'web/admin/info.php';
-    const ADMIN_WORKFLOWS_PAGE    = 'web/admin/admin_workflows.php';
+    public const USERS_PAGE         = 'web/admin/users.php';
+    public const USER_CONFIG_PAGE   = 'web/admin/user_config.php';
+    public const SERVERS_PAGE       = 'web/admin/servers.php';
+    public const SERVER_CONFIG_PAGE = 'web/admin/server_config.php';
+    public const ADMIN_INFO_PAGE    = 'web/admin/info.php';
+    public const ADMIN_WORKFLOWS_PAGE    = 'web/admin/admin_workflows.php';
 
-    const HELP_LIST_PAGE     = 'web/admin/help_list.php';
-    const HELP_EDIT_PAGE     = 'web/admin/help_edit.php';
+    public const HELP_LIST_PAGE     = 'web/admin/help_list.php';
+    public const HELP_EDIT_PAGE     = 'web/admin/help_edit.php';
 
-    const LOG_PAGE           = 'web/admin/log.php';
+    public const LOG_PAGE           = 'web/admin/log.php';
 
-    const RUN_PAGE             = 'web/run.php';
-    const USER_ETL_CONFIG_PAGE = 'web/configure.php';
+    public const RUN_PAGE             = 'web/run.php';
+    public const USER_ETL_CONFIG_PAGE = 'web/configure.php';
 
-    const WORKFLOWS_PAGE       = 'web/workflows.php';
+    public const WORKFLOWS_PAGE       = 'web/workflows.php';
 
     # REDCap event log constants
-    const RUN_LOG_ACTION    = 'REDCap-ETL Export';
-    const CHANGE_LOG_ACTION = 'REDCap-ETL Change';
-    const LOG_EVENT         = -1;
+    public const RUN_LOG_ACTION    = 'REDCap-ETL Export';
+    public const CHANGE_LOG_ACTION = 'REDCap-ETL Change';
+    public const LOG_EVENT         = -1;
 
     # REDCap external module log constants
-    const ETL_CRON        = 'ETL cron';
-    const ETL_CRON_JOB    = 'ETL cron job';
-    const ETL_RUN         = 'ETL run';
-    const ETL_RUN_DETAILS = 'ETL run details';
-    const WORKFLOW_RUN    = 'workflow run';
+    public const ETL_CRON        = 'ETL cron';
+    public const ETL_CRON_JOB    = 'ETL cron job';
+    public const ETL_RUN         = 'ETL run';
+    public const ETL_RUN_DETAILS = 'ETL run details';
+    public const WORKFLOW_RUN    = 'workflow run';
 
     # Access/permission errors
-    const CSRF_ERROR                  = 1;   # (Possible) Cross-Site Request Forgery Error
-    const USER_RIGHTS_ERROR           = 2;
-    const NO_ETL_PROJECT_PERMISSION   = 3;
-    const NO_CONFIGURATION_PERMISSION = 4;
+    public const CSRF_ERROR                  = 1;   # (Possible) Cross-Site Request Forgery Error
+    public const USER_RIGHTS_ERROR           = 2;
+    public const NO_ETL_PROJECT_PERMISSION   = 3;
+    public const NO_CONFIGURATION_PERMISSION = 4;
 
     # Workflow constants
-    const WORKFLOW_REMOVED           = 'Removed';
-    const WORKFLOW_NAME              = 'workflow_name';
-    const JSON_WORKFLOW_KEY          = 'workflow';
-    const JSON_GLOBAL_PROPERTIES_KEY = 'global_properties';
-    const JSON_TASKS_KEY             = 'tasks';
-    const TASK_CONFIG                = 'task_config';
+    public const WORKFLOW_REMOVED           = 'Removed';
+    public const WORKFLOW_NAME              = 'workflow_name';
+    public const JSON_WORKFLOW_KEY          = 'workflow';
+    public const JSON_GLOBAL_PROPERTIES_KEY = 'global_properties';
+    public const JSON_TASKS_KEY             = 'tasks';
+    public const TASK_CONFIG                = 'task_config';
 
     private $db;
     private $settings;

@@ -12,12 +12,12 @@ use phpseclib3\Crypt\PublicKeyLoader;
 
 class ServerConfig implements \JsonSerializable
 {
-    const EMBEDDED_SERVER_NAME = '(embedded server)';
+    public const EMBEDDED_SERVER_NAME = '(embedded server)';
 
-    const AUTH_METHOD_SSH_KEY  = 0;
-    const AUTH_METHOD_PASSWORD = 1;
+    public const AUTH_METHOD_SSH_KEY  = 0;
+    public const AUTH_METHOD_PASSWORD = 1;
 
-    const ACCESS_LEVELS = array('admin','private','public');
+    public const ACCESS_LEVELS = array('admin','private','public');
 
     private $name;
 

@@ -12,8 +12,8 @@ namespace IU\RedCapEtlModule;
  */
 class DataExportRight
 {
-    const NO_ACCESS             = 0;
-    const FULL_DATA_SET         = 1;
-    const DEIDENTIFIED          = 2;  // No tagged identifiers, and no free-form text or date/time field
-    const NO_TAGGED_IDENTIFIERS = 3;
+    public const NO_ACCESS             = 0;
+    public const FULL_DATA_SET         = 1;
+    public const DEIDENTIFIED          = 2;  // No tagged identifiers, and no free-form text or date/time field
+    public const NO_TAGGED_IDENTIFIERS = 3;
 }

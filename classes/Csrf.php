@@ -13,7 +13,7 @@ namespace IU\RedCapEtlModule;
  */
 class Csrf
 {
-    const TOKEN_NAME = 'etl_csrf_token';
+    public const TOKEN_NAME = 'etl_csrf_token';
 
     public static function getToken()
     {

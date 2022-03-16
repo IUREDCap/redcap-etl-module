@@ -12,23 +12,23 @@ namespace IU\RedCapEtlModule;
  */
 class Settings
 {
-    const ADMIN_CONFIG_KEY         = 'admin-config';
-    const SERVER_CONFIG_KEY_PREFIX = 'server-config:';
-    const ETL_CONFIG_KEY           = 'configuration:';
-    const PROJECT_INFO_KEY         = 'project-info';
-    const SERVERS_KEY              = 'servers';
-    const USER_LIST_KEY            = 'user-list';
-    const LAST_RUN_TIME_KEY        = 'last-run-time'; // for storing day and time of last run
+    public const ADMIN_CONFIG_KEY         = 'admin-config';
+    public const SERVER_CONFIG_KEY_PREFIX = 'server-config:';
+    public const ETL_CONFIG_KEY           = 'configuration:';
+    public const PROJECT_INFO_KEY         = 'project-info';
+    public const SERVERS_KEY              = 'servers';
+    public const USER_LIST_KEY            = 'user-list';
+    public const LAST_RUN_TIME_KEY        = 'last-run-time'; // for storing day and time of last run
 
-    const USER_PROJECTS_KEY_PREFIX = 'user-projects:';  // append with username to make key
-    const USER_SERVERS_KEY_PREFIX  = 'user-servers:';
-    const PRIVATE_SERVER_USERS_KEY_PREFIX  = 'private-server-users:';
+    public const USER_PROJECTS_KEY_PREFIX = 'user-projects:';  // append with username to make key
+    public const USER_SERVERS_KEY_PREFIX  = 'user-servers:';
+    public const PRIVATE_SERVER_USERS_KEY_PREFIX  = 'private-server-users:';
 
-    const WORKFLOWS_KEY               = 'workflows';
+    public const WORKFLOWS_KEY               = 'workflows';
 
-    const VERSION_KEY = 'version';
+    public const VERSION_KEY = 'version';
 
-    const CONFIG_SESSION_KEY = 'redcap-etl-config';
+    public const CONFIG_SESSION_KEY = 'redcap-etl-config';
 
     private $module;
 

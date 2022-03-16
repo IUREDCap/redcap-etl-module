@@ -10,9 +10,9 @@ namespace IU\RedCapEtlModule;
 class Workflow implements \JsonSerializable
 {
     # Workflow status constants
-    const WORKFLOW_INCOMPLETE = 'Incomplete';
-    const WORKFLOW_READY  = 'Ready';
-    const WORKFLOW_REMOVED = 'Removed';
+    public const WORKFLOW_INCOMPLETE = 'Incomplete';
+    public const WORKFLOW_READY  = 'Ready';
+    public const WORKFLOW_REMOVED = 'Removed';
 
     private $metadata;
     private $globalProperties;

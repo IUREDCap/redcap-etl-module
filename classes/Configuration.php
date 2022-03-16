@@ -14,85 +14,85 @@ class Configuration implements \JsonSerializable
     # here need to match those in REDCap-ETL's
     # ConfigProperties class.
     #--------------------------------------------------
-    const REDCAP_API_URL = 'redcap_api_url';
-    const DATA_SOURCE_API_TOKEN = 'data_source_api_token';
-    const SSL_VERIFY = 'ssl_verify';
+    public const REDCAP_API_URL = 'redcap_api_url';
+    public const DATA_SOURCE_API_TOKEN = 'data_source_api_token';
+    public const SSL_VERIFY = 'ssl_verify';
 
-    const DATA_EXPORT_RIGHT = 'data_export_right';
+    public const DATA_EXPORT_RIGHT = 'data_export_right';
 
-    const API_TOKEN_USERNAME = 'api_token_username';
+    public const API_TOKEN_USERNAME = 'api_token_username';
 
-    const TRANSFORM_RULES_FILE   = 'transform_rules_file';
-    const TRANSFORM_RULES_TEXT   = 'transform_rules_text';
-    const TRANSFORM_RULES_SOURCE = 'transform_rules_source';
+    public const TRANSFORM_RULES_FILE   = 'transform_rules_file';
+    public const TRANSFORM_RULES_TEXT   = 'transform_rules_text';
+    public const TRANSFORM_RULES_SOURCE = 'transform_rules_source';
 
-    const CONFIG_API_TOKEN = 'config_api_token';
-    const CONFIG_NAME      = 'config_name';
-    const CONFIG_OWNER     = 'config_owner';
+    public const CONFIG_API_TOKEN = 'config_api_token';
+    public const CONFIG_NAME      = 'config_name';
+    public const CONFIG_OWNER     = 'config_owner';
 
-    const CRON_JOB         = 'cron_job';
+    public const CRON_JOB         = 'cron_job';
 
-    const DB_LOGGING         = 'db_logging';
-    const DB_LOG_TABLE       = 'db_log_table';
-    const DB_EVENT_LOG_TABLE = 'db_event_log_table';
+    public const DB_LOGGING         = 'db_logging';
+    public const DB_LOG_TABLE       = 'db_log_table';
+    public const DB_EVENT_LOG_TABLE = 'db_event_log_table';
 
     # External module specific property names that are not in REDCap-ETL.
     # The values for these properties are combined to form REDCap-ETL's
     # DB_CONNECTION property.
-    const DB_TYPE = 'db_type';
-    const DB_HOST = 'db_host';
-    const DB_PORT = 'db_port';
-    const DB_NAME   = 'db_name';
-    const DB_SCHEMA = 'db_schema';
-    const DB_USERNAME = 'db_username';
-    const DB_PASSWORD = 'db_password';
+    public const DB_TYPE = 'db_type';
+    public const DB_HOST = 'db_host';
+    public const DB_PORT = 'db_port';
+    public const DB_NAME   = 'db_name';
+    public const DB_SCHEMA = 'db_schema';
+    public const DB_USERNAME = 'db_username';
+    public const DB_PASSWORD = 'db_password';
 
-    const DB_CONNECTION = 'db_connection';
+    public const DB_CONNECTION = 'db_connection';
 
-    const DB_SSL        = 'db_ssl';
-    const DB_SSL_VERIFY = 'db_ssl_verify';
+    public const DB_SSL        = 'db_ssl';
+    public const DB_SSL_VERIFY = 'db_ssl_verify';
 
-    const DB_PRIMARY_KEYS = 'db_primary_keys';
-    const DB_FOREIGN_KEYS = 'db_foreign_keys';
+    public const DB_PRIMARY_KEYS = 'db_primary_keys';
+    public const DB_FOREIGN_KEYS = 'db_foreign_keys';
 
-    const CA_CERT_FILE  = 'ca_cert_file';
+    public const CA_CERT_FILE  = 'ca_cert_file';
 
-    const IGNORE_EMPTY_INCOMPLETE_FORMS = 'ignore_empty_incomplete_forms';
+    public const IGNORE_EMPTY_INCOMPLETE_FORMS = 'ignore_empty_incomplete_forms';
 
-    const BATCH_SIZE = 'batch_size';
+    public const BATCH_SIZE = 'batch_size';
 
-    const TABLE_PREFIX = 'table_prefix';
+    public const TABLE_PREFIX = 'table_prefix';
 
-    const LABEL_VIEW_SUFFIX = 'label_view_suffix';
+    public const LABEL_VIEW_SUFFIX = 'label_view_suffix';
 
-    const POST_PROCESSING_SQL = 'post_processing_sql';
-    const PRE_PROCESSING_SQL  = 'pre_processing_sql';
-    const PRINT_LOGGING = 'print_logging';
-    const PROJECT_ID = 'project_id';
+    public const POST_PROCESSING_SQL = 'post_processing_sql';
+    public const PRE_PROCESSING_SQL  = 'pre_processing_sql';
+    public const PRINT_LOGGING = 'print_logging';
+    public const PROJECT_ID = 'project_id';
 
 
 
-    const LOG_FILE  = 'log_file';
+    public const LOG_FILE  = 'log_file';
 
-    const EMAIL_ERRORS        = 'email_errors';
-    const EMAIL_SUMMARY       = 'email_summary';
-    const EMAIL_FROM_ADDRESS  = 'email_from_address';
-    const EMAIL_SUBJECT       = 'email_subject';
-    const EMAIL_TO_LIST       = 'email_to_list';
+    public const EMAIL_ERRORS        = 'email_errors';
+    public const EMAIL_SUMMARY       = 'email_summary';
+    public const EMAIL_FROM_ADDRESS  = 'email_from_address';
+    public const EMAIL_SUBJECT       = 'email_subject';
+    public const EMAIL_TO_LIST       = 'email_to_list';
 
-    const CRON_SERVER   = 'cron_server';
-    const CRON_SCHEDULE = 'cron_schedule';
+    public const CRON_SERVER   = 'cron_server';
+    public const CRON_SCHEDULE = 'cron_schedule';
 
-    const AUTOGEN_INCLUDE_COMPLETE_FIELDS = 'autogen_include_complete_fields';
-    const AUTOGEN_INCLUDE_DAG_FIELDS = 'autogen_include_dag_fields';
-    const AUTOGEN_INCLUDE_FILE_FIELDS = 'autogen_include_file_fields';
-    const AUTOGEN_INCLUDE_SURVEY_FIELDS = 'autogen_include_survey_fields';
-    const AUTOGEN_REMOVE_NOTES_FIELDS = 'autogen_remove_notes_fields';
-    const AUTOGEN_REMOVE_IDENTIFIER_FIELDS = 'autogen_remove_identifier_fields';
-    const AUTOGEN_COMBINE_NON_REPEATING_FIELDS = 'autogen_combine_non_repeating_fields';
-    const AUTOGEN_NON_REPEATING_FIELDS_TABLE = 'autogen_non_repeating_fields_table';
+    public const AUTOGEN_INCLUDE_COMPLETE_FIELDS = 'autogen_include_complete_fields';
+    public const AUTOGEN_INCLUDE_DAG_FIELDS = 'autogen_include_dag_fields';
+    public const AUTOGEN_INCLUDE_FILE_FIELDS = 'autogen_include_file_fields';
+    public const AUTOGEN_INCLUDE_SURVEY_FIELDS = 'autogen_include_survey_fields';
+    public const AUTOGEN_REMOVE_NOTES_FIELDS = 'autogen_remove_notes_fields';
+    public const AUTOGEN_REMOVE_IDENTIFIER_FIELDS = 'autogen_remove_identifier_fields';
+    public const AUTOGEN_COMBINE_NON_REPEATING_FIELDS = 'autogen_combine_non_repeating_fields';
+    public const AUTOGEN_NON_REPEATING_FIELDS_TABLE = 'autogen_non_repeating_fields_table';
 
-    const DATA_TARGET = 'data_target';
+    public const DATA_TARGET = 'data_target';
 
     private $name;
     private $username;

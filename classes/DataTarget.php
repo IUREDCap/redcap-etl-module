@@ -15,11 +15,11 @@ class DataTarget
     #----------------------------------------------------------------
     # Data targets of ETL process
     #----------------------------------------------------------------
-    const DBTYPE_CSV  = 'CSV';
-    const DB          = 'db';
-    const CSV_ZIP     = 'csv_zip';
+    public const DBTYPE_CSV  = 'CSV';
+    public const DB          = 'db';
+    public const CSV_ZIP     = 'csv_zip';
 
-    const DEFAULT_MAX_ZIP_DOWNLOAD_FILESIZE = 100; //MB
+    public const DEFAULT_MAX_ZIP_DOWNLOAD_FILESIZE = 100; //MB
 
     public function exportEtlCsvZip($tempDir, $pid)
     {

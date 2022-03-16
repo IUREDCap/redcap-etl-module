@@ -10,13 +10,13 @@ namespace IU\RedCapEtlModule;
 class Help
 {
     // Help settings
-    const DEFAULT_TEXT        = 0;
-    const CUSTOM_TEXT         = 1;
-    const PREPEND_CUSTOM_TEXT = 2;  // prepend custom text to default text
-    const APPEND_CUSTOM_TEXT  = 3;  // append custom text to default text
+    public const DEFAULT_TEXT        = 0;
+    public const CUSTOM_TEXT         = 1;
+    public const PREPEND_CUSTOM_TEXT = 2;  // prepend custom text to default text
+    public const APPEND_CUSTOM_TEXT  = 3;  // append custom text to default text
 
-    const HELP_SETTING_PREFIX = 'help-setting:';    // Prefix for help setting for a topic
-    const HELP_TEXT_PREFIX    = 'help-text:';       // Prefix for (custom) help text for a topic
+    public const HELP_SETTING_PREFIX = 'help-setting:';    // Prefix for help setting for a topic
+    public const HELP_TEXT_PREFIX    = 'help-text:';       // Prefix for (custom) help text for a topic
 
     /** @var array map from help topic to help content */
     private static $help = [

@@ -9,20 +9,20 @@ namespace IU\RedCapEtlModule;
 
 class AdminConfig implements \JsonSerializable
 {
-    const KEY = 'admin-config';
-    const DAY_LABELS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    public const KEY = 'admin-config';
+    public const DAY_LABELS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     # Property constants
-    const SSL_VERIFY     = 'sslVerify';
-    const CA_CERT_FILE   = 'caCertFile';
+    public const SSL_VERIFY     = 'sslVerify';
+    public const CA_CERT_FILE   = 'caCertFile';
 
     #const ALLOW_EMBEDDED_SERVER              = 'allowEmbeddedServer';
     #const EMBEDDED_SERVER_EMAIL_FROM_ADDRESS = 'embeddedServerEmailFromAddress';
     #const EMBEDDED_SERVER_LOG_FILE           = 'embeddedServerLogFile';
 
-    const ALLOW_ON_DEMAND    = 'allowOnDemand';
-    const ALLOW_CRON         = 'allowCron';
-    const ALLOWED_CRON_TIMES = 'allowedCronTimes';
+    public const ALLOW_ON_DEMAND    = 'allowOnDemand';
+    public const ALLOW_CRON         = 'allowCron';
+    public const ALLOWED_CRON_TIMES = 'allowedCronTimes';
 
     /** @var boolean indicates if SSL verification should be done for local REDCap */
     private $sslVerify;

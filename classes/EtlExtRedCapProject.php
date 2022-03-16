@@ -24,7 +24,7 @@ namespace IU\RedCapEtlModule;
  */
 class EtlExtRedCapProject extends \IU\REDCapETL\EtlRedCapProject
 {
-    const REDCAP_XML_NAMESPACE = 'https://projectredcap.org';
+    public const REDCAP_XML_NAMESPACE = 'https://projectredcap.org';
 
     private $projectXml = null;
 
