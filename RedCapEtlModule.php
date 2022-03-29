@@ -1526,7 +1526,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 }
             }
 
-            $superUser = SUPER_USER;
+            $superUser = $this->isSuperUser();
+
             #-------------------------------------------------
             # Log run information to external module log
             #-------------------------------------------------

@@ -655,7 +655,7 @@ class Settings
 
                 for ($day = 0; $day < 7; $day++) {
                     $hour = $times[$day];
-                    if (isset($hour)) {
+                    if (isset($hour) && strlen(trim($hour)) > 0) {
                         $run = array(
                             'username'  => $username,
                             'projectId' => $projectId,
