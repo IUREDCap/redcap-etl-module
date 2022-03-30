@@ -267,7 +267,8 @@ class ModuleLog
         $query .= " where (log_type = '" . self::ETL_CRON_JOB . "'"
             . " or log_type = '" . self::WORKFLOW_CRON_JOB . "')"
             . " and cron_log_id = '" . Filter::escapeForMysql($logId) . "'";
-        $cronJob = $this->module->queryLogs($query);
+        $args = array();
+        $cronJob = $this->module->queryLogs($query, $args);
         return $cronJob;
     }
 
@@ -280,7 +281,8 @@ class ModuleLog
         $query .= " where (log_type = '" . self::ETL_RUN . "'"
             . " or log_type = '" . self::WORKFLOW_RUN . "')"
             . " and cron_log_id = '" . Filter::escapeForMysql($cronLogId) . "'";
-        $result = $this->module->queryLogs($query);
+        $args = array();
+        $result = $this->module->queryLogs($query, $args);
 
         $logId = null;
         if (array_key_exists('log_id', $result)) {
@@ -298,7 +300,8 @@ class ModuleLog
         $query = "select log_id, timestamp, ui_id, project_id, message, log_type, etl_server, config, etl_run_log_id";
         $query .= " where log_type = '" . self::ETL_RUN_DETAILS . "'"
             . " and etl_run_log_id = '" . Filter::escapeForMysql($etlRunLogId) . "'";
-        $etlRunDetails = $this->module->queryLogs($query);
+        $args = array();
+        $etlRunDetails = $this->module->queryLogs($query, $args);
         return $etlRunDetails;
     }
 

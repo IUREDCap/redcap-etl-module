@@ -929,7 +929,7 @@ class Settings
             if (strcmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
                 $serverConfig = new ServerConfig($serverName);
                 $serverConfig->setIsActive(true);
-                if (SUPER_USER) {
+                if ($this->module->isSuperUser()) {
                     # If admin, then add embedded server to system settings
                     # (non-admin users do not have permission to set system
                     # settings, and attempting to do so causes a permission error)

@@ -102,8 +102,12 @@ class Configuration implements \JsonSerializable
     private $booleanUserProperties;  // array of boolean property names that are
                                     // set in the external module user interface
 
-    public function __construct($name, $username = USERID, $projectId = PROJECT_ID)
+    public function __construct($name, $username = USERID, $projectId = null)
     {
+        if (!isset($projectId)) {
+            $projectId = RedCapEtlModule::getProjectIdConstant();
+        }
+
         $this->booleanUserProperties = [
             self::DB_LOGGING,
             self::DB_PRIMARY_KEYS,

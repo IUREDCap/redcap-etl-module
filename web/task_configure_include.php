@@ -597,11 +597,11 @@ Configuration form
         <table>
             <tbody style="padding: 20px;">
 
-                <?php if (SUPER_USER) { ?>
+                <?php if ($module->isSuperUser()) { ?>
                 <tr>
                     <td>REDCap API URL</td>
                     <?php
-                    if ($testMode && SUPER_USER) { # make API URL editable
+                    if ($testMode && $module->isSuperUser()) { # make API URL editable
                         $displayApiUrl = Filter::escapeForHtmlAttribute($properties[Configuration::REDCAP_API_URL]);
                         ?>
                     <td>
@@ -619,7 +619,7 @@ Configuration form
                 </tr>
                 <?php } // End if super user ?>
 
-                <?php if ($testMode && SUPER_USER) { # make API URL editable ?>
+                <?php if ($testMode && $module->isSuperUser()) { # make API URL editable ?>
                 <tr>
                     <td>
                     SSL certificate verification&nbsp;

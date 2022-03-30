@@ -175,7 +175,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
                         # For admins - get list of workflows that include "removed" workflows
                         # (removed by user but not actually deleted from system)
-                        if (defined('SUPER_USER') && SUPER_USER) {
+                        if ($module->isSuperUser()) {
                             $excludeRemoved = false;
                         }
                         $projectWorkflows = $module->getProjectAvailableWorkflows(

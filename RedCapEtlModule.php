@@ -556,6 +556,15 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         return $isSuperUser;
     }
 
+    public static function getProjectIdConstant()
+    {
+        $projectId = null;
+        if (defined('PROJECT_ID')) {
+            $projectId = PROJECT_ID;
+        }
+        return $projectId;
+    }
+
     /**
      * Get a REDCap "from e-mail" address.
      */
@@ -1287,7 +1296,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function checkAdminPagePermission()
     {
-        if ((defined('SUPER_USER') && !SUPER_USER) || !defined('SUPER_USER')) {
+        if (!$this->isSuperUser()) {
             exit("Only super users can access this page!");
         } elseif (!Csrf::isValidRequest()) {
             exit(
@@ -1310,9 +1319,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function getWorkflows()
     {
-        $superUser = SUPER_USER;
         $workflows = null;
-        if ($superUser) {
+        if ($this->isSuperUser()) {
              $workflows = $this->settings->getWorkflows();
         } else {
             throw new \Exception('You do not have permission to retrieve all workflows.');
@@ -1462,8 +1470,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function deleteWorkflow($workflowName, $username = USERID)
     {
-        $superUser = SUPER_USER;
-        if ($superUser) {
+        if ($this->isSuperUser()) {
             $this->settings->deleteWorkflow($workflowName);
             $details = 'REDCap-ETL workflow "' . $workflowName . '" deleted by user "' . $username . '.';
             \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
@@ -1474,8 +1481,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function reinstateWorkflow($workflowName, $username = USERID)
     {
-        $superUser = SUPER_USER;
-        if ($superUser) {
+        if ($this->isSuperUser()) {
             $this->settings->reinstateWorkflow($workflowName, $username);
             $details = 'REDCap-ETL workflow "' . $workflowName . '" reinstated by user "' . $username . '.';
             \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);

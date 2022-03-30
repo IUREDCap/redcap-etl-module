@@ -124,7 +124,7 @@ have permissions will be displayed. There are three server access-level options:
         - the server is open to any user. This is the default value.
     </li>
     <li><span style="font-weight: bold;">private</span>
-        - only specified users are allowed access to the server.
+        - only REDCap administrators and specified non-admin users are allowed access to the server.
         You will be able to add users to a list of permitted users,
         as well as remove them from the list. If a server has a private access-level
         and a list of permitted users and you later change that access level to some

@@ -183,8 +183,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 <?php
 #Determine if the user has permissions to export for this project
 $hasPermissionToExport = false;
-$superUser = SUPER_USER;
-if ($superUser) {
+if ($module->isSuperUser()) {
     $hasPermissionToExport = true;
 } else {
     $db = new RedCapDb();

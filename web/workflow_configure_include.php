@@ -59,7 +59,7 @@ $etlTaskKey = null;
 $etlProjectId = null;
 
 $username = USERID;
-$superUser = SUPER_USER;
+$superUser = $module->isSuperUser();
 
 #Get projects that this user has access to
 $db = new RedCapDb();
