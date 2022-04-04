@@ -22,6 +22,8 @@ use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
+$errorMessage = '';
+
 $selfUrl         = $module->getUrl(RedCapEtlModule::LOG_PAGE);
 $adminUrl        = $module->getURL(RedCapEtlModule::ADMIN_HOME_PAGE);
 $serverConfigUrl = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
@@ -47,16 +49,20 @@ if (empty($logType)) {
 }
 
 $startDate = Filter::sanitizeDate($_POST['startDate']);
-if (!empty($startDate) && !checkdate($startDate)) {
-    $error = 'invalid start date';
-} else {
+list($startMonth, $startDay, $startYear) = explode('/', $startDate);
+if (!empty($startDate) && !checkdate($startMonth, $startDay, $startYear)) {
+    $errorMessage .= 'Invalid start date. ';
+    $startDate = date('m/d/Y');
+} elseif (empty($startDate)) {
     $startDate = date('m/d/Y');
 }
 
 $endDate  = Filter::sanitizeDate($_POST['endDate']);
-if (!empty($endDate) && !checkdate($endDate)) {
-    $error = 'invalid end date';
-} else {
+list($endMonth, $endDay, $endYear) = explode('/', $startDate);
+if (!empty($endDate) && !checkdate($endMonth, $endDay, $endYear)) {
+    $errorMessage .= 'Invalid end date. ';
+    $endDate = date('m/d/Y');
+} elseif (empty($endDate)) {
     $endDate = date('m/d/Y');
 }
 
@@ -89,7 +95,7 @@ echo $buffer;
 
 <?php
 
-$errorMessage   = Filter::stripTags($_GET['error']);
+$errorMessage   .= Filter::stripTags($_GET['error']);
 $successMessage = Filter::stripTags($_GET['success']);
 
 $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, $successMessage);
