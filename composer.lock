@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8ec40f6f5765ef9ed73b21ff179466cf",
+    "content-hash": "ff6a1e9133feb0c10b40eb0f4e1839b5",
     "packages": [
         {
             "name": "iu-redcap/phpcap",
@@ -49,16 +49,16 @@
         },
         {
             "name": "iu-redcap/redcap-etl",
-            "version": "2.0.14",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/redcap-etl.git",
-                "reference": "76a64491c939be2c5b5f4f4fd0c119016f17d6e1"
+                "reference": "d860354301747b3af37ec94889eda74c730d0b7f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/76a64491c939be2c5b5f4f4fd0c119016f17d6e1",
-                "reference": "76a64491c939be2c5b5f4f4fd0c119016f17d6e1",
+                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/d860354301747b3af37ec94889eda74c730d0b7f",
+                "reference": "d860354301747b3af37ec94889eda74c730d0b7f",
                 "shasum": ""
             },
             "require": {
@@ -88,7 +88,7 @@
                 "etl",
                 "redcap"
             ],
-            "time": "2022-04-29T19:44:56+00:00"
+            "time": "2022-05-20T19:16:42+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",

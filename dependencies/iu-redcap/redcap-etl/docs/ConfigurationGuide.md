@@ -223,9 +223,22 @@ provide support for it by default</td>
 is being extracted from REDCap.</td>
 </tr>
 
+<tr>
+<td>extract_filter_logic</td>
+<td>REDCap filter logic that is used to restrict the records extracted from the project.
+For example, <pre>extract_filter_logic='[record_id] < 1020'</pre> would cause only records
+with a record ID less than 1020 to be extracted from REDCap. Note that REDCap-ETL just passes
+the extract filter logic value to REDCap, and REDCap does minimal error checking. In many
+cases when you have an error in your filter, REDCap will not generate an error and no records
+will be returned.
+You can test out your filter logic in the API Playground within REDCap to make
+sure that it returns the records expected.
+Also note that some characters typically used in for the filter logic can cause an error when
+REDCap-ETL processes the configuration file. To prevent this from happening, it is best
+to put the filter logic value in quotes as shown in the example above.
+</td>
 </tbody>
 </table>
-
 
 ### Database Properties
 
