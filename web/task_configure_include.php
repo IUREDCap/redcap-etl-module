@@ -447,8 +447,8 @@ $module->renderMessages($error, $warning, $success);
                 return false;
             });            
             $('#extract-settings-help-link').click(function () {
-                $('#extract-settings-help').dialog({dialogClass: 'redcap-etl-help', width: 500, maxHeight: 440})
-                    .dialog('widget').position({my: 'left top', at: 'right top+60', of: $(this)})
+                $('#extract-settings-help').dialog({dialogClass: 'redcap-etl-help', width: 500, maxHeight: 540})
+                    .dialog('widget').position({my: 'left+30 top', at: 'right top-140', of: $(this)})
                     ;
                 return false;
             });
@@ -759,6 +759,19 @@ Configuration form
                         echo "</div>\n";
                         ?>
                     </td>
+                </tr>
+
+                <tr>
+                    <td>Extract Filter Logic <br/> (optional)</td>
+                    <td>
+                        <input type="text" size="72" name="<?php echo Configuration::EXTRACT_FILTER_LOGIC;?>"
+                            value="<?php
+                                   echo Filter::escapeForHtmlAttribute(
+                                       $properties[Configuration::EXTRACT_FILTER_LOGIC]
+                                   );
+                                    ?>">
+                    </td>
+
                 </tr>
             </tbody>
         </table>

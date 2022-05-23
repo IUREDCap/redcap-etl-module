@@ -22,6 +22,8 @@ class Configuration implements \JsonSerializable
 
     public const API_TOKEN_USERNAME = 'api_token_username';
 
+    public const EXTRACT_FILTER_LOGIC = 'extract_filter_logic';
+
     public const TRANSFORM_RULES_FILE   = 'transform_rules_file';
     public const TRANSFORM_RULES_TEXT   = 'transform_rules_text';
     public const TRANSFORM_RULES_SOURCE = 'transform_rules_source';

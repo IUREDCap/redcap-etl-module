@@ -174,6 +174,17 @@ class Help
             . " then a user who has full data set export permission will"
             . " need to request an API token with export rights."
             . "</p>"
+            . "<p>"
+            . "<b>Extract Filter Logic.</b> This property can be used to restrict the records that are"
+            . " exported from REDCap. For example, the following logic would cause only records with"
+            . " a record_id less than 1020 to be extracted:"
+            . " <pre>[record_id] &lt; 1020</pre>"
+            . "Values for this property should use the standard REDCap syntax for logic. This value"
+            . " is passed to REDCap, and REDCap-ETL relies on REDCap to check this value for errors."
+            . " Unfortunately, error checking for filter logic in REDCap is extremenly limited, and"
+            . " in most cases where there is an error, REDCap will not generate an error message"
+            . " and simply return no records."
+            . "</p>"
         ,
         'global-properties' =>
             "<p>"
