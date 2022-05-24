@@ -762,9 +762,14 @@ Configuration form
                 </tr>
 
                 <tr>
-                    <td>Extract Filter Logic <br/> (optional)</td>
+                    <td>
+                        <label for="<?php echo Configuration::EXTRACT_FILTER_LOGIC;?>">Extract Filter Logic</label>
+                        <br/>
+                        (optional)
+                    </td>
                     <td>
                         <input type="text" size="72" name="<?php echo Configuration::EXTRACT_FILTER_LOGIC;?>"
+                            id="<?php echo Configuration::EXTRACT_FILTER_LOGIC;?>"
                             value="<?php
                                    echo Filter::escapeForHtmlAttribute(
                                        $properties[Configuration::EXTRACT_FILTER_LOGIC]

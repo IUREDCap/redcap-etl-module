@@ -138,7 +138,9 @@ class Configuration implements \JsonSerializable
                 $this->properties[$name] = '';
         }
 
+        #------------------------------------------------
         # Set non-blank defaults
+        #------------------------------------------------
         $this->properties[self::REDCAP_API_URL] = RedCapEtlModule::getRedCapApiUrl();
         $this->properties[self::SSL_VERIFY]     = true;
 
@@ -759,6 +761,7 @@ class Configuration implements \JsonSerializable
         unset($properties[self::AUTOGEN_NON_REPEATING_FIELDS_TABLE]);
         unset($properties[self::PROJECT_ID]);
         unset($properties[self::EMAIL_FROM_ADDRESS]);
+        unset($properties[self::EXTRACT_FILTER_LOGIC]);
         unset($properties[self::LOG_FILE]);
         unset($properties[self::CA_CERT_FILE]);
         unset($properties[self::DB_SSL]);
@@ -770,32 +773,37 @@ class Configuration implements \JsonSerializable
             #---------------------------------------
             # Remove all default values
             #---------------------------------------
-            $properties[self::CRON_JOB]   = null;
-            $properties[self::DB_TYPE] = null;
-            $properties[self::DB_HOST] = null;
-            $properties[self::DB_PORT] = null;
-            $properties[self::DB_NAME] = null;
-            $properties[self::DB_SCHEMA] = null;
-            $properties[self::DB_USERNAME] = null;
-            $properties[self::DB_PASSWORD] = null;
+            $properties[self::CRON_JOB] = null;
+
+            $properties[self::DB_TYPE]       = null;
+            $properties[self::DB_HOST]       = null;
+            $properties[self::DB_PORT]       = null;
+            $properties[self::DB_NAME]       = null;
+            $properties[self::DB_SCHEMA]     = null;
+            $properties[self::DB_USERNAME]   = null;
+            $properties[self::DB_PASSWORD]   = null;
             $properties[self::DB_CONNECTION] = null;
-            $properties[self::BATCH_SIZE] = null;
+
+            $properties[self::BATCH_SIZE]                    = null;
             $properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS] = null;
-            $properties[self::TABLE_PREFIX] = null;
-            $properties[self::LABEL_VIEW_SUFFIX] = null;
-            $properties[self::DB_PRIMARY_KEYS] = null;
-            $properties[self::DB_FOREIGN_KEYS] = null;
-            $properties[self::DB_LOGGING] = null;
-            $properties[self::DB_LOG_TABLE]  = null;
+            $properties[self::TABLE_PREFIX]                  = null;
+            $properties[self::LABEL_VIEW_SUFFIX]             = null;
+
+            $properties[self::DB_PRIMARY_KEYS]    = null;
+            $properties[self::DB_FOREIGN_KEYS]    = null;
+            $properties[self::DB_LOGGING]         = null;
+            $properties[self::DB_LOG_TABLE]       = null;
             $properties[self::DB_EVENT_LOG_TABLE] = null;
-            $properties[self::EMAIL_ERRORS] = null;
+
+            $properties[self::EMAIL_ERRORS]  = null;
             $properties[self::EMAIL_SUMMARY] = null;
             $properties[self::EMAIL_SUBJECT] = null;
             $properties[self::EMAIL_TO_LIST] = null;
-            $properties[self::POST_PROCESSING_SQL] = null;
-            $properties[self::PRE_PROCESSING_SQL] = null;
-            $properties[self::CRON_SERVER] = null;
-            $properties[self::CRON_SCHEDULE] = null;
+
+            $properties[self::POST_PROCESSING_SQL]  = null;
+            $properties[self::PRE_PROCESSING_SQL]   = null;
+            $properties[self::CRON_SERVER]          = null;
+            $properties[self::CRON_SCHEDULE]        = null;
         }
 
         return $properties;
