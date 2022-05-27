@@ -176,7 +176,7 @@ class Help
             . "</p>"
             . "<p>"
             . "<b>Extract Filter Logic.</b> This property can be used to restrict the records that are"
-            . " exported from REDCap. For example, the following logic would cause only records with"
+            . " extracted from REDCap. For example, the following logic would cause only records with"
             . " a record_id less than 1020 to be extracted:"
             . " <pre>[record_id] &lt; 1020</pre>"
             . "Values for this property should use the standard REDCap syntax for logic. This value"
