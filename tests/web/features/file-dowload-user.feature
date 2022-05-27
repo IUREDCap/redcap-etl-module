@@ -15,6 +15,11 @@ Feature: Zipped CSV file dowload functionality
     When I select the test project
     And I follow "REDCap-ETL"
     
+  Scenario: Initialize by deleting test configuration if it exists
+    When I follow "ETL Configurations"
+    And I delete configuration "behat-config-test" if it exists
+    Then I should not see "behat-config-test"
+
    Scenario: Confirm dataTarget element is displayed correctly 
     When I fill in "configurationName" with "behat-config-test"
     And I press "Add"
@@ -95,10 +100,6 @@ Feature: Zipped CSV file dowload functionality
     And I wait for 6 seconds
     Then I should see "ERROR: CSV zip"
 
-  Scenario: Cleanup by deleting configuration
-    When I follow "ETL Configurations"
-    And I delete configuration "behat-config-test"
-    Then I should not see "behat-config-test"
 
    Scenario: Clean up max Zip file size
     When I log out
