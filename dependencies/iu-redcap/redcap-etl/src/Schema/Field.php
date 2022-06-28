@@ -14,7 +14,9 @@ use IU\REDCapETL\RedCapEtl;
  */
 class Field
 {
-    /** @var string REDCap field name, and default database field name */
+    /** @var string REDCap field name, and default database field name. For suffix fields, this
+        name will be the root of multiple REDCap field names, for example, you might have REDCap fields
+        "phone1", "phone2", "phone3", which would be represented by a Field object with name "phone". */
     public $name = '';
     
     /** @var string the REDCap type of the field, or blank if the field
@@ -25,7 +27,8 @@ class Field
     public $type = '';
     public $size = null;
     
-    /** @var string database field name */
+    /** @var string database field name - the name of the field in the database where the REDCap field values
+                    will be stored. By default, this will be the same as the REDCap field name. */
     public $dbName = '';
 
     /** @var mixed the lookup field name (string) if this field uses the lookup table,
@@ -37,6 +40,13 @@ class Field
     
     /** @var array map from values to labels for multiple-choice fields. */
     public $valueToLabelMap;
+
+    /** @var string the label for a checkbox field */
+    public $checkboxLabel;
+
+    /** @var boolean indicates if the field is a label field, which is used to display the label
+     *     (as opposed to the code/value) for a multiple choice field. */
+    public $isLabel; // only set for label fields
 
     /**
      * Creates a Field object that is used to describe a field in REDCap and
@@ -76,30 +86,9 @@ class Field
         } else {
             $this->dbName = $name;
         }
-    }
 
-    /**
-     * Indicates if the specified field is equal to the field on which this method is invoked
-     * for the field that will be generated in the database.
-     *
-     * @return boolean returns true if the fields have equivalent database types.
-     */
-    public function isDatabaseEquivalent($field, $lookupTable)
-    {
-        $matches = false;
-        if ($this->dbName === $field->dbName && $this->type === $field->type && $this->size === $field->size) {
-            if ($this->usesLookup && $field->usesLookup) {
-                # If both fields use lookup, i.e., are multiple choice fields
-                # Compare choice values...
-                # Need the lookup table here
-                //$lt1 = $lookupTable->getValueLabelMap($tableName, $fieldName);
-            } elseif (!$this->usesLookup && !$field->usesLookup) {
-                # If both fields do NOT use lookup, i.e., are NOT multiple choice fields
-                $matches = true;
-            } else {
-            }
-        }
-        return $matches;
+        $this->isLabel = false;
+        $this->checkboxLabel = null;
     }
 
     /**
@@ -112,6 +101,8 @@ class Field
         $mergedField = new Field($this->name, $this->type, $this->size, $this->dbName, $this->redcapType);
         $mergedField->usesLookup      = $this->usesLookup;
         $mergedField->valueToLabelMap = $this->valueToLabelMap;
+        $mergedField->isLabel         = $this->isLabel;
+        $mergedField->checkboxLabel   = $this->checkboxLabel;
 
         #------------------------------------
         # Set error message prefix
@@ -128,9 +119,9 @@ class Field
 
         # Check that fields' database names match
         if ($this->dbName !== $field->dbName) {
-            $message = $errorMesssage . 'database field names "'.$this->dbName.'"'
-                .' and "'.$field->dbName.'" do not match.';
-            $code    = EtlException::INPUT_ERROR;
+            $message = $errorMessage .  $message = 'database field names "' . $this->dbName . '"'
+                . ' and "' . $field->dbName . '" do not match.';
+            $code = EtlException::INPUT_ERROR;
             throw new EtlException($message, $code);
         }
         
@@ -230,5 +221,36 @@ class Field
     public function setUsesLookup($usesLookup)
     {
         $this->usesLookup = $usesLookup;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * Indicates if this field is a label for a REDCAp mutliple choice (radio, checkbox, dropdown) field.
+     * If this is a label field, its redcapType should have "_label" appended to it.
+     */
+    public function isLabel()
+    {
+        return $this->isLabel;
+    }
+
+    public function isCheckbox()
+    {
+        // ORIGINAL CHECK:
+        // return preg_match('/'.RedCapEtl::CHECKBOX_SEPARATOR.'/', $this->name);
+        return $this->redcapType === 'checkbox';
+    }
+
+    public function isSurveyTimestamp()
+    {
+        return (preg_match('/_timestamp$/', $this->name) === 1 && $this->type === FieldType::DATETIME);
     }
 }

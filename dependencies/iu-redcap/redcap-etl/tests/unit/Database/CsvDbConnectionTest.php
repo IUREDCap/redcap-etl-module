@@ -23,7 +23,7 @@ use IU\REDCapETL\Schema\Table;
 
 class CsvDbConnectionTest extends TestCase
 {
-    protected $dbString = './tests/output/';
+    protected $dbString = __DIR__ . '/../../output/csv-db-connection/';
     protected $ssl = null;
     protected $sslVerify = null;
     protected $caCertFile = null;
@@ -302,6 +302,7 @@ class CsvDbConnectionTest extends TestCase
             $this->recordIdFieldName
         );
         $rootTable1->usesLookup = true;
+        $rootTable1->setNeedsLabelView(true);
 
         # Create fields in the data table object
         $field4 = new Field(
@@ -332,6 +333,7 @@ class CsvDbConnectionTest extends TestCase
             null
         );
         $field8->setUsesLookup('exercises___0');
+        $field8->redcapType = 'checkbox';
         $rootTable1->addField($field8);
 
         $field9 = new Field(
@@ -339,6 +341,7 @@ class CsvDbConnectionTest extends TestCase
             FieldType::CHECKBOX,
             null
         );
+        $field9->redcapType = 'checkbox';
         $field9->setUsesLookup('exercises___1');
         $rootTable1->addField($field9);
 
@@ -347,6 +350,7 @@ class CsvDbConnectionTest extends TestCase
             FieldType::CHECKBOX,
             null
         );
+        $fielda->redcapType = 'checkbox';
         $fielda->setUsesLookup('exercises___2');
         $rootTable1->addField($fielda);
 
@@ -396,7 +400,7 @@ class CsvDbConnectionTest extends TestCase
         $csvDbConnection1->createTable($rootTable1, false);
 
         # run the replaceLookupView method
-        $result = $csvDbConnection1->replaceLookupView($rootTable1, $lookupTable);
+        $result = $csvDbConnection1->replaceLookupView($rootTable1, $lookupTable, true);
 
         # insert rows into the file
         $result = $csvDbConnection1->storeRows($rootTable1);
@@ -487,6 +491,8 @@ class CsvDbConnectionTest extends TestCase
             $this->suffixes,
             $this->recordIdFieldName
         );
+        $rootTable->usesLookup = true;
+        $rootTable->setNeedsLabelView(true);
 
         # Create fields in the Table object
         $field0 = new Field(
@@ -559,7 +565,7 @@ class CsvDbConnectionTest extends TestCase
         #############################################################
 
         # run the replaceLookupView method and verify it returns successfully
-        $result = $csvDbConnection->replaceLookupView($rootTable, $lookupTable);
+        $result = $csvDbConnection->replaceLookupView($rootTable, $lookupTable, true);
         $this->assertNull($result, 'CsvDbConnection replaceTable successful return check');
         
         #Check to see if a file was actually created.

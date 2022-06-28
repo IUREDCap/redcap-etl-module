@@ -44,17 +44,17 @@
     },
     {
         "name": "iu-redcap/redcap-etl",
-        "version": "2.1.0",
-        "version_normalized": "2.1.0.0",
+        "version": "2.2.0",
+        "version_normalized": "2.2.0.0",
         "source": {
             "type": "git",
             "url": "https://github.com/IUREDCap/redcap-etl.git",
-            "reference": "d860354301747b3af37ec94889eda74c730d0b7f"
+            "reference": "5a01d0a82c71c2c08446b5c2d16c73081a582e25"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/d860354301747b3af37ec94889eda74c730d0b7f",
-            "reference": "d860354301747b3af37ec94889eda74c730d0b7f",
+            "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/5a01d0a82c71c2c08446b5c2d16c73081a582e25",
+            "reference": "5a01d0a82c71c2c08446b5c2d16c73081a582e25",
             "shasum": ""
         },
         "require": {
@@ -69,7 +69,7 @@
             "phpunit/phpunit": "9.5.8",
             "squizlabs/php_codesniffer": "3.6.0"
         },
-        "time": "2022-05-20T19:16:42+00:00",
+        "time": "2022-06-28T16:20:27+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -89,17 +89,17 @@
     },
     {
         "name": "paragonie/constant_time_encoding",
-        "version": "v2.5.0",
-        "version_normalized": "2.5.0.0",
+        "version": "v2.6.3",
+        "version_normalized": "2.6.3.0",
         "source": {
             "type": "git",
             "url": "https://github.com/paragonie/constant_time_encoding.git",
-            "reference": "9229e15f2e6ba772f0c55dd6986c563b937170a8"
+            "reference": "58c3f47f650c94ec05a151692652a868995d2938"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/9229e15f2e6ba772f0c55dd6986c563b937170a8",
-            "reference": "9229e15f2e6ba772f0c55dd6986c563b937170a8",
+            "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/58c3f47f650c94ec05a151692652a868995d2938",
+            "reference": "58c3f47f650c94ec05a151692652a868995d2938",
             "shasum": ""
         },
         "require": {
@@ -109,7 +109,7 @@
             "phpunit/phpunit": "^6|^7|^8|^9",
             "vimeo/psalm": "^1|^2|^3|^4"
         },
-        "time": "2022-01-17T05:32:27+00:00",
+        "time": "2022-06-14T06:56:20+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {

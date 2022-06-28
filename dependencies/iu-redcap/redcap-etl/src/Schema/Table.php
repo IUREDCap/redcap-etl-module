@@ -52,6 +52,8 @@ class Table
     
     private $keyType;
 
+    private $needsLabelView;
+
     /**
      * Creates a Table object.
      *
@@ -103,6 +105,8 @@ class Table
             // Otherwise, create a new synthetic primary key
             $this->primary = $this->createPrimary();
         }
+
+        $this->needsLabelView = false;
     }
 
     /**
@@ -116,7 +120,8 @@ class Table
     {
         $mergedTable = clone $this;
 
-        $mergedTable->usesLookup = $this->usesLookup || $table->usesLookup;
+        $mergedTable->usesLookup     = $this->usesLookup || $table->usesLookup;
+        $mergedTable->needsLabelView = $this->needsLabelView || $table->needsLabelView;
 
         # Check the table name (tables with different names should not be merged in the first place,
         # so this error would tend to indicate some kind of logic error in the calling code).
@@ -276,6 +281,15 @@ class Table
         $map = array();
         foreach ($this->getAllFields() as $field) {
             $map[$field->dbName] = $field;
+        }
+        return $map;
+    }
+
+    public function getFieldNameMap()
+    {
+        $map = array();
+        foreach ($this->getAllFields() as $field) {
+            $map[$field->name] = $field;
         }
         return $map;
     }
@@ -463,24 +477,12 @@ class Table
         $dataFound = false;
         
         $allFields = $this->getFields();
-        
+
         // Foreach field
         foreach ($allFields as $field) {
             if (isset($this->recordIdFieldName) && $field->name === $this->recordIdFieldName) {
                 $row->data[$field->dbName] = $data[$field->name];
 
-                /*
-                if (count($allFields) === 1) {
-                    # If the record ID is the ONLY field in the table, (and it has been found if you get to here)
-                    # consider the data to be found
-                    $dataFound = true;
-                } elseif (count($allFields) === 2 && in_array(RedCapEtl::COLUMN_DAG, $fieldNames)) {
-                    # If the record ID and DAG (Data Access Group) are the only records in the table,
-                    # consider the data to be found (e.g., this is a root table of auto-generation where the DAG
-                    # fields option was selected)
-                    $dataFound = true;
-                }
-                 */
                 if ($this->isRecordIdTable()) {
                     # If the record ID is the ONLY field in the table, (and it has been found if you get to here)
                     # or if the record ID and DAG (Data Access Group) are the ONLY records in the table,
@@ -516,7 +518,7 @@ class Table
             } elseif ($field->name === RedCapEtl::COLUMN_DATA_SOURCE) {
                 # Just copy the field and don't count it as a "data found" field
                 $row->data[$field->dbName] = $data[$field->name];
-            } elseif (preg_match('/_timestamp$/', $field->name) === 1 && $field->type === FieldType::DATETIME) {
+            } elseif ($field->isSurveyTimestamp()) {
                 # Handle survey timestamps differently; can have '[not completed]' value,
                 # which may cause an error for datetime fields
                 $value = $data[$field->name];
@@ -533,11 +535,11 @@ class Table
                 
                 $isCalcField     = false;
                 $isCheckbox      = false;
-                $isRadio         = false;
                 $isCompleteField = false;
 
                 // If this is a checkbox field
-                if (preg_match('/'.RedCapEtl::CHECKBOX_SEPARATOR.'/', $field->name)) {
+                // if (preg_match('/'.RedCapEtl::CHECKBOX_SEPARATOR.'/', $field->name)) {
+                if ($field->isCheckbox()) {
                     $isCheckbox = true;
                     list($rootName,$choiceValue) = explode(RedCapEtl::CHECKBOX_SEPARATOR, $field->name);
                     $choiceValue = str_replace('-', '_', $choiceValue);
@@ -548,8 +550,6 @@ class Table
                                         
                     if ($field->redcapType === 'calc') {
                         $isCalcField = true;
-                    } elseif ($field->redcapType === 'radio') {
-                        $isRadio = true;
                     }
 
                     if (preg_match('/_complete$/', $field->name)) {
@@ -568,7 +568,24 @@ class Table
                 if (array_key_exists($variableName, $data)) {
                     $value = $data[$variableName];
                     # print "\nAdded value {$value} to field {$field->dbName}\n";
-                    $row->data[$field->dbName] = $value;
+                    if ($field->isLabel) {
+                        if ($isCheckbox) {
+                            if ($value == 1) {
+                                $labelValue = $field->checkboxLabel;
+                            } else {
+                                $labelValue = "";
+                            }
+                        } else {
+                            if (array_key_exists($value, $field->valueToLabelMap)) {
+                                $labelValue = $field->valueToLabelMap[$value];
+                            } else {
+                                $labelValue = "";
+                            }
+                        }
+                        $row->data[$field->dbName] = $labelValue;
+                    } else {
+                        $row->data[$field->dbName] = $value;
+                    }
                 }
 
                 if (isset($value)) {
@@ -767,6 +784,16 @@ class Table
     public function getNamePrefix()
     {
         return $this->namePrefix;
+    }
+
+    public function getNeedsLabelView()
+    {
+        return $this->needsLabelView;
+    }
+
+    public function setNeedsLabelView($needsLabelView)
+    {
+        $this->needsLabelView = $needsLabelView;
     }
 
 
