@@ -65,18 +65,24 @@ One-time initial setup:
               files directory (e.g., **/etc/apache2/conf-available/**) with the following contents
               (the script directory needed to be changed as appropropriate):
 
-    php_value auto_prepend_file /var/www/html/redcap/modules/redcap-etl-module_v2.2.0/tests/web/start_coverage.php
-    php_value auto_append_file  /var/www/html/redcap/modules/redcap-etl-module_v2.2.0/tests/web/end_coverage.php
+                <pre>
+                php_value auto_prepend_file /var/www/html/redcap/modules/redcap-etl-module_v2.2.0/tests/web/start_coverage.php
+                php_value auto_append_file  /var/www/html/redcap/modules/redcap-etl-module_v2.2.0/tests/web/end_coverage.php
+                </pre>
 
             * Enable the above configuration file with the following commands:
                 
-    sudo a2enconf code-coverage
-    sudo systemctl reload apache2'
+                <pre>
+                sudo a2enconf code-coverage
+                sudo systemctl reload apache2'
+                </pre>
 
             * Disable the configuration file with this command:
 
-    sudo a2disconf code-coverage
-    sudo systemctl reload apache2
+                <pre>
+                sudo a2disconf code-coverage
+                sudo systemctl reload apache2
+                </pre>
 
 
 
