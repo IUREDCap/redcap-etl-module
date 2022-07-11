@@ -61,9 +61,9 @@ One-time initial setup:
     * If you are using the Apache web server, an alternative, more flexible approach to set up the coverage
       code is as follows (using Ubuntu as the example operating system):
 
-        * Create an Apache configuration file **code-coverage.conf** in Apache's avaialble configuration
+        * Create an Apache configuration file **code-coverage.conf** in Apache's available configuration
           files directory (e.g., **/etc/apache2/conf-available/**) with the following contents
-          (the script directory needs to be changed as appropropriate):
+          (the script directory needs to be changed as appropriate):
 
             <pre>
             php_value auto_prepend_file /var/www/html/redcap/modules/redcap-etl-module_v2.2.0/tests/web/start_coverage.php
