@@ -77,7 +77,7 @@ One-time initial setup:
                 sudo systemctl reload apache2
                 </pre>
 
-            * Disable the configuration file with this commands:
+            * Disable the configuration file with these commands:
 
                 <pre>
                 sudo a2disconf code-coverage
