@@ -58,32 +58,31 @@ One-time initial setup:
         * **auto_prepend_file** - should be set to the full path of the **tests/web/start_coverage.php** script
         * **auto_append_file** - should be set to the full path of the **tests/web/end_coverage.php** script
 
-        * If you are using the Apache web server, a more flexible approach to set up the coverage
-          code is as follows (using Ubuntu as the example operating system):
+    * If you are using the Apache web server, an alternative, more flexible approach to set up the coverage
+      code is as follows (using Ubuntu as the example operating system):
 
-            * Create an Apache configuration file **code-coverage.conf** in Apache's avaialble configuration
-              files directory (e.g., **/etc/apache2/conf-available/**) with the following contents
-              (the script directory needs to be changed as appropropriate):
+        * Create an Apache configuration file **code-coverage.conf** in Apache's avaialble configuration
+          files directory (e.g., **/etc/apache2/conf-available/**) with the following contents
+          (the script directory needs to be changed as appropropriate):
 
-                <pre>
-                php_value auto_prepend_file /var/www/html/redcap/modules/redcap-etl-module_v2.2.0/tests/web/start_coverage.php
-                php_value auto_append_file  /var/www/html/redcap/modules/redcap-etl-module_v2.2.0/tests/web/end_coverage.php
-                </pre>
+            <pre>
+            php_value auto_prepend_file /var/www/html/redcap/modules/redcap-etl-module_v2.2.0/tests/web/start_coverage.php
+            php_value auto_append_file  /var/www/html/redcap/modules/redcap-etl-module_v2.2.0/tests/web/end_coverage.php
+            </pre>
 
-            * Enable the above configuration file with the following commands:
+        * Enable the above configuration file with the following commands:
                 
-                <pre>
-                sudo a2enconf code-coverage
-                sudo systemctl reload apache2
-                </pre>
+            <pre>
+            sudo a2enconf code-coverage
+            sudo systemctl reload apache2
+            </pre>
 
-            * Disable the configuration file with these commands:
+        * Disable the configuration file with these commands:
 
-                <pre>
-                sudo a2disconf code-coverage
-                sudo systemctl reload apache2
-                </pre>
-
+            <pre>
+            sudo a2disconf code-coverage
+            sudo systemctl reload apache2
+            </pre>
 
 
 Setup each time before tests are run
