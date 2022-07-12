@@ -65,7 +65,9 @@ class Configuration implements \JsonSerializable
 
     public const TABLE_PREFIX = 'table_prefix';
 
-    public const LABEL_VIEW_SUFFIX = 'label_view_suffix';
+    public const LABEL_FIELD_SUFFIX = 'label_field_suffix';
+    public const LABEL_VIEW_SUFFIX  = 'label_view_suffix';
+    public const LABEL_VIEWS        = 'label_views';
 
     public const POST_PROCESSING_SQL = 'post_processing_sql';
     public const PRE_PROCESSING_SQL  = 'pre_processing_sql';
@@ -117,6 +119,7 @@ class Configuration implements \JsonSerializable
             self::EMAIL_ERRORS,
             self::EMAIL_SUMMARY,
             self::IGNORE_EMPTY_INCOMPLETE_FORMS,
+            self::LABEL_VIEWS,
             self::SSL_VERIFY,
             self::AUTOGEN_INCLUDE_COMPLETE_FIELDS,
             self::AUTOGEN_INCLUDE_DAG_FIELDS,
@@ -157,7 +160,9 @@ class Configuration implements \JsonSerializable
 
         $this->properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS] = false;
 
-        $this->properties[self::LABEL_VIEW_SUFFIX] = \IU\REDCapETL\TaskConfig::DEFAULT_LABEL_VIEW_SUFFIX;
+        $this->properties[self::LABEL_VIEWS]        = false;
+        $this->properties[self::LABEL_VIEW_SUFFIX]  = \IU\REDCapETL\TaskConfig::DEFAULT_LABEL_VIEW_SUFFIX;
+        $this->properties[self::LABEL_FIELD_SUFFIX] = \IU\REDCapETL\TaskConfig::DEFAULT_LABEL_FIELD_SUFFIX;
 
         $this->properties[self::DB_LOGGING]         = true;
         $this->properties[self::DB_LOG_TABLE]       = \IU\REDCapETL\TaskConfig::DEFAULT_DB_LOG_TABLE;
@@ -291,6 +296,9 @@ class Configuration implements \JsonSerializable
         self::validateTablePrefix($tablePrefix);
 
         $labelViewSuffix = $this->getProperty(self::LABEL_VIEW_SUFFIX);
+        self::validateLabelViewSuffix($labelViewSuffix);
+
+        $labelViewSuffix = $this->getProperty(self::LABEL_FIELD_SUFFIX);
         self::validateLabelViewSuffix($labelViewSuffix);
 
         $emailToList = $this->getProperty(self::EMAIL_TO_LIST);
@@ -788,6 +796,7 @@ class Configuration implements \JsonSerializable
             $properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS] = null;
             $properties[self::TABLE_PREFIX]                  = null;
             $properties[self::LABEL_VIEW_SUFFIX]             = null;
+            $properties[self::LABEL_FIELD_SUFFIX]            = null;
 
             $properties[self::DB_PRIMARY_KEYS]    = null;
             $properties[self::DB_FOREIGN_KEYS]    = null;

@@ -357,7 +357,7 @@ class Settings
         $configValues = json_decode($setting, true);
 
         if (isset($configValues) && is_array($configValues)) {
-            $projectIdUpdated = false;
+            $projectIdUpdated    = false;
 
             if (!empty($projectId) && $configValues['projectId'] !== $projectId) {
                 #-------------------------------------------------------------------------
@@ -373,6 +373,15 @@ class Settings
                 $configValues['properties'][Configuration::API_TOKEN_USERNAME]    = '';
                 $configValues['properties'][Configuration::CRON_SCHEDULE]         = '';
                 $projectIdUpdated = true;
+            }
+
+            # If this is a configuration from before when the "label_views" and
+            # "label_field_suffix" properties were added, add these properties
+            # to the configuration and set them so that the project will behave
+            # as before (i.e. label views will be generated, and label fields will not).
+            if (!array_key_exists(Configuration::LABEL_VIEWS, $configValues['properties'])) {
+                $configValues['properties'][Configuration::LABEL_VIEWS] = true;
+                $configValues['properties'][Configuration::LABEL_FIELD_SUFFIX] = '';
             }
 
             $configuration = new Configuration(

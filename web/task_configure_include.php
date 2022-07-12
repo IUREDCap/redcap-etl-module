@@ -459,8 +459,8 @@ $module->renderMessages($error, $warning, $success);
                     ;
                 return false;
             });
-            $('#label-view-suffix-help-link').click(function () {
-                $('#label-view-suffix-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
+            $('#labels-help-link').click(function () {
+                $('#labels-help').dialog({dialogClass: 'redcap-etl-help', width: 600, maxHeight: 440})
                     .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
                     ;
                 return false;
@@ -1146,22 +1146,55 @@ Configuration form
                     <td><input type="text" name="<?php echo Configuration::TABLE_PREFIX;?>"
                         id="<?php echo Configuration::TABLE_PREFIX;?>"
                         value="<?php echo Filter::escapeForHtml($properties[Configuration::TABLE_PREFIX]);?>"/>
-                        <a href="#" id="table-name-prefix-help-link" class="etl-help">?</a>
+                    </td>
+                    <td>
+                        <a href="#" id="table-name-prefix-help-link" class="etl-help" style="margin-left: 1em;">?</a>
                         <div id="table-name-prefix-help" title="Table Name Prefix" style="display: none;">
                             <?php echo Help::getHelpWithPageLink('table-name-prefix', $module); ?>
                         </div>
                     </td>
                 </tr>
      
+                <tr>
+                    <td>&nbsp;</td>
+                </tr>
+     
+                <!-- LABEL VIEWS -->
+                <tr>
+                    <td style="padding-right: 1em;">Label views</td>
+                    <td>
+                        <?php
+                        $checked = '';
+                        if ($properties[Configuration::LABEL_VIEWS]) {
+                            $checked = ' checked ';
+                        }
+                        ?>
+                        <input type="checkbox" name="<?php echo Configuration::LABEL_VIEWS;?>"
+                               value="true" <?php echo $checked;?>
+                               style="vertical-align: middle; margin: 0;"
+                        />
+                    </td>
+                    <td>
+                        <a href="#" id="labels-help-link" class="etl-help" style="margin-left: 1em;">?</a>
+                        <div id="labels-help" title="Labels" style="display: none;">
+                            <?php echo Help::getHelpWithPageLink('labels', $module); ?>
+                        </div>
+                    </td>
+                </tr>
+                
                 <!-- LABEL VIEW SUFFIX -->
                 <tr>
                     <td style="padding-right: 1em;">Label view suffix</td>
                     <td><input type="text" name="<?php echo Configuration::LABEL_VIEW_SUFFIX;?>"
                         value="<?php echo Filter::escapeForHtml($properties[Configuration::LABEL_VIEW_SUFFIX]);?>"/>
-                        <a href="#" id="label-view-suffix-help-link" class="etl-help">?</a>
-                        <div id="label-view-suffix-help" title="Label View Suffix" style="display: none;">
-                            <?php echo Help::getHelpWithPageLink('label-view-suffix', $module); ?>
-                        </div>
+                    </td>
+                </tr>
+                
+                <!-- LABEL FIELD SUFFIX -->
+                <tr>
+                    <td style="padding-right: 1em;">Label field suffix</td>
+                    <td><input type="text" name="<?php echo Configuration::LABEL_FIELD_SUFFIX;?>"
+                        value="<?php echo Filter::escapeForHtml($properties[Configuration::LABEL_FIELD_SUFFIX]);?>"/>
                     </td>
                 </tr>
                 
@@ -1182,6 +1215,8 @@ Configuration form
                         <input type="checkbox" name="<?php echo Configuration::DB_PRIMARY_KEYS;?>"
                             id="db_primary_keys" value="true"
                             <?php echo $checked;?> style="vertical-align: middle; margin: 0;">    
+                    </td>
+                    <td>
                         <a href="#" id="database-keys-help-link" class="etl-help" style="margin-left: 1em;">?</a>
                         <div id="database-keys-help" title="Database Keys" style="display: none;">
                             <?php echo Help::getHelpWithPageLink('database-keys', $module); ?>
