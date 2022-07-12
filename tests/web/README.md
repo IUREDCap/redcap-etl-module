@@ -18,7 +18,12 @@ One-time initial setup:
 
 2. Create a non-admin REDCap user and admin REDCap user for testing.
 
-3. Create a database account (if you don't already have one) for testing.
+3. Create a database and database account (if you don't already have one) for the tests to use for loading data extracted
+   from REDCap. For example, in MySQL:
+
+        CREATE DATABASE `etl_test`;
+        CREATE USER 'etl_user'@'localhost' IDENTIFIED BY 'etlPassword';
+        GRANT ALL ON `etl_test`.* TO 'etl_user'@'localhost';
 
 4. Create a REDCap-ETL enabled project for the non-admin user where:
 
