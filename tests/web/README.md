@@ -6,17 +6,21 @@ SPDX-License-Identifier: BSD-3-Clause
 REDCap-ETL External Module Web Tests
 ======================================
 
-Web tests, which access the REDCap-ETL External Module running in REDCap, have been developed
-using [behat](https://behat.org). 
+Automated web tests, which access the REDCap-ETL External Module running in REDCap, have been developed
+using [Behat](https://behat.org) with [Mink](https://mink.behat.org/en/latest/). The tests are
+written in English based on standard and custom sentence patterns and are in the **tests/web/features**
+directory. In addition, some web tests have been written that use [PHPUnit](https://phpunit.de/) with 
+[Mink](https://mink.behat.org/en/latest/). There tests have been written in PHP.
+
 
 One-time initial setup:
 --------------------------
 
-1. Install the Chrome browser if it is not already installed. For example, on Ubuntu 16 you can use the following:
+1. Install the Chrome browser if it is not already installed. For example, on Ubuntu 20 you can use the following:
 
     sudo apt install chromium-browser
 
-2. Create a non-admin REDCap user and admin REDCap user for testing.
+2. In REDCap, create a non-admin REDCap user and admin REDCap user for testing.
 
 3. Create a database and database account (if you don't already have one) for the tests to use for loading data extracted
    from REDCap. For example, in MySQL:
@@ -93,6 +97,9 @@ One-time initial setup:
 Setup each time before tests are run
 ---------------------------------------
 
+Since the web tests need to access a running instance of the REDCap-ETL external module, REDCap must be running
+and have REDCap-ETL external module installed.
+
 ### Test coverage statistics
 
 If you want to collect test coverage data, you will need to
@@ -116,7 +123,8 @@ If you use the command below, you will need to run the tests one feature at a ti
 
     chrome --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222
 
-
+Note that if you installed **chromium-browser**, you will either need to make an alias named "chrome" for it, or
+use "chromium-browser" in the commands above instead of "chrome".
 
 
 Running the tests
