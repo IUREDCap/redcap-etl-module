@@ -205,13 +205,13 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         $page = $session->getPage();
         $element = $page->findField($fieldLocator);
         if (!isset($element)) {
-            throw new \Exception("Fiel \"{$css}\" not found.");
+            throw new \Exception("Field \"{$css}\" not found.");
         }
 
         $fieldValue = $element->getValue();
 
         if (strpos($fieldValue, $value) === false) {
-            throw new \Exception("Fiel \"{$css}\" does not contain value \"{$value}\".");
+            throw new \Exception("Field \"{$css}\" does not contain value \"{$value}\".");
         }
     }
 
