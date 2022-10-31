@@ -105,6 +105,7 @@ class Util
 
         $page = $session->getPage();
         $page->clickLink('Control Center');
+        sleep(1);
         $page->clickLink('REDCap-ETL');
     }
 

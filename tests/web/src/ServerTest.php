@@ -12,6 +12,9 @@ use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use DMore\ChromeDriver\ChromeDriver;
 
+/**
+ * PHPUnit-based web test for ETL servers.
+ */
 class ServerTest extends TestCase
 {
     private static $testConfig;

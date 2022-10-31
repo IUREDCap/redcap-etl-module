@@ -12,6 +12,9 @@ use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use DMore\ChromeDriver\ChromeDriver;
 
+/**
+ * PHPUnit-based web test for REDCap-ETL test setup status.
+ */
 class StatusTest extends TestCase
 {
     private static $testConfig;
@@ -77,6 +80,7 @@ class StatusTest extends TestCase
         $page = self::$session->getPage();
         $page->clickLink('Control Center');
 
+        sleep(1);
         $link = $page->findLink('REDCap-ETL');
         $this->assertNotNull($link, 'REDCap-ETL admin link not null check');
         $page->clickLink('REDCap-ETL');
