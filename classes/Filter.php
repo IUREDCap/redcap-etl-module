@@ -20,6 +20,11 @@ class Filter
         'ul'
     ];
 
+    public static $allowedLogDetailsTags = [
+        'h1', 'h2', 'h3', 'h4',
+        'table', 'tbody', 'td', 'th', 'thead', 'tr'
+    ];
+
     /**
      * Escape text for displaying as HTML.
      * This method only works within REDCap context.
@@ -132,6 +137,65 @@ class Filter
     {
         $flags = FILTER_FLAG_STRIP_LOW;
         return filter_var($value, FILTER_SANITIZE_STRING, $flags);
+    }
+
+    /**
+     * Fixes problems with tags in text.
+     */
+    public static function fixTags($text)
+    {
+        # Remove leading spacing from tags
+        $text = preg_replace('/<\s+/', '<', $text);
+
+        # Remove trailing space from tags
+        $text = preg_replace('/\s+>/', '>', $text);
+
+        # Close nested tags, for example, change "<a <a>" => "<a> <a>"
+        $text = preg_replace('/<\s*([a-z][a-z0-9]*)([^<>]*<)/i', '<${1}>${2}', $text);
+
+        # Terminate non-terminated a tags, e.g.: "<a this is a test" => "<a> this is a test"
+        $text = preg_replace('/<\s*[a-z][a-z0-9]*\s+([^>]*$)/i', '<a>$1', $text);
+
+        return $text;
+    }
+
+    public static function sanitizeLogDetails($text)
+    {
+        $text = self::fixTags($text);
+
+        # Remove non-allowed tags
+        $allowedTagsString = '<' . implode('><', self::$allowedLogDetailsTags) . '>';
+        $text = strip_tags($text, $allowedTagsString);
+
+        # Remove all attributes of allowed tags, except for the "table" and "td" tags
+        foreach (self::$allowedLogDetailsTags as $tag) {
+            # if table tag
+            if ($tag === 'table') {
+                # For each of the table tags, eliminate attributes for cases that
+                # have attributes other than "class" (the only allowed attribute)
+                preg_match_all('/<table[^>]*>/', $text, $matches);
+                foreach ($matches as $match) {
+                    $match = $match[0];
+                    if (preg_match('/<table\s+class="[a-zA-Z0-9\-]+"\s*>/', $match) !== 1) {
+                        $text = preg_replace("/{$match}/", '<table>', $text);
+                    }
+                }
+            } elseif ($tag === 'td') {
+                # For each of the td tags, eliminate attributes for cases that
+                # have attributes other than "style" (the only allowed attribute)
+                preg_match_all('/<td[^>]*>/', $text, $matches);
+                foreach ($matches as $match) {
+                    $match = $match[0];
+                    if (preg_match('/<td\s+style="[a-zA-Z0-9\- ;:]+"\s*>/', $match) !== 1) {
+                        $text = preg_replace("/{$match}/", '<td>', $text);
+                    }
+                }
+            } else {
+                $text = preg_replace("/<{$tag}\s+[^>]*?(\/?)>/i", '<' . $tag . '$1>', $text);
+            }
+        }
+
+        return $text;
     }
 
     /**
