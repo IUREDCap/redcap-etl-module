@@ -21,4 +21,4 @@ $moduleLog = new ModuleLog($module);
 
 $logInfo = $moduleLog->renderEtlRunDetails($etlRunLogId);
 
-echo Filter::escapeForHtml($logInfo);
+echo Filter::sanitizeLogDetails($logInfo);
