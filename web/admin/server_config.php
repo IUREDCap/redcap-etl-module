@@ -507,7 +507,47 @@ $(function() {
             $maxZipDownloadSize = DataTarget::DEFAULT_MAX_ZIP_DOWNLOAD_FILESIZE;
         }
         ?>
-        <!-- CSV ZIP DOWNLOAD SETTING -->
+            <!-- DATA LOAD SETTING -->
+            <fieldset class="server-config">
+            <legend>Data Load Options</legend>
+
+                <!-- CSV ZIP file and Databas download -->
+                <input type="radio" name="dataLoadOptions"
+                    value="<?php echo ServerConfig::DATA_LOAD_DB_AND_FILE;?>"
+                <?php
+                if ($serverConfig->getDataLoadOptions() == ServerConfig::DATA_LOAD_DB_AND_FILE) {
+                    echo ' checked ';
+                }
+                ?>
+                style="vertical-align: middle; margin: 0;">
+                <span style="vertical-align: top; margin-right: 8px;">CSV ZIP file and Database</span>
+
+                <!-- Database only -->
+                <input type="radio" name="dataLoadOptions"
+                    value="<?php echo ServerConfig::DATA_LOAD_DB_ONLY;?>"
+                <?php
+                if ($serverConfig->getDataLoadOptions() == ServerConfig::DATA_LOAD_DB_ONLY) {
+                    echo ' checked ';
+                }
+                ?>
+                style="vertical-align: middle; margin: 0;">
+                <span style="vertical-align: top; margin-right: 8px;">Database only</span>
+
+
+                <!-- CSV ZIP file download only -->
+                <input type="radio" name="dataLoadOptions"
+                    value="<?php echo ServerConfig::DATA_LOAD_FILE_ONLY;?>"
+                <?php
+                if ($serverConfig->getDataLoadOptions() == ServerConfig::DATA_LOAD_FILE_ONLY) {
+                    echo ' checked ';
+                }
+                ?>
+                style="vertical-align: middle; margin: 0;">
+                <span style="vertical-align: top; margin-right: 8px;">CSV ZIP file only</span>
+
+            </fieldset>
+
+            <!-- CSV ZIP DOWNLOAD SETTING -->
             <fieldset class="server-config">
             <legend>CSV ZIP Download</legend>
             <table>

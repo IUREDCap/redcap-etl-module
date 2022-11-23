@@ -64,7 +64,12 @@ try {
     # may be stored in the user's session as "CSV" from a previous run
     if ($configType !== 'task' || $server !== ServerConfig::EMBEDDED_SERVER_NAME) {
         $dataTarget = DataTarget::DB;
+    } elseif ($configType === 'task' && $server === ServerConfig::EMBEDDED_SERVER_NAME) {
+        $serverConfig = $module->getServerConfig($server);
+        # FINISH!!!!!!!!!!!!!!!!!!!
+        $dataLoadOptions = $serverConfig->getDataLoadOptions();
     }
+
 
     #-------------------------
     # Set the submit value
@@ -193,6 +198,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 # Configuration & Server selection form
 #------------------------------------------
 ?>
+
 <form action="<?php echo $selfUrl;?>" name="runForm" method="post" 
     style="padding: 12px; margin-bottom: 0px; margin-right: 1em; border-radius: 10px; border: 1px solid #ccc;">
 
@@ -305,13 +311,29 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
         <!-- DATA TARGET -->
         <?php
         if ($configType === 'task' && $server === ServerConfig::EMBEDDED_SERVER_NAME) {
-            echo '
+            if ($dataLoadOptions === ServerConfig::DATA_LOAD_DB_ONLY) {
+                echo '
+                <div style="float: left; margin-bottom: 22px; margin-left: 2em">
+                    <select name="dataTarget" id="dataTarget" style="margin-left: 1em;">
+                        <option value="' . DataTarget::DB . '">Load data into database </option>
+                    </select>
+                </div>';
+            } elseif ($dataLoadOptions === ServerConfig::DATA_LOAD_FILE_ONLY) {
+                echo '
+                <div style="float: left; margin-bottom: 22px; margin-left: 2em">
+                    <select name="dataTarget" id="dataTarget" style="margin-left: 1em;">
+                        <option value="' . DataTarget::CSV_ZIP . '">Export data as CSV zip file</option>
+                    </select>
+                </div>';
+            } else {
+                echo '
                 <div style="float: left; margin-bottom: 22px; margin-left: 2em">
                     <select name="dataTarget" id="dataTarget" style="margin-left: 1em;">
                         <option value="' . DataTarget::DB . '">Load data into database </option>
                         <option value="' . DataTarget::CSV_ZIP . '">Export data as CSV zip file</option>
                     </select>
                 </div>';
+            }
         }
         ?>
     

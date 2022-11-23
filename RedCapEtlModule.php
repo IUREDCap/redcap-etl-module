@@ -444,7 +444,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         return $servers;
     }
 
-    public function getUserAllowedServersBasedOnAccessLevel($username = USERID)
+    /**
+     * Gets the list of servers the user is allowed to use.
+     *
+     * @param string $username the REDCap username of the user.
+     * @param boolean $isInteractive indicates if the check is for an interactive run (as opposed to a scheduled run).
+     */
+    public function getUserAllowedServersBasedOnAccessLevel($username = USERID, $isFileDownload = null)
     {
         $servers = array();
 
@@ -463,6 +469,29 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             # Get uniue server names. There are cases where a server can be listed twice, for example, if a private
             # server is changed to being public, and the list of users for the private version is saved.
             $servers = array_unique($servers);
+
+            #---------------------------------------------------------------------------------
+            # Check to see if the embedded server should be removed, because it is not set
+            # to allow the type of download (database or file) being done.
+            #---------------------------------------------------------------------------------
+            $embeddedServerIndex = array_search(ServerConfig::EMBEDDED_SERVER_NAME, $servers);
+            if ($embbdedServerIndex !== false && $isFileDownload != null) {
+                $embeddedServerConfig = $this->getServerConfig(ServerConfig::EMBEDDED_SERVER_NAME);
+                $dataLoadOptions = $embeddedServerConfig->getDataLoadOptions();
+                if ($isFileDownLoad) {
+                    # If a file download is being done, and the embedded server only has database download enabled,
+                    # then remove the embedded server from the list of servers.
+                    if ($dataLoadOptions === ServerConfig::DATA_LOAD_DB_ONLY) {
+                        unset($servers[$embeddedServerIndex]);
+                    }
+                } else {
+                    # If a databasee download is being done, and the embedded server only has file download enabled,
+                    # then remove the embedded server from the list of servers.
+                    if ($dataLoadOptions === ServerConfig::DATA_LOAD_FILE_ONLY) {
+                        unset($servers[$embeddedServerIndex]);
+                    }
+                }
+            }
         }
 
         return $servers;

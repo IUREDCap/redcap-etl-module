@@ -19,13 +19,20 @@ class ServerConfig implements \JsonSerializable
 
     public const ACCESS_LEVELS = array('admin','private','public');
 
+    # Data load options for the embedded server
+    public const DATA_LOAD_DB_AND_FILE = 'data-load-db-and-file';
+    public const DATA_LOAD_DB_ONLY     = 'data-load-db-only';
+    public const DATA_LOAD_FILE_ONLY   = 'data-load-file-only';
+
     private $name;
 
     /** @var boolean indicates if the server is active or not; inactive servers
                      don't show up as choices for users. */
     private $isActive;
 
-    private $accessLevel; #who is allowed to run the server
+    private $accessLevel; # who is allowed to run the server
+
+    private $dataLoadOptions; # where data can be loaded (csv, db, csv and db)
 
     private $serverAddress; # address of REDCap-ETL server
     private $authMethod;
@@ -63,6 +70,9 @@ class ServerConfig implements \JsonSerializable
         $this->isActive = false;
 
         $this->accessLevel = 'public';
+
+        $this->dataLoadOptions = self::DATA_LOAD_DB_AND_FILE;  # By default, set to both
+                                                               # database and file as data load options
 
         $this->authMethod = self::AUTH_METHOD_SSH_KEY;
         $this->sshKeyPassword = '';
@@ -319,7 +329,7 @@ class ServerConfig implements \JsonSerializable
                     $result = mkdir($tempDir, 0700);
                     if ($result === false) {
                         $message = 'Unable to create directory for CSV files.';
-                        throw new EtlException($message, EtlException::FILE_ERROR);
+                        throw new \Exception($message);
                     }
                     $properties[Configuration::DB_CONNECTION] = DataTarget::DBTYPE_CSV . ':' . $tempDir;
                 }
@@ -346,35 +356,37 @@ class ServerConfig implements \JsonSerializable
                 $redCapEtl->run();
 
                 if ($runWorkflow) {
-                    #$redCapEtl->run();
                     // If this is a workflow, reset the logger to the workflow logger.
                     $logger = $redCapEtl->getWorkflowConfig()->getLogger();
                     $output = implode("\n", $logger->getLogArray());
                 } else {
                     switch ($dataTarget) {
                         case DataTarget::DB:
-                            #$redCapEtl->run();
                             $output = implode("\n", $logger->getLogArray());
                             break;
                         case DataTarget::CSV_ZIP:
-                            #$redCapEtl->run();
                             $pid = $properties['project_id'];
-                            $dt = new DataTarget();
-                            $result = $dt->exportEtlCsvZip($tempDir, $pid);
+                            $dataTarget = new DataTarget();
+                            $result = $dataTarget->exportEtlCsvZip($tempDir, $pid);
 
                             #If the filesize is larger than the allowable filesize, then send
                             #a message instead of the zip file.
                             $fileSize = filesize($result);
-                            $fsMb = $fileSize / 1024 / 1024;
-                            $maxFsMb = $this->getMaxZipDownloadFileSize();
-                            if (is_null($maxFsMb) || ($maxFsMb === '')) {
-                                $maxFsMb = $dt::DEFAULT_MAX_ZIP_DOWNLOAD_FILESIZE;
+                            $fileSizeMB = $fileSize / 1024 / 1024;
+                            $maxFileSizeMB = $this->getMaxZipDownloadFileSize();
+
+                            if (is_null($maxFileSizeMB) || ($maxFileSizeMB === '')) {
+                                $maxFileSizeMB = $dataTarget::DEFAULT_MAX_ZIP_DOWNLOAD_FILESIZE;
                             }
-                            if ($fsMb > $maxFsMb) {
-                                $output = "ERROR: CSV zip file size exceeds max of $maxFsMb MB. Cannot download.";
+
+                            if ($fileSizeMB > $maxFileSizeMB) {
+                                $message = "CSV zip file size ({$fileSizeMB} MB) exceeds" .
+                                   " max of {$maxFileSizeMB} MB. Cannot download.";
+                                throw new \Exception($message);
                             } else {
                                 $output = $result;
                             }
+
                             break;
                     }
                 }
@@ -565,6 +577,11 @@ class ServerConfig implements \JsonSerializable
     public function setIsActive($isActive)
     {
         $this->isActive = $isActive;
+    }
+
+    public function getDataLoadOptions()
+    {
+        return $this->dataLoadOptions;
     }
 
     public function getServerAddress()

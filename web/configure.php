@@ -20,8 +20,6 @@ $success = '';
 $pid = PROJECT_ID;
 $username = USERID;
 
-$servers = array();
-
 try {
     #-----------------------------------------------------------
     # Check that the user has permission to access this page
@@ -38,8 +36,6 @@ try {
     }
 
     $selfUrl  = $module->getUrl("web/configure.php");
-
-    $servers  = $module->getUserAllowedServersBasedOnAccessLevel(USERID);
 
     #------------------------------------------
     # Get request variables

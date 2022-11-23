@@ -35,7 +35,7 @@ class DataTarget
         $result = $zip->open($zipFile, \ZipArchive::CREATE);
         if ($result === false) {
             $message = 'Unable to create zip file.';
-            throw new EtlException($message, EtlException::FILE_ERROR);
+            throw new \Exception($message);
         }
 
         $pattern = $tempDir . '*' . \IU\REDCapETL\Database\CsvDbConnection::FILE_EXTENSION;
