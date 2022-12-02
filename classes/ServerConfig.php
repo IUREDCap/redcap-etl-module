@@ -165,6 +165,10 @@ class ServerConfig implements \JsonSerializable
                 $this->accessLevel = 'public';
             }
         }
+
+        if (empty($this->dataLoadOptions)) {
+            $this->dataLoadOptions = self::DATA_LOAD_DB_AND_FILE;
+        }
     }
 
     public function toJson()

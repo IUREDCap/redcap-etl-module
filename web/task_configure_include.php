@@ -918,7 +918,7 @@ Configuration form
                                    );
                                     ?>">
                         <br /><br />                          
-                        <input type="submit" name="submitValue" value="Auto-Generate">
+                        <input type="submit" name="submitValue" style="font-weight: bold;" value="Auto-Generate">
                         </div>
 
 

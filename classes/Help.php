@@ -99,6 +99,13 @@ class Help
             . " For very large projects, using a large batch size may cause"
             . " system memory limits to be exceeded and the ETL process to fail.</p>"
         ,
+        'data-load-options' =>
+            " <p>"
+            . "The embedded server supports loading data extracted from REDCap to both a database"
+            . " and as a CSV ZIP file. Data load options configuration allows either of these options "
+            . " to be disallowed."
+            . "</p>"
+        ,
         'database-keys' =>
             " <p>"
             . "Selecting database primary keys will cause primary key constraints to be generated for"

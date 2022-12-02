@@ -20,6 +20,7 @@ use phpseclib\Net\SFTP;
 use phpseclib\Net\SSH2;
 
 use IU\RedCapEtlModule\Csrf;
+use IU\RedCapEtlModule\Help;
 use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\ServerConfig;
 use IU\RedCapEtlModule\RedCapEtlModule;
@@ -230,6 +231,16 @@ $(function() {
         }
     });
 });
+
+        $( function() {
+            $('#data-load-options-help-link').click(function () {
+                $('#data-load-options-help').dialog({dialogClass: 'redcap-etl-help', width: 540, maxHeight: 440})
+                    .dialog('widget').position({my: 'left top', at: 'right+10 top+40', of: $(this)})
+                    ;
+                return false;
+            });
+        });
+
 </script>
 
 <?php
@@ -544,6 +555,16 @@ $(function() {
                 ?>
                 style="vertical-align: middle; margin: 0;">
                 <span style="vertical-align: top; margin-right: 8px;">CSV ZIP file only</span>
+
+                <!-- HELP -->
+                <div style="float: right;">
+                    <a href="#" id="data-load-options-help-link" class="etl-help" title="help">?</a>
+                    <div id="data-load-options-help" title="Data Load Options" style="display: none;">
+                        <?php echo Help::getHelpWithPageLink('data-load-options', $module); ?>
+                    </div>
+                </div>
+
+                <div style="clear: both;"></div>
 
             </fieldset>
 
