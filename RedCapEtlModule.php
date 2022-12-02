@@ -454,20 +454,22 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $servers = array();
 
-       #if this is a REDCap admin, then return all servers
+        #-------------------------------------------------------------
+        # If this is a REDCap admin, then return all servers
+        #-------------------------------------------------------------
         if ($this->isSuperUser($username)) {
             $servers = $this->getServersViaAccessLevels('none');
         } else {
-            #add servers with public access
+            # Add servers with public access
             $servers = $this->getServersViaAccessLevels('public');
 
-            #add the private servers that the user is allowed to access
+            # Add the private servers that the user is allowed to access
             $userPrivateServers = array();
             $userPrivateServers = $this->settings->getUserPrivateServerNames($username);
             $servers = array_merge($servers, $userPrivateServers);
 
-            # Get uniue server names. There are cases where a server can be listed twice, for example, if a private
-            # server is changed to being public, and the list of users for the private version is saved.
+            # Remove duplicate server names. There are cases where a server can be listed twice, for example, if
+            # a private server is changed to being public, and the list of users for the private version is saved.
             $servers = array_unique($servers);
 
             #---------------------------------------------------------------------------------
@@ -475,7 +477,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             # to allow the type of download (database or file) being done.
             #---------------------------------------------------------------------------------
             $embeddedServerIndex = array_search(ServerConfig::EMBEDDED_SERVER_NAME, $servers);
-            if ($embbdedServerIndex !== false && $isFileDownload != null) {
+            if ($embbdedServerIndex !== false && isset($isFileDownload)) {
                 $embeddedServerConfig = $this->getServerConfig(ServerConfig::EMBEDDED_SERVER_NAME);
                 $dataLoadOptions = $embeddedServerConfig->getDataLoadOptions();
                 if ($isFileDownLoad) {

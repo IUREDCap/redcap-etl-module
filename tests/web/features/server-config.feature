@@ -19,6 +19,14 @@ Feature: Server configuration management
     But I should not see "local-server"
     And I should not see "Error:"
 
+  Scenario: Test embedded server configuration
+    When I follow "Servers"
+    And I follow server "(embedded server)"
+    Then I should see "Data Load Options"
+    And I should see "CSV ZIP Download"
+    But I should not see "Server Connection Settings"
+    But I should not see "Server Command Settings"
+
   Scenario: Test embedded server connection
     When I follow "Servers"
     And I follow server "(embedded server)"

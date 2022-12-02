@@ -103,7 +103,7 @@ class Help
             " <p>"
             . "The embedded server supports loading data extracted from REDCap to both a database"
             . " and as a CSV ZIP file. Data load options configuration allows either of these options "
-            . " to be disallowed."
+            . " to be disallowed for non-admin users."
             . "</p>"
         ,
         'database-keys' =>
