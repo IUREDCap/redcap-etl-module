@@ -17,6 +17,7 @@ require_once __DIR__ . '/../../dependencies/autoload.php';
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
+use IU\RedCapEtlModule\Help;
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\ServerConfig;
 
@@ -99,10 +100,15 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
 
 
 
-<form action="<?php echo $selfUrl;?>" method="post" style="margin-bottom: 12px;">
-<label for="server-name">Server:</label> <input type="text" id="server-name" name="server-name" size="40">
-<input type="submit" name="submit" value="Add Server"><br />
-<?php Csrf::generateFormToken(); ?>
+<form action="<?php echo $selfUrl;?>" method="post" style="margin-bottom: 12px; margin-top: 17px;">
+    <label for="server-name">ETL Server:</label> <input type="text" id="server-name" name="server-name" size="40">
+    <input type="submit" name="submit" value="Add Server">
+    <!-- HELP -->
+    <a href="#" id="etl-servers-help-link" class="etl-help" style="margin-left: 17px;" title="help">?</a>
+    <div id="etl-servers-help" title="ETL Servers" style="display: none;">
+        <?php echo Help::getHelpWithPageLink('etl-servers', $module); ?>
+    </div>
+    <?php Csrf::generateFormToken(); ?>
 </form>
     <!--
 <div class="ui-widget">
@@ -111,9 +117,11 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
 </div>
 -->
 
+
+
 <table class="dataTable">
   <thead>
-    <tr> <th>Server Name</th> <th>Active</th> </th><th>Access</th><th>Configure</th>
+    <tr> <th>ETL Server Name</th> <th>Active</th> </th><th>Access</th><th>Configure</th>
     <th>Copy</th> <th>Rename</th> </th><th>Delete</th> </th></tr>
   </thead>
   <tbody>
@@ -285,3 +293,16 @@ echo "</script>\n";
 ?>
 
 <?php require_once APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>
+
+<script>
+    $(document).ready(function() {
+        $( function() {
+            $('#etl-servers-help-link').click(function () {
+                $('#etl-servers-help').dialog({dialogClass: 'redcap-etl-help', width: 440, maxHeight: 440})
+                    .dialog('widget').position({my: 'left top', at: 'right-184 top+144', of: $(this)})
+                    ;
+                return false;
+            });
+        });
+    });
+</script>

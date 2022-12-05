@@ -103,7 +103,7 @@ class Help
             " <p>"
             . "The embedded server supports loading data extracted from REDCap to both a database"
             . " and as a CSV ZIP file. Data load options configuration allows either of these options "
-            . " to be disallowed for non-admin users."
+            . " to be disallowed for users."
             . "</p>"
         ,
         'database-keys' =>
@@ -168,6 +168,20 @@ class Help
         'email-to-list' =>
             "<p>"
             . "A comma-separated list of e-mail addresses that REDCap-ETL sends error and summary e-mails to."
+            . "</p>"
+        ,
+        'etl-servers' =>
+            "<p>"
+            . "The REDCap-ETL external module uses ETL servers to process users' ETL configurations and workflows."
+            . " The external module"
+            . " includes a built-in ETL server, called the \"embedded server\", which runs within REDCap."
+            . " You can also add configurations here for any remote ETL servers you have set up."
+            . " Remote ETL servers run outside of your REDCap server, and they can"
+            . " be used to reduce the ETL processing load on your REDCap server and to get around"
+            . " firewall restrictions your REDCap server may have."
+            . " Information on how to set up a remote ETL server is here:"
+            . " <a href=\"https://github.com/IUREDCap/redcap-etl-module/blob/master/docs/RemoteEtlServerGuide.md\">"
+            . " Remote ETL Server Guide</a>"
             . "</p>"
         ,
         'extract-settings' =>
