@@ -95,7 +95,7 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     }
     ?>
     <input type="checkbox" name="<?php echo AdminConfig::ALLOW_ON_DEMAND;?>" <?php echo $checked;?>>
-    Allow ETL jobs to be run on demand? <br />
+    Allow ETL processes to be run interactively? <br />
     
     <?php
     #------------------------------------------------
@@ -107,7 +107,7 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     }
     ?>
     <input type="checkbox" name="<?php echo AdminConfig::ALLOW_CRON;?>" <?php echo $checked;?>>
-    Allow ETL cron jobs? <br />
+    Allow user scheduled ETL cron jobs? <br />
 
     <?php
     #---------------------------------------
@@ -135,7 +135,13 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     #----------------------------------------------------------------
     ?>
     <p style="text-align: center; margin-top: 14px;">Allowed ETL cron job times
-    and number of scheduled jobs per time</p>
+    and number of scheduled jobs per time
+    <a href="#" id="etl-cron-jobs-help-link" class="etl-help" style="margin-left: 12px;" title="help">?</a>
+    <div id="etl-cron-jobs-help" title="ETL Cron Jobs" style="display: none;">
+        <?php echo Help::getHelpWithPageLink('etl-cron-jobs', $module); ?>
+    </div>
+
+    </p>
     
     <table class="cron-schedule admin-cron-schedule">
       <thead>
@@ -208,3 +214,17 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
 ?>
 
 <?php require_once APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>
+
+<script>
+    $(document).ready(function() {
+        $( function() {
+            $('#etl-cron-jobs-help-link').click(function () {
+                $('#etl-cron-jobs-help').dialog({dialogClass: 'redcap-etl-help', width: 440, maxHeight: 440})
+                    .dialog('widget').position({my: 'left top', at: 'right-284 top+80', of: $(this)})
+                    ;
+                return false;
+            });
+        });
+    });
+</script>
+

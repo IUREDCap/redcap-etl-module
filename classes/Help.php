@@ -170,6 +170,16 @@ class Help
             . "A comma-separated list of e-mail addresses that REDCap-ETL sends error and summary e-mails to."
             . "</p>"
         ,
+        'etl-cron-jobs' =>
+            "<p>"
+            . "REDCap-ETL supports ETL cron jobs, which allow users to schedule ETL processes to run daily or weekly."
+            . " Users can only schedile ETL processes to run for a given day and time range if its checkbox"
+            . " in the table is checked."
+            . " The number in each box in the table (if any) represents the number of ETL processes scheduled to run"
+            . "  at that time, and it"
+            . " can be clicked to see the details of those ETL processes."
+            . "</p>"
+        ,
         'etl-servers' =>
             "<p>"
             . "The REDCap-ETL external module uses ETL servers to process users' ETL configurations and workflows."
@@ -182,6 +192,12 @@ class Help
             . " Information on how to set up a remote ETL server is here:"
             . " <a href=\"https://github.com/IUREDCap/redcap-etl-module/blob/master/docs/RemoteEtlServerGuide.md\">"
             . " Remote ETL Server Guide</a>"
+            . "</p>"
+        ,
+        'etl-users' =>
+            "<p>"
+            . "Non-admin users need to be given persmission to use REDCap-ETL on a per project basis."
+            . " Use REDCap-ETL's users search feature to find users and add ETL permissions for them."
             . "</p>"
         ,
         'extract-settings' =>

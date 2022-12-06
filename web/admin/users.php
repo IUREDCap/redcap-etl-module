@@ -16,6 +16,7 @@ require_once __DIR__ . '/../../dependencies/autoload.php';
 
 use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Filter;
+use IU\RedCapEtlModule\Help;
 use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\RedCapEtlModule;
 
@@ -59,7 +60,19 @@ $module->renderAdminUsersSubTabs($selfUrl);
 ?>
 
 
-<h5 style="margin-top: 2em;">REDCap-ETL Users</h5>
+<div style="margin-top: 3em;">
+    <h5 style="float: left;">REDCap-ETL Users</h5>
+    <!-- HELP -->
+    <div style="float: right;">
+        <a href="#" id="etl-users-help-link" class="etl-help" style="margin-left: 17px;" title="help">?</a>
+    </div>
+    <div style="clear: both;"></div>
+</div>
+
+<div id="etl-users-help" title="ETL Users" style="display: none;">
+    <?php echo Help::getHelpWithPageLink('etl-users', $module); ?>
+</div>
+
 <table class="dataTable">
     <thead>
         <tr> <th>username</th> <th>ETL Project Permissions</th> <th>ETL Configurations</th> </tr>
@@ -92,3 +105,17 @@ $module->renderAdminUsersSubTabs($selfUrl);
 
 
 <?php require_once APP_PATH_DOCROOT . 'ControlCenter/footer.php'; ?>
+
+<script>
+    $(document).ready(function() {
+        $( function() {
+            $('#etl-users-help-link').click(function () {
+                $('#etl-users-help').dialog({dialogClass: 'redcap-etl-help', width: 440, maxHeight: 440})
+                    .dialog('widget').position({my: 'left top', at: 'left-420 top+80', of: $(this)})
+                    ;
+                return false;
+            });
+        });
+    });
+</script>
+
