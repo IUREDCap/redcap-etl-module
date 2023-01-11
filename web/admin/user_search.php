@@ -5,9 +5,11 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
-#---------------------------------------------
-# Check that the user has access permission
-#---------------------------------------------
+#----------------------------------------------------
+# Web service for getting user search results
+#----------------------------------------------------
+
+# Check that the user has admin permission
 $module->checkAdminPagePermission();
 
 
@@ -24,6 +26,8 @@ $redCapDb = new RedCapDb();
 
 $users = $redCapDb->getUserSearchInfo($term);
 
-$data = $users;
+$encodedData = json_encode($users);
 
-echo json_encode($data);
+# Send back response to web service client
+$fh = fopen('php://output', 'w');
+fwrite($fh, $encodedData);
