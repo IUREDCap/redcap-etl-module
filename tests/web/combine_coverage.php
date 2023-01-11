@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
-require_once __DIR__.'/../../vendor/autoload.php';
+require_once __DIR__.'/vendor/autoload.php';
 
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Filter;
