@@ -11,9 +11,9 @@ Directory Structure
 
 * __classes/__ - PHP classes other than the main module class
 * config.json - module configuration file
-* __dependencies/__ - production dependencies
 * docgen.php - script for generating the external module version of the transformation rules
     guide from the REDCap-ETL version
+* __dependencies/__ - production dependencies, which are committed to Git
 * __docs/__ - documents
 * README.md - module description and usage requirements
 * RedCapEtlModule.php - main module class
@@ -21,7 +21,7 @@ Directory Structure
 * __tests/__ - test files
     * __unit/__ - unit tests
     * __web/__ - web tests (that access a running instance of the module)
-* __vendor/__ - development dependencies (if these have been installed)
+* __vendor/__ - development dependencies (if these have been installed), which are not committed to Git
 * __web/__ - user web pages
     * __admin/__ - admin web pages
 
@@ -29,7 +29,9 @@ Updating Dependencies
 --------------------------
 To avoid requiring Composer to be run when the module is installed, the non-development dependencies
 are copied to the __dependencies/__ directory, and this directory is committed to Git.
-To update the contents of this directory, the following commands
+The dependencies for development are stored in the __vendor/__ directory, and this directory is not
+committed to Git.
+To update the contents of the __dependencies__ directory, the following commands
 can be used from the top-level directory:
 
     composer update
@@ -76,6 +78,35 @@ command in the top-level directory of the project:
     ./vendor/bin/psalm
 
 A configuration file (psalm.xml) has been created that will cause Psalm to run in security analysis mode.
+
+
+REDCap External Module Security Scan
+-----------------------------------------------
+
+As of sometime around December 2022, a new security script has been added to REDCap that needs
+to be run successfully on external modules before they can be submitted.
+To run this command use (as of January 2023):
+
+
+Command to scan module:
+
+    <redcap-root>/bin/scan <path-to-module>
+
+Note:
+
+* any errors that show up for the vendor or tests/web/vendor directories can be ignored, because these
+    directories will not be committed to GitHub
+* the ExternalModules directory under the REDCap version directory you are using
+    must be writable by the user running the scan command for the scan to work
+
+To see the latest information on scanning, in the __Cotrol Center__ in REDCap:
+
+* access __External Modules -> Manage__
+* click on __Module Security Scanning__
+
+
+
+
 
 Automated Tests
 --------------------------
