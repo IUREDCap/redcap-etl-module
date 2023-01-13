@@ -9,7 +9,7 @@ namespace IU\RedCapEtlModule;
 
 # This is required for cron jobs
 // phpcs:disable
-require_once(__DIR__.'/dependencies/autoload.php');
+require_once(__DIR__.'/vendor/autoload.php');
 // phpcs:enable
 
 define('REDCAP_ETL_MODULE', 1);

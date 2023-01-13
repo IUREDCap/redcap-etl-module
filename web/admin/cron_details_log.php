@@ -10,7 +10,7 @@
 #---------------------------------------------
 $module->checkAdminPagePermission();
 
-require_once __DIR__ . '/../../dependencies/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 use IU\RedCapEtlModule\Filter;
 use IU\RedCapEtlModule\ModuleLog;

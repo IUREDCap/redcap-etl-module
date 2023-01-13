@@ -13,7 +13,6 @@ Directory Structure
 * config.json - module configuration file
 * docgen.php - script for generating the external module version of the transformation rules
     guide from the REDCap-ETL version
-* __dependencies/__ - production dependencies, which are committed to Git
 * __docs/__ - documents
 * README.md - module description and usage requirements
 * RedCapEtlModule.php - main module class
@@ -21,24 +20,21 @@ Directory Structure
 * __tests/__ - test files
     * __unit/__ - unit tests
     * __web/__ - web tests (that access a running instance of the module)
-* __vendor/__ - development dependencies (if these have been installed), which are not committed to Git
+* __vendor/__ - production dependencies, which are committed to Git (development dependencies should not
+                be committed to Git)
 * __web/__ - user web pages
     * __admin/__ - admin web pages
 
 Updating Dependencies
 --------------------------
-To avoid requiring Composer to be run when the module is installed, the non-development dependencies
-are copied to the __dependencies/__ directory, and this directory is committed to Git.
-The dependencies for development are stored in the __vendor/__ directory, and this directory is not
-committed to Git.
-To update the contents of the __dependencies__ directory, the following commands
-can be used from the top-level directory:
+To avoid requiring Composer to be run when the module is installed, dependencies are committed to Git, however,
+only the non-development dependencies should be committed to Git. Previsouly, the development dependencies were
+stored in a separate directory, but this approach did not work well with a security scanner that Vanderbilt
+started including in REDCap.
 
-    composer update
+To make sure only non-development dependencies are in the __vendor/__ directory, run the following command:
+
     composer install --no-dev
-    rm -rf dependencies
-    mv vendor dependencies
-    composer install
 
 
 To check for out of date dependencies, use:

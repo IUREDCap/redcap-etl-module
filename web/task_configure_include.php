@@ -367,7 +367,7 @@ try {
 
                 #$checkConfiguration = new \IU\REDCapETL\Configuration($logger, $checkProperties);
                 $checkConfiguration = new \IU\REDCapETL\TaskConfig();
-                $checkConfiguration->set($logger, $checkProperties);
+                $checkConfiguration->setWithArray($logger, $checkProperties);
 
                 $schemaGenerator = new \IU\REDCapETL\SchemaGenerator($dataProject, $checkConfiguration, $logger);
                 $rulesText = $checkConfiguration->getProperty(Configuration::TRANSFORM_RULES_TEXT);
