@@ -21,8 +21,7 @@ Directory Structure
 * __tests/__ - test files
     * __unit/__ - unit tests
     * __web/__ - web tests (that access a running instance of the module)
-* __vendor/__ - production dependencies, which are committed to Git (development dependencies should not
-                be committed to Git)
+* __vendor/__ - production dependencies, which are committed to Git
 * __web/__ - user web pages
     * __admin/__ - admin web pages
 
@@ -76,7 +75,7 @@ prevented from following them by REDCap:
 
 To check for coding standards compliance, enter the following command in the top-level directory:
 
-    ./vendor/bin/phpcs -n
+    ./dev/bin/phpcs -n
     
 The "-n" option eliminated warnings. The configuration for phpcs is in file __phpcs.xml__ in the top-level directory.
 
@@ -91,7 +90,7 @@ This scanner has been adopted by Vanderbilt
 as a security scanner for REDCap external module submissions. To scan the REDCap-ETL external module, use the following
 command in the top-level directory of the project:
 
-    ./vendor/bin/psalm
+    ./dev/bin/psalm
 
 A configuration file (psalm.xml) has been created that will cause Psalm to run in security analysis mode.
 
@@ -117,6 +116,10 @@ Command to scan module:
 
     <redcap-root>/bin/scan <path-to-module>
 
+For example:
+
+    /var/www/html/redcap/bin/scan /var/www/html/redcap/modules/redcap-etl-module_v1.4.0
+
 Note:
 
 * any errors that show up for the vendor or tests/web/vendor directories can be ignored, because these
@@ -131,13 +134,11 @@ To see the latest information on scanning, in the __Cotrol Center__ in REDCap:
 
 
 
-
-
 Automated Tests
 --------------------------
 To run the unit tests, enter the following command in the top-level directory:
 
-    ./vendor/bin/phpunit
+    ./dev/bin/phpunit
     
 The configuration for phpunit is in file __phpunit.xml__ in the top-level directory.
 
