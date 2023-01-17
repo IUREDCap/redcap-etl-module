@@ -11,6 +11,7 @@
     <projectFiles>
         <directory name="." />
         <ignoreFiles>
+            <directory name="dev" />
             <directory name="tests/web/vendor" />
             <directory name="vendor" />
         </ignoreFiles>

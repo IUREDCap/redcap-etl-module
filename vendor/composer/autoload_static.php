@@ -25,6 +25,10 @@ class ComposerStaticInitf5f63481dffe8fc7e9be3eef1fcfaf33
             'IU\\REDCapETL\\' => 13,
             'IU\\PHPCap\\' => 10,
         ),
+        'E' => 
+        array (
+            'ExternalModules\\' => 16,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -40,6 +44,7 @@ class ComposerStaticInitf5f63481dffe8fc7e9be3eef1fcfaf33
         array (
             0 => __DIR__ . '/../..' . '/',
             1 => __DIR__ . '/../..' . '/classes',
+            2 => __DIR__ . '/../..' . '/tests/unit',
         ),
         'IU\\REDCapETL\\' => 
         array (
@@ -48,6 +53,10 @@ class ComposerStaticInitf5f63481dffe8fc7e9be3eef1fcfaf33
         'IU\\PHPCap\\' => 
         array (
             0 => __DIR__ . '/..' . '/iu-redcap/phpcap/src',
+        ),
+        'ExternalModules\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/tests/external',
         ),
     );
 

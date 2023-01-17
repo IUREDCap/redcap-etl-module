@@ -8,7 +8,8 @@ $baseDir = dirname($vendorDir);
 return array(
     'phpseclib3\\' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
     'ParagonIE\\ConstantTime\\' => array($vendorDir . '/paragonie/constant_time_encoding/src'),
-    'IU\\RedCapEtlModule\\' => array($baseDir . '/', $baseDir . '/classes'),
+    'IU\\RedCapEtlModule\\' => array($baseDir . '/', $baseDir . '/classes', $baseDir . '/tests/unit'),
     'IU\\REDCapETL\\' => array($vendorDir . '/iu-redcap/redcap-etl/src'),
     'IU\\PHPCap\\' => array($vendorDir . '/iu-redcap/phpcap/src'),
+    'ExternalModules\\' => array($baseDir . '/tests/external'),
 );

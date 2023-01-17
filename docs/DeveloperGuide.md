@@ -13,6 +13,7 @@ Directory Structure
 * config.json - module configuration file
 * docgen.php - script for generating the external module version of the transformation rules
     guide from the REDCap-ETL version
+* __dev/__ - develpment dependencies, which are NOT committed to Git
 * __docs/__ - documents
 * README.md - module description and usage requirements
 * RedCapEtlModule.php - main module class
@@ -27,19 +28,38 @@ Directory Structure
 
 Updating Dependencies
 --------------------------
+
+__Production Dependencies__
+
 To avoid requiring Composer to be run when the module is installed, dependencies are committed to Git, however,
-only the non-development dependencies should be committed to Git. Previsouly, the development dependencies were
-stored in a separate directory, but this approach did not work well with a security scanner that Vanderbilt
-started including in REDCap.
-
-To make sure only non-development dependencies are in the __vendor/__ directory, run the following command:
-
-    composer install --no-dev
-
+only the non-development dependencies should be committed to Git. The non-development dependencies are stored
+in the standard __vendor/__ directory.
 
 To check for out of date dependencies, use:
 
     composer outdated --direct
+
+__Development Dependencies__
+
+Development depedencies are stored in the __dev/__ directory and are NOT committed to Git. They are managed
+using the __dev-composer.json__ configuration file.
+
+To install and update the development dependencies, which will be stored in directory __dev/__, use the following
+commands in the top-level directory:
+
+    COMPOSER=dev-composer.json composer install
+    COMPOSER=dev-composer.json composer update
+
+__Automated Web Tests Dependencies__
+
+There are also separate dependencies (not committed to Git) that are used for the automated web tests.
+The configuration file for these dependencies is:
+
+    tests/web/composer.json
+
+And the dependencies are stored in the following directory:
+
+    tests/web/vendor
 
 
 Coding Standards Compliance
@@ -79,10 +99,19 @@ A configuration file (psalm.xml) has been created that will cause Psalm to run i
 REDCap External Module Security Scan
 -----------------------------------------------
 
-As of sometime around December 2022, a new security script has been added to REDCap that needs
+As of sometime around December 2022, a new security script was added to REDCap that needs
 to be run successfully on external modules before they can be submitted.
 To run this command use (as of January 2023):
 
+Before the command is run, you should remove the following directories (which are not committed to Git),
+so that they will not show up in the security scan results:
+
+    dev/
+    tests/web/vendor
+
+Before you remove the tests/web/vendor directory, it is important that you turn off test coverage statistics
+collection, because that will use scripts in this directory, which will not function with the tests/web/vendor
+directory removed.
 
 Command to scan module:
 

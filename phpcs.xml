@@ -27,6 +27,7 @@ SPDX-License-Identifier: BSD-3-Clause
     <file>tests/unit/</file>
 
     <exclude-pattern>*/dependencies/*</exclude-pattern>
+    <exclude-pattern>*/dev/*</exclude-pattern>
     <exclude-pattern>*/tests/web/*</exclude-pattern>
     <exclude-pattern>*/resources/*</exclude-pattern>
     <exclude-pattern>*/vendor/*</exclude-pattern>
