@@ -38,6 +38,11 @@ To check for out of date dependencies, use:
 
     composer outdated --direct
 
+To update the production dependencies update the composer.json file with the new dependency version
+numbers and run the following command:
+
+    composer update
+
 __Development Dependencies__
 
 Development depedencies are stored in the __dev/__ directory and are NOT committed to Git. They are managed
