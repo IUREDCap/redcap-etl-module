@@ -209,6 +209,8 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
 <?php
 
+$worflowNamesIndex = false;
+
 if ($configType === 'task') {
     echo ""
         . "<script>\n"
@@ -230,7 +232,12 @@ if ($configType === 'task') {
     #-------------------------------------------------------------------------------------------------
     # $workflowNames = $module->getProjectAvailableWorkflows();
     $workflowNames = $module->getProjectAvailableWorkflows($pid, $excludeIncomplete, $excludeRemoved);
-    if (!in_array($workflowName, $workflowNames)) {
+
+    if (!empty($workflowName)) {
+        $workflowNameIndex = array_search($workflowName, $workflowNames);
+    }
+
+    if ($workflowNamesIndex === false) {
         $workflowName = '';
         $_SESSION[$workflowName] = '';
     }

@@ -51,9 +51,10 @@ try {
         . '&configType=workflow'
         ;
     $workflowUrl = $module->getUrl('web/configure.php')
-        . '&workflowName=' . Filter::escapeForUrlParameter($workflowName)
+        . '&workflowName=' . $workflowNames[$workflowNameIndex]
         . '$configType=workflow'
         ;
+        // . '&workflowName=' . Filter::escapeForUrlParameter($workflowName)
     $workflowsUrl = $module->getUrl('web/workflows.php');
     $configureUrl = $module->getUrl('web/configure.php');
 
@@ -81,6 +82,7 @@ try {
         $properties[Configuration::DB_CONNECTION] = null;
         if (strcasecmp($submitValue, 'Cancel') === 0) {
             header('Location: ' . $workflowUrl);
+            exit;
         } elseif (strcasecmp($submitValue, 'Save') === 0) {
             if (empty($warning) && empty($error)) {
                 # if the database password is equal to the make value, it means that it
