@@ -209,7 +209,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
 <?php
 
-$worflowNamesIndex = false;
+$worflowNameIndex = false;
 
 if ($configType === 'task') {
     echo ""
@@ -237,7 +237,7 @@ if ($configType === 'task') {
         $workflowNameIndex = array_search($workflowName, $workflowNames);
     }
 
-    if ($workflowNamesIndex === false) {
+    if ($workflowNameIndex === false) {
         $workflowName = '';
         $_SESSION[$workflowName] = '';
     }
@@ -246,7 +246,6 @@ if ($configType === 'task') {
         include(__DIR__ . '/workflow_configure_include.php');
     }
 }
-
 ?>
 
 <?php require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
