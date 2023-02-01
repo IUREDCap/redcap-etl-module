@@ -131,6 +131,8 @@ Note:
     directories will not be committed to GitHub
 * the ExternalModules directory under the REDCap version directory you are using
     must be writable by the user running the scan command for the scan to work
+* the **--output=html-file** option can be used for the scan command to
+    generate an HTML file
 
 To see the latest information on scanning, in the __Cotrol Center__ in REDCap:
 
