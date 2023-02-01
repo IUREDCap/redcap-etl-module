@@ -1198,6 +1198,31 @@ Configuration form
                     </td>
                 </tr>
                 
+                <!-- LABEL FIELD TYPE -->
+                <tr>
+                    <td style="padding-right: 1em;">Label field type</td>
+                    <td>
+                        <?php
+                        $varcharSelected = '';
+                        $charSelected = '';
+                        $stringSelected = '';
+                        $generatedLabelType = $properties[Configuration::GENERATED_LABEL_TYPE];
+                        if ($generatedLabelType === 'varchar') {
+                            $varcharSelected = 'selected';
+                        } elseif ($generatedLabelType === 'char') {
+                            $charSelected = 'selected';
+                        } elseif ($generatedLabelType === 'string') {
+                            $stringSelected = 'selected';
+                        }
+                        ?>
+                        <select name="<?php echo Filter::escapeForHtml(Configuration::GENERATED_LABEL_TYPE);?>">
+                            <option value="varchar" <?php echo $varcharSelected?>>varchar</option>
+                            <option value="char" <?php echo $charSelected?>>char</option>
+                            <option value="string" <?php echo $stringSelected?>>string</option>
+                        </select>
+                    </td>
+                </tr>
+                
                 <tr>
                     <td>&nbsp;</td>
                 </tr>

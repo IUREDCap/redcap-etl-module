@@ -173,7 +173,7 @@ class Help
         'etl-cron-jobs' =>
             "<p>"
             . "REDCap-ETL supports ETL cron jobs, which allow users to schedule ETL processes to run daily or weekly."
-            . " Users can only schedile ETL processes to run for a given day and time range if its checkbox"
+            . " Users can only schedule ETL processes to run for a given day and time range if its checkbox"
             . " in the table is checked."
             . " The number in each box in the table (if any) represents the number of ETL processes scheduled to run"
             . "  at that time, and it"
@@ -196,7 +196,7 @@ class Help
         ,
         'etl-users' =>
             "<p>"
-            . "Non-admin users need to be given persmission to use REDCap-ETL on a per project basis."
+            . "Non-admin users need to be given permission to use REDCap-ETL on a per project basis."
             . " Use REDCap-ETL's users search feature to find users and add ETL permissions for them."
             . "</p>"
         ,
@@ -260,9 +260,9 @@ class Help
             . " (e.g., value 0 for label \"no\")."
             . " Originally, REDCap-ETL stored only the multiple choice values in the"
             . " database tables it generated."
-            . " Corresponding views are also created that contain"
-            . " the labels for the multiple choice questions."
-            . " The name of the view is the same as the"
+            . " Corresponding views were also created that contained"
+            . " the labels for the multiple choice questions instead of the values."
+            . " The name of the view was the same as the"
             . " name of its corresponding table with the \"label view suffix\" appended to it."
             . "</p>"
             . "<p>"
@@ -271,7 +271,7 @@ class Help
             . " stored in the same field name with the \"label field suffix\" appended to it."
             . " If the \"label field suffix\" is left blank, no label fields will be generated."
             . " The label views have been deprecated and turned off by default for new projects,"
-            . " and the plan is to remove label views in the future."
+            . " and the future of label views is uncertain."
             . "</p>"
             . "<ul>"
             . "<li><b>Label views</b> - <i>(deprecated)</i> turns on/off creation of"
@@ -280,6 +280,10 @@ class Help
             . " a table name to make the name for its label view</li>"
             . "<li><b>Label field suffix</b> - text appended to field name of multiple choice response value field to"
             . "  make the corresponding multiple choice label field</li>"
+            . "<li><b>Label field type</b> - the type used in the database for label fields. For CSV files, the type"
+            . " makes no difference. For databases, specifying the \"string\" type will store labels as \"text\"."
+            . " Specifying the \"string\" type instead of the \"char\" or \"varchar\" types can be used in some cases"
+            . " to resolve database row size errors</li>"
             . "</ul>"
         ,
         'load-settings' =>

@@ -13,7 +13,7 @@ Directory Structure
 * config.json - module configuration file
 * docgen.php - script for generating the external module version of the transformation rules
     guide from the REDCap-ETL version
-* __dev/__ - develpment dependencies, which are NOT committed to Git
+* __dev/__ - development dependencies, which are NOT committed to Git
 * __docs/__ - documents
 * README.md - module description and usage requirements
 * RedCapEtlModule.php - main module class
@@ -45,7 +45,7 @@ numbers and run the following command:
 
 __Development Dependencies__
 
-Development depedencies are stored in the __dev/__ directory and are NOT committed to Git. They are managed
+Development dependencies are stored in the __dev/__ directory and are NOT committed to Git. They are managed
 using the __dev-composer.json__ configuration file.
 
 To install and update the development dependencies, which will be stored in directory __dev/__, use the following
@@ -132,7 +132,7 @@ Note:
 * the ExternalModules directory under the REDCap version directory you are using
     must be writable by the user running the scan command for the scan to work
 
-To see the latest information on scanning, in the __Cotrol Center__ in REDCap:
+To see the latest information on scanning, in the __Control Center__ in REDCap:
 
 * access __External Modules -> Manage__
 * click on __Module Security Scanning__

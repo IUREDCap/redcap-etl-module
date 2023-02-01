@@ -15,6 +15,10 @@ $htmlPage->PrintHeaderExt();
     <img src="<?php echo APP_PATH_IMAGES . "redcap-logo.png"; ?>" alt="REDCap"/>
 </div>
 <?php // phpcs:disable ?>
+<!-- =================================================
+Copyright (C) 2019 The Trustees of Indiana University
+SPDX-License-Identifier: BSD-3-Clause
+================================================== -->
 <h1>REDCap-ETL Transformation Rules</h1>
 <p>The transformation rules specify how the records in REDCap are transformed
 into records in your database.</p>
@@ -325,6 +329,22 @@ the database types used to store the different REDCap-ETL types.</p>
 <td>text</td>
 </tr>
 <tr>
+<td><strong>dropdown</strong></td>
+<td>int/varchar</td>
+<td>int/varchar</td>
+<td>int/varchar</td>
+<td>int/varchar</td>
+<td>number/text</td>
+</tr>
+<tr>
+<td><strong>radio</strong></td>
+<td>int/varchar</td>
+<td>int/varchar</td>
+<td>int/varchar</td>
+<td>int/varchar</td>
+<td>number/text</td>
+</tr>
+<tr>
 <td><strong>date</strong></td>
 <td>date</td>
 <td>date</td>
@@ -350,7 +370,16 @@ the database types used to store the different REDCap-ETL types.</p>
 </tr>
 </tbody>
 </table>
-<p>NOTE: <code>TABLE</code>, <code>FIELD</code>, <code>&lt;rows_type&gt;</code>, and <code>&lt;field_type&gt;</code>; are all case sensitive. So, for example, <code>TABLE</code>, <code>FIELD</code>, <code>ROOT</code>, and <code>EVENTS</code> must be uppercase, and <code>int</code>, <code>float</code>, <code>string</code>, <code>date</code>, and <code>checkbox</code> must be lowercase.</p>
+<p>NOTES: </p>
+<ul>
+<li>Field types 'dropdown' and 'radio' will have database type int/number if all values specified in REDCap for them are integer values,
+otherwise they will have database type varchar/text. The size of the varchar will be the minimum size necessary to
+store the longest dropdown/radio value.</li>
+<li>Field types 'checkbox', 'dropdown', and 'radio' can only be used for their corresponding REDCap field types.</li>
+<li><code>TABLE</code>, <code>FIELD</code>, <code>&lt;rows_type&gt;</code>, and <code>&lt;field_type&gt;</code> are all case sensitive. So, for example,
+<code>TABLE</code>, <code>FIELD</code>, <code>ROOT</code>, and <code>EVENTS</code> must be uppercase, and <code>int</code>, <code>float</code>, <code>string</code>, <code>date</code>, and
+<code>checkbox</code> must be lowercase.</li>
+</ul>
 <hr />
 <h2>Transformation Rules Examples</h2>
 <h3>Events Example</h3>
@@ -997,16 +1026,15 @@ FIELD,  var8, string</code></pre>
 </tr>
 </tbody>
 </table>
+<p>NOTES:</p>
 <ul>
-<li>
-<p>NOTE: In this example, var3/var4 need to be put in one table while var7 needs to be put in a different table, despite the fact that all three variables have the same 1-many relationship with var1/var2.</p>
-</li>
-<li>
-<p>NOTE: This syntax assumes that Events will always be used to define 1-many relationships to the root parent table. Although we might envision a more complex situation in which events are named such that some events are considered children of other events, in practice that has not been done.</p>
-</li>
-<li>
-<p>NOTE: This example does not include a situation in which a child table that uses suffixes has a parent table that also uses suffixes, but the transforming code can handle that situation.</p>
-</li>
+<li>In this example, var3/var4 need to be put in one table while var7 needs to be put in a different table,
+despite the fact that all three variables have the same 1-many relationship with var1/var2.</li>
+<li>This syntax assumes that Events will always be used to define 1-many relationships to the root parent table.
+Although we might envision a more complex situation in which events are named such that some events are considered
+children of other events, in practice that has not been done.</li>
+<li>This example does not include a situation in which a child table that uses suffixes has a parent table that also uses
+suffixes, but the transforming code can handle that situation.</li>
 </ul><?php // phpcs:enable ?>
 
 <style type="text/css">#footer { display: block; }</style>

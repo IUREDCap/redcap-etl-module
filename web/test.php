@@ -345,5 +345,3 @@ print "</pre></div>\n";
 
 
 <?php require_once APP_PATH_DOCROOT . 'ProjectGeneral/footer.php'; ?>
-
-

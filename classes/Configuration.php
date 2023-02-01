@@ -65,9 +65,10 @@ class Configuration implements \JsonSerializable
 
     public const TABLE_PREFIX = 'table_prefix';
 
-    public const LABEL_FIELD_SUFFIX = 'label_field_suffix';
-    public const LABEL_VIEW_SUFFIX  = 'label_view_suffix';
-    public const LABEL_VIEWS        = 'label_views';
+    public const LABEL_FIELD_SUFFIX   = 'label_field_suffix';
+    public const LABEL_VIEW_SUFFIX    = 'label_view_suffix';
+    public const LABEL_VIEWS          = 'label_views';
+    public const GENERATED_LABEL_TYPE = 'generated_label_type';
 
     public const POST_PROCESSING_SQL = 'post_processing_sql';
     public const PRE_PROCESSING_SQL  = 'pre_processing_sql';
@@ -160,9 +161,10 @@ class Configuration implements \JsonSerializable
 
         $this->properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS] = false;
 
-        $this->properties[self::LABEL_VIEWS]        = false;
-        $this->properties[self::LABEL_VIEW_SUFFIX]  = \IU\REDCapETL\TaskConfig::DEFAULT_LABEL_VIEW_SUFFIX;
-        $this->properties[self::LABEL_FIELD_SUFFIX] = \IU\REDCapETL\TaskConfig::DEFAULT_LABEL_FIELD_SUFFIX;
+        $this->properties[self::LABEL_VIEWS]          = false;
+        $this->properties[self::LABEL_VIEW_SUFFIX]    = \IU\REDCapETL\TaskConfig::DEFAULT_LABEL_VIEW_SUFFIX;
+        $this->properties[self::LABEL_FIELD_SUFFIX]   = \IU\REDCapETL\TaskConfig::DEFAULT_LABEL_FIELD_SUFFIX;
+        $this->properties[self::GENERATED_LABEL_TYPE] = \IU\REDCapETL\TaskConfig::DEFAULT_GENERATED_LABEL_TYPE;
 
         $this->properties[self::DB_LOGGING]         = true;
         $this->properties[self::DB_LOG_TABLE]       = \IU\REDCapETL\TaskConfig::DEFAULT_DB_LOG_TABLE;
@@ -301,6 +303,9 @@ class Configuration implements \JsonSerializable
         $labelViewSuffix = $this->getProperty(self::LABEL_FIELD_SUFFIX);
         self::validateLabelViewSuffix($labelViewSuffix);
 
+        $labelType = $this->getProperty(self::GENERATED_LABEL_TYPE);
+        self::validateGeneratedLabelType($labelType);
+
         $emailToList = $this->getProperty(self::EMAIL_TO_LIST);
         self::validateEmailToList($emailToList);
     }
@@ -397,6 +402,19 @@ class Configuration implements \JsonSerializable
         } else {
              $errorMessage = 'Invalid label view suffix "' . $suffix . '". Label view suffixes need to contain'
                  . ' only letters (a-z or A-Z), underscores, or digits (0-9)';
+            throw new \Exception($errorMessage);
+        }
+        return true;
+    }
+
+    public static function validateGeneratedLabelType($labelType)
+    {
+        $matches = array();
+        if ($labelType === 'varchar' || $labelType === 'char' || $labelType === 'string') {
+            ; // OK
+        } else {
+             $errorMessage = 'Invalid label type "' . $labelType . '". Label type must be'
+                 . ' "varchar", "char", or "string".';
             throw new \Exception($errorMessage);
         }
         return true;
