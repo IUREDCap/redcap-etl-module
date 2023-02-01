@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
-files=( "./README.md" "classes/Help.php" "./web/user_manual.php" "./web/admin/info.php" );
+files=( "./README.md" "./docs/DeveloperGuide.md" "./docs/RemoteEtlServerGuide.md" "classes/Help.php" "./web/user_manual.php" "./web/admin/info.php" );
 
 for file in "${files[@]}"
 do

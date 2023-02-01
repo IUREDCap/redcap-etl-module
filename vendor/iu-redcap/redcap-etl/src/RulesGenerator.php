@@ -297,12 +297,23 @@ class RulesGenerator
             } else {
                 $type = FieldType::VARCHAR . '(' . self::DEFAULT_VARCHAR_SIZE . ')';
             }
+        } elseif ($fieldType === 'slider') {
+            # If someone sets the max to a really high value, it could exceed the database size for an int.
+            # This needs to come before the "number validation" check, because sometimes sliders have this.
+            $type = FieldType::INT;
         } elseif (substr($validationType, 0, 6) === 'number') {
             # starts with 'number'
             $type = FieldType::FLOAT;
-        } elseif ($fieldType === 'dropdown' || $fieldType === 'radio') {
-            # values for multiple choice can have letters
-            $type = FieldType::VARCHAR . '(' . self::DEFAULT_VARCHAR_SIZE . ')';
+        #} elseif ($fieldType === 'dropdown' || $fieldType === 'radio') {
+        #    # values for multiple choice can have letters
+        #    $type = FieldType::VARCHAR . '(' . self::DEFAULT_VARCHAR_SIZE . ')';
+        } elseif ($fieldType === 'dropdown') {
+            $type = FieldType::DROPDOWN;
+        } elseif ($fieldType === 'radio') {
+            $type = FieldType::RADIO;
+        } elseif ($fieldType === 'truefalse' || $fieldType === 'yesno') {
+            # values for these pre-defined multiple-choice fields have to be integer and cannot be changed
+            $type = FieldType::INT;
         } elseif (substr($validationType, 0, 5) === 'date_') {
             # starts with 'date_'
             $type = FieldType::DATE;

@@ -15,7 +15,7 @@ if (PHP_SAPI !== 'cli') {
     die('Not allowed.');
 }
 
-require_once 'vendor/autoload.php';
+require_once 'dev/autoload.php';
 
 $trFile = __DIR__ . '/vendor/iu-redcap/redcap-etl/docs/TransformationRulesGuide.md';
 
