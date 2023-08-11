@@ -34,14 +34,14 @@
        "control-center": [
            {
                "name": "REDCap-ETL",
-               "icon": "table_gear",
+               "icon": "fas fa-download",
                "url": "web/admin/info.php"
            }
        ],
        "project": [
            {
                "name": "REDCap-ETL",
-               "icon": "database_table",
+               "icon": "fas fa-download",
                "url": "web/index.php"
            }
        ]
