@@ -101,9 +101,13 @@ class Help
         ,
         'data-load-options' =>
             " <p>"
-            . "The embedded server supports loading data extracted from REDCap to both a database"
-            . " and as a CSV ZIP file. Data load options configuration allows either of these options "
+            . "The embedded server supports loading data extracted from REDCap to either a database"
+            . " or a CSV ZIP file. Data load options configuration allows either of these options"
             . " to be disallowed for users."
+            . "</p>"
+            . "<p>"
+            . "Note that the CSV ZIP file option can only be used interactively (on the Run page)."
+            . " It cannot be used when scheduling an ETL process."
             . "</p>"
         ,
         'database-keys' =>
