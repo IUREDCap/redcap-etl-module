@@ -16,7 +16,7 @@ Feature: Admin Help Customization
     And I follow "Help Edit"
     And I follow "Edit"
     And I select "E-mail To List" from "Help Topic"
-    And I wait for 2 seconds
+    And I wait for 4 seconds
     Then I should see "A comma-separated list of e-mail addresses"
 
   Scenario: Try to save help with no help topic selected
@@ -34,7 +34,7 @@ Feature: Admin Help Customization
     And I fill in "customHelp" with "custom help"
     And I select "Prepend custom text to default" from "helpSetting"
     And I press "Preview"
-    And I wait for 2 seconds
+    And I wait for 4 seconds
     Then I should see "custom help REDCap-ETL uses the REDCap API"
 
   Scenario: Preview custom help appended to default help
@@ -44,7 +44,7 @@ Feature: Admin Help Customization
     And I fill in "customHelp" with "custom help"
     And I select "Append custom text to default" from "helpSetting"
     And I press "Preview"
-    And I wait for 2 seconds
+    And I wait for 4 seconds
     Then I should see "the same ETL process. custom help"
 
   @modified-help-for-batch-size

@@ -122,6 +122,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
   </fieldset>
   
     <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken();?>"/>
 </form>
 
 
@@ -196,6 +197,7 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
     <input type="submit" name="submitValue" value="Save">
   </p>
     <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken();?>"/>
 </form>
 
 
@@ -217,7 +219,8 @@ $module->renderAdminHelpEditSubTabs($selfUrl);
                         setting: $('#helpSetting').val(),
                         defaultHelp: "<?php echo $defaultHelp; ?>",
                         customHelp: $('#customHelp').val(),
-                        <?php echo Csrf::TOKEN_NAME; ?>: "<?php echo Csrf::getToken(); ?>"
+                        <?php echo Csrf::TOKEN_NAME; ?>: "<?php echo Csrf::getToken(); ?>",
+                        redcap_csrf_token: "<?php echo $module->getCsrfToken(); ?>"
                     }).dialog();
                 
                 //alert($url);

@@ -72,9 +72,10 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
 
 
 <form action="<?php echo $selfUrl;?>" method="post" style="margin-bottom: 12px;">
-Workflow name: <input type="text" id="search-text" name="search-text" size="40">
-<input type="submit" name="submit" value="Search"><br />
-<?php Csrf::generateFormToken(); ?>
+    Workflow name: <input type="text" id="search-text" name="search-text" size="40">
+    <input type="submit" name="submit" value="Search"><br />
+    <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>
 </form>
     <!--
 <div class="ui-widget">
@@ -195,11 +196,12 @@ Workflow name: <input type="text" id="search-text" name="search-text" size="40">
     style="display: none;"
     >
     <form id="reinstate-form" action="<?php echo $selfUrl;?>" method="post">
-    To reinstate the workflow <span id="workflow-to-reinstate" style="font-weight: bold;"></span>
-    (i.e., remove it from 'Removed' status), click on the 
-    <span style="font-weight: bold;">Reinstate workflow</span> button.
-    <input type="hidden" name="reinstate-workflow-name" id="reinstate-workflow-name" value="">
-    <?php Csrf::generateFormToken(); ?>
+        To reinstate the workflow <span id="workflow-to-reinstate" style="font-weight: bold;"></span>
+        (i.e., remove it from 'Removed' status), click on the 
+        <span style="font-weight: bold;">Reinstate workflow</span> button.
+        <input type="hidden" name="reinstate-workflow-name" id="reinstate-workflow-name" value="">
+        <?php Csrf::generateFormToken(); ?>
+        <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>
     </form>
 </div>
 
@@ -213,10 +215,11 @@ Workflow name: <input type="text" id="search-text" name="search-text" size="40">
     style="display: none;"
     >
     <form id="delete-form" action="<?php echo $selfUrl;?>" method="post">
-    To delete the workflow <span id="workflow-to-delete" style="font-weight: bold;"></span>,
-    click on the <span style="font-weight: bold;">Delete workflow</span> button.
-    <input type="hidden" name="delete-workflow-name" id="delete-workflow-name" value="">
-    <?php Csrf::generateFormToken(); ?>
+        To delete the workflow <span id="workflow-to-delete" style="font-weight: bold;"></span>,
+        click on the <span style="font-weight: bold;">Delete workflow</span> button.
+        <input type="hidden" name="delete-workflow-name" id="delete-workflow-name" value="">
+        <?php Csrf::generateFormToken(); ?>
+        <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>
     </form>
 </div>
 

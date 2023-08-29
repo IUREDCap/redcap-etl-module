@@ -243,6 +243,7 @@ if (!empty($availableUserProjects)) {
     <br />&nbsp;
     <!--</fieldset> -->
     <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $redcapCsrfToken; ?>"/>
     </form>
 <?php } ?>
 
@@ -443,6 +444,7 @@ if (!$accessToAllProjects) {
 <div style="clear: both;"></div>
 </p>
 <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $redcapCsrfToken; ?>"/>
 </form>
 
 </div> <!-- tasks-container -->
@@ -577,17 +579,18 @@ $(function() {
     style="display: none;"
     >
     <form id="renameForm" action="<?php echo $selfUrl;?>" method="post">
-    To rename the task for Project ID <span id="taskToRename" style="font-weight: bold;"></span>,
-    enter the new name below, and click on the
-    <span style="font-weight: bold;">Rename task</span> button.
-    <p>
-    <span style="font-weight: bold;">New task name:</span>
-    <input type="text" name="renameNewTaskName" id="renameNewTaskName" size="50">
-    </p>
-    <input type="hidden" name="renameTaskKey" id="renameTaskKey" value="">
-    <input type="hidden" name="renameProjectId" id="renameProjectId" value="">
-    <input type="hidden" name="configSubmitValue" value="rename">
-    <?php Csrf::generateFormToken(); ?>
+        To rename the task for Project ID <span id="taskToRename" style="font-weight: bold;"></span>,
+        enter the new name below, and click on the
+        <span style="font-weight: bold;">Rename task</span> button.
+        <p>
+        <span style="font-weight: bold;">New task name:</span>
+        <input type="text" name="renameNewTaskName" id="renameNewTaskName" size="50">
+        </p>
+        <input type="hidden" name="renameTaskKey" id="renameTaskKey" value="">
+        <input type="hidden" name="renameProjectId" id="renameProjectId" value="">
+        <input type="hidden" name="configSubmitValue" value="rename">
+        <?php Csrf::generateFormToken(); ?>
+        <input type="hidden" name="redcap_csrf_token" value="<?php echo $redcapCsrfToken; ?>"/>
     </form>
 </div>
 
@@ -669,19 +672,20 @@ $(function() {
     >
 
     <form id="etlConfigForm" action="<?php echo $selfUrl;?>" method="post">
-    To specify an ETL configuration for this task, select one of the ETL configurations for Project ID 
-    <span id="taskEtlPid" style="font-weight: bold;"></span>, and click on the
-    <span style="font-weight: bold;">Specify ETL</span> button. 
-    <p>
-    <span style="font-weight: bold;">ETL Configurations:</span>
-    <select name="projectEtlConfigSelect" id="projectEtlConfigSelect">
-    </select>
+        To specify an ETL configuration for this task, select one of the ETL configurations for Project ID 
+        <span id="taskEtlPid" style="font-weight: bold;"></span>, and click on the
+        <span style="font-weight: bold;">Specify ETL</span> button. 
+        <p>
+        <span style="font-weight: bold;">ETL Configurations:</span>
+        <select name="projectEtlConfigSelect" id="projectEtlConfigSelect">
+        </select>
 
-    </p>
-    <input type="hidden" name="etlTaskKey" id="etlTaskKey" value="">
-    <input type="hidden" name="etlProjectId" id="etlProjectId" value="">
-    <input type="hidden" name="configSubmitValue" value="etlConfig">
-    <?php Csrf::generateFormToken(); ?>
+        </p>
+        <input type="hidden" name="etlTaskKey" id="etlTaskKey" value="">
+        <input type="hidden" name="etlProjectId" id="etlProjectId" value="">
+        <input type="hidden" name="configSubmitValue" value="etlConfig">
+        <?php Csrf::generateFormToken(); ?>
+        <input type="hidden" name="redcap_csrf_token" value="<?php echo $redcapCsrfToken; ?>"/>
     </form>
 </div>
 
@@ -735,12 +739,13 @@ $(function() {
     style="display: none;"
     >
     <form id="deleteForm" action="<?php echo $selfUrl;?>" method="post">
-    To delete this task for Project Id <span id="projectToDelete" style="font-weight: bold;"></span>,
-    click on the <span style="font-weight: bold;">Delete project</span> button.
-    <input type="hidden" name="deleteTaskKey" id="deleteTaskKey" value="">
-    <input type="hidden" name="deleteProjectId" id="deleteProjectId" value="">
-    <input type="hidden" name="configSubmitValue" value="delete">
-    <?php Csrf::generateFormToken(); ?>
+        To delete this task for Project Id <span id="projectToDelete" style="font-weight: bold;"></span>,
+        click on the <span style="font-weight: bold;">Delete project</span> button.
+        <input type="hidden" name="deleteTaskKey" id="deleteTaskKey" value="">
+        <input type="hidden" name="deleteProjectId" id="deleteProjectId" value="">
+        <input type="hidden" name="configSubmitValue" value="delete">
+        <?php Csrf::generateFormToken(); ?>
+        <input type="hidden" name="redcap_csrf_token" value="<?php echo $redcapCsrfToken; ?>"/>
     </form>
 </div>
 

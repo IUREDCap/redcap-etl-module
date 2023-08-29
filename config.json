@@ -2,7 +2,7 @@
    "name": "REDCap-ETL Module",
    "namespace": "IU\\RedCapEtlModule", 
    "description": "REDCap-ETL module for extracting REDCap data and storing it in a database.",
-   "framework-version": 7,
+   "framework-version": 10,
    "authors": [
        {
            "name": "Jim Mullen",
@@ -27,7 +27,7 @@
     "compatibility": {
       "php-version-min": "7.1.0",
       "php-version-max": "",
-      "redcap-version-min": "11.0.0",
+      "redcap-version-min": "12.4.1",
       "redcap-version-max": ""
     },
     "links": {

@@ -356,6 +356,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
 
     <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>
 </form>
 
 <script>

@@ -10,6 +10,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use IU\RedCapEtlModule\RedCapEtlModule;
 use IU\RedCapEtlModule\Authorization;
+use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
 
 require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
@@ -100,9 +101,9 @@ if ($accessError === RedCapEtlModule::CSRF_ERROR) {
         . ' onclick="$(\'#requestButton\').css(\'cursor\', \'progress\'); $(\'body\').css(\'cursor\', \'progress\');" >'
         ;
 
-    echo '    <?php Csrf::generateFormToken(); ?>' . "\n";
-    echo '    <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>' . "\n";
-
+    Csrf::generateFormToken();
+    echo "\n";
+    echo '    <input type="hidden" name="redcap_csrf_token" value="' . $module->getCsrfToken() . '"/>' . "\n";
     echo "</form>\n";
 
 

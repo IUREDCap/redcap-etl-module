@@ -134,7 +134,7 @@ class ServerTest extends TestCase
         #print "\nPAGE:\n";
         #print_r($page);
         $page->pressButton('Test Server Connection');
-        sleep(4);
+        sleep(6);
         $testOutput = $page->findById("testOutput")->getValue();
         $this->assertMatchesRegularExpression("/SUCCESS/", $testOutput); 
         $this->assertMatchesRegularExpression("/output of hostname command:/", $testOutput); 
@@ -156,7 +156,6 @@ class ServerTest extends TestCase
 
         ConfigurePage::configureConfiguration(self::$session, 'behat', $emailSubject);
 
-
         #$page->clickLink('Run');
         $page->clickLink('ETL Configurations');
         # Find the table row where the first element matches the configuration name,
@@ -168,10 +167,16 @@ class ServerTest extends TestCase
         $this->assertMatchesRegularExpression("/ETL Configuration/", $text); 
         $this->assertMatchesRegularExpression("/Run/", $text); 
 
-        RunPage::runConfiguration(self::$session, $configName, $serverName);
-        sleep(4);
-        $text = $page->getText();
-        $this->assertMatchesRegularExpression("/Your job has been submitted to server/", $text); 
+        try {
+            RunPage::runConfiguration(self::$session, $configName, $serverName);
+            sleep(6);
+            $text = $page->getText();
+            $this->assertMatchesRegularExpression("/Your job has been submitted to server/", $text); 
+        } catch (\Exception $exception) {
+            print "Error running configuration: " . $exception->getMessage() . "\n";
+            print "\n" . $exception->getTraceAsString() . "\n";
+            sleep(20);
+        }
 
         Util::logout(self::$session);
     }

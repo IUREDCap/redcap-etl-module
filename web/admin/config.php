@@ -207,6 +207,7 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     <input type="submit" name="submitValue" value="Save">
   </p>
     <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>
 </form>
 
 <?php
