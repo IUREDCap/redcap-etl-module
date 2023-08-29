@@ -14,11 +14,12 @@ I need to be able to autogenerate the transformation rules
     When I follow "My Projects"
     And I select the forms project
     And I follow "REDCap-ETL"
-    And I wait for 1 seconds
 
   Scenario: Create configuration
-    When I fill in "configurationName" with "behat-config-test"
+    When I delete configuration "behat-config-test" if it exists
+    And I fill in "configurationName" with "behat-config-test"
     And I press "Add"
+    And Print element "body" text
     Then I should see "behat-config-test"
     But I should not see "Error:"
 
@@ -124,8 +125,4 @@ I need to be able to autogenerate the transformation rules
     And I should see "Created table 'testtable'"
     And I should see "Created table 'weight'"
     But I should not see "Created table 'registration'"
-
- Scenario: Cleanup by delete configuration
-    When I follow "ETL Configurations"
-    And I delete configuration "behat-config-test"
 

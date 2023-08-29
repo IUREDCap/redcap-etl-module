@@ -437,17 +437,21 @@ class Util
     {
         # Save the current window names
         $windowNames = $session->getWindowNames();
+        print_r($windowNames);
 
         # Follow the link (which should create a new window name)
         $page = $session->getPage();
+        print "LINK: {$link}\n";
         $page->clickLink($link);
-        sleep(2); // Give some time for new window to open
+        sleep(5); // Give some time for new window to open
 
         # See what window name was added (this should be the new window)
         $newWindowNames = $session->getWindowNames();
+        print_r($newWindowNames);
         $windowNamesDiff = array_diff($newWindowNames, $windowNames);
         $newWindowName = array_shift($windowNamesDiff); // There should be only 1 element in the diff
 
+        print "\nNEW WINDOW NAME: {$newWindowName}\n";
         $session->switchToWindow($newWindowName);
 
         return $newWindowName;

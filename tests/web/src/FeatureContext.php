@@ -187,13 +187,25 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     /**
      * @Then /^Print element "([^"]*)" value$/
      */
-    public function printValueText($css)
+    public function printElementValue($css)
     {
         $session = $this->getSession();
         $page = $session->getPage();
         $element = $page->find('css', $css);
         $value = $element->getValue();
         print "{$value}\n";
+    }
+
+    /**
+     * @Then /^Print element "([^"]*)" html$/
+     */
+    public function printElementHtml($css)
+    {
+        $session = $this->getSession();
+        $page = $session->getPage();
+        $element = $page->find('css', $css);
+        $html = $element->getHtml();
+        print "{$html}\n";
     }
 
     /**

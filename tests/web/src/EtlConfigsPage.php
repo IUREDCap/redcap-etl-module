@@ -90,10 +90,15 @@ class EtlConfigsPage
         $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[6]");
 
         if (isset($element)) {
+            print "Delete button for configuration \"{$configName}\" found.\n";
             $element->click();
+
+            sleep(2);
 
             # Handle confirmation dialog
             $page->pressButton("Delete configuration");
+
+            sleep(2);
         }
     }
 

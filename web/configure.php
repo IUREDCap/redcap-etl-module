@@ -44,6 +44,11 @@ try {
     $configName   = $module->getRequestVar('configName', '\IU\RedCapEtlModule\Filter::sanitizeLabel');
     $workflowName = $module->getRequestVar('workflowName', '\IU\RedCapEtlModule\Filter::sanitizeLabel');
 
+    #-----------------------------------
+    # Get REDCap token
+    #-----------------------------------
+    $redcapCsrfToken = $module->getCsrfToken();
+
     #-------------------------
     # Set the submit value
     #-------------------------
@@ -205,6 +210,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     <div style="clear: both;"></div>
 
     <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $redcapCsrfToken; ?>"/>
 </form>
 
 <?php

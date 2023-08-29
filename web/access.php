@@ -101,6 +101,8 @@ if ($accessError === RedCapEtlModule::CSRF_ERROR) {
         ;
 
     echo '    <?php Csrf::generateFormToken(); ?>' . "\n";
+    echo '    <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>' . "\n";
+
     echo "</form>\n";
 
 

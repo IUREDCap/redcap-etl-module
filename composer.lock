@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dab9324ea2a465b3787bfa1b5a33aa4b",
+    "content-hash": "df6a6f938229d57b88fcbbae56b5aff5",
     "packages": [
         {
             "name": "iu-redcap/phpcap",
-            "version": "1.1.2",
+            "version": "1.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/phpcap.git",
-                "reference": "31ef095b3ef3ecb14b384d1a12829440b2045beb"
+                "reference": "122c92f5b7b26ae9119276e4032a5ef836bf51c6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/phpcap/zipball/31ef095b3ef3ecb14b384d1a12829440b2045beb",
-                "reference": "31ef095b3ef3ecb14b384d1a12829440b2045beb",
+                "url": "https://api.github.com/repos/IUREDCap/phpcap/zipball/122c92f5b7b26ae9119276e4032a5ef836bf51c6",
+                "reference": "122c92f5b7b26ae9119276e4032a5ef836bf51c6",
                 "shasum": ""
             },
             "require": {
@@ -28,8 +28,9 @@
             "require-dev": {
                 "erusev/parsedown": "1.7.4",
                 "kzykhys/php-csv-parser": "1.4.1",
-                "phpunit/phpunit": "9.5.7",
-                "squizlabs/php_codesniffer": "3.6.0"
+                "phpunit/phpunit": "9.6.10",
+                "smalot/pdfparser": "2.5.0",
+                "squizlabs/php_codesniffer": "3.7.2"
             },
             "type": "library",
             "autoload": {
@@ -45,33 +46,33 @@
             "keywords": [
                 "redcap"
             ],
-            "time": "2021-07-30T13:58:52+00:00"
+            "time": "2023-08-10T12:30:43+00:00"
         },
         {
             "name": "iu-redcap/redcap-etl",
-            "version": "2.3.0",
+            "version": "2.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/redcap-etl.git",
-                "reference": "9a9f4d2083c46df57dcefb3b947a050562a78da6"
+                "reference": "4591ef87edf59e7d8a170252f7e9c9cf738f5589"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/9a9f4d2083c46df57dcefb3b947a050562a78da6",
-                "reference": "9a9f4d2083c46df57dcefb3b947a050562a78da6",
+                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/4591ef87edf59e7d8a170252f7e9c9cf738f5589",
+                "reference": "4591ef87edf59e7d8a170252f7e9c9cf738f5589",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "ext-dom": "*",
                 "ext-openssl": "*",
-                "iu-redcap/phpcap": "1.1.2",
+                "iu-redcap/phpcap": "1.4.1",
                 "php": ">=5.6.0"
             },
             "require-dev": {
                 "kzykhys/php-csv-parser": "1.4.1",
-                "phpunit/phpunit": "9.5.8",
-                "squizlabs/php_codesniffer": "3.6.0"
+                "phpunit/phpunit": "9.6.10",
+                "squizlabs/php_codesniffer": "3.7.2"
             },
             "type": "library",
             "autoload": {
@@ -88,7 +89,7 @@
                 "etl",
                 "redcap"
             ],
-            "time": "2023-01-31T17:46:55+00:00"
+            "time": "2023-08-10T13:52:53+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -199,16 +200,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "3.0.18",
+            "version": "3.0.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "f28693d38ba21bb0d9f0c411ee5dae2b178201da"
+                "reference": "4580645d3fc05c189024eb3b834c6c1e4f0f30a1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/f28693d38ba21bb0d9f0c411ee5dae2b178201da",
-                "reference": "f28693d38ba21bb0d9f0c411ee5dae2b178201da",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/4580645d3fc05c189024eb3b834c6c1e4f0f30a1",
+                "reference": "4580645d3fc05c189024eb3b834c6c1e4f0f30a1",
                 "shasum": ""
             },
             "require": {
@@ -301,7 +302,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-12-17T18:26:50+00:00"
+            "time": "2023-07-09T15:24:48+00:00"
         }
     ],
     "packages-dev": [],

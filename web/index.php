@@ -20,6 +20,11 @@ try {
     #-----------------------------------------------------------
     $module->checkUserPagePermission(USERID);
 
+    #-------------------------------------------------------------
+    # Get REDCap CSRF (Cross-Site Request Forgery) token
+    #-------------------------------------------------------------
+    $redcapCsrfToken = $module->getCsrfToken();
+
     #-----------------------------------------------------------------
     # Process form submissions (configuration add/copy/delete/rename)
     #-----------------------------------------------------------------
@@ -132,6 +137,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     <input name="configurationName" id="configurationName" type="text" size="40" />
     <input type="submit" name="submitValue" value="Add" />
     <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $redcapCsrfToken; ?>"/>
 </form>
 
 
@@ -365,6 +371,7 @@ $(function() {
     <input type="hidden" name="copyFromConfigName" id="copyFromConfigName" value="">
     <input type="hidden" name="submitValue" value="copy">
     <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $redcapCsrfToken; ?>"/>
     </form>
 </div>
 
@@ -422,6 +429,7 @@ $(function() {
     <input type="hidden" name="renameConfigName" id="renameConfigName" value="">
     <input type="hidden" name="submitValue" value="rename">
     <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $redcapCsrfToken; ?>"/>
     </form>
 </div>
 
@@ -470,11 +478,12 @@ $(function() {
     style="display: none;"
     >
     <form id="deleteForm" action="<?php echo $selfUrl;?>" method="post">
-    To delete the ETL configuration <span id="configToDelete" style="font-weight: bold;"></span>,
-    click on the <span style="font-weight: bold;">Delete configuration</span> button.
-    <input type="hidden" name="deleteConfigName" id="deleteConfigName" value="">
-    <input type="hidden" name="submitValue" value="delete">
-    <?php Csrf::generateFormToken(); ?>
+        To delete the ETL configuration <span id="configToDelete" style="font-weight: bold;"></span>,
+        click on the <span style="font-weight: bold;">Delete configuration</span> button.
+        <input type="hidden" name="deleteConfigName" id="deleteConfigName" value="">
+        <input type="hidden" name="submitValue" value="delete">
+        <?php Csrf::generateFormToken(); ?>
+        <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>
     </form>
 </div>
 

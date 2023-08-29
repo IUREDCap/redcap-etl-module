@@ -122,6 +122,7 @@ User:&nbsp;
 <input type="hidden" name="username" id="username">
 <input type="hidden" name="userLabel" id="userLabel">
 <?php Csrf::generateFormToken(); ?>
+<input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>
 </form>
     <!--
 <div class="ui-widget">
@@ -178,6 +179,7 @@ if (!empty($username)) {
         value="<?php echo Filter::escapeForHtmlAttribute($username);?>">
     <input type="hidden" name="submitValue" value="<?php echo $deleteButtonLabel;?>">
     <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>
     </form>
 </div>
 
@@ -321,6 +323,7 @@ $(function() {
 <div style="clear: both;"></div>
 </p>
     <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>
 </form>
     <?php
 }

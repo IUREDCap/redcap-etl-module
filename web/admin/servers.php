@@ -109,6 +109,7 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
         <?php echo Help::getHelpWithPageLink('etl-servers', $module); ?>
     </div>
     <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>
 </form>
     <!--
 <div class="ui-widget">
@@ -218,14 +219,16 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
     style="display: none;"
     >
     <form id="copy-form" action="<?php echo $selfUrl;?>" method="post">
-    To copy the server <span id="server-to-copy" style="font-weight: bold;"></span>,
-    enter the name of the new server below, and click on the <span style="font-weight: bold;">Copy server</span> button.
-    <p>
-    <span style="font-weight: bold;">New server name:</span>
-    <input type="text" name="copy-to-server-name" id="copy-to-server-name">
-    </p>
-    <input type="hidden" name="copy-from-server-name" id="copy-from-server-name" value="">
-    <?php Csrf::generateFormToken(); ?>
+        To copy the server <span id="server-to-copy" style="font-weight: bold;"></span>,
+        enter the name of the new server below,
+        and click on the <span style="font-weight: bold;">Copy server</span> button.
+        <p>
+        <span style="font-weight: bold;">New server name:</span>
+        <input type="text" name="copy-to-server-name" id="copy-to-server-name">
+        </p>
+        <input type="hidden" name="copy-from-server-name" id="copy-from-server-name" value="">
+        <?php Csrf::generateFormToken(); ?>
+        <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>
     </form>
 </div>
 
@@ -239,15 +242,16 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
     style="display: none;"
     >
     <form id="rename-form" action="<?php echo $selfUrl;?>" method="post">
-    To rename the server <span id="server-to-rename" style="font-weight: bold;"></span>,
-    enter the new name for the new server below, and click on the
-    <span style="font-weight: bold;">Rename server</span> button.
-    <p>
-    <span style="font-weight: bold;">New server name:</span>
-    <input type="text" name="rename-new-server-name" id="rename-new-server-name">
-    </p>
-    <input type="hidden" name="rename-server-name" id="rename-server-name" value="">
-    <?php Csrf::generateFormToken(); ?>
+        To rename the server <span id="server-to-rename" style="font-weight: bold;"></span>,
+        enter the new name for the new server below, and click on the
+        <span style="font-weight: bold;">Rename server</span> button.
+        <p>
+        <span style="font-weight: bold;">New server name:</span>
+        <input type="text" name="rename-new-server-name" id="rename-new-server-name">
+        </p>
+        <input type="hidden" name="rename-server-name" id="rename-server-name" value="">
+        <?php Csrf::generateFormToken(); ?>
+        <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>
     </form>
 </div>
 
@@ -261,10 +265,11 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
     style="display: none;"
     >
     <form id="delete-form" action="<?php echo $selfUrl;?>" method="post">
-    To delete the server <span id="server-to-delete" style="font-weight: bold;"></span>,
-    click on the <span style="font-weight: bold;">Delete server</span> button.
-    <input type="hidden" name="delete-server-name" id="delete-server-name" value="">
-    <?php Csrf::generateFormToken(); ?>
+        To delete the server <span id="server-to-delete" style="font-weight: bold;"></span>,
+        click on the <span style="font-weight: bold;">Delete server</span> button.
+        <input type="hidden" name="delete-server-name" id="delete-server-name" value="">
+        <?php Csrf::generateFormToken(); ?>
+        <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>
     </form>
 </div>
 
