@@ -10,9 +10,9 @@
 ./vendor/bin/behat features/admin-project-access.feature
 ./vendor/bin/behat features/admin-user-management.feature
 ./vendor/bin/behat features/admin-user-search.feature
-/vendor/bin/behat features/autogen-config.feature
-/vendor/bin/behat features/etl-config.feature
-/vendor/bin/behat features/etl-workflow.feature
+./vendor/bin/behat features/autogen-config.feature
+./vendor/bin/behat features/etl-config.feature
+./vendor/bin/behat features/etl-workflow.feature
 
 ./vendor/bin/behat features/extract-filter.feature
 ./vendor/bin/behat features/file-dowload-admin.feature
