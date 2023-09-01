@@ -72,15 +72,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     private $changeLogAction;
 
-    public function __construct()
-    {
-        $this->db = new RedCapDb();
-        $this->settings = new Settings($this, $this->db);
-        $this->moduleLog = new ModuleLog($this);
-        parent::__construct();
-    }
-
-
     /**
      * Returns REDCap user rights for the current project.
      *
@@ -152,7 +143,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
         $cronJobsCount = count($taskCronJobs) + count($workflowCronJobs);
         $cronJobsCount = count($taskCronJobs) + count($workflowCronJobs);
-        $cronJobsRunLogId = $this->moduleLog->logCronJobsRun($cronJobsCount, $day, $hour);
+        $cronJobsRunLogId = $this->getModuleLog()->logCronJobsRun($cronJobsCount, $day, $hour);
 
         $this->runTaskCronJobs($taskCronJobs, $day, $hour, $cronJobsRunLogId);
         $this->runWorkflowCronJobs($workflowCronJobs, $day, $hour, $cronJobsRunLogId);
@@ -190,7 +181,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             #-------------------------------------------------
             # Log run information to external module log
             #-------------------------------------------------
-            $this->moduleLog->logEtlRun(
+            $this->getModuleLog()->logEtlRun(
                 $projectId,
                 $username,
                 $isCronJob,
@@ -308,8 +299,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             #    $status = $serverConfig->run($etlConfig, $isCronJob);
             #}
 
-            #$status = $serverConfig->run($etlConfig, $isCronJob, $this->moduleLog);
-            $status = $serverConfig->run($etlConfig, $isCronJob, $this->moduleLog, false, $dataTarget);
+            #$status = $serverConfig->run($etlConfig, $isCronJob, $this->getModuleLog());
+            $status = $serverConfig->run($etlConfig, $isCronJob, $this->getModuleLog(), false, $dataTarget);
         } catch (\Exception $exception) {
             $status = "ETL job failed: " . $exception->getMessage();
             $details = "ETL job failed\n" . $details
@@ -374,19 +365,34 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function getVersion()
     {
-        return $this->settings->getVersion();
+        return $this->getSettings()->getVersion();
     }
 
     /**
-     * Gets the settings for this module.
+     * Gets the settings for this module and initializes settings if they are unset.
+     * This method should always be called (outside of this method) instead of
+     * accessing settings directly.
      *
      * @return Settings the settings for this module.
      */
     public function getSettings()
     {
+        if (!isset($this->settings)) {
+            $this->db = new RedCapDb();
+            $this->settings = new Settings($this, $this->db);
+        }
+
         return $this->settings;
     }
 
+    public function getModuleLog()
+    {
+        if (!isset($this->moduleLog)) {
+            $this->moduleLog = new ModuleLog($this);
+        }
+
+        return $this->moduleLog;
+    }
 
 
     #-------------------------------------------------------------------
@@ -395,19 +401,19 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function getUsers()
     {
-        return $this->settings->getUsers();
+        return $this->getSettings()->getUsers();
     }
 
     public function addUser($username)
     {
-        $this->settings->addUser($username);
+        $this->getSettings()->addUser($username);
         $details = 'User ' . $username . ' added to ETL users.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
     public function deleteUser($username)
     {
-        $this->settings->deleteUser($username);
+        $this->getSettings()->deleteUser($username);
         $details = 'User ' . $username . ' deleted from ETL users.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
@@ -420,12 +426,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         #get server names
         $servers = array();
-        $allServers = $this->settings->getServers();
+        $allServers = $this->getSettings()->getServers();
 
         #loop through the server names to get their access levels
         foreach ($allServers as $serverName) {
            #get the server configurations for the server name
-            $serverConfig = $this->settings->getServerConfig($serverName);
+            $serverConfig = $this->getSettings()->getServerConfig($serverName);
 
            #if the server has the access level specified,
            #add it to the array of servers
@@ -465,7 +471,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
             # Add the private servers that the user is allowed to access
             $userPrivateServers = array();
-            $userPrivateServers = $this->settings->getUserPrivateServerNames($username);
+            $userPrivateServers = $this->getSettings()->getUserPrivateServerNames($username);
             $servers = array_merge($servers, $userPrivateServers);
 
             # Remove duplicate server names. There are cases where a server can be listed twice, for example, if
@@ -502,20 +508,20 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function setUserPrivateServerNames($username, $userServerNames)
     {
-        $this->settings->setUserPrivateServerNames($username, $userServerNames);
+        $this->getSettings()->setUserPrivateServerNames($username, $userServerNames);
         $details = 'Allowable private servers modified for user ' . $username;
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
     public function processUserPrivateServers($username, $userServerNames, $privateServers)
     {
-        $this->settings->processUserPrivateServers($username, $userServerNames, $privateServers);
+        $this->getSettings()->processUserPrivateServers($username, $userServerNames, $privateServers);
     }
 
     public function getUserPrivateServerNames($username, $privateServers)
     {
         $userServerNames = array();
-        $userServers = $this->settings->getUserPrivateServerNames($username);
+        $userServers = $this->getSettings()->getUserPrivateServerNames($username);
 
         foreach ($userServers as $serverName) {
            #if the user-assigned server stills have private access, then keep it
@@ -524,7 +530,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             }
         }
         if ($userServerNames != $userServers) {
-            $this->settings->setUserPrivateServerNames($username, $userServerNames);
+            $this->getSettings()->setUserPrivateServerNames($username, $userServerNames);
         }
 
         return $userServerNames;
@@ -532,12 +538,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function getPrivateServerUsers($serverName)
     {
-        return $this->settings->getPrivateServerUsers($serverName);
+        return $this->getSettings()->getPrivateServerUsers($serverName);
     }
 
     public function processPrivateServerUsers($serverName, $removeUsernames)
     {
-        $this->settings->processPrivateServerUsers($serverName, $removeUsernames);
+        $this->getSettings()->processPrivateServerUsers($serverName, $removeUsernames);
     }
 
     #-------------------------------------------------------------------
@@ -554,7 +560,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function getUserEtlProjects($username = USERID)
     {
-        return $this->settings->getUserEtlProjects($username);
+        return $this->getSettings()->getUserEtlProjects($username);
     }
 
     #/**
@@ -566,7 +572,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     # */
     #public function hasEtlUser($projectId = PROJECT_ID)
     #{
-    #    return $this->settings->hasEtlUser($projectId);
+    #    return $this->getSettings()->hasEtlUser($projectId);
     #}
 
     #/**
@@ -631,7 +637,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function setUserEtlProjects($username, $projects)
     {
-        $this->settings->setUserEtlProjects($username, $projects);
+        $this->getSettings()->setUserEtlProjects($username, $projects);
         $details = 'ETL projects modified for user ' . $username;
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
@@ -649,7 +655,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function getConfiguration($name, $projectId = PROJECT_ID)
     {
-        return $this->settings->getConfiguration($name, $projectId);
+        return $this->getSettings()->getConfiguration($name, $projectId);
     }
 
     /**
@@ -659,7 +665,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function setConfiguration($configuration, $username = USERID, $projectId = PROJECT_ID)
     {
-        $this->settings->setConfiguration($configuration, $username, $projectId);
+        $this->getSettings()->setConfiguration($configuration, $username, $projectId);
         $details = 'REDCap-ETL configuration "' . $configuration->getName()
             . '" updated (pid=' . $configuration->getProjectId() . ') ';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
@@ -667,7 +673,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function setConfigSchedule($configName, $server, $schedule, $username = USERID, $projectId = PROJECT_ID)
     {
-        $this->settings->setConfigSchedule($configName, $server, $schedule, $username, $projectId);
+        $this->getSettings()->setConfigSchedule($configName, $server, $schedule, $username, $projectId);
         $details = 'REDCap-ETL configuration "' . $configName
             . '" schedule modified for user ' . $username . ' and project ID ' . $projectId . '.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
@@ -676,7 +682,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function addConfiguration($name, $username = USERID, $projectId = PROJECT_ID)
     {
         $dataExportRight = $this->getDataExportRight();
-        $this->settings->addConfiguration($name, $username, $projectId, $dataExportRight);
+        $this->getSettings()->addConfiguration($name, $username, $projectId, $dataExportRight);
         $details = 'REDCap-ETL configuration "' . $name . '" created.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
@@ -690,7 +696,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         if (Authorization::hasEtlConfigNamePermission($this, $fromConfigName, PROJECT_ID)) {
             $toExportRight = $this->getDataExportRight();
-            $this->settings->copyConfiguration($fromConfigName, $toConfigName, $toExportRight);
+            $this->getSettings()->copyConfiguration($fromConfigName, $toConfigName, $toExportRight);
             $details = 'REDCap-ETL configuration "' . $fromConfigName . '" copied to "'
                 . $toConfigName . '" for user ' . USERID . ', project ID ' . PROJECT_ID . '.';
             \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
@@ -708,7 +714,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function renameConfiguration($configName, $newConfigName)
     {
         if (Authorization::hasEtlConfigNamePermission($this, $configName, PROJECT_ID)) {
-            $this->settings->renameConfiguration($configName, $newConfigName);
+            $this->getSettings()->renameConfiguration($configName, $newConfigName);
             $details = 'REDCap-ETL configuration "' . $configName . '" renamed to "'
                 . $newConfigName . '" for user ' . USERID . ', project ID ' . PROJECT_ID . '.';
             \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
@@ -720,7 +726,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function removeConfiguration($configName)
     {
         if (Authorization::hasEtlConfigNamePermission($this, $configName, PROJECT_ID)) {
-            $this->settings->removeConfiguration($configName);
+            $this->getSettings()->removeConfiguration($configName);
             $details = 'REDCap-ETL configuration "' . $configName . '" deleted.';
             \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
         } else {
@@ -739,7 +745,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function getConfigurationNames($projectId = PROJECT_ID)
     {
-        return $this->settings->getConfigurationNames($projectId);
+        return $this->getSettings()->getConfigurationNames($projectId);
     }
 
     /**
@@ -807,7 +813,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function getAllCronJobs()
     {
-        return $this->settings->getAllCronJobs();
+        return $this->getSettings()->getAllCronJobs();
     }
 
     /**
@@ -816,7 +822,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function getTaskCronJobs($day, $time)
     {
-        return $this->settings->getTaskCronJobs($day, $time);
+        return $this->getSettings()->getTaskCronJobs($day, $time);
     }
 
 
@@ -826,12 +832,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function getAdminConfig()
     {
-        return $this->settings->getAdminConfig();
+        return $this->getSettings()->getAdminConfig();
     }
 
     public function setAdminConfig($adminConfig)
     {
-        $this->settings->setAdminConfig($adminConfig);
+        $this->getSettings()->setAdminConfig($adminConfig);
         $details = 'REDCap-ETL admin configuration "' . $configName . '" modified.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
@@ -842,7 +848,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function getServers()
     {
-        return $this->settings->getServers();
+        return $this->getSettings()->getServers();
     }
 
     /**
@@ -852,7 +858,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      */
     public function addServer($serverName)
     {
-        $this->settings->addServer($serverName);
+        $this->getSettings()->addServer($serverName);
         $details = 'Server "' . $serverName . '" created.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
@@ -862,7 +868,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         if (strcasecmp($fromServerName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
             throw new \Exception('The embedded server "' . ServerConfig::EMBEDDED_SERVER_NAME . '" cannot be copied.');
         }
-        $this->settings->copyServer($fromServerName, $toServerName);
+        $this->getSettings()->copyServer($fromServerName, $toServerName);
         $details = 'Server "' . $fromServerName . '" copied to "' . $toServerName . '".';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
@@ -872,7 +878,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         if (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
             throw new \Exception('The embedded server "' . ServerConfig::EMBEDDED_SERVER_NAME . '" cannot be renamed.');
         }
-        $this->settings->renameServer($serverName, $newServerName);
+        $this->getSettings()->renameServer($serverName, $newServerName);
         $details = 'Server "' . $serverName . '" renamed to "' . $newServerName . '".';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
@@ -883,7 +889,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         if (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
             throw new \Exception('The embedded server "' . ServerConfig::EMBEDDED_SERVER_NAME . '" cannot be deleted.');
         }
-        $this->settings->removeServer($serverName);
+        $this->getSettings()->removeServer($serverName);
         $details = 'Server "' . $serverName . '" deleted.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
@@ -895,12 +901,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function getServerConfig($serverName)
     {
-        return $this->settings->getServerConfig($serverName);
+        return $this->getSettings()->getServerConfig($serverName);
     }
 
     public function setServerConfig($serverConfig)
     {
-        $this->settings->setServerConfig($serverConfig);
+        $this->getSettings()->setServerConfig($serverConfig);
         $details = 'Server "' . $serverName . '" modified.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
@@ -911,18 +917,18 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function getLastRunTime()
     {
-        return $this->settings->getLastRunTime();
+        return $this->getSettings()->getLastRunTime();
     }
 
     public function setLastRunTime($date, $hour, $minutes)
     {
-        $this->settings->setLastRunTime($date, $hour, $minutes);
+        $this->getSettings()->setLastRunTime($date, $hour, $minutes);
         # Don't log this because it is an internal event
     }
 
     public function isLastRunTime($date, $hour)
     {
-        return $this->settings->isLastRunTime($date, $hour);
+        return $this->getSettings()->isLastRunTime($date, $hour);
     }
 
     #=============================================================
@@ -931,22 +937,22 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function getHelpSetting($topic)
     {
-        return $this->settings->getHelpSetting($topic);
+        return $this->getSettings()->getHelpSetting($topic);
     }
 
     public function setHelpSetting($topic, $setting)
     {
-        $this->settings->setHelpSetting($topic, $setting);
+        $this->getSettings()->setHelpSetting($topic, $setting);
     }
 
     public function getCustomHelp($topic)
     {
-        return $this->settings->getCustomHelp($topic);
+        return $this->getSettings()->getCustomHelp($topic);
     }
 
     public function setCustomHelp($topic, $help)
     {
-        $this->settings->setCustomHelp($topic, $help);
+        $this->getSettings()->setCustomHelp($topic, $help);
     }
 
 
@@ -1341,7 +1347,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function addWorkflow($workflowName, $username = USERID, $projectId = PROJECT_ID)
     {
         if ($this->getDataExportRight()) {
-            $this->settings->addWorkflow($workflowName, $username, $projectId, $dataExportRight);
+            $this->getSettings()->addWorkflow($workflowName, $username, $projectId, $dataExportRight);
             $details = 'REDCap-ETL workflow "' . $workflowName . '" created.';
             \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
         } else {
@@ -1353,7 +1359,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     {
         $workflows = null;
         if ($this->isSuperUser()) {
-             $workflows = $this->settings->getWorkflows();
+             $workflows = $this->getSettings()->getWorkflows();
         } else {
             throw new \Exception('You do not have permission to retrieve all workflows.');
         }
@@ -1362,17 +1368,17 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function getWorkflow($workflowName)
     {
-         return $this->settings->getWorkflow($workflowName);
+         return $this->getSettings()->getWorkflow($workflowName);
     }
 
     public function getWorkflowTasks($workflowName)
     {
-         return $this->settings->getWorkflowTasks($workflowName);
+         return $this->getSettings()->getWorkflowTasks($workflowName);
     }
 
     public function getWorkflowStatus($workflowName)
     {
-         return $this->settings->getWorkflowStatus($workflowName);
+         return $this->getSettings()->getWorkflowStatus($workflowName);
     }
 
     public function getProjectAvailableWorkflows(
@@ -1380,7 +1386,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $excludeIncomplete = false,
         $excludeRemoved = true
     ) {
-         return $this->settings->getProjectAvailableWorkflows($projectId, $excludeIncomplete, $excludeRemoved);
+         return $this->getSettings()->getProjectAvailableWorkflows($projectId, $excludeIncomplete, $excludeRemoved);
     }
 
     /**
@@ -1389,7 +1395,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function deleteUserWorkflow($workflowName, $username = USERID)
     {
         if ($this->getDataExportRight()) {
-            $this->settings->deleteUserWorkflow($workflowName, $username);
+            $this->getSettings()->deleteUserWorkflow($workflowName, $username);
             $details = 'REDCap-ETL workflow "' . $workflowName . '" marked as removed by user ' . $username . '.';
             \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
         } else {
@@ -1400,7 +1406,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function renameWorkflow($workflowName, $newWorkflowName, $username = USERID)
     {
         if ($this->getDataExportRight()) {
-            $this->settings->renameWorkflow($workflowName, $newWorkflowName, $username);
+            $this->getSettings()->renameWorkflow($workflowName, $newWorkflowName, $username);
             $details = 'REDCap-ETL workflow "' . $workflowName . '" renamed to "' .
                 $newWorkflowName . '" by user ' . $username . ', project ID ' . PROJECT_ID . '.';
             \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
@@ -1412,7 +1418,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function copyWorkflow($fromWorkflowName, $toWorkflowName, $username = USERID)
     {
         if ($this->getDataExportRight()) {
-            $this->settings->copyWorkflow($fromWorkflowName, $toWorkflowName, $username);
+            $this->getSettings()->copyWorkflow($fromWorkflowName, $toWorkflowName, $username);
             $details = 'REDCap-ETL workflow "' . $fromWorkflowName . '" copied to "' .
                 $toWorkflowName . '" by user ' . $username . ', project ID ' . PROJECT_ID . '.';
             \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
@@ -1423,13 +1429,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function addProjectToWorkflow($workflowName, $project, $username = USERID)
     {
-         return $this->settings->addProjectToWorkflow($workflowName, $project, $username);
+         return $this->getSettings()->addProjectToWorkflow($workflowName, $project, $username);
     }
 
     public function deleteTaskfromWorkflow($workflowName, $deleteTaskKey, $projectId, $username = USERID)
     {
         if ($this->getDataExportRight()) {
-            $this->settings->deleteTaskFromWorkflow($workflowName, $deleteTaskKey, $username);
+            $this->getSettings()->deleteTaskFromWorkflow($workflowName, $deleteTaskKey, $username);
             $details = 'Task # ' . $deleteTaskKey . ' (Project Id ' . $projectId
                 . ') deleted from REDCap-ETL workflow "' . $workflowName
                 . '" by user ' . $username . '.';
@@ -1442,12 +1448,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function moveWorkflowTask($workflowName, $direction, $moveTaskKey)
     {
-        $this->settings->moveWorkflowTask($workflowName, $direction, $moveTaskKey);
+        $this->getSettings()->moveWorkflowTask($workflowName, $direction, $moveTaskKey);
     }
 
     public function hasPermissionsForAllTasks($workflowName, $username = USERID)
     {
-        return $this->settings->hasPermissionsForAllTasks($workflowName, $username);
+        return $this->getSettings()->hasPermissionsForAllTasks($workflowName, $username);
     }
 
     public function renameWorkflowTask(
@@ -1458,7 +1464,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $username
     ) {
         if ($this->getDataExportRight()) {
-            $this->settings->renameWorkflowTask(
+            $this->getSettings()->renameWorkflowTask(
                 $workflowName,
                 $renameTaskKey,
                 $renameNewTaskName,
@@ -1483,7 +1489,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         $username
     ) {
         if ($this->getDataExportRight()) {
-            $this->settings->assignWorkflowTaskEtlConfig(
+            $this->getSettings()->assignWorkflowTaskEtlConfig(
                 $workflowName,
                 $etlProjectId,
                 $etlTaskKey,
@@ -1503,7 +1509,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function deleteWorkflow($workflowName, $username = USERID)
     {
         if ($this->isSuperUser()) {
-            $this->settings->deleteWorkflow($workflowName);
+            $this->getSettings()->deleteWorkflow($workflowName);
             $details = 'REDCap-ETL workflow "' . $workflowName . '" deleted by user "' . $username . '.';
             \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
         } else {
@@ -1514,7 +1520,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function reinstateWorkflow($workflowName, $username = USERID)
     {
         if ($this->isSuperUser()) {
-            $this->settings->reinstateWorkflow($workflowName, $username);
+            $this->getSettings()->reinstateWorkflow($workflowName, $username);
             $details = 'REDCap-ETL workflow "' . $workflowName . '" reinstated by user "' . $username . '.';
             \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
         } else {
@@ -1524,23 +1530,23 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function getWorkflowGlobalProperties($workflowName)
     {
-         return $this->settings->getWorkflowGlobalProperties($workflowName);
+         return $this->getSettings()->getWorkflowGlobalProperties($workflowName);
     }
 
     public function getWorkflowGlobalConfiguration($workflowName)
     {
-         return $this->settings->getWorkflowGlobalConfiguration($workflowName);
+         return $this->getSettings()->getWorkflowGlobalConfiguration($workflowName);
     }
 
     public function setWorkflowGlobalProperties($workflowName, $properties, $username)
     {
-         $this->settings->setWorkflowGlobalProperties($workflowName, $properties, $username);
+         $this->getSettings()->setWorkflowGlobalProperties($workflowName, $properties, $username);
     }
 
 
     public function validateWorkflowForRunning($workflowName, $serverName, $isCron = false)
     {
-        $this->settings->validateWorkflowForRunning($workflowName, $serverName, $isCron);
+        $this->getSettings()->validateWorkflowForRunning($workflowName, $serverName, $isCron);
     }
 
     public function runWorkflow(
@@ -1569,7 +1575,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             #-------------------------------------------------
             # Log run information to external module log
             #-------------------------------------------------
-            $this->moduleLog->logWorkflowRun(
+            $this->getModuleLog()->logWorkflowRun(
                 $username,
                 $isCronJob,
                 $workflowName,
@@ -1797,7 +1803,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                     } #next task
 
                     $runWorkflow = true;
-                    $status = $serverConfig->run($workflowConfig, $isCronJob, $this->moduleLog, $runWorkflow);
+                    $status = $serverConfig->run($workflowConfig, $isCronJob, $this->getModuleLog(), $runWorkflow);
                 } # end if workflow has status "Ready"
             } # end if (empty(workflowName))
         } catch (\Exception $exception) {
@@ -1825,7 +1831,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function setWorkflowSchedule($workflowName, $server, $schedule, $username = USERID)
     {
-        $this->settings->setWorkflowSchedule($workflowName, $server, $schedule, $username);
+        $this->getSettings()->setWorkflowSchedule($workflowName, $server, $schedule, $username);
         $details = 'REDCap-ETL workflow "' . $workflowName
             . '" schedule modified by user ' . $username . '.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
@@ -1833,12 +1839,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function getWorkflowSchedule($workflowName)
     {
-         return $this->settings->getWorkflowSchedule($workflowName);
+         return $this->getSettings()->getWorkflowSchedule($workflowName);
     }
 
     public function getWorkflowCronJobs($day, $time)
     {
-         return $this->settings->getWorkflowCronJobs($day, $time);
+         return $this->getSettings()->getWorkflowCronJobs($day, $time);
     }
 
     public function runTaskCronJobs($cronJobs, $day, $hour, $cronJobsRunLogId)
@@ -1864,7 +1870,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
                 $isCronJob = true;
 
-                $cronJobLogId = $this->moduleLog->logCronJob($projectId, $serverName, $configName, $cronJobsRunLogId);
+                $cronJobLogId =
+                    $this->getModuleLog()->logCronJob($projectId, $serverName, $configName, $cronJobsRunLogId);
 
                 if (strcmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
                     # Running on the embedded server
@@ -1926,7 +1933,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                     $details .= "server: {$serverName}\n";
                     $details .= "cron: yes\n";
 
-                    $cronJobLogId = $this->moduleLog->logWorkflowCronJob(
+                    $cronJobLogId = $this->getModuleLog()->logWorkflowCronJob(
                         $workflowName,
                         $serverName,
                         $cronJobsRunLogId
