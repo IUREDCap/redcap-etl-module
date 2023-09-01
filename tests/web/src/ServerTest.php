@@ -174,7 +174,8 @@ class ServerTest extends TestCase
             $this->assertMatchesRegularExpression("/Your job has been submitted to server/", $text); 
         } catch (\Exception $exception) {
             print "Error running configuration: " . $exception->getMessage() . "\n";
-            print "\n" . $exception->getTraceAsString() . "\n";
+            $trace = htmlspecialchars($exception->getTraceAsString(), ENT_QUOTES);
+            print "\n" . $trace . "\n";
             sleep(20);
         }
 
