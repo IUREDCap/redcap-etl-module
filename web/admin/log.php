@@ -322,6 +322,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
 
 <script>
     $(document).ready(function() {
+
         //--------------------------------------
         // Cron detail dialog
         //--------------------------------------
@@ -334,7 +335,8 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
             $dialog = $('<div></div>')
                 .load($url, {
                     cron_log_id: id,
-                    <?php echo Csrf::TOKEN_NAME; ?>: "<?php echo Csrf::getToken(); ?>"
+                    <?php echo Csrf::TOKEN_NAME; ?>: "<?php echo Csrf::getToken(); ?>",
+                    <?php echo 'redcap_csrf_token: "' . $module->getCsrfToken()  . '"'; ?>
                 }).dialog();
                 
             $dialog.dialog({
@@ -343,6 +345,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                 width: 500,
                 maxHeight: 400
             })
+
             //.position({my: 'left top', at: 'right+20 top', of: $(this)})
             .dialog('open')
             ;
@@ -362,7 +365,8 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
             $dialog = $('<div></div>')
                 .load($url, {
                     etl_run_log_id: id,
-                    <?php echo Csrf::TOKEN_NAME; ?>: "<?php echo Csrf::getToken(); ?>"
+                    <?php echo Csrf::TOKEN_NAME; ?>: "<?php echo Csrf::getToken(); ?>",
+                    <?php echo 'redcap_csrf_token: "' . $module->getCsrfToken()  . '"'; ?>
                 }).dialog();
                 
             $dialog.dialog({title: 'ETL Run Details', dialogClass: 'redcap-etl-log', width: 600, maxHeight: 400})
