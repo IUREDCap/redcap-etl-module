@@ -70,6 +70,13 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
 
 ?>
 
+<div style="float: right;">
+Version <?php echo IU\RedCapEtlModule\Version::RELEASE_NUMBER; ?> &nbsp;
+(<a href="https://github.com/IUREDCap/redcap-etl-module/releases" target="_blank">Release History</a>)
+</div>
+
+<div style="clear: both;"></div>
+
 
 <h5 style="font-weight: bold;">Overview</h5>
 
@@ -90,32 +97,51 @@ The REDCap-ETL (Extract Transform Load) external module:
 
 <h5 style="font-weight: bold;">REDCap-ETL Servers</h5>
 
-The REDCap-ETL external module needs at least one REDCap-ETL server to function. There are 3 basic options:
-<ol>
-    <li>
-        <span style="font-weight: bold;">Embedded Server</span>
-        - the external module has an embedded REDCap-ETL server that can be used without
-        any additional setup effort. It can be enabled/disabled and configured
-        here: <a href="<?php echo $embeddedServerConfigUrl;?>" style="font-weight: bold;">Embedded ETL Server Config</a>
-    </li>
-    <li>
-        <span style="font-weight: bold;">Standard REDCap-ETL Server</span>
-        - a standard REDCap-ETL server is a stand-alone program that runs outside of REDCap.
-        More information can be found here:
-        <a href="https://github.com/IUREDCap/redcap-etl">https://github.com/IUREDCap/redcap-etl</a>.
-        Setting up a standard REDCap-ETL server may require a fair amount of effort, but an
-        advantage of doing this is that is will take much of the processing load
-        from ETL processes off of your REDCap server.
-    </li>
-    <li>
-        <span style="font-weight: bold;">Custom ETL Server</span>
-        - you can set up a custom ETL server and then configure it within the
-        external module. The custom server needs to be accessible by SSH (secure shell)
-        and have a single command that can be executed to run a job on it.
-    </li>
-</ol>
+<p>
+The REDCap-ETL external module uses "ETL servers" to do the actual ETL processing.
+ETL configurations are created in the external module and then passed to
+an ETL server for processing. The ETL server extracts, transforms and loads the
+data according to the ETL configuration it receives.
+</p>
 
-<p> You will be able to select an access level for each server.
+<h6>The Embedded ETL Server</h6>
+
+<p>
+A built-in ETL server is provided, which is referred to as the "embedded server",
+and it is sufficient for using REDCap-ETL.
+The embedded server can be enabled/disabled and configured
+here: <a href="<?php echo $embeddedServerConfigUrl;?>" style="font-weight: bold;">Embedded ETL Server Config</a>
+</p>
+
+<h6>Additional ETL Servers</h6>
+
+<p>
+You can optionally set up and configure additional ETL servers, and these servers can
+run on remote systems.
+Two reasons for setting up remote ETL servers are to reduce the load on
+your REDCap server, and getting around firewall restrictions that prevent your REDCap server
+from writing to the database where you want to store the extracted REDCap data.
+</p>
+
+<p>
+You can use the 
+<a href="https://github.com/IUREDCap/redcap-etl" style="font-weight: bold;">
+REDCap-ETL application
+</a>
+to create an additional server.
+The REDCap-ETL application needs to be installed
+on a system that supports SSH (secure shell), which is used by the REDCap-ETL external module
+to communicate with the REDCap-ETL application.
+For more information on how to create and configure a remote ETL server, see:
+<a href="https://github.com/IUREDCap/redcap-etl-module/blob/master/docs/RemoteEtlServerGuide.md"
+   style="font-weight: bold">
+Remote ETL Server Guide
+</a>.
+</p>
+
+<h6>ETL Server Access Levels</h6>
+
+<p> You will be able to select an access level for each ETL server.
 A server's access level identifies which users are allowed to access the server.
 When a user goes to run or schedule an ETL job, only those servers to which they
 have permissions will be displayed. There are three server access-level options:
