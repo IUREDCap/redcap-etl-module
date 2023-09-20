@@ -50,7 +50,7 @@ class ModuleLog
             'num_jobs'           => $numCronJobs
         ];
 
-        $logMessage = 'REDCap-ETL cron jobs run';
+        $logMessage = "REDCap-ETL cron jobs run, day: {$day}, hour: {$hour}, number of jobs: {$numCronJobs}";
         $logId = $this->module->log($logMessage, $logParams);
 
         return $logId;
@@ -67,7 +67,7 @@ class ModuleLog
             'cron_log_id'        => $cronLogId
         ];
 
-        $logMessage = 'REDCap-ETL cron job';
+        $logMessage = "REDCap-ETL cron job, ETL server: {$serverName}, config: {$configName}";
 
         $logId = $this->module->log($logMessage, $logParams);
 
@@ -103,7 +103,7 @@ class ModuleLog
             'etl_server'         => $serverName
         ];
 
-        $logMessage = "ETL run";
+        $logMessage = "ETL run, user: {$username}, ETL server: {$serverName}, config: {$configName}";
 
         $logId = $this->module->log($logMessage, $logParams);
         $this->lastEtlRunLogId = $logId;
@@ -391,7 +391,7 @@ class ModuleLog
             'etl_server'         => $serverName
         ];
 
-        $logMessage = "ETL workflow run";
+        $logMessage = "ETL workflow run, ETL server: {$serverName}, workflow: {$workflowName}";
 
         $logId = $this->module->log($logMessage, $logParams);
         $this->lastEtlRunLogId = $logId;
@@ -410,7 +410,7 @@ class ModuleLog
             'cron_log_id'        => $cronLogId
         ];
 
-        $logMessage = 'REDCap-ETL Workflow cron job';
+        $logMessage = "REDCap-ETL Workflow cron job, ETL server: {$serverName}, workflow: {$workflowName}";
 
         $logId = $this->module->log($logMessage, $logParams);
 

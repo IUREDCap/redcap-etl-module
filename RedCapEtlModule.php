@@ -157,7 +157,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      * @param string $configName the name of the REDCap-ETL configuration to run
      * @param string $serverName name of server to run on
      * @param boolean $isCronJon indicates whether this is being called from a cron job or not.
-     * @param int $conJobLogId the log ID of the cron job log entry
+     * @param int $cronJobLogId the log ID of the cron job log entry
      *
      * @return string the status of the run.
      */

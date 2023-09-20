@@ -28,7 +28,8 @@ class ModuleLogTest extends TestCase
     {
         $moduleLog = new ModuleLog($this->moduleMock);
 
-        $message = 'REDCap-ETL cron jobs run';
+        $message = 'REDCap-ETL cron jobs run, day: 1, hour: 7, number of jobs: 2';
+
         $numJobs = 2;
         $day = 1;
         $hour = 7;
@@ -55,7 +56,7 @@ class ModuleLogTest extends TestCase
     {
         $moduleLog = new ModuleLog($this->moduleMock);
 
-        $message    = 'ETL run';
+        $message    = 'ETL run, user: etluser, ETL server: (embedded), config: export';
         $projectId  = 123;
         $username   = 'etluser';
         $isCronJob  = false;
