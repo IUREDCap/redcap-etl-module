@@ -6,8 +6,8 @@
 		"REDCap", "ETL", "REDCap-ETL"
 	],
 	"require" : {
-        "phpseclib/phpseclib" : "3.0.21",
-        "iu-redcap/redcap-etl" : "2.3.2"
+        "phpseclib/phpseclib" : "3.0.23",
+        "iu-redcap/redcap-etl" : "2.3.3"
 	},
 	"autoload" : {
 		"psr-4" : {
