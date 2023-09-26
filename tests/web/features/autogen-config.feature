@@ -17,6 +17,7 @@ I need to be able to autogenerate the transformation rules
 
   Scenario: Create configuration
     When I delete configuration "behat-config-test" if it exists
+    And I wait for 4 seconds
     And I fill in "configurationName" with "behat-config-test"
     And I press "Add"
     And Print element "body" text

@@ -15,6 +15,7 @@ Feature: Server configuration management
   Scenario: Delete local server (if it exist)
     When I follow "Servers"
     And I delete server "local-server"
+    And I wait for 4 seconds
     Then I should see "(embedded server)"
     But I should not see "local-server"
     And I should not see "Error:"

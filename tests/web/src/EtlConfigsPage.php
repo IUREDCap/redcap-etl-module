@@ -1,5 +1,4 @@
-<?php
-#-------------------------------------------------------
+<?php #-------------------------------------------------------
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
@@ -76,6 +75,8 @@ class EtlConfigsPage
         } else {
             $element->click();
 
+        $page = $session->getPage();
+
             # Handle confirmation dialog
             $page->pressButton("Delete configuration");
         }
@@ -90,15 +91,29 @@ class EtlConfigsPage
         $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[6]");
 
         if (isset($element)) {
-            print "Delete button for configuration \"{$configName}\" found.\n";
+            print "Delete button for configuration \"{$configName}\" found: {$element->getHtml()}\n";
+
             $element->click();
 
             sleep(2);
+
+            # print $page->getHtml();
+
+            #$button = $page->find("xpath", "//button[text()='Delete configuration']");
+            #if ($button == null) {
+            #    print "\n*** Button NOT found.\n";
+            #}
+            #print "\nButton:\n";
+            # print_r($button);
 
             # Handle confirmation dialog
             $page->pressButton("Delete configuration");
 
             sleep(2);
+            # $button->click();
+            # $page = $session->getPage();
+
+            # print $page->getText();
         }
     }
 

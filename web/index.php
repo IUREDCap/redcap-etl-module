@@ -483,7 +483,7 @@ $(function() {
         <input type="hidden" name="deleteConfigName" id="deleteConfigName" value="">
         <input type="hidden" name="submitValue" value="delete">
         <?php Csrf::generateFormToken(); ?>
-        <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>
+        <input type="hidden" name="redcap_csrf_token" value="<?php echo $redcapCsrfToken; ?>"/>
     </form>
 </div>
 

@@ -17,10 +17,12 @@
 ./vendor/bin/behat features/extract-filter.feature
 ./vendor/bin/behat features/file-dowload-admin.feature
 ./vendor/bin/behat features/file-dowload-user.feature
-# ./vendor/bin/behat features/help.feature
+./vendor/bin/behat features/help.feature
 ./vendor/bin/behat features/schedule.feature
 ./vendor/bin/behat features/server-access-level-admin.feature
 ./vendor/bin/behat features/server-access-level-user.feature
 ./vendor/bin/behat features/server-config.feature
+
+./vendor/bin/behat features/transformation-rules-guide.feature
 ./vendor/bin/behat features/user-interface.feature
 ./vendor/bin/behat features/workflow.feature

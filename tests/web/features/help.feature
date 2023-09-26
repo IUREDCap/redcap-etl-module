@@ -16,8 +16,13 @@ I need to be able to create, copy, rename and delete configurations
     When I select the test project
     And I follow "REDCap-ETL"
 
+  Scenario: Delete configuration if it exists
+    When I delete configuration "behat-help-test" if it exists
+    And I wait for 2 seconds
+    Then I should not see "behat-help-test"
+
   Scenario: Create configuration
-    When I fill in "configurationName" with "behat-help-test"
+    And I fill in "configurationName" with "behat-help-test"
     And I press "Add"
     Then I should see "behat-help-test"
 
@@ -30,22 +35,8 @@ I need to be able to create, copy, rename and delete configurations
   Scenario: Batch size help on separate page
     When I follow "configure-behat-help-test"
     And I follow "batch-size-help-link"
+    And I wait for 2 seconds
     And I follow "batch-size-help-page" to new window
     Then I should see "The batch size indicates how many REDCap record IDs will be processed"
     But I should not see "View text on separate page"
-    Then I go to previous window
-    Then I follow "Home"
 
-  Scenario: Transformation rules guide
-    When I follow "configure-behat-help-test"
-    And I follow "Transformation Rules Guide" to new window
-    Then I should see "Transformation Rules"
-    And I should see "This is a simple example"
-    Then I go to previous window
-    Then I follow "Home"
-
-  Scenario: Delete configuration
-    When I follow "ETL Configurations"
-    And I press "deleteConfig1"
-    And I press "Delete configuration"
-    Then I should not see "behat-test"

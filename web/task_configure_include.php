@@ -967,7 +967,8 @@ Configuration form
                         </div>
                         <hr style="margin: 7px 0px;"/>           
                         <div>
-                            <a href="<?php echo $module->getUrl('web/transformation_rules.php');?>" target="_blank">
+                            <a href="<?php echo $module->getUrl('web/transformation_rules.php');?>"
+                               id="transformation-rules-guide" target="_blank">
                                 <i class="fas fa-book"></i>
                                 Transformation Rules Guide
                             </a>

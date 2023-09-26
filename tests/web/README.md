@@ -126,6 +126,9 @@ If you use the command below, you will need to run the tests one feature at a ti
 Note that if you installed **chromium-browser**, you will either need to make an alias named "chrome" for it, or
 use "chromium-browser" in the commands above instead of "chrome".
 
+You will need to make sure that pop-ups are enabled for the site from which you are running the tests
+(e.g., localhost).
+
 
 Running the tests
 ----------------------
