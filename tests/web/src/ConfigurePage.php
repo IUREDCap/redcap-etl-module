@@ -32,7 +32,7 @@ class ConfigurePage
 
         $page = $session->getPage();
 
-        print( $page->getText() );
+        # print( $page->getText() );
 
         $page->selectFieldOption('api_token_username', $etlConfig['api_token_username']);
 

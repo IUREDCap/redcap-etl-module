@@ -165,7 +165,7 @@ I need to be able to create, run and schedule workflows
     And I select "remote-server-workflow-test" from "server"
     And I press "Run"
     And I wait for 4 seconds
-    And Print element "body" text
+    # And Print element "body" text
     Then I should see "Your job has been submitted to server"
     And I should see "remote-server-workflow-test"
     And I should not see "Error:"
@@ -210,7 +210,7 @@ I need to be able to create, run and schedule workflows
     When I configure workflow "behat-workflow-test" in admin workflows
     Then I should see "behat-workflow-test"
     And I should see "Configure"
-    And Print element "body" text
+    # And Print element "body" text
     And I should see "Task1"
     And I should see "Task2"
     And I should not see "Error:"

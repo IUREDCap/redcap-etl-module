@@ -49,8 +49,6 @@ class ConfigureWorkflowPage
         # so the rename column can be set
         $xpath = "//table[@id='workflowTasks']/thead/tr[1]/th[1]";
         $element = $page->find("xpath", $xpath);
-        print("HEADER 1 TEXT: " . $element->getText() . "\n");
-        print("HEADER 1 HTML: " . $element->getHtml() . "\n");
         if ($element->getText() === 'Task Name') {
             $renameColumn = 5;
         } else {
@@ -58,25 +56,20 @@ class ConfigureWorkflowPage
             $renameColumn = 6;
         }
 
-        print("RENAME COLUMN: " . $renameColumn . "\n");
         sleep(2);
 
         # Find the table row for the specified task number, and then get the
         # rename element and click it
         $xpath = "//table[@id='workflowTasks']/tbody/tr[{$taskNumber}]/td[{$renameColumn}]/input";
         $element = $page->find("xpath", $xpath);
-        print ($element->getHtml() . "\n");
         $element->click();
-        print ("Element clicked.\n");
         sleep(2);
 
         # Rename the task
         $page->fillField("renameNewTaskName", $newTaskName);
-        print ("Fields filled.\n");
         sleep(2);
 
         $page->pressButton("Rename task");
-        print ("Button pressed.\n");
     }
 
     public static function specifyEtlConfig($session, $taskName, $configName)
@@ -86,7 +79,6 @@ class ConfigureWorkflowPage
         # Find the table row where the first element matches the task name, and then get the
         # 5th column element to the right and click it
         $element = $page->find("xpath", "//tr/td[text()='".$taskName."']/following-sibling::td[5]/input");
-        print ("SPECIFY ELEMENT: " . $element->getHtml());
         $element->click();
 
         $page = $session->getPage();

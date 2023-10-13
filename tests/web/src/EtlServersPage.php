@@ -26,7 +26,7 @@ class EtlServersPage
         # Find the table row where the first element matches the server name, and then get the
         # 4th column element and click it
         $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[3]/a");
-        print("SERVER LINK: " . $element->getHtml());
+        # print("SERVER LINK: " . $element->getHtml());
         $element->click();
     }
 
@@ -83,16 +83,16 @@ class EtlServersPage
         # 7th column element and click it
         $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[6]/input");
 
-        print "SERVER NAME: {$serverName}\n";
+        # print "SERVER NAME: {$serverName}\n";
         if (isset($element)) {
-            print("ELEMENT OUTER HTML: " . $element->getOuterHtml() . "\n");
+            # print("ELEMENT OUTER HTML: " . $element->getOuterHtml() . "\n");
             $element->click();
 
-            print("Element clicked\n");
+            # print("Element clicked\n");
 
             sleep(4);
 
-            print($page->getText());
+            # print($page->getText());
 
             # Handle confirmation dialog
             $page->pressButton("Delete server");

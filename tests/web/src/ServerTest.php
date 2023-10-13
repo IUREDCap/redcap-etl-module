@@ -103,20 +103,20 @@ class ServerTest extends TestCase
         $text = $page->getText();
         $this->assertMatchesRegularExpression("/Server Name/", $text); 
 
-        print "\nSERVER NAME: {$serverName}\n\n";
+        # print "\nSERVER NAME: {$serverName}\n\n";
 
         EtlServersPage::deleteServer(self::$session, $serverName);
         $page = self::$session->getPage();
         $text = $page->getText();
-        print $text . "\n";
-        print "-------------------------------------------------------------------\n";
+        # print $text . "\n";
+        # print "-------------------------------------------------------------------\n";
 
         EtlServersPage::addServer(self::$session, $serverName);
         EtlServersPage::followServer(self::$session, $serverName);
 
         $page = self::$session->getPage();
         $text = $page->getText();
-        print $text . "\n";
+        # print $text . "\n";
 
         EtlServerConfigPage::configureServer(self::$session, $serverName);
 
