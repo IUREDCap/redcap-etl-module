@@ -12,12 +12,16 @@ Feature: Server configuration management
     Given I am on "/"
     When I access the admin interface
 
-  Scenario: Delete local server (if it exist)
+  Scenario: Delete local servers (if they exist)
     When I follow "Servers"
     And I delete server "local-server"
+    And I delete server "local-server-copy"
+    And I delete server "local-server-rename"
     And I wait for 4 seconds
     Then I should see "(embedded server)"
     But I should not see "local-server"
+    But I should not see "local-server-copy"
+    But I should not see "local-server-rename"
     And I should not see "Error:"
 
   Scenario: Test embedded server configuration

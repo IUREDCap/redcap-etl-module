@@ -56,16 +56,25 @@ class EtlServerConfigPage
             $page->selectFieldOption('accessLevel', 'public');
         }
 
+        print "\nSERVER CONFIG:\n";
+        print_r($serverConfig);
+        print "\n";
+
         $page->fillField('serverAddress', $serverConfig['server_address']);
         if ($serverConfig['auth_method'] === "0") {
+            print ("AUTH METHOD 0\n");
             $element = $page->find('xpath', "//*[@id='authMethodSshKey']");
-            $element->click();
+            // $element->click();
+            $element->selectOption(0);
             $page->fillField('username', $serverConfig['username']);
             $page->fillField('sshKeyFile', $serverConfig['ssh_key_file']);
             $page->fillField('sshKeyPassword', $serverConfig['ssh_key_password']);
         } elseif ($serverConfig['auth_method'] === "1") {
+            print ("AUTH METHOD 1\n");
             $element = $page->find('xpath', "//*[@id='authMethodPassword']");
-            $element->click();
+            print("ELEMENT: " . $element->getOuterHtml() . "\n");
+            //$element->click();
+            $element->selectOption(1);
             $page->fillField('username', $serverConfig['username']);
             $page->fillField('password', $serverConfig['password']);
         }

@@ -45,7 +45,7 @@ Feature: Server access level management
     #create a private server with no assigned users
     And I follow "Servers"
     And I delete server "private-test"
-    And I wait for 1 seconds
+    And I wait for 3 seconds
     And I follow "List"
     Then I should not see "private-test"
 

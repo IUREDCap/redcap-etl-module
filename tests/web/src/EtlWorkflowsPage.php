@@ -70,7 +70,7 @@ class EtlWorkflowsPage
 
         # Find the table row where the first element matches the workflow name, and then get the
         # 7th column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$workflowName."']/following-sibling::td[6]");
+        $element = $page->find("xpath", "//tr/td[text()='".$workflowName."']/following-sibling::td[6]/input");
         if ($ifExists && !isset($element)) {
             ;
         } else {
@@ -87,7 +87,7 @@ class EtlWorkflowsPage
 
         # Find the table row where the first element matches the workflow name, and then get the
         # 7th column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$workflowName."']/following-sibling::td[6]");
+        $element = $page->find("xpath", "//tr/td[text()='".$workflowName."']/following-sibling::td[6]/input");
 
         if (isset($element)) {
             $element->click();

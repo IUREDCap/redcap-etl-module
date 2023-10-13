@@ -50,7 +50,9 @@ class AdminWorkflowsPage
 
         # Find the table row where the first element matches the workflow name, and then get the
         # 6th column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$workflowName."']/following-sibling::td[3]");
+        $element = $page->find("xpath", "//tr/td[text()='".$workflowName."']/following-sibling::td[3]/a");
+        print("ELEMENT OUTER HTML: " . $element->getOuterHtml() . "\n");
+        print("ELEMENT HTML: " . $element->getHtml() . "\n");
         if (!isset($element)) {
             $message = 'Workflow "' . $workflow .'" could not be configured in the admin interface,'
                . ' because it does not exist.';
@@ -88,13 +90,18 @@ class AdminWorkflowsPage
 
         # Find the table row where the first element matches the workflow name, and then get the
         # 6th column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$workflowName."']/following-sibling::td[5]");
+        $element = $page->find("xpath", "//tr/td[text()='".$workflowName."']/following-sibling::td[5]/input");
+
+        print ($element->getHtml());
 
         if (isset($element)) {
             $element->click();
 
+            sleep(2);
+
             # Handle confirmation dialog
             $page->pressButton("Delete workflow");
+            print ("DELETED!");
         }
     }
 }

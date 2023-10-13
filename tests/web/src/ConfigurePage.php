@@ -32,6 +32,8 @@ class ConfigurePage
 
         $page = $session->getPage();
 
+        print( $page->getText() );
+
         $page->selectFieldOption('api_token_username', $etlConfig['api_token_username']);
 
         $page->pressButton('Auto-Generate');

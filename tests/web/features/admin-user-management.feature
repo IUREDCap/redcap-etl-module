@@ -18,7 +18,9 @@ Feature: Admin User Management
     And I follow "Search"
     And I search for user
     And I press "Delete User from REDCap-ETL"
+    And I wait for 2 seconds
     And I press "Delete user"
+    And I wait for 2 seconds
     Then I should see "deleted"
 
   Scenario: Try to access REDCap-ETL for test project as the test user

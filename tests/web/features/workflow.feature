@@ -60,6 +60,7 @@ I need to be able to create, run and schedule workflows
 
   Scenario: Configure config2 for workflow
     When I follow configuration "behat-workflow-config2-test"
+    And I wait for 2 seconds
     And I configure configuration "behat"
     And I press "Save"
     Then I should see "Extract Settings"
@@ -85,6 +86,7 @@ I need to be able to create, run and schedule workflows
     And I specify etl-configuration "behat-workflow-config1-test" for task "Task1"
 
     And I add task for workflow
+    And I wait for 2 seconds
     And I rename task 2 to "Task2"
     And I specify etl-configuration "behat-workflow-config2-test" for task "Task2"
 
@@ -162,6 +164,8 @@ I need to be able to create, run and schedule workflows
     And I select "behat-workflow-test" from "workflowName"
     And I select "remote-server-workflow-test" from "server"
     And I press "Run"
+    And I wait for 4 seconds
+    And Print element "body" text
     Then I should see "Your job has been submitted to server"
     And I should see "remote-server-workflow-test"
     And I should not see "Error:"
@@ -206,6 +210,7 @@ I need to be able to create, run and schedule workflows
     When I configure workflow "behat-workflow-test" in admin workflows
     Then I should see "behat-workflow-test"
     And I should see "Configure"
+    And Print element "body" text
     And I should see "Task1"
     And I should see "Task2"
     And I should not see "Error:"

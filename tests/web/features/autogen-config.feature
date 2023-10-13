@@ -20,7 +20,8 @@ I need to be able to autogenerate the transformation rules
     And I wait for 4 seconds
     And I fill in "configurationName" with "behat-config-test"
     And I press "Add"
-    And Print element "body" text
+    And I wait for 4 seconds
+    # And Print element "body" text
     Then I should see "behat-config-test"
     But I should not see "Error:"
 
