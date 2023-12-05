@@ -25,7 +25,7 @@ class EtlConfigsPage
         # Find the table row where the first element matches the config name, and then get the
         # 2nd column element and click it
         $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[1]/a");
-        print ($element->getHtml());
+        # print ($element->getHtml());
         $element->click();
     }
 
@@ -92,7 +92,7 @@ class EtlConfigsPage
         $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[6]/input");
 
         if (isset($element)) {
-            print "Delete button for configuration \"{$configName}\" found: {$element->getHtml()}\n";
+            # print "Delete button for configuration \"{$configName}\" found: {$element->getHtml()}\n";
 
             $element->click();
 
