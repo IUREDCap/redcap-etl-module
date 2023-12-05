@@ -361,7 +361,7 @@ class Util
      *
      * @return string
      */
-    private function removeContentBetweenTags($tagName,$content)
+    private static function removeContentBetweenTags($tagName,$content)
     {
         $parts = explode('<' . $tagName, $content);
 
@@ -433,7 +433,7 @@ class Util
      *
      * @return string the name of the new window
      */
-    public function goToNewWindow($session, $link)
+    public static function goToNewWindow($session, $link)
     {
         # Save the current window names
         $windowNames = $session->getWindowNames();
@@ -457,7 +457,7 @@ class Util
         return $newWindowName;
     }
 
-    public function findDownloadedFile()
+    public static function findDownloadedFile()
     {
         $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
         $dir = $testConfig->getUser()['zip_download_directory'];
