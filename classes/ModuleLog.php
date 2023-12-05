@@ -177,6 +177,8 @@ class ModuleLog
             # $queryParameters[] = $endTime;
         }
 
+        $query .= " order by timestamp desc";
+
         $logData = $this->module->queryLogs($query, $queryParameters);
         return $logData;
     }
