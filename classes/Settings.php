@@ -211,7 +211,7 @@ class Settings
         #get the current allowed-users for this server
         $privateServerUsers = $this->getPrivateServerUsers($serverName);
 
-        #find the username in the array, remove it, and save the updated user list
+        # find the username in the array, remove it, and save the updated user list
         if (($key = array_search($username, $privateServerUsers)) !== false) {
             unset($privateServerUsers[$key]);
             $this->setPrivateServerUsers($serverName, $privateServerUsers);
@@ -230,6 +230,11 @@ class Settings
         $key = self::PRIVATE_SERVER_USERS_KEY_PREFIX . $serverName;
         $json = $this->module->getSystemSetting($key);
         $usernames = json_decode($json, true);
+
+        if ($usernames == null) {
+            $usernames = [];
+        }
+
         return $usernames;
     }
 
@@ -293,6 +298,9 @@ class Settings
         $key = self::USER_PROJECTS_KEY_PREFIX . $username;
         $json = $this->module->getSystemSetting($key);
         $projects = json_decode($json, true);
+        if ($projects == null) {
+            $projects = [];
+        }
         return $projects;
     }
 
