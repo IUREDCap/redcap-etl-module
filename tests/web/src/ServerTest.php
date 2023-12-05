@@ -160,7 +160,7 @@ class ServerTest extends TestCase
         $page->clickLink('ETL Configurations');
         # Find the table row where the first element matches the configuration name,
         # and then get the 2nd column element (the 'Run' icon') and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[2]");
+        $element = $page->find("xpath", "//tr/td[text()='".$configName."']/following-sibling::td[2]/a");
         $element->click();
 
         $text = $page->getText();
