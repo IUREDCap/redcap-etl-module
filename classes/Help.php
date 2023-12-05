@@ -456,7 +456,7 @@ class Help
         return $help;
     }
 
-    public function getHelpFromText($setting, $defaultHelp, $customHelp)
+    public static function getHelpFromText($setting, $defaultHelp, $customHelp)
     {
         $help = '';
 
