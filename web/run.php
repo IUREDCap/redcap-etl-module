@@ -105,6 +105,7 @@ try {
                     $result = $runOutput;
                     if (is_string($result) && (substr($result, 0, 6) === 'ERROR:')) {
                         $error = $result;
+                        # error_log($error, 3, __DIR__ . '/log.txt');
                     } else {
                         header('Content-Type: application/zip');
                         header('Content-Disposition: attachment; filename="redcap-etl.zip"');

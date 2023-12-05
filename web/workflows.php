@@ -33,6 +33,11 @@ try {
     #-----------------------------------------------------------
     $module->checkUserPagePermission(USERID);
 
+    #-------------------------------------------------------------
+    # Get REDCap CSRF (Cross-Site Request Forgery) token
+    #-------------------------------------------------------------
+    $redcapCsrfToken = $module->getCsrfToken();
+
     #-----------------------------------------------------------------
     # Process form submissions (workflow add/copy/delete/rename)
     #-----------------------------------------------------------------
@@ -152,6 +157,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     <input name="workflowName" id="workflowName" type="text" size="40" />
     <input type="submit" name="submitValue" value="Add" />
     <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $redcapCsrfToken; ?>"/>
 </form>
 
 <table class="dataTable">
@@ -374,6 +380,7 @@ $(function() {
     <input type="hidden" name="copyFromWorkflowName" id="copyFromWorkflowName" value="">
     <input type="hidden" name="submitValue" value="copy">
     <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $redcapCsrfToken; ?>"/>
     </form>
 </div>
 
@@ -431,6 +438,7 @@ $(function() {
     <input type="hidden" name="renameWorkflowName" id="renameWorkflowName" value="">
     <input type="hidden" name="submitValue" value="rename">
     <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $redcapCsrfToken; ?>"/>
     </form>
 </div>
 
@@ -484,6 +492,7 @@ $(function() {
     <input type="hidden" name="deleteWorkflowName" id="deleteWorkflowName" value="">
     <input type="hidden" name="submitValue" value="delete">
     <?php Csrf::generateFormToken(); ?>
+    <input type="hidden" name="redcap_csrf_token" value="<?php echo $redcapCsrfToken; ?>"/>
     </form>
 </div>
 

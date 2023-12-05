@@ -93,6 +93,16 @@ One-time initial setup:
             sudo systemctl reload apache2
             </pre>
 
+10. Remote server setup
+
+    * To run all of the tests, you will need to set up a remote REDCap-ETL server.
+    * See [docs/RemoteEtlServerGuide.md](../../docs/RemoteEtlServerGuide.md) for more information
+
+
+11. Embedded server configuration
+
+    * Make sure that the from e-mail for the embedded server is set
+
 
 Setup each time before tests are run
 ---------------------------------------
@@ -145,6 +155,18 @@ web tests directory (tests/web) to run the behat web tests:
     ./vendor/bin/behat -f progress      # just prints summary of results
     ./vendor/bin/behat <path-to-feature-file>    # for testing a single feature file
 
+Test E-mails
+------------------------
+
+If the ETL servers for the web tests are configured correctly, and the web tests run successfully, e-mails with the
+following subjects should be sent to the specified target for the e-mails:
+
+* REDCap-ETL Access Request
+* REDCap-ETL Module web test 1/3: schedule ETL configuration
+* REDCap-ETL Module web test 2/3: run workflow on remote server
+* REDCap-ETL Module web test 3/3: schedule workflow on remote server
+
+Note that the e-mails sent from scheduled jobs may take a while (up to about an hour) to be sent.
 
 Viewing the test coverage data
 -------------------------------

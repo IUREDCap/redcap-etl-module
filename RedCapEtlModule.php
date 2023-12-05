@@ -472,7 +472,9 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             # Add the private servers that the user is allowed to access
             $userPrivateServers = array();
             $userPrivateServers = $this->getSettings()->getUserPrivateServerNames($username);
-            $servers = array_merge($servers, $userPrivateServers);
+            if (!empty($userPrivateServers)) {
+                $servers = array_merge($servers, $userPrivateServers);
+            }
 
             # Remove duplicate server names. There are cases where a server can be listed twice, for example, if
             # a private server is changed to being public, and the list of users for the private version is saved.
@@ -529,8 +531,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 $userServerNames[] = $serverName;
             }
         }
+
         if ($userServerNames != $userServers) {
             $this->getSettings()->setUserPrivateServerNames($username, $userServerNames);
+        }
+
+        if ($userServerNames == null) {
+            $userServerNames = [];
         }
 
         return $userServerNames;
