@@ -125,7 +125,7 @@ To run the browser in headless mode (the recommended approach), use the command 
 Running in headless mode will make the tests run faster, and can be used to run the entire set of tests at once,
 but you won't see the browser running.
 
-    chrome --disable-gpu --headless --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222
+    chrome --disable-gpu --headless=new --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222
 
 If you want to actually see the tests interacting with the browser, use the command shown below 
 to start Chrome instead of the command above.

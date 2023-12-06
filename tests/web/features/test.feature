@@ -36,12 +36,9 @@ Feature: Zipped CSV file dowload functionality
     And I select "task" from "configType"
     And I select "behat-config-test" from "configName"
     And I select "(embedded server)" from "server"
-    And I wait for 2 seconds
     And I select "csv_zip" from "dataTarget"
-    And I wait for 2 seconds
     And I press "Run"
-    And I wait for 16 seconds
-    And Print element "body" text
+    And I wait for 6 seconds
     Then a downloaded file should be found
 
 
