@@ -29,7 +29,7 @@ One-time initial setup:
         CREATE USER 'etl_user'@'localhost' IDENTIFIED BY 'etlPassword';
         GRANT ALL ON `etl_test`.* TO 'etl_user'@'localhost';
 
-4. Create a REDCap-ETL enabled project for the non-admin user where:
+4. In REDCap, create a REDCap-ETL enabled project for the non-admin user where:
 
     * the title of the project is unique
     * the project is created by importing the REDCap-ETL [Repeating Events](https://github.com/IUREDCap/redcap-etl/blob/master/tests/projects/RepeatingEvents.REDCap.xml) project file
@@ -37,7 +37,7 @@ One-time initial setup:
     * the project has no ETL configurations
     * the project has an API token with export permission
 
-5. Create a REDCap-ETL enabled project for the non-admin user where:
+5. In REDCap, create a REDCap-ETL enabled project for the non-admin user where:
 
     * the title of the project is unique
     * the project is created by importing the REDCap-ETL [Repeating Forms](https://github.com/IUREDCap/redcap-etl/blob/master/tests/projects/RepeatingForms.REDCap.xml) project file
@@ -45,17 +45,24 @@ One-time initial setup:
     * the project has no ETL configurations
     * the project has an API token with export permission
 
-6. Install Composer if you don't already have it, and run the following command in the tests/web directory:
+6. In REDCap, in the REDCap-ETL admin interface, make sure that the from e-mail for the embedded server is set
+
+7. Remote server setup
+
+    * To run all of the tests, you will need to set up a remote REDCap-ETL server.
+    * See [docs/RemoteEtlServerGuide.md](../../docs/RemoteEtlServerGuide.md) for more information
+
+8. Install Composer if you don't already have it, and run the following command in the tests/web directory:
 
     composer install
 
-7. Run the following command in the top-level web tests directory:
+9. Run the following command in the top-level web tests directory:
 
     cp config-example.ini config.ini
 
-8. Edit the config.ini file created above, and enter appropriate values for properties
+10. Edit the config.ini file created above, and enter appropriate values for properties
 
-9. If you want to collect test coverage data, you need to complete the following steps:
+11. If you want to collect test coverage data, you need to complete the following steps:
 
     * Make sure that the tests/web/coverage-data/ directory can be written to by your REDCap web server.
       The REDCap web server has to have permission to write to this directory for code coverage
@@ -93,15 +100,6 @@ One-time initial setup:
             sudo systemctl reload apache2
             </pre>
 
-10. Remote server setup
-
-    * To run all of the tests, you will need to set up a remote REDCap-ETL server.
-    * See [docs/RemoteEtlServerGuide.md](../../docs/RemoteEtlServerGuide.md) for more information
-
-
-11. Embedded server configuration
-
-    * Make sure that the from e-mail for the embedded server is set
 
 
 Setup each time before tests are run
@@ -125,7 +123,7 @@ To run the browser in headless mode (the recommended approach), use the command 
 Running in headless mode will make the tests run faster, and can be used to run the entire set of tests at once,
 but you won't see the browser running.
 
-    chrome --disable-gpu --headless=new --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222
+    chrome --disable-gpu --headless=new --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --window-size=1920,1080
 
 If you want to actually see the tests interacting with the browser, use the command shown below 
 to start Chrome instead of the command above.
@@ -154,6 +152,30 @@ web tests directory (tests/web) to run the behat web tests:
     ./vendor/bin/behat
     ./vendor/bin/behat -f progress      # just prints summary of results
     ./vendor/bin/behat <path-to-feature-file>    # for testing a single feature file
+
+
+Debugging tests
+-------------------------
+
+If tests that look like they should be working are failing, here are some things to try:
+
+* **Non-headless browser mode.** If you are running in headless browser mode, try running the tests in non-headless browser mode
+  to see if you can see an error displayed in the browser. If an error message goes away before you
+  are able to read it, you can put in a wait statement (e.g., "And I wait for 10 seconds") in
+  the feature file so that you have time to read the message. Note that there have been serveral cases where tests
+  have failed in headless mode, but then work in non-headless mode, so this approach will not always work.
+
+* **Add wait statements.** Sometimes errors occur because an access of a page occurs before the page is
+  fully updated. To fix this issue a wait statement (e.g., "And I wait for 4 seconds") can be added in the
+  feature file before the statement accessing the page that causes the error.
+
+* **Check XPath expressions.** Some of the custom steps that have been defined use XPath expressions to specify elements on web pages.
+  There have been inconsistencies in how these work between headless and non-headless browser modes, and between
+  newer and older versions of the web testing software dependencies. There have been cases where an XPath expression
+  was working in both headless and non-headless browser modes, but then after an update of the web test software dependencies,
+  quit working for the headless mode. The fix for this has generally been to specify a more nested element (e.g., changing "td[1]" to
+  "td[1]/a" for clicking on a link in a table).
+
 
 Test E-mails
 ------------------------

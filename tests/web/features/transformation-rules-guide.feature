@@ -28,6 +28,7 @@ I need to be able to see the Transformation Rules Guide for editing transformati
     When I follow "configure-behat-rules-guide-test"
     And I wait for 2 seconds
     And I follow "Transformation Rules Guide" to new window
+    And I wait for 2 seconds
     Then I should see "Transformation Rules"
     And I should see "This is a simple example"
 
