@@ -29,7 +29,7 @@ class SqlServerAutoRulesTest extends TestCase
             $configuration->set(self::$logger, self::CONFIG_FILE);
 
             list($dbHost, $dbUser, $dbPassword, $dbName) = $configuration->getSqlServerConnectionInfo();
-            $dsn = 'sqlsrv:database='.$dbName.';server='.$dbHost;
+            $dsn = 'sqlsrv:database=' . $dbName . ';server=' . $dbHost . ';Encrypt=0';
             try {
                 self::$dbh = new \PDO($dsn, $dbUser, $dbPassword);
             } catch (Exception $exception) {
@@ -96,8 +96,7 @@ class SqlServerAutoRulesTest extends TestCase
         $statement  = self::$dbh->query($sql);
         $actualData = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
-        $parser2 = \KzykHys\CsvParser\CsvParser::fromFile(self::TEST_DATA_DIR.'re_enrollment.csv');
-        $expectedData = $parser2->parse();
+        $expectedData = CsvUtil::csvFileToArray(self::TEST_DATA_DIR.'re_enrollment.csv');
 
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 
@@ -115,8 +114,7 @@ class SqlServerAutoRulesTest extends TestCase
         $statement  = self::$dbh->query($sql);
         $actualData = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
-        $parser2 = \KzykHys\CsvParser\CsvParser::fromFile(self::TEST_DATA_DIR.'re_enrollment_label_view.csv');
-        $expectedData = $parser2->parse();
+        $expectedData = CsvUtil::csvFileToArray(self::TEST_DATA_DIR.'re_enrollment_label_view.csv');
 
         $expectedData = SystemTestsUtil::convertCsvToMap($expectedData);
 

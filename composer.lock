@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eefa6233f745f6d94f31ccb0e273a1c6",
+    "content-hash": "1ed7e9fb86b18647ff6c3b3edb53e8c3",
     "packages": [
         {
             "name": "iu-redcap/phpcap",
-            "version": "1.4.1",
+            "version": "1.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/phpcap.git",
-                "reference": "122c92f5b7b26ae9119276e4032a5ef836bf51c6"
+                "reference": "461985ab461fd732c6b6f2b8640ffc214a7a3895"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/phpcap/zipball/122c92f5b7b26ae9119276e4032a5ef836bf51c6",
-                "reference": "122c92f5b7b26ae9119276e4032a5ef836bf51c6",
+                "url": "https://api.github.com/repos/IUREDCap/phpcap/zipball/461985ab461fd732c6b6f2b8640ffc214a7a3895",
+                "reference": "461985ab461fd732c6b6f2b8640ffc214a7a3895",
                 "shasum": ""
             },
             "require": {
@@ -46,33 +46,36 @@
             "keywords": [
                 "redcap"
             ],
-            "time": "2023-08-10T12:30:43+00:00"
+            "support": {
+                "issues": "https://github.com/IUREDCap/phpcap/issues",
+                "source": "https://github.com/IUREDCap/phpcap/tree/1.4.2"
+            },
+            "time": "2023-10-16T17:05:45+00:00"
         },
         {
             "name": "iu-redcap/redcap-etl",
-            "version": "2.3.3",
+            "version": "2.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/redcap-etl.git",
-                "reference": "67695a057a9d7d21b5f4203534120a13e7a47f0b"
+                "reference": "18509d8a4cb2d5ccb757cc3c870b47623aae19fa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/67695a057a9d7d21b5f4203534120a13e7a47f0b",
-                "reference": "67695a057a9d7d21b5f4203534120a13e7a47f0b",
+                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/18509d8a4cb2d5ccb757cc3c870b47623aae19fa",
+                "reference": "18509d8a4cb2d5ccb757cc3c870b47623aae19fa",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "ext-dom": "*",
                 "ext-openssl": "*",
-                "iu-redcap/phpcap": "1.4.1",
+                "iu-redcap/phpcap": "1.4.2",
                 "php": ">=5.6.0"
             },
             "require-dev": {
-                "kzykhys/php-csv-parser": "1.4.1",
                 "phpunit/phpunit": "9.6.10",
-                "squizlabs/php_codesniffer": "3.7.2"
+                "squizlabs/php_codesniffer": "3.8.0"
             },
             "type": "library",
             "autoload": {
@@ -89,7 +92,11 @@
                 "etl",
                 "redcap"
             ],
-            "time": "2023-09-25T14:40:54+00:00"
+            "support": {
+                "issues": "https://github.com/IUREDCap/redcap-etl/issues",
+                "source": "https://github.com/IUREDCap/redcap-etl/tree/2.3.5"
+            },
+            "time": "2024-01-31T20:02:55+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -151,6 +158,11 @@
                 "hex2bin",
                 "rfc4648"
             ],
+            "support": {
+                "email": "info@paragonie.com",
+                "issues": "https://github.com/paragonie/constant_time_encoding/issues",
+                "source": "https://github.com/paragonie/constant_time_encoding"
+            },
             "time": "2022-06-14T06:56:20+00:00"
         },
         {
@@ -196,20 +208,25 @@
                 "pseudorandom",
                 "random"
             ],
+            "support": {
+                "email": "info@paragonie.com",
+                "issues": "https://github.com/paragonie/random_compat/issues",
+                "source": "https://github.com/paragonie/random_compat"
+            },
             "time": "2020-10-15T08:29:30+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "3.0.23",
+            "version": "3.0.35",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "866cc78fbd82462ffd880e3f65692afe928bed50"
+                "reference": "4b1827beabce71953ca479485c0ae9c51287f2fe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/866cc78fbd82462ffd880e3f65692afe928bed50",
-                "reference": "866cc78fbd82462ffd880e3f65692afe928bed50",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/4b1827beabce71953ca479485c0ae9c51287f2fe",
+                "reference": "4b1827beabce71953ca479485c0ae9c51287f2fe",
                 "shasum": ""
             },
             "require": {
@@ -288,6 +305,10 @@
                 "x.509",
                 "x509"
             ],
+            "support": {
+                "issues": "https://github.com/phpseclib/phpseclib/issues",
+                "source": "https://github.com/phpseclib/phpseclib/tree/3.0.35"
+            },
             "funding": [
                 {
                     "url": "https://github.com/terrafrost",
@@ -302,7 +323,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-09-18T17:22:01+00:00"
+            "time": "2023-12-29T01:59:53+00:00"
         }
     ],
     "packages-dev": [],
@@ -316,5 +337,5 @@
     "platform-overrides": {
         "php": "7.2.5"
     },
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.2.0"
 }
