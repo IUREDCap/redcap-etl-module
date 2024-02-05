@@ -3,8 +3,8 @@ Copyright (C) 2019 The Trustees of Indiana University
 SPDX-License-Identifier: BSD-3-Clause
 -->
 
-**Note:** The help web test is currently failing when all tests are run together, but it
-should succeed if you run it separately.
+**Note:** The web tests are sometimes failing when run all together, and they are taking a very long time to run.
+Running the web tests one feature at a time will prevent these issues.
 
 REDCap-ETL External Module Web Tests
 ======================================
