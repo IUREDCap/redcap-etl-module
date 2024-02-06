@@ -165,7 +165,7 @@ If tests that look like they should be working are failing, here are some things
 * **Non-headless browser mode.** If you are running in headless browser mode, try running the tests in non-headless browser mode
   to see if you can see an error displayed in the browser. If an error message goes away before you
   are able to read it, you can put in a wait statement (e.g., "And I wait for 10 seconds") in
-  the feature file so that you have time to read the message. Note that there have been serveral cases where tests
+  the feature file so that you have time to read the message. Note that there have been several cases where tests
   have failed in headless mode, but then work in non-headless mode, so this approach will not always work.
 
 * **Add wait statements.** Sometimes errors occur because an access of a page occurs before the page is
