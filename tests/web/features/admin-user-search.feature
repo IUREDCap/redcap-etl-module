@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
-Feature: Admin-Interface
+Feature: Admin User Search
   In order to execute admin actions
   As an admin
   I need to be able to access the REDCap-ETL Admin Pages

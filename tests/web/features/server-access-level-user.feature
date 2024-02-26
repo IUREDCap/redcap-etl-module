@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
-Feature: Server access level management
+Feature: Server user access level management
   In order to manage access to servers
   As an admin
   I need to be able to set the access level and assign and remove allowed users for private-level servers

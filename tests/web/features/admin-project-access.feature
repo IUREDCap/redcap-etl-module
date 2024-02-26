@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
-Feature: Admin-Interface
+Feature: Admin Project Access
   In order to help users
   As an admin
   I need to be able to access their projects' ETL information

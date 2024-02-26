@@ -3,11 +3,10 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
-Feature: User-Interface
+Feature: Help
 In order to use REDCap-ETL
 As a non-admin user
-I need to be able to create, copy, rename and delete configurations
-  and get help for a REDCap-ETL enabled project
+I need to be able access help
 
   Background:
     Given I am on "/"

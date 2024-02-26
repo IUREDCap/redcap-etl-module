@@ -103,7 +103,7 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         #print_r($session);
 
         $this->setMinkParameter('base_url', $this->baseUrl);
-        echo "Base URL set to: ".$this->baseUrl;
+        echo "Base URL set to: " . $this->baseUrl . "\n";
 
         $this->getSession()->visit($this->baseUrl);
         $this->getSession()->setCookie($cookieName, $cookieValue);
@@ -116,12 +116,12 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     public function afterScenario($event)
     {
         $session = $this->getSession();
-        $session->reset();
 
         $scenario = $event->getScenario();
         $tags = $scenario->getTags();
 
         if ($scenario->hasTag('modified-help-for-batch-size')) {
+            $session->reset();
             Util::logInAsAdminAndAccessRedCapEtl($session);
             $page = $session->getPage();
             $page->clickLink("Help Edit");
@@ -130,6 +130,9 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
             $page->selectFieldOption("helpSetting", "Use default text");
             $page->pressButton("Save");
         }
+
+        // $session->reset();
+        $session->restart();
     }
 
 

@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
 
-Feature: User-Interface
+Feature: Auto-Generation of ETL Transformation Rules
 In order to use REDCap-ETL
 As a non-admin user
 I need to be able to autogenerate the transformation rules
