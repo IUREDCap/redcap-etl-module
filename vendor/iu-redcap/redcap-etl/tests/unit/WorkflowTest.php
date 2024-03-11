@@ -26,11 +26,14 @@ class WorkflowTest extends TestCase
         $loggerMock = $this->createMock(Logger::class);
         $properties = array();
 
-        $workflowConfigMock = $this->getMockBuilder(WorkflowConfig::class)
-            ->setMethods(array())
-            ->disableOriginalConstructor()
-            ->getMock();
-        $workflowConfigMock->method('getTaskConfigs')->will($this->returnValue(array()));
+        $workflowConfigMock = $this->createMock(WorkflowConfig::class);
+
+        #$workflowConfigMock = $this->getMockBuilder(WorkflowConfig::class)
+        #    ->setMethods(array())
+        #    ->disableOriginalConstructor()
+        #    ->getMock();
+
+        $workflowConfigMock->method('getTaskConfigs')->willReturn(array());
 
         $workflow->set($workflowConfigMock, $loggerMock);
         $this->assertNotNull($workflow, 'Workflow not null after set check');

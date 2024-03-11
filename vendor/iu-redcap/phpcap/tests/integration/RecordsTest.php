@@ -544,8 +544,7 @@ class RecordsTest extends TestCase
     
         $records = self::$basicDemographyProject->exportRecords($format = 'csv', $type = null, $recordIds);
 
-        $parser = \KzykHys\CsvParser\CsvParser::fromString($records);
-        $csv = $parser->parse();
+        $csv = CsvUtil::csvStringToArray($records);
         $this->assertEquals(2, count($csv), 'Correct number of records returned test.');
 
         $firstDataRow = $csv[1];
@@ -563,8 +562,7 @@ class RecordsTest extends TestCase
             ['format' => 'csv', 'recordIds' => $recordIds, 'csvDelimiter' => '']
         );
 
-        $parser = \KzykHys\CsvParser\CsvParser::fromString($records);
-        $csv = $parser->parse();
+        $csv = CsvUtil::csvStringToArray($records);
         $this->assertEquals(2, count($csv), 'Correct number of records returned test.');
 
         $firstDataRow = $csv[1];
@@ -664,8 +662,7 @@ class RecordsTest extends TestCase
             ]
         );
         
-        $parser = \KzykHys\CsvParser\CsvParser::fromString($records);
-        $csv = $parser->parse();
+        $csv = CsvUtil::csvStringToArray($records);
 
         $header = $csv[0];
         
@@ -693,8 +690,7 @@ class RecordsTest extends TestCase
             ]
         );
         
-        $parser = \KzykHys\CsvParser\CsvParser::fromString($records);
-        $csv = $parser->parse();
+        $csv = CsvUtil::csvStringToArray($records);
         
         $header = $csv[0];
         
@@ -737,8 +733,7 @@ class RecordsTest extends TestCase
             ]
         );
         
-        $parser = \KzykHys\CsvParser\CsvParser::fromString($records);
-        $csv = $parser->parse();
+        $csv = CsvUtil::csvStringToArray($records);
     
         $header = $csv[0];
         
@@ -772,8 +767,7 @@ class RecordsTest extends TestCase
             ]
         );
         
-        $parser = \KzykHys\CsvParser\CsvParser::fromString($records);
-        $csv = $parser->parse();
+        $csv = CsvUtil::csvStringToArray($records);
     
         $header = $csv[0];
     
@@ -1319,15 +1313,25 @@ class RecordsTest extends TestCase
             $event = null;
 
             # Delete repeating instances 1 and 3 for form weight for record ID 1002
-            $recordsDeleted = self::$repeatingFormsProject->deleteRecords([1002], $arm, $form, $event, 1);
+            $recordsDeleted = self::$repeatingFormsProject->deleteRecords([1002], $arm, $form, $event, 1, 0);
             $recordsDeleted = self::$repeatingFormsProject->deleteRecords([1002], $arm, $form, $event, 3);
-
 
             $records = self::$repeatingFormsProject->exportRecordsAp(
                 ['format' => 'csv', 'recordIds' => [1002]]
             );
             $countAfterDelete = count(preg_split("/\n/", $records));
             $this->assertEquals($countBeforeDelete - 2, $countAfterDelete, 'Record count after delete.');
+
+            # try to delete a records with an invalid delete logging value
+            $deleteLogging = 'invalid';
+            $exceptionCaught = false;
+            try {
+                $recordsDeleted =
+                    self::$repeatingFormsProject->deleteRecords([1003], $arm, $form, $event, 1, $deleteLogging);
+            } catch (\Exception $exception) {
+                $exceptionCaught = true;
+            }
+            $this->assertTrue($exceptionCaught, 'Invalid deleteLogging exception check');
 
             # delete remaining imported records
             $recordsDeleted = self::$repeatingFormsProject->deleteRecords([1001, 1002, 1003, 1004]);
