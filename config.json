@@ -2,7 +2,7 @@
    "name": "REDCap-ETL Module",
    "namespace": "IU\\RedCapEtlModule",
    "description": "REDCap-ETL extracts, transforms and loads REDCap data to a database or CSV files. Data extractions to a database can be scheduled to run automatically on a daily or weekly basis. The database systems supported are MySQL, PostgreSQL and SQL Server.",
-   "framework-version": 12,
+   "framework-version": 14,
    "authors": [
        {
            "name": "Jim Mullen",
@@ -25,10 +25,10 @@
         }
     ],
     "compatibility": {
-      "php-version-min": "7.1.0",
-      "php-version-max": "",
-      "redcap-version-min": "12.4.1",
-      "redcap-version-max": ""
+        "php-version-min": "7.1.0",
+        "php-version-max": "",
+        "redcap-version-min": "13.7.0",
+        "redcap-version-max": ""
     },
     "links": {
        "control-center": [
