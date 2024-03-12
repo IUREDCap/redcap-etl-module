@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "75fd1a76ef6ce6873894e5476c242d72",
+    "content-hash": "7ea67e20b2788e47dc76c50f7f50e0e9",
     "packages": [],
     "packages-dev": [
         {
@@ -998,16 +998,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "10.0.0",
+            "version": "10.5.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "c4c60c34c0e92045afce938510f8878d7cd84f8a"
+                "reference": "20a63fc1c6db29b15da3bd02d4b6cf59900088a7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c4c60c34c0e92045afce938510f8878d7cd84f8a",
-                "reference": "c4c60c34c0e92045afce938510f8878d7cd84f8a",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/20a63fc1c6db29b15da3bd02d4b6cf59900088a7",
+                "reference": "20a63fc1c6db29b15da3bd02d4b6cf59900088a7",
                 "shasum": ""
             },
             "require": {
@@ -1021,7 +1021,7 @@
                 "phar-io/manifest": "^2.0.3",
                 "phar-io/version": "^3.0.2",
                 "php": ">=8.1",
-                "phpunit/php-code-coverage": "^10.0",
+                "phpunit/php-code-coverage": "^10.1.5",
                 "phpunit/php-file-iterator": "^4.0",
                 "phpunit/php-invoker": "^4.0",
                 "phpunit/php-text-template": "^3.0",
@@ -1031,15 +1031,15 @@
                 "sebastian/comparator": "^5.0",
                 "sebastian/diff": "^5.0",
                 "sebastian/environment": "^6.0",
-                "sebastian/exporter": "^5.0",
-                "sebastian/global-state": "^6.0",
+                "sebastian/exporter": "^5.1",
+                "sebastian/global-state": "^6.0.1",
                 "sebastian/object-enumerator": "^5.0",
                 "sebastian/recursion-context": "^5.0",
                 "sebastian/type": "^4.0",
                 "sebastian/version": "^4.0"
             },
             "suggest": {
-                "ext-soap": "*"
+                "ext-soap": "To be able to generate mocks based on WSDL files"
             },
             "bin": [
                 "phpunit"
@@ -1047,7 +1047,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "10.0-dev"
+                    "dev-main": "10.5-dev"
                 }
             },
             "autoload": {
@@ -1078,7 +1078,8 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.0.0"
+                "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.13"
             },
             "funding": [
                 {
@@ -1094,7 +1095,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-02-03T07:16:15+00:00"
+            "time": "2024-03-12T15:37:41+00:00"
         },
         {
             "name": "phrity/net-uri",
