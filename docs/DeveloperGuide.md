@@ -48,6 +48,10 @@ __Development Dependencies__
 Development dependencies are stored in the __dev/__ directory and are NOT committed to Git. They are managed
 using the __dev-composer.json__ configuration file.
 
+To check for out of date dependencies, use:
+
+    COMPOSER=dev-composer.json composer outdated --direct
+
 To install and update the development dependencies, which will be stored in directory __dev/__, use the following
 commands in the top-level directory:
 
