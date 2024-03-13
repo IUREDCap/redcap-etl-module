@@ -17,7 +17,7 @@ class Workflows implements \JsonSerializable
         $this->workflows = array();
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return (object) get_object_vars($this);
     }

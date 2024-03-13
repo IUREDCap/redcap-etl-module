@@ -20,9 +20,9 @@ class WorkflowConfig implements \JsonSerializable
 
     public function __construct()
     {
-        $this->status           = Workflow::WORKFLOW_INCOMPLETE;
-        $this->globalProperties = null; # Configuration
-        $this->taskConfigs      = array(); # map from task name to Configuration
+        $this->status                 = Workflow::WORKFLOW_INCOMPLETE;
+        $this->globalPropertiesConfig = null; # Configuration
+        $this->taskConfigs            = array(); # map from task name to Configuration
     }
 
     public function getStatus()
@@ -115,7 +115,7 @@ class WorkflowConfig implements \JsonSerializable
     }
 
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return (object) get_object_vars($this);
     }
