@@ -118,6 +118,11 @@ clear any previous coverage data by executing the following in the **tests/web**
 
     php clear_coverage_data.php
 
+And you will need to run the following before running phpunit or behat:
+
+    XDEBUG_MODE=coverage
+    export XDEBUG_MODE
+
 ### Browser setup
 
 For the automated web tests to run, you need to run an instance of the Chrome browser that the web tests
@@ -206,7 +211,9 @@ Open the following file with a web browser:
 
 You can add the unit test coverage data by executing the following command in the top-level module directory:
 
-    ./vendor/bin/phpunit --coverage-php tests/web/coverage-data/coverage.unit
+    XDEBUG_MODE=coverage
+    export XDEBUG_MODE
+    ./dev/bin/phpunit --coverage-php tests/web/coverage-data/coverage.unit
 
 Then to update the coverage/index.php file, you need to re-run the combine_coverage.php script.
 

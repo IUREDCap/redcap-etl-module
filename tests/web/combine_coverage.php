@@ -18,15 +18,25 @@ $files = glob(__DIR__.'/coverage-data/coverage.*');
 
 $filter = new Filter;
 
-# Included files and directories
+# Included main external module file
 $filter->includeFile(__DIR__.'/../../RedCapEtlModule.php');
-$filter->includeDirectory(__DIR__.'/../../classes');
-$filter->includeDirectory(__DIR__.'/../../web');
 
-# Excluded files
-$filter->excludeFile(__DIR__.'/../../classes/EtlExtRedCapProject.php');
-$filter->excludeFile(__DIR__.'/../../web/test.php');
+# Add applicable files in the classes directory
+$classesFiles = glob(__DIR__.'/../../classes/*.php');
+$filter->includeFiles($classesFiles);
 
+# Add applicable files in the web directory
+$webFiles = glob(__DIR__.'/../../web/*.php');
+foreach ($webFiles as $key => $value) {
+    if (preg_match('/test.php$/', $value)) {
+        unset($webFiles[$key]);
+    }
+}
+$webFiles = array_values($webFiles);
+$filter->includeFiles($webFiles);
+
+# Add PHP files in the web/admin directory
+$filter->includeFiles(glob(__DIR__.'/../../web/admin/*.php'));
 
 $selector = new Selector;
 
