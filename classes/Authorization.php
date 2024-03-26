@@ -135,7 +135,13 @@ class Authorization
     {
         $instrumentExportRights = null;
 
-        if (array_key_exists('data_export_instruments', $rights)) {
+        if (array_key_exists('forms_export', $rights)) {
+            $formsExport = $rights['forms_export'];
+
+            foreach ($formsExport as $form => $value) {
+                $instrumentExportRights[$form] = $value;
+            }
+        } elseif (array_key_exists('data_export_instruments', $rights)) {
             $dataExportRights = $rights['data_export_rights'];
             $dataExportRights = trim($dataExportRights, '[]');
             $dataExportRights = explode('][', $dataExportRights);
@@ -149,6 +155,7 @@ class Authorization
                 $instrumentExportRightss[$instrument] = $accessLevel;
             }
         }
+
         return $instrumentExportRights;
     }
 
@@ -156,7 +163,7 @@ class Authorization
     {
         $canExportAllInstruments = false;
 
-        if (array_key_exists('data_export_instruments', $rights)) {
+        if (array_key_exists('forms_export', $rights) || array_key_exists('data_export_instruments', $rights)) {
             $canExportAllInstruments = true;
             $instrumentExportRights = self::getInstrumentExportRights($rights);
             foreach ($instrumentExportRights as $instrument => $accessLevel) {
