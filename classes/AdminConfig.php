@@ -135,7 +135,7 @@ class AdminConfig implements \JsonSerializable
     }
 
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize()
     {
         return (object) get_object_vars($this);
     }

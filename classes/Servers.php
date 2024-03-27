@@ -17,7 +17,7 @@ class Servers implements \JsonSerializable
         $this->servers[ServerConfig::EMBEDDED_SERVER_NAME] = 1;
     }
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize()
     {
         return (object) get_object_vars($this);
     }

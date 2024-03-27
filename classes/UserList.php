@@ -17,7 +17,7 @@ class UserList implements \JsonSerializable
         $this->userList = array();
     }
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize()
     {
         return (object) get_object_vars($this);
     }
