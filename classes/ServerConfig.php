@@ -400,11 +400,37 @@ class ServerConfig implements \JsonSerializable
                 $output = "ERROR: " . $exception->getMessage();
             }
         } else {
-            #-------------------------------------------------
-            # Remote server
-            #-------------------------------------------------
+            #----------------------------------------
+            # Get email logging information
+            #----------------------------------------
+            $configName  = $etlConfig->getProperty(Configuration::CONFIG_NAME);
+            $projectId   = $etlConfig->getProperty(Configuration::PROJECT_ID);
+            $emailErrors = $etlConfig->getProperty(Configuration::EMAIL_ERRORS);
+            $fromEmail   = $etlConfig->getProperty(Configuration::EMAIL_FROM_ADDRESS);
+            $toEmails    = $etlConfig->getProperty(Configuration::EMAIL_TO_LIST);
+            $subject     = $etlConfig->getProperty(Configuration::EMAIL_SUBJECT);
 
-            $ssh = $this->getRemoteConnection();
+            #-------------------------------------------------
+            # Remote server connection
+            #-------------------------------------------------
+            $ssh = null;
+            try {
+                $ssh = $this->getRemoteConnection();
+            } catch (\Exception $exception) {
+                $message = 'ERROR: Connection to remote ETL server "' . $this->name . '"'
+                    . ' failed for ETL configuration "'
+                    . $configName . '" for project ID ' . $projectId . ': '
+                    . $exception->getMessage();
+                if ($emailErrors) {
+                    # Try to e-mail error to REDCap-ETL user(s)
+                    try {
+                        \REDCap::email($toEmails, $fromEmail, $subject, $message);
+                    } catch (\Exception $exception) {
+                        ; # Tried to send e-mai, but it failed; message will be logged by code below
+                    }
+                }
+                throw $exception; // rethrow exception
+            }
 
             #------------------------------------------------
             # Copy configuration file and transformation
@@ -429,6 +455,18 @@ class ServerConfig implements \JsonSerializable
                 $error = error_get_last();
                 if (isset($error) && is_array($error) && array_key_exists('message', $error)) {
                     $message .= " Error: " . $error['message'];
+                }
+
+                # If set in configuration, e-mail users that there was an error
+                if ($etlConfig->getProperty(Configuration::EMAIL_ERRORS) === true) {
+                    # Try to e-mail error to REDCap-ETL user(s)
+                    try {
+                        \REDCap::email($toEmails, $fromEmail, $subject, $message);
+                    } catch (\Exception $exception) {
+                        ; # Tried to send e-mai, but it failed; message will be logged by code below
+                    }
+
+                    # Try to e-mail error tp REDCap admin (?)
                 }
 
                 throw new \Exception($message);
