@@ -91,8 +91,11 @@ class ServerConfig implements \JsonSerializable
             $this->enableErrorEmail   = true;
             $this->enableSummaryEmail = true;
 
+            $homepageContactEmail = '';
             // phpcs:disable
-            $homepageContactEmail = $homepage_contact_email;
+            if (isset($homepage_contact_email)) {
+                $homepageContactEmail = $homepage_contact_email;
+            }
             // phpcs:enable
             $this->emailFromAddress = $homepageContactEmail;
         }
@@ -213,6 +216,7 @@ class ServerConfig implements \JsonSerializable
         $etlConfig->setProperty(Configuration::CONFIG_OWNER, $configOwner);
 
         $etlConfig->setProperty(Configuration::EMAIL_FROM_ADDRESS, $this->emailFromAddress);
+
         # If e-mailing of errors has not been enabled for this server, make sure that
         # the "e-mail errors" property is set to false in the ETL configuration
         if (!$this->getEnableErrorEmail()) {
@@ -400,6 +404,10 @@ class ServerConfig implements \JsonSerializable
                 $output = "ERROR: " . $exception->getMessage();
             }
         } else {
+            #-----------------------------------------------
+            # Remote Server
+            #-----------------------------------------------
+
             #----------------------------------------
             # Get email logging information
             #----------------------------------------
@@ -411,25 +419,37 @@ class ServerConfig implements \JsonSerializable
             $subject     = $etlConfig->getProperty(Configuration::EMAIL_SUBJECT);
 
             #-------------------------------------------------
-            # Remote server connection
+            # Connect to remote server
             #-------------------------------------------------
             $ssh = null;
             try {
                 $ssh = $this->getRemoteConnection();
-            } catch (\Exception $exception) {
-                $message = 'ERROR: Connection to remote ETL server "' . $this->name . '"'
-                    . ' failed for ETL configuration "'
+            } catch (\Exception $sshException) {
+                $message = 'ERROR: Connection to remote REDCap-ETL server "' . $this->name . '"'
+                    . ' failed for REDCap-ETL configuration "'
                     . $configName . '" for project ID ' . $projectId . ': '
-                    . $exception->getMessage();
+                    . $sshException->getMessage();
+
                 if ($emailErrors) {
                     # Try to e-mail error to REDCap-ETL user(s)
                     try {
                         \REDCap::email($toEmails, $fromEmail, $subject, $message);
                     } catch (\Exception $exception) {
-                        ; # Tried to send e-mai, but it failed; message will be logged by code below
+                        ; # Tried to send e-mai, but it failed
                     }
                 }
-                throw $exception; // rethrow exception
+
+                # Try to mail error to REDCap Admin
+                if (!empty($this->emailFromAddress)) {
+                    try {
+                        $emailSubject = 'Remote REDCap-ETL server connection error';
+                        \REDCap::email($this->emailFromAddress, $fromEmail, $emailSubject, $message);
+                    } catch (\Exception $exception) {
+                        ; # Tried to send e-mai, but it failed
+                    }
+                }
+
+                throw $sshException; // rethrow exception
             }
 
             #------------------------------------------------
@@ -447,10 +467,24 @@ class ServerConfig implements \JsonSerializable
             $configFileName = 'etl_config_' . $fileNameSuffix . '.json';
             $configFilePath = $this->configDir . '/' . $configFileName;
 
-            $sftpResult = $ssh->put($configFilePath, $propertiesJson);
+            $sftpResults = false;
+            $putException = null;
+            try {
+                $sftpResult = $ssh->put($configFilePath, $propertiesJson);
+            } catch (\Exception $exception) {
+                $sftpResults = false;
+                $putException = $exception;
+            }
+
             if (!$sftpResult) {
-                $message = 'Copy of ETL configuration to server failed.'
-                    . ' Please contact your system administrator for assistance.';
+                $message = 'Copy of REDCap-ETL configuration "' . $configName
+                    . '" for project ID ' . $projectId . ' to server "'
+                    . $this->name . '" failed.'
+                    ;
+
+                if (isset($putException)) {
+                    $message .= ' Error: ' . $putException->getMessage();
+                }
 
                 $error = error_get_last();
                 if (isset($error) && is_array($error) && array_key_exists('message', $error)) {
@@ -465,8 +499,17 @@ class ServerConfig implements \JsonSerializable
                     } catch (\Exception $exception) {
                         ; # Tried to send e-mai, but it failed; message will be logged by code below
                     }
+                }
 
-                    # Try to e-mail error tp REDCap admin (?)
+                # Try to e-mail error tp REDCap admin
+                if (!empty($this->emailFromAddress)) {
+                    try {
+                        # Note: if subject is too long, it gets removed
+                        $emailSubject = 'Remote REDCap-ETL server ETL config copy error';
+                        \REDCap::email($this->emailFromAddress, $fromEmail, $emailSubject, $message);
+                    } catch (\Exception $exception) {
+                        ; # Tried to send e-mai, but it failed
+                    }
                 }
 
                 throw new \Exception($message);
