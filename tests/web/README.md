@@ -131,13 +131,13 @@ To run the browser in headless mode (the recommended approach), use the command 
 Running in headless mode will make the tests run faster, and can be used to run the entire set of tests at once,
 but you won't see the browser running.
 
-    chrome --disable-gpu --headless=new --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222 --window-size=1920,1080
+    chrome --disable-gpu --disable-popup-blocking --headless=new --remote-debugging-port=9222 --window-size=1920,1080
 
 If you want to actually see the tests interacting with the browser, use the command shown below 
 to start Chrome instead of the command above.
 If you use the command below, you will need to run the tests one feature at a time.
 
-    chrome --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222
+    chrome --disable-gpu --disable-popup-blocking --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222
 
 Note that if you installed **chromium-browser**, you will either need to make an alias named "chrome" for it, or
 use "chromium-browser" in the commands above instead of "chrome".
@@ -167,23 +167,45 @@ Debugging tests
 
 If tests that look like they should be working are failing, here are some things to try:
 
-* **Non-headless browser mode.** If you are running in headless browser mode, try running the tests in non-headless browser mode
-  to see if you can see an error displayed in the browser. If an error message goes away before you
+* **Run in Non-headless browser mode.** If you are running in headless browser mode, try running the tests
+  in non-headless browser mode to see if you can see an error displayed in the browser.
+  If an error message goes away before you
   are able to read it, you can put in a wait statement (e.g., "And I wait for 10 seconds") in
-  the feature file so that you have time to read the message. Note that there have been several cases where tests
+  the feature file, or a "sleep(10);" statement in PHP code,
+  so that you have time to read the message. Note that there have been several cases where tests
   have failed in headless mode, but then work in non-headless mode, so this approach will not always work.
+  One of the reasons for this has been related to REDCap CSRF tokens (see below for more information).
+  Additional reasons this can happen are also discussed below.
 
 * **Add wait statements.** Sometimes errors occur because an access of a page occurs before the page is
-  fully updated. To fix this issue a wait statement (e.g., "And I wait for 4 seconds") can be added in the
-  feature file before the statement accessing the page that causes the error.
+  fully updated. To fix this issue, a wait statement (e.g., "And I wait for 4 seconds") can be added in the
+  feature file before the statement accessing the page that causes the error. If the issue occurs in PHP
+  code, then a sleep statement can be added, for example, "sleep(2);" to wait for 2 seconds.
 
-* **Check XPath expressions.** Some of the custom steps that have been defined use XPath expressions to specify elements on web pages.
-  There have been inconsistencies in how these work between headless and non-headless browser modes, and between
-  newer and older versions of the web testing software dependencies. There have been cases where an XPath expression
-  was working in both headless and non-headless browser modes, but then after an update of the web test software dependencies,
-  quit working for the headless mode. The fix for this has generally been to specify a more nested element (e.g., changing "td[1]" to
+* **Check XPath expressions.** Some of the custom steps that have been defined use XPath expressions to specify
+  elements on web pages. There have been inconsistencies in how these work between headless and non-headless
+  browser modes, and between newer and older versions of the web testing software dependencies. There have been
+  cases where an XPath expression was working in both headless and non-headless browser modes, but then after
+  an update of the web test software dependencies, quit working for the headless mode. The fix for this has
+  generally been to specify a more nested element (e.g., changing "td[1]" to
   "td[1]/a" for clicking on a link in a table).
 
+* **Add REDCap CSRF tokens.** REDCap's CSRF (Cross-Site Request Forgery) token should be added automatically to forms,
+  but in certain cases it needs to be added explicitly to the form for the automated tests to work.
+  This can be done by adding a statement like the following within the form:
+
+        <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>
+
+* **Modify the browser options.** Modifying the options used when the Chrome browser is started has fixed some issues.
+  The following option fixed an issue that was only occurring in headless mode for a case when a new page/tab was
+  opened:
+
+        --disable-popup-blocking
+
+* **Run tests in isolation.** If you run the tests more then once in too short a time period, the different test
+  runs may interfere with each other. This is particularly true for the tests that schedule ETL jobs,
+  which may run up to about an hour after the tests are run. If you are having trouble with any of the
+  scheduling tests, try to make sure the tests run completely finish before running additional tests.
 
 Test E-mails
 ------------------------
