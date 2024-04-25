@@ -137,7 +137,7 @@ If you want to actually see the tests interacting with the browser, use the comm
 to start Chrome instead of the command above.
 If you use the command below, you will need to run the tests one feature at a time.
 
-    chrome --disable-gpu --disable-popup-blocking --remote-debugging-address=0.0.0.0 --remote-debugging-port=9222
+    chrome --disable-gpu --disable-popup-blocking --remote-debugging-port=9222
 
 Note that if you installed **chromium-browser**, you will either need to make an alias named "chrome" for it, or
 use "chromium-browser" in the commands above instead of "chrome".
