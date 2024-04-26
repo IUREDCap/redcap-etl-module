@@ -399,106 +399,146 @@ $module->renderMessages($error, $warning, $success);
         });
 
 
-        $( function() {
             
-            $('#db_primary_keys').click(function () {
-                if (this.checked) {
-                    $("#db_foreign_keys").prop("disabled", false);
-                } else {
-                    $("#db_foreign_keys").prop("checked", false);
-                    $("#db_foreign_keys").prop("disabled", true);
-                }
-            });
+        $('#db_primary_keys').click(function () {
+            if (this.checked) {
+                $("#db_foreign_keys").prop("disabled", false);
+            } else {
+                $("#db_foreign_keys").prop("checked", false);
+                $("#db_foreign_keys").prop("disabled", true);
+            }
+        });
             
-            $('#auto-generate-rules-help-link').click(function () {
-                $('#auto-generate-rules-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
-                    .dialog('widget').position({my: 'left top', at: 'right+370 top-140', of: $(this)})
-                    ;
-                return false;
-            });
-            $('#batch-size-help-link').click(function () {
-                $('#batch-size-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
-                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
-                    ;
-                return false;
-            });
-            $('#database-event-log-table-help-link').click(function () {
-                $('#database-event-log-table-help').dialog({dialogClass: 'redcap-etl-help'})
-                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
-                    ;
-                return false;
-            });             
-            $('#database-log-table-help-link').click(function () {
-                $('#database-log-table-help').dialog({dialogClass: 'redcap-etl-help'})
-                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
-                    ;
-                return false;
-            });            
-            $('#database-logging-help-link').click(function () {
-                $('#database-logging-help').dialog({dialogClass: 'redcap-etl-help'})
-                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
-                    ;
-                return false;
-            });
-            $('#email-notifications-help-link').click(function () {
-                $('#email-notifications-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
-                    .dialog('widget').position({my: 'left top', at: 'right-20 top', of: $(this)})
-                    ;
-                return false;
-            });            
-            $('#extract-settings-help-link').click(function () {
-                $('#extract-settings-help').dialog({dialogClass: 'redcap-etl-help', width: 500, maxHeight: 540})
-                    .dialog('widget').position({my: 'left+30 top', at: 'right top-140', of: $(this)})
-                    ;
-                return false;
-            });
-            $('#ignore-empty-incomplete-forms-help-link').click(function () {
-                $('#ignore-empty-incomplete-forms-help')
-                    .dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
-                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
-                    ;
-                return false;
-            });
-            $('#labels-help-link').click(function () {
-                $('#labels-help').dialog({dialogClass: 'redcap-etl-help', width: 600, maxHeight: 440})
-                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
-                    ;
-                return false;
-            });
-            $('#database-keys-help-link').click(function () {
-                $('#database-keys-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
-                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
-                    ;
-                return false;
-            });            
-            $('#load-settings-help-link').click(function () {
-                $('#load-settings-help').dialog({dialogClass: 'redcap-etl-help', width: 500, maxHeight: 440})
-                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
-                    ;
-                return false;
-            });
-            $('#pre-processing-sql-help-link').click(function () {
-                $('#pre-processing-sql-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 400})
-                    .dialog('widget').position({my: 'left top', at: 'right+10 top', of: $(this)})
-                    ;
-                return false;
-            });  
-            $('#post-processing-sql-help-link').click(function () {
-                $('#post-processing-sql-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 400})
-                    .dialog('widget').position({my: 'left top', at: 'right+10 top', of: $(this)})
-                    ;
-                return false;
-            });            
-            $('#table-name-prefix-help-link').click(function () {
-                $('#table-name-prefix-help').dialog({dialogClass: 'redcap-etl-help'})
-                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
-                    ;
-                return false;
-            });
+        $('#<?php echo Configuration::API_TOKEN_USERNAME;?>').on('change', function(e) {
+            // alert(this.value);
+
+            let okImage = 
+                '<?php
+                echo '<img alt="OK" style="color: green; font-weight: bold;" src='
+                    . APP_PATH_IMAGES . 'tick.png>&nbsp;&nbsp;'
+                ?>'
+
+            let xImage = 
+                '<?php
+                echo '<img alt="X" style="color: red; font-weight: bold;" src='
+                    . APP_PATH_IMAGES . 'cross.png>&nbsp;&nbsp;';
+                ?>'
+             
+            let message = '';
+            if (this.value === '') {
+                message = xImage + "No user's API token has been selected for this project."
+                    + "<br /><br />"
+                    + "You need to select an API token user"
+                    + " (whose API token will be used to access REDCap).";
+            }
+            else {
+                message = 
+                    okImage + 'The API token for uer "' + this.value + '" has been selected.';
+            }
+
+            $('#api_token_status').html(message);
+        });
+
+        $('#auto-generate-rules-help-link').click(function () {
+            $('#auto-generate-rules-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
+                .dialog('widget').position({my: 'left top', at: 'right+370 top-140', of: $(this)})
+                ;
+            return false;
+        });
+
+        $('#batch-size-help-link').click(function () {
+            $('#batch-size-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
+                .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                ;
+            return false;
+        });
+
+        $('#database-event-log-table-help-link').click(function () {
+            $('#database-event-log-table-help').dialog({dialogClass: 'redcap-etl-help'})
+                .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                ;
+            return false;
+        });             
+
+        $('#database-log-table-help-link').click(function () {
+            $('#database-log-table-help').dialog({dialogClass: 'redcap-etl-help'})
+                .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                ;
+            return false;
+        });            
+
+        $('#database-logging-help-link').click(function () {
+            $('#database-logging-help').dialog({dialogClass: 'redcap-etl-help'})
+                .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                ;
+            return false;
+        });
+
+        $('#email-notifications-help-link').click(function () {
+            $('#email-notifications-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
+                .dialog('widget').position({my: 'left top', at: 'right-20 top', of: $(this)})
+                ;
+            return false;
+        });            
+
+        $('#extract-settings-help-link').click(function () {
+            $('#extract-settings-help').dialog({dialogClass: 'redcap-etl-help', width: 500, maxHeight: 540})
+                .dialog('widget').position({my: 'left+30 top', at: 'right top-140', of: $(this)})
+                ;
+            return false;
+        });
+
+        $('#ignore-empty-incomplete-forms-help-link').click(function () {
+            $('#ignore-empty-incomplete-forms-help')
+                .dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
+                .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                ;
+            return false;
+        });
+
+        $('#labels-help-link').click(function () {
+            $('#labels-help').dialog({dialogClass: 'redcap-etl-help', width: 600, maxHeight: 440})
+                .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                ;
+            return false;
+        });
+
+        $('#database-keys-help-link').click(function () {
+            $('#database-keys-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
+                .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                ;
+            return false;
+        });            
+
+        $('#load-settings-help-link').click(function () {
+            $('#load-settings-help').dialog({dialogClass: 'redcap-etl-help', width: 500, maxHeight: 440})
+                .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                ;
+            return false;
+        });
+
+        $('#pre-processing-sql-help-link').click(function () {
+            $('#pre-processing-sql-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 400})
+                .dialog('widget').position({my: 'left top', at: 'right+10 top', of: $(this)})
+                ;
+            return false;
+        });  
+
+        $('#post-processing-sql-help-link').click(function () {
+            $('#post-processing-sql-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 400})
+                .dialog('widget').position({my: 'left top', at: 'right+10 top', of: $(this)})
+                ;
+            return false;
+        });            
+
+        $('#table-name-prefix-help-link').click(function () {
+            $('#table-name-prefix-help').dialog({dialogClass: 'redcap-etl-help'})
+                .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                ;
+            return false;
         });
         
         // Database schema display
-        $(function() {
         $("select[name=<?php echo Configuration::DB_TYPE;?>]").change(function() {
             var value = $(this).val();
             if (value == "<?php echo DbConnectionFactory::DBTYPE_POSTGRESQL; ?>") {
@@ -507,11 +547,7 @@ $module->renderMessages($error, $warning, $success);
                 $("#dbSchemaRow").hide();
             }
         });
-            
     });
-    
-
-});
 </script>
 
 <div class="projhdr"> 
@@ -676,7 +712,8 @@ Configuration form
                 <tr class="localRow" <?php echo $localRowStyle; ?> >
                     <td>API Token - use token of user&nbsp;</td>
                     <td>
-                        <select name="<?php echo Configuration::API_TOKEN_USERNAME;?>">
+                        <select id="<?php echo Configuration::API_TOKEN_USERNAME;?>"
+                                name="<?php echo Configuration::API_TOKEN_USERNAME;?>">
                             <?php
 
                             echo '<option value=""></option>' . "\n";
@@ -711,7 +748,7 @@ Configuration form
                     <td>
                         <?php
 
-                        echo "<div style=\"border: 1px solid #AAAAAA; margin-bottom: 4px;"
+                        echo "<div id=\"api_token_status\" style=\"border: 1px solid #AAAAAA; margin-bottom: 4px;"
                             . " padding: 4px; border-radius: 4px;\">\n";
 
 
