@@ -109,6 +109,7 @@ fieldset.server-config td {
 }
 
 fieldset.server-config legend {
+    float: none;
     font-weight: bold;
 }
 
