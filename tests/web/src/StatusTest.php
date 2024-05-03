@@ -90,6 +90,6 @@ class StatusTest extends TestCase
 
         $page->clickLink("ETL Servers");
         $text = $page->getText();
-        $this->assertMatchesRegularExpression("/\(embedded server\)(\s)*public/", $text);
+        $this->assertMatchesRegularExpression("/\(embedded server\)(\s)*embedded(\s)*public/", $text);
     }
 }

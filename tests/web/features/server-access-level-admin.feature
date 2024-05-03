@@ -30,7 +30,7 @@ Feature: Server access level management
     And I should not see "Users Currently Granted Access"
 
     When I follow "Servers"
-    Then I should see "local-server" followed by "admin"
+    Then I should see "local-server" followed by "remote" followed by "admin"
 
   Scenario: Set the access level to public
     When I follow "Servers"
@@ -41,7 +41,7 @@ Feature: Server access level management
     But I should not see "Users Currently Granted Access"
 
     When I follow "Servers"
-    Then I should see "local-server" followed by "public"
+    Then I should see "local-server" followed by "remote" followed by "public"
 
   Scenario: Set the access level to private
     When I follow "Servers"

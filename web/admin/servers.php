@@ -26,13 +26,32 @@ $configureUrl = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
 
 $submit = Filter::sanitizeLabel($_POST['submit']);
 
+#-------------------------------
+# Set server location values
+#-------------------------------
+$serverLocation = Filter::sanitizeLabel($_POST['serverLocation']);
+if (!isset($serverLocation)) {
+    $serverLocation = ServerConfig::LOCATION_EMBEDDED;
+} elseif ($serverLocation !== ServerConfig::LOCATION_EMBEDDED && $serverLocation !== ServerConfig::LOCATION_REMOTE) {
+    $serverLocation = ServerConfig::LOCATION_EMBEDDED;
+}
+
+$embeddedChecked = '';
+$remoteChecked = '';
+if ($serverLocation === ServerConfig::LOCATION_REMOTE) {
+    $remoteChecked = 'checked="checked"';
+} else {
+    $embeddedChecked = 'checked="checked"';
+}
+
+
 $serverName = Filter::sanitizeString($_POST['server-name']);
 
 if (!empty($serverName)) {
     if (strcasecmp($submit, 'Add Server') === 0) {
         try {
             ServerConfig::validateName($serverName);
-            $module->addServer($serverName);
+            $module->addServer($serverName, $serverLocation);
         } catch (Exception $exception) {
             $error = 'ERROR: ' . $exception->getMessage();
         }
@@ -100,16 +119,32 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
 
 
 
-<form action="<?php echo $selfUrl;?>" method="post" style="margin-bottom: 12px; margin-top: 17px;">
-    <label for="server-name">ETL Server:</label> <input type="text" id="server-name" name="server-name" size="40">
-    <input type="submit" name="submit" value="Add Server">
+<form action="<?php echo $selfUrl;?>" method="post" style="margin-bottom: 12px; margin-top: 17px; padding: 7px;">
+
+    <fieldset class="server-config">
+
+    <input type="submit" name="submit" value="Add Server" style="font-weight: bold;"/>
+    &nbsp;
+    <label for="server-name">Name:</label> <input type="text" id="server-name" name="server-name" size="40">
     <!-- HELP -->
     <a href="#" id="etl-servers-help-link" class="etl-help" style="margin-left: 17px;" title="help">?</a>
     <div id="etl-servers-help" title="ETL Servers" style="display: none;">
         <?php echo Help::getHelpWithPageLink('etl-servers', $module); ?>
     </div>
+    <div>
+        <span style="margin-left: 8em">Location:</span>
+        <input type="radio" name="serverLocation" value="<?php echo ServerConfig::LOCATION_EMBEDDED; ?>"
+               <?php echo $embeddedChecked; ?>>
+            &nbsp;embedded
+        </input>
+        <input type="radio" name="serverLocation" value="<?php echo ServerConfig::LOCATION_REMOTE; ?>"
+               <?php echo $remoteChecked; ?>>
+            &nbsp; remote
+        </input>
+    </div>
     <?php Csrf::generateFormToken(); ?>
     <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>
+    </fieldset>
 </form>
     <!--
 <div class="ui-widget">
@@ -119,10 +154,9 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
 -->
 
 
-
 <table class="dataTable">
   <thead>
-    <tr> <th>ETL Server Name</th> <th>Active</th> </th><th>Access</th><th>Configure</th>
+    <tr> <th>ETL Server Name</th> <th>Active</th> <th>Location</th> <th>Access</th><th>Configure</th>
     <th>Copy</th> <th>Rename</th> </th><th>Delete</th> </th></tr>
   </thead>
   <tbody>
@@ -152,6 +186,13 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
         echo "</td>\n";
 
         #-------------------------------
+        # Location
+        #-------------------------------
+        echo '<td style="text-align:center;">';
+        echo $serverConfig->getLocation();
+        echo "</td>\n";
+
+        #-------------------------------
         # Access Level
         #-------------------------------
         $accessLevel = $serverConfig->getAccessLevel();
@@ -171,18 +212,18 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
             . "</td>\n";
 
 
-        if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
-            echo "<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>\n";
-        } else {
-            #-------------------------------
-            # Copy
-            #-------------------------------
-            echo '<td style="text-align:center;">'
-                . '<input type="image" src="' . APP_PATH_IMAGES . 'page_copy.png" alt="COPY" '
-                . 'id="copyServer' . $row . '"'
-                . ' class="copyServer" style="cursor: pointer;">'
-                . "</td>\n";
+        #-------------------------------
+        # Copy
+        #-------------------------------
+        echo '<td style="text-align:center;">'
+            . '<input type="image" src="' . APP_PATH_IMAGES . 'page_copy.png" alt="COPY" '
+            . 'id="copyServer' . $row . '"'
+            . ' class="copyServer" style="cursor: pointer;">'
+            . "</td>\n";
 
+        if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
+            echo "<td>&nbsp;</td><td>&nbsp;</td>\n";
+        } else {
             #-------------------------------
             # Rename
             #-------------------------------

@@ -146,7 +146,7 @@ I need to be able to create, run and schedule workflows
     And I access the admin interface
     And I follow "Servers"
     And I delete server "remote-server-workflow-test"
-    And I fill in "Server:" with "remote-server-workflow-test"
+    And I fill in "Name:" with "remote-server-workflow-test"
     And I press "Add Server"
     And I follow server "remote-server-workflow-test"
     And I check "isActive"

@@ -592,12 +592,19 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     #    return USERID;
     #}
 
-    public function isSuperUser()
+    public function isSuperUser($username = null)
     {
+
         $isSuperUser = false;
-        if (defined('SUPER_USER') && SUPER_USER) {
-            $isSuperUser = true;
+        $user = $this->getUser($username);
+        if ($user === null) {
+            $isSuperUser = false;
+        } else {
+            $isSuperUser = $user->isSuperUser();
         }
+        #if (defined('SUPER_USER') && SUPER_USER) {
+            #$isSuperUser = true;
+        #}
         return $isSuperUser;
     }
 
@@ -863,18 +870,19 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      *
      * @param string $serverName the name of the server to add.
      */
-    public function addServer($serverName)
+    public function addServer($serverName, $serverLocation = ServerConfig::LOCATION_REMOTE)
     {
-        $this->getSettings()->addServer($serverName);
+        $isTransaction = true;
+        $this->getSettings()->addServer($serverName, $isTransaction, $serverLocation);
         $details = 'Server "' . $serverName . '" created.';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
     public function copyServer($fromServerName, $toServerName)
     {
-        if (strcasecmp($fromServerName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
-            throw new \Exception('The embedded server "' . ServerConfig::EMBEDDED_SERVER_NAME . '" cannot be copied.');
-        }
+        #if (strcasecmp($fromServerName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
+        #    throw new \Exception('The embedded server "' . ServerConfig::EMBEDDED_SERVER_NAME . '" cannot be copied.');
+        #}
         $this->getSettings()->copyServer($fromServerName, $toServerName);
         $details = 'Server "' . $fromServerName . '" copied to "' . $toServerName . '".';
         \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);

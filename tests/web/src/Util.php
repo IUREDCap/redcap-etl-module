@@ -256,6 +256,15 @@ class Util
 
     public static function findTextFollowedByText($session, $textA, $textB)
     {
+        $text = $session->getPage()->getText();
+        if (preg_match('/' . $textA . '\s+' . $textB . '/', $text) !== 1) {
+            $seeking = $textA . ' ' . $textB;
+            throw new \Exception(sprintf('"%s" was not found in the page', $seeking));
+        }
+    }
+
+    public static function findTextFollowedByTextOLD($session, $textA, $textB)
+    {
         $content = $session->getPage()->getContent();
 
         // Get rid of stuff between script tags

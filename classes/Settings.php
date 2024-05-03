@@ -788,7 +788,32 @@ class Settings
         return $servers;
     }
 
-    public function addServer($serverName, $transaction = true)
+    /**
+     * Gets the servers for the specified user. If there are not that meet the
+     * specified conditions, an empty arrary will be returned.
+     *
+     * @param boolean $isScheduled if the server is to be used for scheduling ETL processes, if set
+     *     to false means that the server is to be used for interactively running ETL processes.
+     */
+    public function getServersForUser($username, $isScheduled = false, $isFileDownload = false)
+    {
+        $servers = [];
+        // FIMISH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        $this->db->startTransaction();
+
+        // $this->module;
+
+        $allServers = $this->getServers();
+
+        // ...
+
+
+        $this->db->endTransaction($commit);
+        return $servers;
+    }
+
+    public function addServer($serverName, $transaction = true, $serverLocation = ServerConfig::LOCATION_REMOTE)
     {
         $commit = true;
         $errorMessage = '';
@@ -814,7 +839,7 @@ class Settings
         $this->module->setSystemSetting(self::SERVERS_KEY, $json);
 
         # Add the server configuration
-        $serverConfig = new ServerConfig($serverName);
+        $serverConfig = new ServerConfig($serverName, $serverLocation);
         $this->setServerConfig($serverConfig);
 
         if ($transaction) {
@@ -941,7 +966,7 @@ class Settings
 
         if (empty($setting)) {
             # If the server configuration is NOT found then
-            # create it if it is the embedded server
+            # create it, if it is the embedded server
             # Else, throw an exception
             if (strcmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
                 $serverConfig = new ServerConfig($serverName);
@@ -982,6 +1007,13 @@ class Settings
 
         $toServerConfig = $this->getServerConfig($fromServerName);
         $toServerConfig->setName($toServerName);
+
+        if ($fromServerName === ServerConfig::EMBEDDED_SERVER_NAME) {
+            # If copying the embedded server, make sure that the location
+            # for the new server is set to embedded
+            $toServerConfig->setLocation(ServerConfig::LOCATION_EMBEDDED);
+        }
+
         $json = $toServerConfig->toJson();
         $key = self::SERVER_CONFIG_KEY_PREFIX . $toServerName;
         $this->module->setSystemSetting($key, $json);

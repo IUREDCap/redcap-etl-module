@@ -820,6 +820,19 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @Then I should see :text1 followed by :text2 followed by :text3
+     */
+    public function iShouldSeeFollowedByFollowedBy($text1, $text2, $text3)
+    {
+        $session = $this->getSession();
+
+        $text = $session->getPage()->getText();
+        if (preg_match('/' . $text1 . '\s+' . $text2 . '\s+' . $text3 . '/', $text) !== 1) {
+            throw new \Exception("\"{$text1} {$text2} {$text3}\" was not found in the page.");
+        }
+    }
+
+    /**
      * @When /^I click on the user$/
      */
     public function iClickOnTheUser()

@@ -159,8 +159,6 @@ have permissions will be displayed. There are three server access-level options:
     </li>
     <li><span style="font-weight: bold;">admin</span>
         - only REDCap administrators can run the server.
-        You needn't specify any users for this access level.
-        Any administrator will be able to run the server.
     </li>
 </ol>
 <hr />

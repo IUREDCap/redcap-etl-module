@@ -85,6 +85,8 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     REDCap SSL certificate verification
     <br />
 
+    <fieldset class="server-config" style="margin-top: 7px;">
+        <legend>ETL Server Default Run Settings</legend>
     <?php
     #--------------------------------------------------
     # Allow On Demand
@@ -95,7 +97,7 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     }
     ?>
     <input type="checkbox" name="<?php echo AdminConfig::ALLOW_ON_DEMAND;?>" <?php echo $checked;?>>
-    Allow ETL processes to be run interactively? <br />
+    Allow users to run ETL processes interactively? <br />
     
     <?php
     #------------------------------------------------
@@ -107,7 +109,9 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     }
     ?>
     <input type="checkbox" name="<?php echo AdminConfig::ALLOW_CRON;?>" <?php echo $checked;?>>
-    Allow user scheduled ETL cron jobs? <br />
+    Allow users to schedule ETL processes (as cron jobs)? <br />
+    </fieldset>
+
 
     <?php
     #---------------------------------------
@@ -158,7 +162,7 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
         
     <?php
     #---------------------------------------------------
-    # Allowed and schedule cron jobs
+    # Allowed and scheduled cron jobs
     #---------------------------------------------------
     $cronJobs = $module->getAllCronJobs();
     $row = 1;

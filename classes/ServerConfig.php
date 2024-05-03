@@ -17,12 +17,17 @@ class ServerConfig implements \JsonSerializable
     public const AUTH_METHOD_SSH_KEY  = 0;
     public const AUTH_METHOD_PASSWORD = 1;
 
+    # Server access levels (private = admins + specified users)
     public const ACCESS_LEVELS = array('admin','private','public');
 
-    # Data load options for the embedded server
+    # Data load options for the embedded servers
     public const DATA_LOAD_DB_AND_FILE = 'data-load-db-and-file';
     public const DATA_LOAD_DB_ONLY     = 'data-load-db-only';
     public const DATA_LOAD_FILE_ONLY   = 'data-load-file-only';
+
+    # Location options for servers
+    public const LOCATION_EMBEDDED = 'embedded';
+    public const LOCATION_REMOTE   = 'remote';
 
     private $name;
 
@@ -49,6 +54,8 @@ class ServerConfig implements \JsonSerializable
 
     private $logFile;
 
+    private $location;
+
     private $emailFromAddress;
     private $enableErrorEmail;
     private $enableSummaryEmail;
@@ -60,12 +67,32 @@ class ServerConfig implements \JsonSerializable
 
     private $maxZipDownloadFileSize;
 
+    # Run settings
+    private $useCustomRunSettings;
+    private $allowOnDemandRun;
+    private $allowCronRun;
 
-    public function __construct($name)
+
+    public function __construct($name, $location = null)
     {
         self::validateName($name);
 
         $this->name = $name;
+
+        #--------------------------------------------------------------
+        # For backward compatibility, if location is null, then
+        # set the location to "embedded" if it is the embedded server,
+        # and "remote" otherwise
+        #--------------------------------------------------------------
+        if ($this->name === self::EMBEDDED_SERVER_NAME) {
+            $this->location = self::LOCATION_EMBEDDED;
+        } else {
+            if ($location === null) {
+                $this->location = self::LOCATION_REMOTE;
+            } else {
+                $this->location = $location;
+            }
+        }
 
         $this->isActive = false;
 
@@ -105,6 +132,8 @@ class ServerConfig implements \JsonSerializable
         $this->caCertFile = '';
 
         $this->maxZipDownloadFileSize = DataTarget::DEFAULT_MAX_ZIP_DOWNLOAD_FILESIZE;
+
+        $this->useCustomRunSettings = false;
     }
 
     /**
@@ -120,6 +149,9 @@ class ServerConfig implements \JsonSerializable
                 case 'isActive':
                 case 'dbSsl':
                 case 'dbSslVerify':
+                case 'useCustomRunSettings':
+                case 'allowOnDemandRun':
+                case 'allowCronRun':
                     # NOTE: THESE CHANGES MESS UP OTHER STUFF:
                     # changed value assignment to '' instead of false
                     # because redcap-etl WorkflowConfig evaluated boolean
@@ -166,6 +198,15 @@ class ServerConfig implements \JsonSerializable
             # If access level is unset, set it to public
             if (empty($this->accessLevel)) {
                 $this->accessLevel = 'public';
+            }
+
+            # If location is unset, set it to backwardly-compatible values
+            if (!isset($this->location)) {
+                if ($this->name === self::EMBEDDED_SERVER_NAME) {
+                    $this->location = self::LOCATION_EMBEDDED;
+                } else {
+                    $this->location = self::LOCATION_REMOTE;
+                }
             }
         }
 
@@ -654,6 +695,16 @@ class ServerConfig implements \JsonSerializable
         $this->name = $name;
     }
 
+    public function getLocation()
+    {
+        return $this->location;
+    }
+
+    public function setLocation($location)
+    {
+        $this->location = $location;
+    }
+
     public function getIsActive()
     {
         return $this->isActive;
@@ -764,12 +815,44 @@ class ServerConfig implements \JsonSerializable
     {
         $this->accessLevel = $accessLevel;
     }
+
     public function getMaxZipDownloadFileSize()
     {
         return $this->maxZipDownloadFileSize;
     }
+
     public function setMaxZipDownloadFileSize($maxZipDownloadFileSize)
     {
         $this->maxZipDownloadFileSize = $maxZipDownloadFileSize;
+    }
+
+    public function getUseCustomRunSettings()
+    {
+        return $this->useCustomRunSettings;
+    }
+
+    public function setUseCustomRunSettings($useCustomRunSettings)
+    {
+        $this->useCustomRunSettings = $useCustomRunSettings;
+    }
+
+    public function getAllowOnDemandRun()
+    {
+        return $this->allowOnDemandRun;
+    }
+
+    public function setAllowOnDemandRun($allowOnDemandRun)
+    {
+        $this->allowOnDemandRun = $allowOnDemandRun;
+    }
+
+    public function getAllowCronRun()
+    {
+        return $this->allowCronRun;
+    }
+
+    public function setAllowCronRun($allowCronRun)
+    {
+        $this->allowCronRun = $allowCronRun;
     }
 }

@@ -19,6 +19,7 @@ use phpseclib\Net\SCP;
 use phpseclib\Net\SFTP;
 use phpseclib\Net\SSH2;
 
+use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Help;
 use IU\RedCapEtlModule\Filter;
@@ -29,7 +30,11 @@ use IU\RedCapEtlModule\DataTarget;
 
 $selfUrl      = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
 $serversUrl   = $module->getUrl(RedCapEtlModule::SERVERS_PAGE);
+$configUrl    = $module->getUrl(RedCapEtlModule::ADMIN_HOME_PAGE);
+
 $configureUserUrl = $module->getUrl(RedCapEtlModule::USER_CONFIG_PAGE);
+
+$adminConfig = $module->getAdminConfig();
 
 $submit = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
@@ -394,9 +399,69 @@ $(function() {
      </table>
   </fieldset> 
 
-  <!-- SERVER CONNECTION SETTINGS -->
+    <fieldset class="server-config">
+        <legend>Run Settings</legend>
+        <?php
+        $defaultChecked = '';
+        $customChecked = '';
+        if ($serverConfig->getUseCustomRunSettings()) {
+            $customChecked =  'checked="checked"';
+        } else {
+            $defaultChecked =  'checked="checked"';
+        }
+        # case 'useCustomRunSettings':
+        # case 'allowOnDemandRun':
+        # case 'allowCronRun':
+        ?>
+        <div>
+            <input type="radio" name="useCustomRunSettings" <?php echo $defaultChecked; ?>>
+            Use Default Settings
+            (set on <a href="<?php echo $configUrl; ?>" style="text-decoration: underline;">Config</a> page)
+            </input>
+
+            <?php
+            $defaultInteractiveChecked = '';
+            if ($adminConfig->getAllowOnDemand()) {
+                $defaultInteractiveChecked = ' checked="checked" ';
+            }
+            $defaultCronChecked = '';
+            if ($adminConfig->getAllowCron()) {
+                $defaultCronChecked = ' checked="checked" ';
+            }
+            ?>
+
+            <div style="margin-left: 2em;">
+            <input type="checkbox" onclick="return false;" disabled <?php echo $defaultInteractiveChecked; ?>>
+                    Allow users to run ETL processes interactively
+                </input>
+                <br/>
+                <input type="checkbox" onclick="return false;" <?php echo $defaultCronChecked; ?>>
+                Allow users to schedule ETL processes
+                </input>
+            </div>
+        </div>
+        <div style="margin-top: 7px;">
+        <input type="radio" name="useCustomRunSettings" <?php echo $customChecked; ?>>
+                Use Custom (Server-Specific) Settings:
+            </input>
+            <div style="margin-left: 2em;">
+            <input type="checkbox" <?php echo $defaultInteractiveChecked; ?>>
+                    Allow users to run ETL processes interactively
+                </input>
+                <br/>
+                <input type="checkbox" <?php echo $defaultCronChecked; ?>>
+                Allow users to schedule ETL processes
+                </input>
+            </div>
+        </div>
+    </fieldset>
+
+    <!-- SERVER CONNECTION SETTINGS -->
     <?php
-    if (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) !== 0) {
+    if ($serverConfig->getLocation() === ServerConfig::LOCATION_REMOTE) {
+        #--------------------------------------------------------
+        # Remote Server
+        #--------------------------------------------------------
         ?>
         <fieldset class="server-config">
             <legend>Server Connection Settings</legend>
@@ -514,6 +579,9 @@ $(function() {
     </fieldset>
         <?php
     } else {
+        #--------------------------------------------------------
+        # Embedded Server
+        #--------------------------------------------------------
         $maxZipDownloadSize = $serverConfig->getMaxZipDownloadFileSize();
         if (is_null($maxZipDownloadSize) || $maxZipDownloadSize === '') {
             $maxZipDownloadSize = DataTarget::DEFAULT_MAX_ZIP_DOWNLOAD_FILESIZE;
