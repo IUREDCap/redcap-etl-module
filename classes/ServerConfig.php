@@ -18,7 +18,7 @@ class ServerConfig implements \JsonSerializable
     public const AUTH_METHOD_PASSWORD = 1;
 
     # Server access levels (private = admins + specified users)
-    public const ACCESS_LEVELS = array('admin','private','public');
+    public const ACCESS_LEVELS = array('admin', 'private', 'public');
 
     # Data load options for the embedded servers
     public const DATA_LOAD_DB_AND_FILE = 'data-load-db-and-file';
@@ -299,6 +299,54 @@ class ServerConfig implements \JsonSerializable
         $properties[Configuration::DB_SSL]        = $this->getDbSsl();
         $properties[Configuration::DB_SSL_VERIFY] = $this->getDbSslVerify();
         $properties[Configuration::CA_CERT_FILE]  = $this->getCaCertFile();
+    }
+
+    public function canLoadDataToDatabase()
+    {
+        $canLoadDataToDatabase = false;
+        return $canLoadDataToDatabase;
+    }
+
+    public function canLoadDataToFiles()
+    {
+        $canLoadDataToFiles = false;
+
+        if ($this->location === self::LOCATION_EMBEDDED) {
+            # Currently, only embedded servers are able to download files
+
+            if ($dataLoadOptions === self::DATA_LOAD_DB_AND_FILE
+                || $dataLoadOptions === self::DATA_LOAD_FILE_ONLY) {
+                $canLoadDataToFiles = true;
+            }
+        }
+
+        return $canLoadDataToFiles;
+    }
+
+    public function canSchedule($adminConfig)
+    {
+        $canSchedule = false;
+
+        if ($this->useCustomRunSettings) {
+            $canSchedule = $this->allowCronRun;
+        } else {
+            $canSchedule = $adminConfig->getAllowCron();
+        }
+
+        return $canSchedule;
+    }
+
+    public function canRunInteractively($adminConfig)
+    {
+        $canRunInteractively = false;
+
+        if ($this->useCustomRunSettings) {
+            $canRuninteractively = $this->allowOnDemandRun;
+        } else {
+            $canRunInteractively = $adminConfig->getAllowOnDemand();
+        }
+
+        return $canRunInteractively;
     }
 
     /**

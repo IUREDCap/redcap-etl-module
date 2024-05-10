@@ -130,13 +130,13 @@ class Settings
             $this->db->startTransaction();
         }
 
-        ###UPDATE THE USER-LIST FOR SERVERS THAT THIS USER IS NO LONGER ALLOWED TO ACCESS
+        # UPDATE THE USER-LIST FOR SERVERS THAT THIS USER IS NO LONGER ALLOWED TO ACCESS
         if (!$serversToCheck) {
            #servers that this user was allowed to access before any changes were made
             $serversToCheck = $this->getUserPrivateServerNames($username);
         }
 
-        #For each of the servers-to-check, see if access is still allowed for this user
+        # For each of the servers-to-check, see if access is still allowed for this user
         foreach ($serversToCheck as $serverName) {
            #if this server is not in the list of allowed servers for this user
            #then remove the username from the allowed-user list for the server if it's there
@@ -146,7 +146,7 @@ class Settings
         }
 
 
-        ###UPDATE THE USER-LIST FOR SERVERS THAT THIS USER IS ALLOWED TO ACCESS
+        # UPDATE THE USER-LIST FOR SERVERS THAT THIS USER IS ALLOWED TO ACCESS
         foreach ($userPrivateServerNames as $serverName) {
             $privateServerUsers = $this->getPrivateServerUsers($serverName);
             if (!in_array($username, $privateServerUsers)) {
@@ -156,7 +156,7 @@ class Settings
         }
 
 
-        ###UPDATE THE SERVER-LIST OF ALLOWED SERVERS FOR THIS USER
+        # UPDATE THE SERVER-LIST OF ALLOWED SERVERS FOR THIS USER
         $this->setUserPrivateServerNames($username, $userPrivateServerNames);
 
         if ($transaction) {
@@ -788,6 +788,36 @@ class Settings
         return $servers;
     }
 
+    public function getPublicServers()
+    {
+        $publicServers = array();
+
+        $allServers = $this->getServers();
+        foreach ($allServers as $server) {
+            $serverConfig = $this->getServerConfig($server);
+            if ($serverConfig->getAccessLevel === 'public') {
+                $publicServers[] = $server;
+            }
+        }
+
+        return $publicServers;
+    }
+
+    public function getAllServersForUser($username)
+    {
+        $allServersForUSer = array();
+
+        if ($this->module->isSuperUser($username)) {
+            $allServersForUser = $this->getServers();
+        } else {
+            $publicServers         = $this->getPublicServers();
+            $privateServersForUser = $this->getUserPrivateServerNames($username);
+            $allServersForUser     = array_merge($publicServers, $privateServersForUser);
+        }
+
+        return $allServersForUser;
+    }
+
     /**
      * Gets the servers for the specified user. If there are not that meet the
      * specified conditions, an empty arrary will be returned.
@@ -795,21 +825,52 @@ class Settings
      * @param boolean $isScheduled if the server is to be used for scheduling ETL processes, if set
      *     to false means that the server is to be used for interactively running ETL processes.
      */
-    public function getServersForUser($username, $isScheduled = false, $isFileDownload = false)
+    public function getServersForUser($username, $isScheduled = false, $isFileDownload = null)
     {
         $servers = [];
-        // FIMISH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         $this->db->startTransaction();
 
-        // $this->module;
+        $adminConfig = $this->getAdminConfig();
 
-        $allServers = $this->getServers();
+        $allServersForUser = $this->getAllServersForUser($username);
 
-        // ...
+        foreach ($allServersForUser as $server) {
+            $serverConfig = $this->getServerConfig();
 
+            if ($isScheduled) {
+                if ($serverConfig->canSchedule()) {
+                    if ($isFileDownload === null) {
+                        $servers[] = $server;
+                    } else {
+                        if ($isFileDownload) {
+                            ; // Can't schedule file downloads currently
+                        } else {
+                            $servers[] = $server;
+                        }
+                    }
+                }
+            } else {
+                # Run interactively
+                if ($serverConfig->canRunInteractively()) {
+                    if ($isFileDownload === null) {
+                        $servers[] = $server;
+                    } else {
+                        if ($isFileDownload) {
+                            if ($serverConfig->canDownloadFiles()) {
+                                $servers[] = $server;
+                            }
+                        } else {
+                        }
+                    }
+                }
+            }
+        }
+
+        // FINISH!!!!!!!!!!!!!!!!!!!!!!!! Add isFileDownload check
 
         $this->db->endTransaction($commit);
+
         return $servers;
     }
 
