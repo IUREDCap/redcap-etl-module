@@ -18,14 +18,47 @@ class Workflow1Test extends TestCase
 
     const CONFIG_FILE = __DIR__.'/../config/workflow1.ini';
 
+    const DATA_DIR   = __DIR__.'/../data/workflow1/';
+    const OUTPUT_DIR = __DIR__.'/../output/workflow1/';
+
     public static function setUpBeforeClass(): void
     {
     }
 
+    public function removeOutputFiles()
+    {
+        # Remove existing CSV output files if any
+        foreach (glob(self::OUTPUT_DIR . '*.csv') as $filePath) {
+            unlink($filePath);
+        }
+    }
+
+    public function checkOutputFiles()
+    {
+        # Check that the lookup file was created
+        $this->assertFileExists(self::OUTPUT_DIR . 'etl_lookup.csv', 'Lookup file exists');
+
+        # Check that the lookup file has the expected contents
+        $expectedFile = self::DATA_DIR . 'etl_lookup.csv';
+        $actualFile = self::OUTPUT_DIR . 'etl_lookup.csv';
+        $this->assertFileEquals($expectedFile, $actualFile, 'Lookup file content check');
+
+        # Check that the redcap metadata file has the expected contents
+        $expectedFile = self::DATA_DIR . 'redcap_metadata.csv';
+        $actualFile = self::OUTPUT_DIR . 'redcap_metadata.csv';
+        $this->assertFileEquals($expectedFile, $actualFile, 'REDCap metadata file content check');
+
+        # Check that the redcap project info file has the expected contents
+        $expectedFile = self::DATA_DIR . 'redcap_project_info.csv';
+        $actualFile = self::OUTPUT_DIR . 'redcap_project_info.csv';
+        $this->assertFileEquals($expectedFile, $actualFile, 'REDCap project info file content check');
+    }
 
     public function testConfigAndSomeMethods()
     {
         try {
+            $this->removeOutputFiles();
+
             $app = basename(__FILE__, '.php');
             self::$logger = new Logger($app);
 
@@ -61,6 +94,9 @@ class Workflow1Test extends TestCase
             $this->assertNotNull($dbSchema);
             $this->assertInstanceOf(Schema\Schema::class, $dbSchema, 'Db Schema instance check');
 
+            # Check the output files
+            $this->checkOutputFiles();
+
 
             #---------------------------------------
             # Test workflow timing methods
@@ -94,6 +130,8 @@ class Workflow1Test extends TestCase
 
     public function testArrayConfig()
     {
+        $this->removeOutputFiles();
+
         $processSections = true;
         $properties = parse_ini_file(self::CONFIG_FILE, $processSections);
         
@@ -102,11 +140,15 @@ class Workflow1Test extends TestCase
             'ssl_verify'    => 1,
             'db_connection' => 'CSV:../output/workflow1/',
             'log_file'      => '../logs/workflow1.log',
-            'print_logging' => false,
             'transform_rules_source' => 3,
+
             'batch_size'    => 10,
+            'create_lookup_table' => 1,
+
+            'print_logging' => false,
 
             'basic-demography' => [
+                'create_lookup_table' => 1,
                 'redcap_api_url'        => $properties['basic-demography']['redcap_api_url'],
                 'data_source_api_token' => $properties['basic-demography']['data_source_api_token']
             ],
@@ -123,14 +165,14 @@ class Workflow1Test extends TestCase
             ]
         ];
 
+        # print_r($configurationArray);
+
         try {
             $app = 'array_test';
             self::$logger = new Logger($app);
 
             $baseDir = __DIR__;
             $redCapEtl = new RedCapEtl(self::$logger, $configurationArray, null, $baseDir);
-
-            $workflowConfig = $redCapEtl->getWorkflowConfig();
 
             $this->assertNotNull($redCapEtl, 'redCapEtl not null');
 
@@ -141,6 +183,8 @@ class Workflow1Test extends TestCase
             $this->assertNotNull($config1, 'redCapEtl configuration 1 not null');
 
             $redCapEtl->run();
+
+            $this->checkOutputFiles();
         } catch (EtlException $exception) {
             print $exception."\n";
             self::$logger->logException($exception);
