@@ -503,6 +503,13 @@ $module->renderMessages($error, $warning, $success);
             return false;
         });
 
+        $('#lookup-table-help-link').click(function () {
+            $('#lookup-table-help').dialog({dialogClass: 'redcap-etl-help', width: 600, maxHeight: 440})
+                .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                ;
+            return false;
+        });
+
         $('#database-keys-help-link').click(function () {
             $('#database-keys-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
                 .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
@@ -1171,10 +1178,11 @@ Configuration form
                 </tr>
             </tbody>
         </table>
-                <fieldset class="config-nested">
-                <legend>Database Tables</legend>
-                        <table>
-            <tbody>
+
+        <fieldset class="config-nested">
+            <legend>Database Tables</legend>
+            <table>
+                <tbody>
           
                 <!-- TABLE NAME PREFIX -->
                 <tr>
@@ -1196,7 +1204,41 @@ Configuration form
                 <tr>
                     <td>&nbsp;</td>
                 </tr>
-     
+
+                <!-- LOOKUP TABLE -->
+                <tr>
+                    <td style="padding-right: 1em;">Create Lookup Table</td>
+                    <td>
+                        <?php
+                        $checked = '';
+                        if ($properties[Configuration::CREATE_LOOKUP_TABLE]) {
+                            $checked = ' checked ';
+                        }
+                        ?>
+                        <input type="checkbox" name="<?php echo Configuration::CREATE_LOOKUP_TABLE;?>"
+                               value="true" <?php echo $checked;?>
+                               style="vertical-align: middle; margin: 0;"
+                        />
+                    </td>
+                    <td>
+                        <a href="#" id="lookup-table-help-link" class="etl-help" style="margin-left: 1em;">?</a>
+                        <div id="lookup-table-help" title="Lookup Table" style="display: none;">
+                            <?php echo Help::getHelpWithPageLink('lookup-table', $module); ?>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-right: 1em;">Lookup Table Name</td>
+                    <td>
+                        <input type="text" name="<?php echo Configuration::LOOKUP_TABLE_NAME;?>"
+                            value="<?php echo Filter::escapeForHtml($properties[Configuration::LOOKUP_TABLE_NAME]);?>"/>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>&nbsp;</td>
+                </tr>
+
                 <!-- LABEL VIEWS -->
                 <tr>
                     <td style="padding-right: 1em;">Label views</td>
@@ -1223,8 +1265,9 @@ Configuration form
                 <!-- LABEL VIEW SUFFIX -->
                 <tr>
                     <td style="padding-right: 1em;">Label view suffix</td>
-                    <td><input type="text" name="<?php echo Configuration::LABEL_VIEW_SUFFIX;?>"
-                        value="<?php echo Filter::escapeForHtml($properties[Configuration::LABEL_VIEW_SUFFIX]);?>"/>
+                    <td>
+                        <input type="text" name="<?php echo Configuration::LABEL_VIEW_SUFFIX;?>"
+                            value="<?php echo Filter::escapeForHtml($properties[Configuration::LABEL_VIEW_SUFFIX]);?>"/>
                     </td>
                 </tr>
                 

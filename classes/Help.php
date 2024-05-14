@@ -313,6 +313,11 @@ class Help
             . "<li>CREATE VIEW</li>"
             . "</ul>"
         ,
+        'lookup-table' =>
+            "<p>The lookup table lists the multiple choice fields in the database tables with"
+            . " their associated values and labels."
+            . " </p>"
+        ,
         'pre-processing-sql' =>
             "<p>The pre-processing SQL field is used to specify SQL commands that you want"
             . " REDCap-ETL to run on the load database"

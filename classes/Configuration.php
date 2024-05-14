@@ -57,6 +57,10 @@ class Configuration implements \JsonSerializable
     public const DB_PRIMARY_KEYS = 'db_primary_keys';
     public const DB_FOREIGN_KEYS = 'db_foreign_keys';
 
+    public const CREATE_LOOKUP_TABLE = 'create_lookup_table';  # true/false indicating if a lookup table
+                                                               # should be created
+    public const LOOKUP_TABLE_NAME   = 'lookup_table_name';
+
     public const CA_CERT_FILE  = 'ca_cert_file';
 
     public const IGNORE_EMPTY_INCOMPLETE_FORMS = 'ignore_empty_incomplete_forms';
@@ -114,6 +118,7 @@ class Configuration implements \JsonSerializable
         }
 
         $this->booleanUserProperties = [
+            self::CREATE_LOOKUP_TABLE,
             self::DB_LOGGING,
             self::DB_PRIMARY_KEYS,
             self::DB_FOREIGN_KEYS,
@@ -177,6 +182,9 @@ class Configuration implements \JsonSerializable
 
         $this->properties[self::DB_PRIMARY_KEYS] = true;
         $this->properties[self::DB_FOREIGN_KEYS] = true;
+
+        $this->properties[self::CREATE_LOOKUP_TABLE] = false;
+        $this->properties[self::LOOKUP_TABLE_NAME]   = 'etl_lookup';
 
         $this->properties[self::AUTOGEN_INCLUDE_COMPLETE_FIELDS] = false;
         $this->properties[self::AUTOGEN_INCLUDE_DAG_FIELDS] = false;
