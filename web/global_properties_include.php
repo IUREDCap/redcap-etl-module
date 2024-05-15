@@ -191,6 +191,21 @@ $module->renderMessages($error, $warning, $success);
                     ;
                 return false;
             });
+
+            $('#lookup-table-help-link').click(function () {
+                $('#lookup-table-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });
+
+            $('#labels-help-link').click(function () {
+                $('#labels-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
+                    .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
+                    ;
+                return false;
+            });
+
             $('#label-view-suffix-help-link').click(function () {
                 $('#label-view-suffix-help').dialog({dialogClass: 'redcap-etl-help', width: 400, maxHeight: 440})
                     .dialog('widget').position({my: 'left top', at: 'right+20 top', of: $(this)})
@@ -478,9 +493,10 @@ $module->renderMessages($error, $warning, $success);
                     <td style="padding-right: 1em;">
                         <label for="<?php echo Configuration::TABLE_PREFIX;?>">Table name prefix</label>
                     </td>
-                    <td><input type="text" name="<?php echo Configuration::TABLE_PREFIX;?>"
-                        id="<?php echo Configuration::TABLE_PREFIX;?>"
-                        value="<?php echo Filter::escapeForHtml($properties[Configuration::TABLE_PREFIX]);?>"/>
+                    <td>
+                        <input type="text" name="<?php echo Configuration::TABLE_PREFIX;?>"
+                               id="<?php echo Configuration::TABLE_PREFIX;?>"
+                               value="<?php echo Filter::escapeForHtml($properties[Configuration::TABLE_PREFIX]);?>"/>
                         <a href="#" id="table-name-prefix-help-link" class="etl-help">?</a>
                         <div id="table-name-prefix-help" title="Table Name Prefix" style="display: none;">
                             <?php echo Help::getHelpWithPageLink('table-name-prefix', $module); ?>
@@ -488,18 +504,108 @@ $module->renderMessages($error, $warning, $success);
                     </td>
                 </tr>
      
+                <tr>
+                    <td>&nbsp;</td>
+                </tr>
+
+                <!-- CREATE LOOKUP TABLE -->
+                <tr>
+                    <td style="padding-right: 1em;">Create Lookup Table</td>
+                    <td>
+                        <?php
+                        $checked = '';
+                        if ($properties[Configuration::CREATE_LOOKUP_TABLE]) {
+                            $checked = ' checked ';
+                        }
+                        ?>
+                        <input type="checkbox" name="<?php echo Configuration::CREATE_LOOKUP_TABLE;?>"
+                               value="true" <?php echo $checked;?>
+                               style="vertical-align: middle; margin: 0;"
+                        />
+
+                        <a href="#" id="lookup-table-help-link" class="etl-help" style="margin-left: 1em;">?</a>
+                        <div id="lookup-table-help" title="Lookup Table" style="display: none;">
+                            <?php echo Help::getHelpWithPageLink('lookup-table', $module); ?>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- LOOKUP TABLE NAME -->
+                <tr>
+                    <td style="padding-right: 1em;">Lookup Table Name</td>
+                    <td>
+                        <input type="text" name="<?php echo Configuration::LOOKUP_TABLE_NAME;?>"
+                            value="<?php echo Filter::escapeForHtml($properties[Configuration::LOOKUP_TABLE_NAME]);?>"/>
+                    </td>
+                </tr>
+-
+                <tr>
+                    <td>&nbsp;</td>
+                </tr>
+
+                <!-- LABEL VIEWS -->
+                <tr>
+                    <td style="padding-right: 1em;">Label views</td>
+                    <td>
+                        <?php
+                        $checked = '';
+                        if ($properties[Configuration::LABEL_VIEWS]) {
+                            $checked = ' checked ';
+                        }
+                        ?>
+                        <input type="checkbox" name="<?php echo Configuration::LABEL_VIEWS;?>"
+                               value="true" <?php echo $checked;?>
+                               style="vertical-align: middle; margin: 0;"
+                        />
+
+                        <a href="#" id="labels-help-link" class="etl-help" style="margin-left: 1em;">?</a>
+                        <div id="labels-help" title="Labels" style="display: none;">
+                            <?php echo Help::getHelpWithPageLink('labels', $module); ?>
+                        </div>
+                    </td>
+                </tr>
+
                 <!-- LABEL VIEW SUFFIX -->
                 <tr>
                     <td style="padding-right: 1em;">Label view suffix</td>
                     <td><input type="text" name="<?php echo Configuration::LABEL_VIEW_SUFFIX;?>"
                         value="<?php echo Filter::escapeForHtml($properties[Configuration::LABEL_VIEW_SUFFIX]);?>"/>
-                        <a href="#" id="label-view-suffix-help-link" class="etl-help">?</a>
-                        <div id="label-view-suffix-help" title="Label View Suffix" style="display: none;">
-                            <?php echo Help::getHelpWithPageLink('label-view-suffix', $module); ?>
-                        </div>
                     </td>
                 </tr>
-                
+
+                <!-- LABEL FIELD SUFFIX -->
+                <tr>
+                    <td style="padding-right: 1em;">Label field suffix</td>
+                    <td><input type="text" name="<?php echo Configuration::LABEL_FIELD_SUFFIX;?>"
+                        value="<?php echo Filter::escapeForHtml($properties[Configuration::LABEL_FIELD_SUFFIX]);?>"/>
+                    </td>
+                </tr>
+
+                <!-- LABEL FIELD TYPE -->
+                <tr>
+                    <td style="padding-right: 1em;">Label field type</td>
+                    <td>
+                        <?php
+                        $varcharSelected = '';
+                        $charSelected = '';
+                        $stringSelected = '';
+                        $generatedLabelType = $properties[Configuration::GENERATED_LABEL_TYPE];
+                        if ($generatedLabelType === 'varchar') {
+                            $varcharSelected = 'selected';
+                        } elseif ($generatedLabelType === 'char') {
+                            $charSelected = 'selected';
+                        } elseif ($generatedLabelType === 'string') {
+                            $stringSelected = 'selected';
+                        }
+                        ?>
+                        <select name="<?php echo Filter::escapeForHtml(Configuration::GENERATED_LABEL_TYPE);?>">
+                            <option value="varchar" <?php echo $varcharSelected?>>varchar</option>
+                            <option value="char" <?php echo $charSelected?>>char</option>
+                            <option value="string" <?php echo $stringSelected?>>string</option>
+                        </select>
+                    </td>
+                </tr>
+
                 <tr>
                     <td>&nbsp;</td>
                 </tr>

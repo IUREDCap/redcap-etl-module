@@ -1205,7 +1205,7 @@ Configuration form
                     <td>&nbsp;</td>
                 </tr>
 
-                <!-- LOOKUP TABLE -->
+                <!-- CREATE LOOKUP TABLE -->
                 <tr>
                     <td style="padding-right: 1em;">Create Lookup Table</td>
                     <td>
@@ -1227,6 +1227,8 @@ Configuration form
                         </div>
                     </td>
                 </tr>
+
+                <!-- LOOKUP TABLE NAME -->
                 <tr>
                     <td style="padding-right: 1em;">Lookup Table Name</td>
                     <td>

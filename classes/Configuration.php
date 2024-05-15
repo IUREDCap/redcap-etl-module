@@ -823,8 +823,10 @@ class Configuration implements \JsonSerializable
             $properties[self::BATCH_SIZE]                    = null;
             $properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS] = null;
             $properties[self::TABLE_PREFIX]                  = null;
-            $properties[self::LABEL_VIEW_SUFFIX]             = null;
-            $properties[self::LABEL_FIELD_SUFFIX]            = null;
+
+            $properties[self::LABEL_VIEWS]        = null;
+            $properties[self::LABEL_VIEW_SUFFIX]  = null;
+            $properties[self::LABEL_FIELD_SUFFIX] = null;
 
             $properties[self::DB_PRIMARY_KEYS]    = null;
             $properties[self::DB_FOREIGN_KEYS]    = null;
