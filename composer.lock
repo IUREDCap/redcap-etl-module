@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9bddbca1b95918dda7878f946fb5a676",
+    "content-hash": "c138ba34947ba934692cf1adc97a414b",
     "packages": [
         {
             "name": "iu-redcap/phpcap",
@@ -53,16 +53,16 @@
         },
         {
             "name": "iu-redcap/redcap-etl",
-            "version": "2.3.6",
+            "version": "2.3.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/redcap-etl.git",
-                "reference": "2a11ddb52ac83926f28c4dfff3b87eff516ce493"
+                "reference": "641dfbd7cdf39a81c9ed92ab02d0ef81a316bece"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/2a11ddb52ac83926f28c4dfff3b87eff516ce493",
-                "reference": "2a11ddb52ac83926f28c4dfff3b87eff516ce493",
+                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/641dfbd7cdf39a81c9ed92ab02d0ef81a316bece",
+                "reference": "641dfbd7cdf39a81c9ed92ab02d0ef81a316bece",
                 "shasum": ""
             },
             "require": {
@@ -93,22 +93,22 @@
             ],
             "support": {
                 "issues": "https://github.com/IUREDCap/redcap-etl/issues",
-                "source": "https://github.com/IUREDCap/redcap-etl/tree/2.3.6"
+                "source": "https://github.com/IUREDCap/redcap-etl/tree/2.3.8"
             },
-            "time": "2024-03-08T20:15:03+00:00"
+            "time": "2024-05-14T20:23:33+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
-            "version": "v2.6.3",
+            "version": "v2.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/constant_time_encoding.git",
-                "reference": "58c3f47f650c94ec05a151692652a868995d2938"
+                "reference": "52a0d99e69f56b9ec27ace92ba56897fe6993105"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/58c3f47f650c94ec05a151692652a868995d2938",
-                "reference": "58c3f47f650c94ec05a151692652a868995d2938",
+                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/52a0d99e69f56b9ec27ace92ba56897fe6993105",
+                "reference": "52a0d99e69f56b9ec27ace92ba56897fe6993105",
                 "shasum": ""
             },
             "require": {
@@ -162,7 +162,7 @@
                 "issues": "https://github.com/paragonie/constant_time_encoding/issues",
                 "source": "https://github.com/paragonie/constant_time_encoding"
             },
-            "time": "2022-06-14T06:56:20+00:00"
+            "time": "2024-05-08T12:18:48+00:00"
         },
         {
             "name": "paragonie/random_compat",

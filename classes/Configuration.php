@@ -18,6 +18,10 @@ class Configuration implements \JsonSerializable
     public const DATA_SOURCE_API_TOKEN = 'data_source_api_token';
     public const SSL_VERIFY = 'ssl_verify';
 
+    public const CREATE_LOOKUP_TABLE = 'create_lookup_table';  # true/false indicating if a lookup table
+                                                               # should be created
+    public const LOOKUP_TABLE_NAME   = 'lookup_table_name';
+
     public const DATA_EXPORT_RIGHT = 'data_export_right';
 
     public const API_TOKEN_USERNAME = 'api_token_username';
@@ -37,17 +41,6 @@ class Configuration implements \JsonSerializable
     public const DB_LOGGING         = 'db_logging';
     public const DB_LOG_TABLE       = 'db_log_table';
     public const DB_EVENT_LOG_TABLE = 'db_event_log_table';
-
-    # External module specific property names that are not in REDCap-ETL.
-    # The values for these properties are combined to form REDCap-ETL's
-    # DB_CONNECTION property.
-    public const DB_TYPE = 'db_type';
-    public const DB_HOST = 'db_host';
-    public const DB_PORT = 'db_port';
-    public const DB_NAME   = 'db_name';
-    public const DB_SCHEMA = 'db_schema';
-    public const DB_USERNAME = 'db_username';
-    public const DB_PASSWORD = 'db_password';
 
     public const DB_CONNECTION = 'db_connection';
 
@@ -99,6 +92,19 @@ class Configuration implements \JsonSerializable
 
     public const DATA_TARGET = 'data_target';
 
+    #-----------------------------------------------------------------------------
+    # External module specific property names that are not in REDCap-ETL.
+    # The values for these properties are combined to form REDCap-ETL's
+    # DB_CONNECTION property.
+    #-----------------------------------------------------------------------------
+    public const DB_TYPE = 'db_type';
+    public const DB_HOST = 'db_host';
+    public const DB_PORT = 'db_port';
+    public const DB_NAME   = 'db_name';
+    public const DB_SCHEMA = 'db_schema';
+    public const DB_USERNAME = 'db_username';
+    public const DB_PASSWORD = 'db_password';
+
     private $name;
     private $username;
     private $projectId;
@@ -114,6 +120,7 @@ class Configuration implements \JsonSerializable
         }
 
         $this->booleanUserProperties = [
+            self::CREATE_LOOKUP_TABLE,
             self::DB_LOGGING,
             self::DB_PRIMARY_KEYS,
             self::DB_FOREIGN_KEYS,
@@ -177,6 +184,9 @@ class Configuration implements \JsonSerializable
 
         $this->properties[self::DB_PRIMARY_KEYS] = true;
         $this->properties[self::DB_FOREIGN_KEYS] = true;
+
+        $this->properties[self::CREATE_LOOKUP_TABLE] = false;
+        $this->properties[self::LOOKUP_TABLE_NAME]   = 'etl_lookup';
 
         $this->properties[self::AUTOGEN_INCLUDE_COMPLETE_FIELDS] = false;
         $this->properties[self::AUTOGEN_INCLUDE_DAG_FIELDS] = false;
@@ -813,8 +823,10 @@ class Configuration implements \JsonSerializable
             $properties[self::BATCH_SIZE]                    = null;
             $properties[self::IGNORE_EMPTY_INCOMPLETE_FORMS] = null;
             $properties[self::TABLE_PREFIX]                  = null;
-            $properties[self::LABEL_VIEW_SUFFIX]             = null;
-            $properties[self::LABEL_FIELD_SUFFIX]            = null;
+
+            $properties[self::LABEL_VIEWS]        = null;
+            $properties[self::LABEL_VIEW_SUFFIX]  = null;
+            $properties[self::LABEL_FIELD_SUFFIX] = null;
 
             $properties[self::DB_PRIMARY_KEYS]    = null;
             $properties[self::DB_FOREIGN_KEYS]    = null;
@@ -831,6 +843,9 @@ class Configuration implements \JsonSerializable
             $properties[self::PRE_PROCESSING_SQL]   = null;
             $properties[self::CRON_SERVER]          = null;
             $properties[self::CRON_SCHEDULE]        = null;
+
+            $properties[self::CREATE_LOOKUP_TABLE] = null;
+            $properties[self::LOOKUP_TABLE_NAME]   = null;
         }
 
         return $properties;
