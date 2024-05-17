@@ -314,8 +314,7 @@ class ServerConfig implements \JsonSerializable
         if ($this->location === self::LOCATION_EMBEDDED) {
             # Currently, only embedded servers are able to download files
 
-            if ($dataLoadOptions === self::DATA_LOAD_DB_AND_FILE
-                || $dataLoadOptions === self::DATA_LOAD_FILE_ONLY) {
+            if ($dataLoadOptions === self::DATA_LOAD_DB_AND_FILE || $dataLoadOptions === self::DATA_LOAD_FILE_ONLY) {
                 $canLoadDataToFiles = true;
             }
         }
