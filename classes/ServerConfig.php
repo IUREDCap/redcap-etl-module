@@ -340,14 +340,14 @@ class ServerConfig implements \JsonSerializable
         $canRunInteractively = false;
 
         if ($this->useCustomRunSettings) {
-            error_log("        use custom run settings\n", 3, __DIR__ . '/../servers.txt');
+            # error_log("        use custom run settings\n", 3, __DIR__ . '/../servers.txt');
             $canRunInteractively = $this->allowOnDemandRun;
         } else {
-            error_log("        use general run settings\n", 3, __DIR__ . '/../servers.txt');
+            # error_log("        use general run settings\n", 3, __DIR__ . '/../servers.txt');
             $canRunInteractively = $adminConfig->getAllowOnDemand();
         }
 
-        error_log("        can run interactively: {$canRunInteractively}\n", 3, __DIR__ . '/../servers.txt');
+        # error_log("        can run interactively: {$canRunInteractively}\n", 3, __DIR__ . '/../servers.txt');
         return $canRunInteractively;
     }
 
