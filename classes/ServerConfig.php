@@ -340,11 +340,14 @@ class ServerConfig implements \JsonSerializable
         $canRunInteractively = false;
 
         if ($this->useCustomRunSettings) {
-            $canRuninteractively = $this->allowOnDemandRun;
+            error_log("        use custom run settings\n", 3, __DIR__ . '/../servers.txt');
+            $canRunInteractively = $this->allowOnDemandRun;
         } else {
+            error_log("        use general run settings\n", 3, __DIR__ . '/../servers.txt');
             $canRunInteractively = $adminConfig->getAllowOnDemand();
         }
 
+        error_log("        can run interactively: {$canRunInteractively}\n", 3, __DIR__ . '/../servers.txt');
         return $canRunInteractively;
     }
 
@@ -726,9 +729,12 @@ class ServerConfig implements \JsonSerializable
     public function isEmbeddedServer()
     {
         $isEmbedded = false;
-        if (strcasecmp($this->name, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
+        if ($this->name === self::EMBEDDED_SERVER_NAME) {
+            $isEmbedded = true;
+        } elseif ($this->location === self::LOCATION_EMBEDDED) {
             $isEmbedded = true;
         }
+
         return $isEmbedded;
     }
 
@@ -901,5 +907,22 @@ class ServerConfig implements \JsonSerializable
     public function setAllowCronRun($allowCronRun)
     {
         $this->allowCronRun = $allowCronRun;
+    }
+
+    public function canDownloadFiles()
+    {
+        $canDownload = false;
+        if ($this->isEmbeddedServer()) {
+            if (isset($this->dataLoadOptions)) {
+                if (
+                    $this->dataLoadOptions === self::DATA_LOAD_DB_AND_FILE
+                    || $this->dataLoadOptions === self::DATA_LOAD_FILE_ONLY
+                ) {
+                        $canDownload = true;
+                }
+            }
+        }
+
+        return $canDownload;
     }
 }

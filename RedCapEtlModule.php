@@ -508,6 +508,14 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         return $servers;
     }
 
+
+    public function getServersForUser($username, $isScheduled = false, $isFileDownload = null)
+    {
+        $servers = $this->getSettings()->getServersForUser($username, $isScheduled, $isFileDownload);
+        return $servers;
+    }
+
+
     public function setUserPrivateServerNames($username, $userServerNames)
     {
         $this->getSettings()->setUserPrivateServerNames($username, $userServerNames);

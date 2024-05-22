@@ -795,7 +795,7 @@ class Settings
         $allServers = $this->getServers();
         foreach ($allServers as $server) {
             $serverConfig = $this->getServerConfig($server);
-            if ($serverConfig->getAccessLevel === 'public') {
+            if ($serverConfig->getAccessLevel() === 'public') {
                 $publicServers[] = $server;
             }
         }
@@ -836,10 +836,10 @@ class Settings
         $allServersForUser = $this->getAllServersForUser($username);
 
         foreach ($allServersForUser as $server) {
-            $serverConfig = $this->getServerConfig();
+            $serverConfig = $this->getServerConfig($server);
 
             if ($isScheduled) {
-                if ($serverConfig->canSchedule()) {
+                if ($serverConfig->canSchedule($this->getAdminConfig())) {
                     if ($isFileDownload === null) {
                         $servers[] = $server;
                     } else {
@@ -851,8 +851,10 @@ class Settings
                     }
                 }
             } else {
+                # error_log("    server: {$server}\n", 3, __DIR__ . '/../servers.txt');
                 # Run interactively
-                if ($serverConfig->canRunInteractively()) {
+                if ($serverConfig->canRunInteractively($this->getAdminConfig())) {
+                    # error_log("        server can run interactively\n", 3, __DIR__ . '/../servers.txt');
                     if ($isFileDownload === null) {
                         $servers[] = $server;
                     } else {
@@ -861,13 +863,12 @@ class Settings
                                 $servers[] = $server;
                             }
                         } else {
+                            $servers[] = $server;
                         }
                     }
                 }
             }
         }
-
-        // FINISH!!!!!!!!!!!!!!!!!!!!!!!! Add isFileDownload check
 
         $this->db->endTransaction($commit);
 
@@ -1066,7 +1067,8 @@ class Settings
             $this->db->startTransaction();
         }
 
-        $toServerConfig = $this->getServerConfig($fromServerName);
+        $fromServerConfig = $this->getServerConfig($fromServerName);
+        $toServerConfig = $fromServerConfig;
         $toServerConfig->setName($toServerName);
 
         if ($fromServerName === ServerConfig::EMBEDDED_SERVER_NAME) {

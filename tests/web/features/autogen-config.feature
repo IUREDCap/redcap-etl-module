@@ -110,15 +110,10 @@ I need to be able to autogenerate the transformation rules
     And I "should" see this text "TABLE,registration,registration_id,ROOT"
     But I "should not" see this text "testtable"
 
-    When I log out
-    And I wait for 1 seconds
-    And I am on "/"
-    And I am logged in as user
-    And I follow "My Projects"
-    And I select the forms project
-    And I follow "REDCap-ETL"
+
+  Scenario: Run configuration
     And I follow "Run"
-    And I wait for 20 seconds
+    And I wait for 2 seconds
     And I select "task" from "configType"
     And I select "behat-config-test" from "configName"
     And I select "(embedded server)" from "server"

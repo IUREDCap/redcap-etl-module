@@ -414,7 +414,7 @@ $(function() {
         # case 'allowCronRun':
         ?>
         <div>
-            <input type="radio" name="useCustomRunSettings" <?php echo $defaultChecked; ?>>
+            <input type="radio" name="useCustomRunSettings" <?php echo $defaultChecked; ?> value="0">
             Use Default Settings
             (set on <a href="<?php echo $configUrl; ?>" style="text-decoration: underline;">Config</a> page)
             </input>
@@ -432,24 +432,36 @@ $(function() {
 
             <div style="margin-left: 2em;">
             <input type="checkbox" onclick="return false;" disabled <?php echo $defaultInteractiveChecked; ?>>
-                    Allow users to run ETL processes interactively
-                </input>
-                <br/>
-                <input type="checkbox" onclick="return false;" <?php echo $defaultCronChecked; ?>>
+                Allow users to run ETL processes interactively
+            </input>
+            <br/>
+            <input type="checkbox" onclick="return false;" disabled <?php echo $defaultCronChecked; ?>>
                 Allow users to schedule ETL processes
-                </input>
+            </input>
             </div>
         </div>
         <div style="margin-top: 7px;">
-        <input type="radio" name="useCustomRunSettings" <?php echo $customChecked; ?>>
-                Use Custom (Server-Specific) Settings:
+            <input type="radio" name="useCustomRunSettings" <?php echo $customChecked; ?> value="1">
+            Use Custom (Server-Specific) Settings:
             </input>
+
+            <?php
+            $customInteractiveChecked = '';
+            if ($serverConfig->canRunInteractively($adminConfig)) {
+                $customInteractiveChecked = ' checked="checked" ';
+            }
+            $customCronChecked = '';
+            if ($serverConfig->canSchedule($adminConfig)) {
+                $customCronChecked = ' checked="checked" ';
+            }
+            ?>
+
             <div style="margin-left: 2em;">
-            <input type="checkbox" <?php echo $defaultInteractiveChecked; ?>>
+            <input type="checkbox" <?php echo $customInteractiveChecked; ?>>
                     Allow users to run ETL processes interactively
                 </input>
                 <br/>
-                <input type="checkbox" <?php echo $defaultCronChecked; ?>>
+                <input type="checkbox" <?php echo $customCronChecked; ?>>
                 Allow users to schedule ETL processes
                 </input>
             </div>

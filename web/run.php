@@ -43,7 +43,6 @@ try {
 
     $selfUrl  = $module->getUrl("web/run.php");
 
-    $servers  = $module->getUserAllowedServersBasedOnAccessLevel(USERID);
 
     #------------------------------------------
     # Get request variables
@@ -54,19 +53,31 @@ try {
     $server       = $module->getRequestVar('server', '\IU\RedCapEtlModule\Filter::stripTags');
     $dataTarget   = $module->getRequestVar('dataTarget', '\IU\RedCapEtlModule\Filter::sanitizeLabel');
 
+    //$servers  = $module->getUserAllowedServersBasedOnAccessLevel(USERID);
+    $isScheduled = false;
+    $isFileDownload = false;
+    if ($dataTarget === DataTarget::CSV_ZIP) {
+        $isFileDownload = true;
+    }
+    $servers  = $module->getServersForUser(USERID, $isScheduled, $isFileDownload);
+
     # If no server is specified, set it to the first of the list of servers (if there is at least 1)
     if (empty($server) && count($servers) > 0) {
         $server = $servers[0];
     }
 
-    # If this is not a task, or the server is not the embedded server,
-    # make sure that the data target is set to "database", because the data target
-    # may be stored in the user's session as "CSV" from a previous run
-    if ($configType !== 'task' || $server !== ServerConfig::EMBEDDED_SERVER_NAME) {
-        $dataTarget = DataTarget::DB;
-    } elseif ($configType === 'task' && $server === ServerConfig::EMBEDDED_SERVER_NAME) {
+    $isEmbeddedServer = false;
+    if (!empty($server)) {
         $serverConfig = $module->getServerConfig($server);
-        # FINISH!!!!!!!!!!!!!!!!!!!
+        $isEmbeddedServer = $serverConfig->isEmbeddedServer();
+    }
+
+    if ($configType !== 'task' || (!$isEmbeddedServer)) {
+        # If this is not a task, or the server is not the embedded server,
+        # make sure that the data target is set to "database", because the data target
+        # may be stored in the user's session as "CSV" from a previous run
+        $dataTarget = DataTarget::DB;
+    } elseif ($configType === 'task' && $isEmbeddedServer) {
         $dataLoadOptions = $serverConfig->getDataLoadOptions();
     }
 
@@ -311,7 +322,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 
         <!-- DATA TARGET -->
         <?php
-        if ($configType === 'task' && $server === ServerConfig::EMBEDDED_SERVER_NAME) {
+        if ($configType === 'task' && $isEmbeddedServer) {
             if ($dataLoadOptions === ServerConfig::DATA_LOAD_DB_ONLY) {
                 echo '
                 <div style="float: left; margin-bottom: 22px; margin-left: 2em">
@@ -327,11 +338,20 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
                     </select>
                 </div>';
             } else {
+                $dbSelected = '';
+                $csvZipSelected = '';
+                if ($dataTarget === DataTarget::DB) {
+                    $dbSelected = ' selected';
+                } elseif ($dataTarget === DataTarget::CSV_ZIP) {
+                    $csvZipSelected = ' selected';
+                }
                 echo '
                 <div style="float: left; margin-bottom: 22px; margin-left: 2em">
                     <select name="dataTarget" id="dataTarget" style="margin-left: 1em;">
-                        <option value="' . DataTarget::DB . '">Load data into database </option>
-                        <option value="' . DataTarget::CSV_ZIP . '">Export data as CSV zip file</option>
+                        <option value="' . DataTarget::DB . '" ' . $dbSelected . '>Load data into database </option>
+                        <option value="' . DataTarget::CSV_ZIP . '" ' . $csvZipSelected . '>
+                            Export data as CSV zip file
+                        </option>
                     </select>
                 </div>';
             }

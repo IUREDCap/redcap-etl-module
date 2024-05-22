@@ -36,9 +36,6 @@ try {
 
     $adminConfig = $module->getAdminConfig();
 
-    $isFileDownload = false;  // cannot schedule file downloads, so this has to be loading data to a database
-    $servers  = $module->getUserAllowedServersBasedOnAccessLevel(USERID, $isFileDownload);
-
     #------------------------------------------
     # Get request variables
     #------------------------------------------
@@ -46,6 +43,14 @@ try {
     $configName   = $module->getRequestVar('configName', '\IU\RedCapEtlModule\Filter::sanitizeLabel');
     $workflowName = $module->getRequestVar('workflowName', '\IU\RedCapEtlModule\Filter::sanitizeLabel');
     $server       = $module->getRequestVar('server', '\IU\RedCapEtlModule\Filter::stripTags');
+
+    #-----------------------------------------------------------------
+    # Get the servers that the current user is allowed to access
+    #-----------------------------------------------------------------
+    $isFileDownload = false;  // cannot schedule file downloads, so this has to be loading data to a database
+    //$servers  = $module->getUserAllowedServersBasedOnAccessLevel(USERID, $isFileDownload);
+    $isScheduled = true;
+    $servers  = $module->getServersForUser(USERID, $isScheduled, $isFileDownload);
 
     #-------------------------
     # Set the submit value
