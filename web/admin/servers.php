@@ -222,6 +222,7 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
             . "</td>\n";
 
         if (strcasecmp($server, ServerConfig::EMBEDDED_SERVER_NAME) === 0) {
+            # Rename and delete not supported for the included embedded server
             echo "<td>&nbsp;</td><td>&nbsp;</td>\n";
         } else {
             #-------------------------------

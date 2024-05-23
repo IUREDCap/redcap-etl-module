@@ -456,6 +456,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
      * @param string $username the REDCap username of the user.
      * @param boolean $isInteractive indicates if the check is for an interactive run (as opposed to a scheduled run).
      */
+    /* OBSOLETE?
     public function getUserAllowedServersBasedOnAccessLevel($username = USERID, $isFileDownload = null)
     {
         $servers = array();
@@ -507,6 +508,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
         return $servers;
     }
+    */
 
 
     public function getServersForUser($username, $isScheduled = false, $isFileDownload = null)

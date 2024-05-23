@@ -243,7 +243,10 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                             . '&configName=' . Filter::escapeForUrlParameter($config)
                         );
                     }
+
                     $server = $entry['etl_server'];
+                    $serverConfig = $module->getServerConfig($server);
+
                     $serverUrl = $serverConfigUrl . '&serverName=' . Filter::escapeForUrlParameter($server);
 
                     echo "<tr>\n";
@@ -278,7 +281,7 @@ $module->renderAdminPageContentHeader($selfUrl, $errorMessage, $warningMessage, 
                     echo '<td style="text-align: right;">' . $entry['cron_hour'] . "</td>\n";
 
                     echo '<td>';
-                    if ($server === ServerConfig::EMBEDDED_SERVER_NAME) {
+                    if ($serverConfig->isEmbeddedServer()) {
                         echo '<a id="etl_run_detail_' . ($entry['log_id']) . '" class="etlRunDetails"'
                             . ' href="#">'
                             . 'details' . '</a>';
