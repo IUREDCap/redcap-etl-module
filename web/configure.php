@@ -67,8 +67,9 @@ try {
 
     if ($configType === 'task') {
         if (strcasecmp($submitValue, 'Download CSV file') === 0) {
+            $fileName = 'redcap-etl-rules' . date("_Y-m-d_Hi");
             header('Content-Type: text/plain');
-            header('Content-disposition: attachment; filename="rules.csv"');
+            header('Content-disposition: attachment; filename="' . $fileName . '"');
             $rulesText = $configuration->getProperty(Configuration::TRANSFORM_RULES_TEXT);
             $rulesText = Filter::stripTags($rulesText);
             $fh = fopen('php://output', 'w');
