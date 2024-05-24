@@ -175,6 +175,18 @@ fieldset.config legend {
     padding: 1px 4px;
 }
 
+.ui-dialog.redcap-etl-help a {
+    outline: none;
+    text-decoration: underline;
+    color: #0000c0;
+}
+
+.ui-dialog.redcap-etl-help a:hover {
+    color: #f00000;
+    outline: 1px solid #4ca2ff;
+    text-decoration: underline;
+}
+
 /*
 .ui-dialog.redcap-etl-help .ui-dialog-content {
 }
