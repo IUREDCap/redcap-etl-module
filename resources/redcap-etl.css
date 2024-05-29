@@ -110,6 +110,7 @@ fieldset.server-config td {
 
 fieldset.server-config legend {
     font-weight: bold;
+    float: none;
 }
 
 fieldset.server-config textarea {
