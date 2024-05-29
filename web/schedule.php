@@ -12,6 +12,7 @@ use IU\RedCapEtlModule\AdminConfig;
 use IU\RedCapEtlModule\Configuration;
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
+use IU\RedCapEtlModule\Help;
 use IU\RedCapEtlModule\RedCapDb;
 use IU\RedCapEtlModule\ServerConfig;
 
@@ -153,6 +154,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 ?>
 
 
+
 <?php
 #-------------------------------------
 # Configuration selection form
@@ -261,6 +263,15 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
         <input type="submit" name="submitValue" value="Save"
             style="padding: 0em 2em; font-weight: bold; color: rgb(45, 107, 161);">
         </div>
+
+        <!-- HELP -->
+        <div style="float: left; margin-left: 6em;">
+            <a href="#" id="schedule-help-link" class="etl-help" title="help">?</a>
+            <div id="schedule-help" title="Schedule ETL" style="display: none; width: 100%;">
+                <?php echo Help::getHelpWithPageLink('schedule', $module); ?>
+            </div>
+        </div>
+
     </div>
 
     <div style="clear: both;"/>
@@ -272,7 +283,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
 // Change radio buttons so that a checked
 // radio button that is clicked will be
 // unchecked
-$(function () {
+$(document).ready(function() {
     var val = -1;
     var vals = {};
     vals['Sunday'] = -1;
@@ -295,8 +306,17 @@ $(function () {
             $(this).prop('checked',true);
             vals[name] = $(this).val();
         }
+    });
+
+    // Help dialog events
+    $('#schedule-help-link').click(function () {
+        $('#schedule-help').dialog({dialogClass: 'redcap-etl-help', width: 540, maxHeight: 440})
+            .dialog('widget').position({my: 'left top', at: 'right+50 top+90', of: $(this)})
+            ;
+        return false;
+    });
 });
-});
+
 </script>
 
 

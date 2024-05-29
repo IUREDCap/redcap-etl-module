@@ -162,13 +162,11 @@ echo $buffer;
     // Help dialog events
     $(document).ready(function() {
 
-        $( function() {
-            $('#run-help-link').click(function () {
-                $('#run-help').dialog({dialogClass: 'redcap-etl-help', width: 540, maxHeight: 440})
-                    .dialog('widget').position({my: 'left top', at: 'right+50 top+90', of: $(this)})
-                    ;
-                return false;
-            });
+        $('#run-help-link').click(function () {
+            $('#run-help').dialog({dialogClass: 'redcap-etl-help', width: 540, maxHeight: 440})
+                .dialog('widget').position({my: 'left top', at: 'right+50 top+90', of: $(this)})
+                ;
+            return false;
         });
     });
 
@@ -346,7 +344,7 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
         </div>
     </div>
     
-    <div style="float: right;">
+    <div style="float: left; margin-left: 2em;">
         <a href="#" id="run-help-link" class="etl-help" title="help">?</a>
         <div id="run-help" title="Run ETL" style="display: none;">
             <?php echo Help::getHelpWithPageLink('run', $module); ?>

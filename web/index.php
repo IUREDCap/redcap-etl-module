@@ -10,6 +10,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use IU\RedCapEtlModule\Authorization;
 use IU\RedCapEtlModule\Configuration;
+use IU\RedCapEtlModule\Help;
 use IU\RedCapEtlModule\Workflow;
 use IU\RedCapEtlModule\Csrf;
 use IU\RedCapEtlModule\Filter;
@@ -136,6 +137,12 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     <label for="configurationName">REDCap-ETL configuration name:</label>
     <input name="configurationName" id="configurationName" type="text" size="40" />
     <input type="submit" name="submitValue" value="Add" />
+
+    <a href="#" id="etl-configurations-help-link" class="etl-help" style="margin-left: 2em;" title="help">?</a>
+    <div id="etl-configurations-help" title="ETL Configurations" style="display: none;">
+        <?php echo Help::getHelpWithPageLink('etl-configurations', $module); ?>
+    </div>
+    
     <?php Csrf::generateFormToken(); ?>
     <input type="hidden" name="redcap_csrf_token" value="<?php echo $redcapCsrfToken; ?>"/>
 </form>
@@ -317,6 +324,19 @@ foreach ($configurationNames as $configurationName) {
 ?>
 </tbody>
 </table>
+
+<script>
+    // Help dialog events
+    $(document).ready(function() {
+
+        $('#etl-configurations-help-link').click(function () {
+            $('#etl-configurations-help').dialog({dialogClass: 'redcap-etl-help', width: 540, maxHeight: 440})
+                .dialog('widget').position({my: 'left top', at: 'right+50 top+90', of: $(this)})
+                ;
+            return false;
+        });
+    });
+</script>
 
 <?php
 #--------------------------------------
