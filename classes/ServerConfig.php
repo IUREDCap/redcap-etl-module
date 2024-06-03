@@ -190,22 +190,22 @@ class ServerConfig implements \JsonSerializable
             }
 
             # If access level is unset, set it to public
-            if (empty($this->accessLevel)) {
+            if (!isset($this->accessLevel)) {
                 $this->accessLevel = 'public';
             }
 
             # Set run settings if missing for backward compatibility
-            if (empty($this->allowOnDemandRun)) {
+            if (!isset($this->allowOnDemandRun)) {
                 $this->allowOnDemandRun = $defaultAllowOnDemandRun;
             }
 
-            if (empty($this->allowCronRun)) {
+            if (!isset($this->allowCronRun)) {
                 $this->allowCronRun = $defaultAllowCronRun;
             }
-        }
 
-        if (empty($this->dataLoadOptions)) {
-            $this->dataLoadOptions = self::DATA_LOAD_DB_AND_FILE;
+            if (!isset($this->dataLoadOptions)) {
+                $this->dataLoadOptions = self::DATA_LOAD_DB_AND_FILE;
+            }
         }
     }
 

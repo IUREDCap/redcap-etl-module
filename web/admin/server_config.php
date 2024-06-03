@@ -399,6 +399,27 @@ $(function() {
     <!-- RUN SETTINGS -->
     <fieldset class="server-config">
         <legend>Run Settings</legend>
+
+        <?php
+        $checked = '';
+        if ($serverConfig->getAllowOnDemandRun()) {
+            $checked = ' checked';
+        }
+        ?>
+        <input type="checkbox" name="allowOnDemandRun" <?php echo $checked; ?>/>
+        Allow ETL processes to be run interactively?
+
+        <br/>
+
+        <?php
+        $checked = '';
+        if ($serverConfig->getAllowCronRun()) {
+            $checked = ' checked';
+        }
+        ?>
+        <input type="checkbox" name="allowCronRun" <?php echo $checked; ?>/>
+        Allow user scheduled ETL cron jobs?
+
     </fieldset>
 
     <!-- SERVER CONNECTION SETTINGS -->
