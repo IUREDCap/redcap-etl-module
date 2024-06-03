@@ -43,7 +43,9 @@ try {
 
     $selfUrl  = $module->getUrl("web/run.php");
 
-    $servers  = $module->getUserAllowedServersBasedOnAccessLevel(USERID);
+    # $servers  = $module->getUserAllowedServersBasedOnAccessLevel(USERID);
+    $isScheduled = false;
+    $servers  = $module->getServersForUser(USERID, $isScheduled);
 
     #------------------------------------------
     # Get request variables

@@ -31,6 +31,8 @@ $selfUrl      = $module->getUrl(RedCapEtlModule::SERVER_CONFIG_PAGE);
 $serversUrl   = $module->getUrl(RedCapEtlModule::SERVERS_PAGE);
 $configureUserUrl = $module->getUrl(RedCapEtlModule::USER_CONFIG_PAGE);
 
+$adminConfig = $module->getAdminConfig();
+
 $submit = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
 #-------------------------------------------
@@ -394,9 +396,15 @@ $(function() {
      </table>
   </fieldset> 
 
-  <!-- SERVER CONNECTION SETTINGS -->
+    <!-- RUN SETTINGS -->
+    <fieldset class="server-config">
+        <legend>Run Settings</legend>
+    </fieldset>
+
+    <!-- SERVER CONNECTION SETTINGS -->
     <?php
     if (strcasecmp($serverName, ServerConfig::EMBEDDED_SERVER_NAME) !== 0) {
+        # REMOTE SERVER
         ?>
         <fieldset class="server-config">
             <legend>Server Connection Settings</legend>
@@ -512,8 +520,11 @@ $(function() {
       </tr>
     </table>
     </fieldset>
+
+
         <?php
     } else {
+        # EMBEDDED SERVER
         $maxZipDownloadSize = $serverConfig->getMaxZipDownloadFileSize();
         if (is_null($maxZipDownloadSize) || $maxZipDownloadSize === '') {
             $maxZipDownloadSize = DataTarget::DEFAULT_MAX_ZIP_DOWNLOAD_FILESIZE;

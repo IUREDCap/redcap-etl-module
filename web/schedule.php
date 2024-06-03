@@ -38,7 +38,9 @@ try {
     $adminConfig = $module->getAdminConfig();
 
     $isFileDownload = false;  // cannot schedule file downloads, so this has to be loading data to a database
-    $servers  = $module->getUserAllowedServersBasedOnAccessLevel(USERID, $isFileDownload);
+    // $servers  = $module->getUserAllowedServersBasedOnAccessLevel(USERID, $isFileDownload);
+    $isScheduled = true;
+    $servers  = $module->getServersForUser(USERID, $isScheduled, $isFileDownload);
 
     #------------------------------------------
     # Get request variables

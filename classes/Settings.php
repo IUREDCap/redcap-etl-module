@@ -788,6 +788,60 @@ class Settings
         return $servers;
     }
 
+    /**
+     * Gets the servers the specified user can use for the specified uses (if any).
+     *
+     * @param string $username the username of the user whose servers are to be retrieved.
+     *
+     * @param bool $isScheduled If null, ignored, if true, then this use of the server is for
+     *     an ETL process that will be scheduled, if false, then the use of the server is for
+     *     an ETL process that it being run interactively.
+     *
+     * @param bool $isFileDownload If null, ignored, if true, then this use of the server is for
+     *     file download, if false, then the use of the server is for loading data to a database.
+     *
+     * @return array An array of strings is returned that represents the names of the servers
+     *     that the user has access to for the specified uses (if any).
+     *
+     */
+    public function getServersForUser($username, $isScheduled = null, $isFileDownload = null)
+    {
+        $serversForUser = [];
+        $allServerNames = $this->getServers();
+
+        foreach ($allServerNames as $serverName) {
+            $serverConfig = $this->getServerConfig($serverName);
+
+            #$serverConfig->getAllowCronRun();
+            #$serverConfig->getAllowOnDemandRun();
+
+            if ($isScheduled === true && !$serverConfig->getAllowCronRun()) {
+                ; // Scheduling specified, but server doesn't support scheduling
+            } elseif ($isScheduled === false && !$serverConfig->getAllowOnDemandRun()) {
+                ; // Interactive run specified, but server doesn't support running interactively
+            } elseif ($isFileDownload === true && !$serverConfig->canLoadDataToFiles()) {
+                ;  // file download specified, but server can't load data to files
+            } elseif ($isFileDownload === false && !$serverConfig->canLoadDataToDatabase()) {
+                ; // database download specified, but server can't load data to a database
+            } else {
+                if ($this->module->isSuperUser($username)) {
+                    # Admin user
+                    $serversForUser[] = $serverName;
+                } elseif ($serverConfig->isPublic()) {
+                    # Public server
+                    $serversForUser[] = $serverName;
+                } elseif ($serverConfig->isPrivate()) {
+                    $privateUsers = $this->getPrivateServerUsers($serverName);
+                    if (in_array($username, $privateUsers)) {
+                        $serversForUser[] = $serverName;
+                    }
+                }
+            }
+        }
+
+        return $serversForUser;
+    }
+
     public function addServer($serverName, $transaction = true)
     {
         $commit = true;
@@ -958,7 +1012,13 @@ class Settings
             }
         } else {
             $serverConfig = new ServerConfig($serverName);
-            $serverConfig->fromJson($setting);
+
+            # Get the AdminConfig object for default run settings to maintain backward compatibility,
+            # because the run settings were originally set globally (in AdminConfig), and old ServeConfig
+            # objects will not have these settings.
+            $adminConfig = $this->getAdminConfig();
+
+            $serverConfig->fromJson($setting, $adminConfig->getAllowOnDemand(), $adminConfig->getAllowCron());
         }
 
         return $serverConfig;

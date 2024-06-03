@@ -17,7 +17,15 @@ class ServerConfig implements \JsonSerializable
     public const AUTH_METHOD_SSH_KEY  = 0;
     public const AUTH_METHOD_PASSWORD = 1;
 
-    public const ACCESS_LEVELS = array('admin','private','public');
+    public const ACCESS_LEVEL_ADMIN   = 'admin';
+    public const ACCESS_LEVEL_PRIVATE = 'private';
+    public const ACCESS_LEVEL_PUBLIC  = 'public';
+
+    public const ACCESS_LEVELS = array(
+        self::ACCESS_LEVEL_ADMIN,
+        self::ACCESS_LEVEL_PRIVATE,
+        self::ACCESS_LEVEL_PUBLIC
+    );
 
     # Data load options for the embedded server
     public const DATA_LOAD_DB_AND_FILE = 'data-load-db-and-file';
@@ -59,6 +67,15 @@ class ServerConfig implements \JsonSerializable
     private $caCertFile;
 
     private $maxZipDownloadFileSize;
+
+    #----------------------------------------------------
+    # Run settings - originally, this was set globally.
+    #     $useCustomRunSettings exists to maintain
+    #     backward compatibility, and by default is set
+    #     to false.
+    #----------------------------------------------------
+    private $allowOnDemandRun;
+    private $allowCronRun;
 
 
     public function __construct($name)
@@ -105,6 +122,10 @@ class ServerConfig implements \JsonSerializable
         $this->caCertFile = '';
 
         $this->maxZipDownloadFileSize = DataTarget::DEFAULT_MAX_ZIP_DOWNLOAD_FILESIZE;
+
+        # Run settings
+        $this->allowOnDemandRun = true;
+        $this->allowCronRun     = true;
     }
 
     /**
@@ -120,6 +141,8 @@ class ServerConfig implements \JsonSerializable
                 case 'isActive':
                 case 'dbSsl':
                 case 'dbSslVerify':
+                case 'allowOnDemandRun':
+                case 'allowCronRun':
                     # NOTE: THESE CHANGES MESS UP OTHER STUFF:
                     # changed value assignment to '' instead of false
                     # because redcap-etl WorkflowConfig evaluated boolean
@@ -155,7 +178,10 @@ class ServerConfig implements \JsonSerializable
         return (object) get_object_vars($this);
     }
 
-    public function fromJson($json)
+    /**
+     * Sets the ServerConfig to the speicifed JSON.
+     */
+    public function fromJson($json, $defaultAllowOnDemandRun = true, $defaultAllowCronRun = true)
     {
         if (!empty($json)) {
             $object = json_decode($json);
@@ -166,6 +192,15 @@ class ServerConfig implements \JsonSerializable
             # If access level is unset, set it to public
             if (empty($this->accessLevel)) {
                 $this->accessLevel = 'public';
+            }
+
+            # Set run settings if missing for backward compatibility
+            if (empty($this->allowOnDemandRun)) {
+                $this->allowOnDemandRun = $defaultAllowOnDemandRun;
+            }
+
+            if (empty($this->allowCronRun)) {
+                $this->allowCronRun = $defaultAllowCronRun;
             }
         }
 
@@ -259,6 +294,44 @@ class ServerConfig implements \JsonSerializable
         $properties[Configuration::DB_SSL_VERIFY] = $this->getDbSslVerify();
         $properties[Configuration::CA_CERT_FILE]  = $this->getCaCertFile();
     }
+
+    public function canLoadDataToDatabase()
+    {
+        $canLoadDataToDatabase = false;
+
+        if ($this->isEmbeddedServer()) {
+            if (
+                $this->dataLoadOptions === self::DATA_LOAD_DB_AND_FILE
+                || $this->dataLoadOptions === self::DATA_LOAD_DB_ONLY
+            ) {
+                $canLoadDataToDatabase = true;
+            }
+        } else {
+            # Non-embedded server can only download data to database
+            $canLoadDataToDatabase = true;
+        }
+
+        return $canLoadDataToDatabase;
+    }
+
+    public function canLoadDataToFiles()
+    {
+        $canLoadDataToFiles = false;
+
+        if ($this->isEmbeddedServer()) {
+            # Currently, only embedded servers are able to download files
+
+            if (
+                $this->dataLoadOptions === self::DATA_LOAD_DB_AND_FILE
+                || $this->dataLoadOptions === self::DATA_LOAD_FILE_ONLY
+            ) {
+                $canLoadDataToFiles = true;
+            }
+        }
+
+        return $canLoadDataToFiles;
+    }
+
 
     /**
      * Run the ETL process for this server.
@@ -764,12 +837,36 @@ class ServerConfig implements \JsonSerializable
     {
         $this->accessLevel = $accessLevel;
     }
+
+    public function isPublic()
+    {
+        $isPublic = $this->accessLevel === self::ACCESS_LEVEL_PUBLIC;
+        return $isPublic;
+    }
+
+    public function isPrivate()
+    {
+        $isPrivate = $this->accessLevel === self::ACCESS_LEVEL_PRIVATE;
+        return $isPrivate;
+    }
+
     public function getMaxZipDownloadFileSize()
     {
         return $this->maxZipDownloadFileSize;
     }
+
     public function setMaxZipDownloadFileSize($maxZipDownloadFileSize)
     {
         $this->maxZipDownloadFileSize = $maxZipDownloadFileSize;
+    }
+
+    public function getAllowOnDemandRun()
+    {
+        return $this->allowOnDemandRun;
+    }
+
+    public function getAllowCronRun()
+    {
+        return $this->allowCronRun;
     }
 }

@@ -450,12 +450,19 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         return $servers;
     }
 
+    public function getServersForUser($username = USERID, $isScheduled = null, $isFileDownload = null)
+    {
+        $servers = $this->settings->getServersForUser($username, $isScheduled, $isFileDownload);
+        return $servers;
+    }
+
     /**
      * Gets the list of servers the user is allowed to use.
      *
      * @param string $username the REDCap username of the user.
      * @param boolean $isInteractive indicates if the check is for an interactive run (as opposed to a scheduled run).
      */
+    /*
     public function getUserAllowedServersBasedOnAccessLevel($username = USERID, $isFileDownload = null)
     {
         $servers = array();
@@ -507,6 +514,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
         return $servers;
     }
+    */
 
     public function setUserPrivateServerNames($username, $userServerNames)
     {
