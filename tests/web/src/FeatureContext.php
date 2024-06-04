@@ -60,8 +60,8 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         print "Initializing admin config\n";
         $page = $session->getPage();
         $page->clickLink('Config');
-        $page->checkField('allowOnDemand');
-        $page->checkField('allowCron');
+        # $page->checkField('allowOnDemand');
+        # $page->checkField('allowCron');
         for ($day = 0; $day <= 6; $day++) {
             for ($hour = 0; $hour <= 23; $hour++) {
                 $page->checkField("allowedCronTimes[{$day}][{$hour}]");

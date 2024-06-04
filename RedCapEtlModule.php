@@ -267,7 +267,7 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             # Authorization checks
             #---------------------------------------------
             if ($isCronJob) {
-                if (!$adminConfig->getAllowCron()) {
+                if (!$serverConfig->getAllowCronRun()) {
                     # Cron jobs not allowed
                     $message = "Cron job failed - cron jobs not allowed\n" . $details;
                     throw new \Exception($message);
@@ -448,6 +448,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         #print "<br /><br />servers object is: <br />";
         #print '<pre>'; print_r($servers); print '</pre>'."<br />";
         return $servers;
+    }
+
+    public function hasServerForUser($username, $isScheduled = null, $isFileDownload = null)
+    {
+        $hasServer = $this->settings->hasServerForUser($username, $isScheduled, $isFileDownload);
+        return $hasServer;
     }
 
     public function getServersForUser($username = USERID, $isScheduled = null, $isFileDownload = null)
@@ -1148,11 +1154,15 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         if (Authorization::hasEtlProjectPagePermission($this)) {
             $tabs[$configUrl]   = $configLabel;
 
-            if ($adminConfig->getAllowOnDemand()) {
+            # if ($adminConfig->getAllowOnDemand()) {
+            $isScheduled = false;
+            if ($this->hasServerForUser(USERID, $isScheduled)) {
                 $tabs[$runUrl] = $runLabel;
             }
 
-            if ($adminConfig->getAllowCron()) {
+            # if ($adminConfig->getAllowCron()) {
+            $isScheduled = true;
+            if ($this->hasServerForUser(USERID, $isScheduled)) {
                 $tabs[$scheduleUrl] = $scheduleLabel;
             }
 
@@ -1310,12 +1320,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
             $accessUrl = $this->getUrl('web/access.php?accessError=' . self::CSRF_ERROR);
             header('Location: ' . $accessUrl);
             exit();
-        } elseif ($runCheck && !$adminConfig->getAllowOnDemand()) {
+        } elseif ($runCheck && !$this->hasServerForUser($username, false)) {
             # Trying to access the run page when running on demand has been disabled
             $indexUrl = $this->getUrl('web/index.php');
             header('Location: ' . $indexUrl);
             exit();
-        } elseif ($scheduleCheck && !$adminConfig->getAllowCron()) {
+        } elseif ($scheduleCheck && !$this->hasServerForUser($username, true)) {
             # trying to access the schedule page when ETL cron jobs have been disabled
             $indexUrl = $this->getUrl('web/index.php');
             header('Location: ' . $indexUrl);
@@ -1615,24 +1625,6 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                 throw new \Exception('No workflow specified.');
             } else {
                 #---------------------------------------------
-                # Authorization checks
-                #---------------------------------------------
-                if ($isCronJob) {
-                    if (!$adminConfig->getAllowCron()) {
-                        # Cron jobs not allowed
-                        $message = "REDCap-ETL cron did not run, because REDCap-ETL cron jobs are not enabled.";
-                        throw new \Exception($message);
-                    }
-                } else {
-                    # If NOT a cron job
-                    if (!Authorization::hasEtlProjectPagePermission($this)) {
-                        $msg = 'User "' . USERID . '" does not have permission to run ETL for project id: ';
-                        $msg .= $originatingProjectId;
-                        throw new \Exception($msg);
-                    }
-                }
-
-                #---------------------------------------------
                 # Process ETL server name
                 #---------------------------------------------
                 if (empty($serverName)) {
@@ -1642,6 +1634,26 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
                     if (!$serverConfig->getIsActive()) {
                         $msg = 'For workflow "' . $workflowName . '": ETL Server "';
                         $msg .= $serverName . '" has been deactivated and cannot be used.';
+                        throw new \Exception($msg);
+                    }
+                }
+
+                #---------------------------------------------
+                # Authorization checks
+                #---------------------------------------------
+                if ($isCronJob) {
+                    if (!$serverConfig->getAllowCronRun()) {
+                        # Cron jobs not allowed
+                        $message = "REDCap-ETL scheduled process did not run,"
+                            . " because the seleted REDCap-ETL server \"{$serverName}\""
+                            . " is not allowed to schedule ETL processes.";
+                        throw new \Exception($message);
+                    }
+                } else {
+                    # If NOT a cron job
+                    if (!Authorization::hasEtlProjectPagePermission($this)) {
+                        $msg = 'User "' . USERID . '" does not have permission to run ETL for project id: ';
+                        $msg .= $originatingProjectId;
                         throw new \Exception($msg);
                     }
                 }

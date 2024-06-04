@@ -159,11 +159,13 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     <!-- <th>Test</th> -->
     <?php
 
-    if ($adminConfig->getAllowOnDemand()) {
+    # if ($adminConfig->getAllowOnDemand()) {
+    if ($module->hasServerForUser(USERID, false)) {
         echo "<th>Run</th>\n";
     }
 
-    if ($adminConfig->getAllowCron()) {
+    # if ($adminConfig->getAllowCron()) {
+    if ($module->hasServerForUser(USERID, true)) {
         echo "<th>Schedule</th>\n";
     }
     ?>
@@ -239,7 +241,8 @@ foreach ($configurationNames as $configurationName) {
     # RUN BUTTON - display if running on demand allowed, but disable if user does not have
     # the needed data export permission to access the configuration
     #--------------------------------------------------------------------------------------
-    if ($adminConfig->getAllowOnDemand()) {
+    # if ($adminConfig->getAllowOnDemand()) {
+    if ($module->hasServerForUser(USERID, false)) {
         if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
             echo '<td style="text-align:center;">'
                 . '<a href="' . $runConfigurationUrl . '"><img src="' . APP_PATH_IMAGES
@@ -256,7 +259,8 @@ foreach ($configurationNames as $configurationName) {
     # SHEDULE BUTTON - display if ETL cron jobs allowed, but disable if user does not have
     # the needed data export permission to access the configuration
     #--------------------------------------------------------------------------------------
-    if ($adminConfig->getAllowCron()) {
+    # if ($adminConfig->getAllowCron()) {
+    if ($module->hasServerForUser(USERID, true)) {
         if (Authorization::hasEtlConfigurationPermission($module, $configuration)) {
             echo '<td style="text-align:center;">'
                 . '<a href="' . $scheduleConfigUrl . '"><img src="' . APP_PATH_IMAGES

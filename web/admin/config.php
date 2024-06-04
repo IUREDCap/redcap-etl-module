@@ -89,25 +89,29 @@ $module->renderAdminPageContentHeader($selfUrl, $error, $warning, $success);
     #--------------------------------------------------
     # Allow On Demand
     #--------------------------------------------------
-    $checked = '';
-    if ($adminConfig->getAllowOnDemand()) {
-        $checked = 'checked';
-    }
+    #$checked = '';
+    #if ($adminConfig->getAllowOnDemand()) {
+    #    $checked = 'checked';
+    #}
     ?>
-    <input type="checkbox" name="<?php echo AdminConfig::ALLOW_ON_DEMAND;?>" <?php echo $checked;?>>
+    <!--
+    <input type="checkbox" name="<?php # echo AdminConfig::ALLOW_ON_DEMAND;?>" <?php # echo $checked;?>>
     Allow ETL processes to be run interactively? <br />
+    -->
     
     <?php
     #------------------------------------------------
     # Allow Cron (Scheduled) Jobs
     #------------------------------------------------
-    $checked = '';
-    if ($adminConfig->getAllowCron()) {
-        $checked = 'checked';
-    }
+    #$checked = '';
+    #if ($adminConfig->getAllowCron()) {
+    #    $checked = 'checked';
+    #}
     ?>
-    <input type="checkbox" name="<?php echo AdminConfig::ALLOW_CRON;?>" <?php echo $checked;?>>
+    <!--
+    <input type="checkbox" name="<?php # echo AdminConfig::ALLOW_CRON;?>" <?php # echo $checked;?>>
     Allow user scheduled ETL cron jobs? <br />
+    -->
 
     <?php
     #---------------------------------------

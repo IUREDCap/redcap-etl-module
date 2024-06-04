@@ -128,23 +128,23 @@ if (preg_match("/REDCap-ETL Admin/", $text) === 1) {
 # Check admin config page settings
 #----------------------------------------
 $page->clickLink("Config");
-$cronJobsAllowed = AdminConfigPage::areCronJobsAllowed($session);
-print "Cron jobs allowed: ";
-if ($cronJobsAllowed) {
-    print "OK\n";
-} else {
-    print "ERROR\n";
-    exit(1);
-}
+#$cronJobsAllowed = AdminConfigPage::areCronJobsAllowed($session);
+#print "Cron jobs allowed: ";
+#if ($cronJobsAllowed) {
+#    print "OK\n";
+#} else {
+#    print "ERROR\n";
+#    exit(1);
+#}
 
-$onDemandJobsAllowed = AdminConfigPage::areOnDemandJobsAllowed($session);
-print "On demand jobs allowed: ";
-if ($onDemandJobsAllowed) {
-    print "OK\n";
-} else {
-    print "ERROR\n";
-    exit(1);
-}
+#$onDemandJobsAllowed = AdminConfigPage::areOnDemandJobsAllowed($session);
+#print "On demand jobs allowed: ";
+#if ($onDemandJobsAllowed) {
+#    print "OK\n";
+#} else {
+#    print "ERROR\n";
+#    exit(1);
+#}
 
 #----------------------------------------
 # Check embedded server settings

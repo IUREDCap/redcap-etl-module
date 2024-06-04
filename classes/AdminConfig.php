@@ -105,19 +105,25 @@ class AdminConfig implements \JsonSerializable
             }
         }
 
+        # NOTE: commented out setting of "allowOnDemand and "allowCron",
+        #       because these properties have been moved to server
+        #       configuration. The properties need to be kept as is for
+        #       use for default values for servers that were created
+        #       before the change to server-specific settings.
+
         # Set flag that indicates if users can run jobs on demand
-        if (array_key_exists(self::ALLOW_ON_DEMAND, $properties)) {
-            $this->allowOnDemand = true;
-        } else {
-            $this->allowOnDemand = false;
-        }
+        #if (array_key_exists(self::ALLOW_ON_DEMAND, $properties)) {
+        #    $this->allowOnDemand = true;
+        #} else {
+        #    $this->allowOnDemand = false;
+        #}
 
         # Set flag that indicates if cron (scheduled) jobs can be run by users
-        if (array_key_exists(self::ALLOW_CRON, $properties)) {
-            $this->allowCron = true;
-        } else {
-            $this->allowCron = false;
-        }
+        #if (array_key_exists(self::ALLOW_CRON, $properties)) {
+        #    $this->allowCron = true;
+        #} else {
+        #    $this->allowCron = false;
+        #}
 
         # Set flag indicating of SSL certificate verification should be done
         if (array_key_exists(self::SSL_VERIFY, $properties)) {

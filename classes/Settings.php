@@ -788,6 +788,17 @@ class Settings
         return $servers;
     }
 
+    public function hasServerForUser($username, $isScheduled = null, $isFileDownload = null)
+    {
+        $hasServer = false;
+        $servers = $this->getServersForUser($username, $isScheduled, $isFileDownload);
+        if (isset($servers) && count($servers) > 0) {
+            $hasServer = true;
+        }
+
+        return $hasServer;
+    }
+
     /**
      * Gets the servers the specified user can use for the specified uses (if any).
      *
