@@ -216,7 +216,9 @@ are 2 basic ways to run REDCap-ETL:
 <ol>
     <li><strong>On Demand</strong> 
     <?php
-    if (!$adminConfig->getAllowOnDemand()) {
+    # if (!$adminConfig->getAllowOnDemand()) {
+    $isScheduled = faise;
+    if (!$module->hasServerForUser(USERID, $isScheduled)) {
         echo ' <span style="color: red">(disabled)</span> ';
     }
     ?>
@@ -232,7 +234,9 @@ are 2 basic ways to run REDCap-ETL:
     </li>
     <li><strong>Scheduled</strong>
     <?php
-    if (!$adminConfig->getAllowCron()) {
+    # if (!$adminConfig->getAllowCron()) {
+    $isScheduled = true;
+    if (!$module->hasServerForUser(USERID, $isScheduled)) {
         echo ' <span style="color: red">(disabled)</span> ';
     }
     ?>

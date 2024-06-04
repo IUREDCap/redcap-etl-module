@@ -169,11 +169,15 @@ $module->renderProjectPageContentHeader($selfUrl, $error, $warning, $success);
     <!-- <th>Test</th> -->
     <?php
 
-    if ($adminConfig->getAllowOnDemand()) {
+    # if ($adminConfig->getAllowOnDemand()) {
+    $isScheduled = false;
+    if ($module->hasServerForUser(USERID, $isScheduled)) {
         echo "<th>Run</th>\n";
     }
 
-    if ($adminConfig->getAllowCron()) {
+    # if ($adminConfig->getAllowCron()) {
+    $isScheduled = true;
+    if ($module->hasServerForUser(USERID, $isScheduled)) {
         echo "<th>Schedule</th>\n";
     }
     ?>
@@ -235,7 +239,9 @@ foreach ($workflowNames as $workflowName) {
     # RUN BUTTON - display if running on demand allowed, but disable if user does not have
     # the needed data export permission to access the configuration
     #--------------------------------------------------------------------------------------
-    if ($adminConfig->getAllowOnDemand()) {
+    # if ($adminConfig->getAllowOnDemand()) {
+    $isScheduled = false;
+    if ($module->hasServerForUser(USERID, $isScheduled)) {
         if ($hasPermissionToExport) {
             $runConfigurationUrl = $runUrl . '&workflowName=' . Filter::escapeForUrlParameter($workflowName)
                 . '&configType=workflow';
@@ -254,7 +260,9 @@ foreach ($workflowNames as $workflowName) {
     # SHEDULE BUTTON - display if ETL cron jobs allowed, but disable if user does not have
     # the needed data export permission to access the configuration
     #--------------------------------------------------------------------------------------
-    if ($adminConfig->getAllowCron()) {
+    # if ($adminConfig->getAllowCron()) {
+    $isScheduled = true;
+    if ($module->hasServerForUser(USERID, $isScheduled)) {
         if ($hasPermissionToExport) {
             $scheduleConfigurationUrl = $scheduleUrl . '&workflowName=' . Filter::escapeForUrlParameter($workflowName)
                 . '&configType=workflow';
