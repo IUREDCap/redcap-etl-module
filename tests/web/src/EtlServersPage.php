@@ -25,7 +25,7 @@ class EtlServersPage
 
         # Find the table row where the first element matches the server name, and then get the
         # 4th column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[3]/a");
+        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[5]/a");
         # print("SERVER LINK: " . $element->getHtml());
         $element->click();
     }
@@ -43,7 +43,7 @@ class EtlServersPage
 
         # Find the table row where the first element matches the server name, and then get the
         # 5th column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[4]/input");
+        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[6]/input");
         $element->click();
 
         sleep(3);
@@ -59,7 +59,7 @@ class EtlServersPage
 
         # Find the table row where the first element matches the server name, and then get the
         # 6th column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[5]/input");
+        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[7]/input");
         $element->click();
 
         sleep(3);
@@ -81,7 +81,7 @@ class EtlServersPage
 
         # Find the table row where the first element matches the server name, and then get the
         # 7th column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[6]/input");
+        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[8]/input");
 
         # print "SERVER NAME: {$serverName}\n";
         if (isset($element)) {

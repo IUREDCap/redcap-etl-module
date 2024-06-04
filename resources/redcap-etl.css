@@ -233,3 +233,13 @@ a.etl-help {
     padding: 1em;
 }
 
+/* ETL Form */
+input.etl-submit, button.etl-submit {
+    padding-left: 1em;
+    padding-right: 1em;
+    font-size: 110%;
+    font-weight: bold;
+    color: #000080;
+}
+
+

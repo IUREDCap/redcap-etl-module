@@ -714,10 +714,10 @@ $(function() {
   
   <div style="margin-top: 20px;">
     <div style="width: 50%; float: left;">
-      <input type="submit" name="submitValue" value="Save" style="margin: auto; display: block;">
+      <input type="submit" name="submitValue" value="Save" class="etl-submit" style="margin: auto; display: block;">
     </div>
     <div style="width: 50%; float: right;">
-      <input type="submit" name="submitValue" value="Cancel" style="margin: auto; display: block;">
+      <input type="submit" name="submitValue" value="Cancel" class="etl-submit" style="margin: auto; display: block;">
     </div>
     <div style="clear: both;">
     </div>

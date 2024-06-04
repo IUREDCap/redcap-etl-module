@@ -198,8 +198,10 @@ class Help
         'etl-servers' =>
             "<p>"
             . "The REDCap-ETL external module uses ETL servers to process users' ETL configurations and workflows."
-            . " The external module"
-            . " includes a built-in ETL server, called the \"embedded server\", which runs within REDCap."
+            . " REDCap-ETL includes a built-in ETL server, called the \"embedded server\", which runs within REDCap,"
+            . " and which cannot be copied, renamed or deleted."
+            . "<p>"
+            . "</p>"
             . " You can also add configurations here for any remote ETL servers you have set up."
             . " Remote ETL servers run outside of your REDCap server, and they can"
             . " be used to reduce the ETL processing load on your REDCap server and to get around"

@@ -122,8 +122,8 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
 
 <table class="dataTable">
   <thead>
-    <tr> <th>ETL Server Name</th> <th>Active</th> </th><th>Access</th><th>Configure</th>
-    <th>Copy</th> <th>Rename</th> </th><th>Delete</th> </th></tr>
+    <tr> <th>ETL Server Name</th> <th>Active</th> </th> <th>Access</th> <th>Run</th> <th>Schedule</th>
+    <th>Configure</th> <th>Copy</th> <th>Rename</th> </th><th>Delete</th> </th></tr>
   </thead>
   <tbody>
     <?php
@@ -143,7 +143,7 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
         #-------------------------------
         # Active
         #-------------------------------
-        echo '<td style="text-align:center;">';
+        echo '<td style="text-align:center; border-left: 1px solid rgba(0, 0, 0, 0.3);">';
         if ($serverConfig->getIsActive()) {
             echo '<img src="' . APP_PATH_IMAGES . 'tick.png" alt="Yes">';
         } else {
@@ -158,14 +158,36 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
         if (empty($accessLevel)) {
             $accessLevel = 'public';
         }
-        echo '<td style="text-align:center;">';
+        echo '<td style="text-align: center;">';
         echo $accessLevel;
         echo "</td>\n";
 
         #-------------------------------
+        # Run
+        #-------------------------------
+        echo '<td style="text-align: center;">';
+        if ($serverConfig->getAllowOnDemandRun()) {
+            echo '<img src="' . APP_PATH_IMAGES . 'tick.png" alt="Yes">';
+        } else {
+            echo '<img src="' . APP_PATH_IMAGES . 'cross.png" alt="No">';
+        }
+        echo '</td>';
+
+        #-------------------------------
+        # Schedule
+        #-------------------------------
+        echo '<td style="text-align: center;">';
+        if ($serverConfig->getAllowCronRun()) {
+            echo '<img src="' . APP_PATH_IMAGES . 'tick.png" alt="Yes">';
+        } else {
+            echo '<img src="' . APP_PATH_IMAGES . 'cross.png" alt="No">';
+        }
+        echo ' </td>';
+
+        #-------------------------------
         # Configure
         #-------------------------------
-        echo '<td style="text-align:center;">'
+        echo '<td style="text-align:center; border-left: 1px solid rgba(0, 0, 0, 0.3);">'
             . '<a href="' . $serverConfigureUrl . '">'
             . '<img src="' . APP_PATH_IMAGES . 'gear.png" alt="CONFIG"></a>'
             . "</td>\n";
@@ -303,8 +325,8 @@ echo "</script>\n";
     $(document).ready(function() {
         $( function() {
             $('#etl-servers-help-link').click(function () {
-                $('#etl-servers-help').dialog({dialogClass: 'redcap-etl-help', width: 440, maxHeight: 440})
-                    .dialog('widget').position({my: 'left top', at: 'right-184 top+144', of: $(this)})
+                $('#etl-servers-help').dialog({dialogClass: 'redcap-etl-help', width: 540, maxHeight: 440})
+                    .dialog('widget').position({my: 'left top', at: 'right-194 top+124', of: $(this)})
                     ;
                 return false;
             });
