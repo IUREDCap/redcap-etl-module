@@ -592,14 +592,20 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     #    return USERID;
     #}
 
-    public function isSuperUser()
+    public function isSuperUser($username = USERID)
     {
         $isSuperUser = false;
-        if (defined('SUPER_USER') && SUPER_USER) {
-            $isSuperUser = true;
+        $user = $this->getUser($username);
+
+        if ($user === null) {
+            $isSuperUser = false;
+        } else {
+            $isSuperUser = $user->isSuperUser();
         }
+
         return $isSuperUser;
     }
+
 
     public static function getProjectIdConstant()
     {
