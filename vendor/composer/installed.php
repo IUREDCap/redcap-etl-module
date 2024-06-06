@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => 'bf9dff20802350c1e5797fae4bee65e92dea1962',
+        'reference' => 'cd0f6e0fd2ba9b1fd8b05f024b244feabe87f38a',
         'name' => 'iu-redcap/redcap-etl-module',
         'dev' => true,
     ),
@@ -20,12 +20,12 @@
             'dev_requirement' => false,
         ),
         'iu-redcap/redcap-etl' => array(
-            'pretty_version' => '2.3.8',
-            'version' => '2.3.8.0',
+            'pretty_version' => '2.3.10',
+            'version' => '2.3.10.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../iu-redcap/redcap-etl',
             'aliases' => array(),
-            'reference' => '641dfbd7cdf39a81c9ed92ab02d0ef81a316bece',
+            'reference' => 'cef8ea87a63c067aaeda8a93e5ab2aed5c455ff1',
             'dev_requirement' => false,
         ),
         'iu-redcap/redcap-etl-module' => array(
@@ -34,7 +34,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => 'bf9dff20802350c1e5797fae4bee65e92dea1962',
+            'reference' => 'cd0f6e0fd2ba9b1fd8b05f024b244feabe87f38a',
             'dev_requirement' => false,
         ),
         'paragonie/constant_time_encoding' => array(
