@@ -33,6 +33,11 @@ $configureUserUrl = $module->getUrl(RedCapEtlModule::USER_CONFIG_PAGE);
 
 $adminConfig = $module->getAdminConfig();
 
+$privateServerUsersUrl    = $module->getUrl('web/admin/private_server_users.php');
+$privateServerSetUsersUrl = $module->getUrl('web/admin/private_server_set_users.php');
+
+$userSearchUrl = $module->getUrl('web/admin/user_search.php');
+
 $submit = Filter::sanitizeButtonLabel($_POST['submitValue']);
 
 #-------------------------------------------
@@ -122,7 +127,7 @@ if (strcasecmp($submit, 'Save') === 0) {
         # allowed-users for this server, for example, so that those users
         # can't have access again if the access-level for the server
         # should go back to private in the future
-        if ($accessSet !== 'private') {
+        if ($accessSet !== ServerConfig::ACCESS_LEVEL_PRIVATE) {
             # this request value is set in a javascript function based on what
             # the user clicks on a js confirm prompt.
             $deleteUsers = $_REQUEST["deletePrivateAccessUsers"] === 'true' ? true : false;
@@ -190,8 +195,8 @@ $module->renderAdminEtlServerSubTabs($selfUrl);
 
 
 <script>
-// Show/hide Password
-$(function() {
+$(document).ready(function() {
+
     $("#showPassword").change(function() {
         var newType = 'password';
         if ($(this).is(':checked')) {
@@ -203,10 +208,7 @@ $(function() {
                 .insertBefore(this);
         }).remove();       
     })
-});    
 
-// Show/hide SSH Key Password
-$(function() {
     $("#showSshKeyPassword").change(function() {
         var newType = 'password';
         if ($(this).is(':checked')) {
@@ -218,9 +220,7 @@ $(function() {
                 .insertBefore(this);
         }).remove();       
     })
-});
 
-$(function() {
      $("input[name=authMethod]").change(function() {
         var value = $(this).val();
         if (value == 0) {
@@ -233,18 +233,221 @@ $(function() {
             $("#sshKeyPasswordRow").hide();
         }
     });
-});
 
-        $( function() {
-            $('#data-load-options-help-link').click(function () {
-                $('#data-load-options-help').dialog({dialogClass: 'redcap-etl-help', width: 540, maxHeight: 440})
-                    .dialog('widget').position({my: 'left top', at: 'right+10 top+40', of: $(this)})
-                    ;
-                return false;
-            });
+    $('#data-load-options-help-link').click(function () {
+        $('#data-load-options-help').dialog({dialogClass: 'redcap-etl-admin', width: 540, maxHeight: 440})
+            .dialog('widget').position({my: 'left top', at: 'right+10 top+40', of: $(this)})
+            ;
+        return false;
+    });
+
+    //------------------------------------------------------------
+    // Manage private users button click
+    //------------------------------------------------------------
+    $("#manage-private-access-users").click(function () {
+        let url = '<?php echo $privateServerUsersUrl; ?>';
+        let serverName = $(this).prop("name");
+
+        dialog = $('#manage-private-users-dialog').dialog({
+            buttons: [
+                {
+                    text: "Save",
+                    id: "save-private-access",
+                    click: function() {
+                        let tbl = [];
+                        // console.log("trs: ");
+                        // console.log(trs);
+
+                        trs = $('table#private-users-table tbody tr').get();
+                        for (i = 0; i < trs.length; i++) {
+                            td = $(trs[i]).find('td:first');
+                            user = td.text();
+                            tbl.push(user);
+                        }
+
+                        let userData = JSON.stringify(tbl);
+
+                        let setUrl = '<?php echo $privateServerSetUsersUrl; ?>';
+                        status = $.post(setUrl, {
+                            server_name: serverName,
+                            user_names: userData,
+                            <?php echo Csrf::TOKEN_NAME; ?>: "<?php echo Csrf::getToken(); ?>",
+                            <?php echo 'redcap_csrf_token: "' . $module->getCsrfToken()  . '"'; ?>
+                        }, function(result){
+                            if (result !== '') {
+                                let messageDialog = '<div>' + result + '</div>';
+                                $(messageDialog).dialog({
+                                    title: 'Private Access Users for Server ' + serverName,
+                                    dialogClass: 'redcap-etl-log',
+                                    buttons: [
+                                        {
+                                            text: "OK",
+                                            click: function() {
+                                                $( this ).dialog( "destroy" );
+                                            }
+                                        }
+                                    ],
+                                    width: 540,
+                                    maxHeight: 540
+                                }).dialog('open')
+                            }
+                        }, 'text');
+
+
+                        $( this ).dialog( "destroy" );
+                    }
+                },
+                {
+                    text: "Cancel",
+                    click: function() {
+                        $( this ).dialog( "destroy" );
+                    }
+                }
+            ]
         });
 
+        // Clear any existing rows from the table (otherwise they accumulate)
+        $('table#private-users-table tbody').empty();
+        $('#user-search').val('');
+
+        status = $.post(url, {
+                server_name: serverName,
+                <?php echo Csrf::TOKEN_NAME; ?>: "<?php echo Csrf::getToken(); ?>",
+                <?php echo 'redcap_csrf_token: "' . $module->getCsrfToken()  . '"'; ?>
+            }, function(result){
+                let values = jQuery.parseJSON(result);
+                // console.log(result);
+                // console.log(values);
+
+                for (i = 0; i < values.length; i++) {
+                    let row = '';
+                    row += '<tr>';
+                    row += '<td>' + (values[i]).username + '</td>';
+                    row += '<td>' + (values[i]).firstname + ' ' + (values[i]).lastname + '</td>';
+                    row += '<td>' + (values[i]).email + '</td>';
+                    row += '<td style="text-align: center;">' + '<button>X</button>' + '</td>';
+                    row += '</tr>';
+                    $('table#private-users-table tbody').append(row);
+                }
+            }, 'text');
+
+
+        dialog.dialog({
+            title: 'Manage Private Access Users for Server ' + serverName,
+            dialogClass: 'redcap-etl-admin',
+            width: 540,
+            height: 500,
+            maxHeight: 640
+        }).dialog('open')
+
+        return false;
+    });
+
+    // Add functionality for delete buttons in private server users table
+    $('table#private-users-table').on('click', 'button', function(e){
+        $(this).closest('tr').remove()
+    })
+
+    //----------------------------------------------------------------
+    // Add user to private server
+    //----------------------------------------------------------------
+    $('button#add-private-user').on('click', '', function(e){
+        let userInfo = $('#user-search').val();
+        $("#user-search").val('');
+
+        let usernameAndRest = userInfo.split(" (");
+        if (usernameAndRest.length != 2) {
+            return false;
+        }
+
+        let username = usernameAndRest[0];
+        let rest = usernameAndRest[1]
+        let nameAndEmail = rest.split(") - ");
+        let name = nameAndEmail[0];
+        let email = nameAndEmail[1];
+
+
+        // Get existing usernames
+        tds = $('table#private-users-table tbody tr td:first-child');
+        usernames = [];
+        for (i = 0; i < tds.length; i++) {
+            un = $(tds[i]).text();
+            usernames.push(un);
+        }
+        console.log(usernames);
+
+        // console.log(tr);
+        if (usernames.includes(username)) {
+            alert("User already added.");
+            return false;
+        }
+
+        let row = '';
+        row += '<tr>';
+        row += '<td>' + username + '</td>';
+        row += '<td>' + name + '</td>';
+        row += '<td>' + email + '</td>';
+        row += '<td style="text-align: center;">' + '<button>X</button>' + '</td>';
+        row += '</tr>';
+        $('table#private-users-table tbody').append(row);
+
+        return false;
+    })
+
+
+    $("#user-search").autocomplete({
+        source: "<?php echo $userSearchUrl;?>",
+        appendTo: "#searchForm",
+        minLength: 2,
+        select: function(event, ui) {
+            $("#user-search").val(ui.item.username);
+            $("#username").val(ui.item.username);
+            $("#userLabel").val(ui.item.label);
+            // $("#searchForm").submit();
+        }
+    })
+    .autocomplete("instance")._renderItem = function(ul, item) {
+        var newLabel = item.label.replace(new RegExp(this.term, "gi"), "<span style=\"font-weight:bold;\">$&</span>");
+        return $("<li>")
+            .append("<div>" + newLabel + "</div>")
+            .appendTo(ul);
+    };
+
+
+});
+
 </script>
+
+<!-- ========================================================================================
+= Dialog for managing users of a private server
+========================================================================================= -->
+<div id="manage-private-users-dialog"
+     style="display: none; padding: 10px; margin: 4px; background-color: #eafeea; border: 1px solid green;">
+    <form id="searchForm" action="<?php echo $selfUrl;?>" method="post" style="margin-bottom: 22px;">
+       <span style="font-weight: bold;">Username:</span>
+       <input id="user-search" name="user-search" type="text" size="48"/>
+       <button id="add-private-user">Add</button>
+
+        <input type="hidden" name="username" id="username">
+        <input type="hidden" name="userLabel" id="userLabel">
+
+        <?php Csrf::generateFormToken(); ?>
+        <input type="hidden" name="redcap_csrf_token" value="<?php echo $module->getCsrfToken(); ?>"/>
+    </form>
+
+    <p style="font-weight: bold;">Users with access to server <?php echo Filter::escapeForHtml($serverName); ?></p>
+    <table id="private-users-table" class="cron-schedule">
+        <thead>
+            <tr><th>Username</th><th>Name</th><th>E-mail</th><th>Delete</th></tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <div style="margin-bottom: 4em;">&nbsp;</div>
+</div>
+
+
 
 <?php
 #----------------------------------------------------
@@ -261,10 +464,11 @@ if (!empty($serverName)) {
     $accessLevel = $serverConfig->getAccessLevel();
     $access = $accessLevel;
     if (empty($accessLevel)) {
-        $access = 'public';
+        $access = ServerConfig::ACCESS_LEVEL_PUBLIC;
     }
-    if ($access === 'private') {
+    if ($access === ServerConfig::ACCESS_LEVEL_PRIVATE) {
         $privateUsers = $module->getPrivateServerUsers($serverName);
+        sort($privateUsers);
     }
     ?>
 
@@ -369,29 +573,43 @@ $(function() {
         ?>
         
         <tr> 
-           <fieldset id="usersRow" name="usersRow" <?php echo $usersRowStyle; ?>>
-              <legend>Users Currently Granted Access</legend>
+           <!-- PRIVATE ACCESS LEVEL -->
+           <div id="usersRow" name="usersRow" <?php echo $usersRowStyle; ?>>
+              <!-- <legend>Users Currently Granted Access</legend> -->
               <div id="privateUsers" name="privateUsers" <?php echo $privateUsersStyle; ?>>
+                 <!--
                  Remove<br />
+                 -->
                     <?php
-                    foreach ($privateUsers as $username) {
-                        echo '<input type="checkbox" name="removeUserCheckbox['
-                            . Filter::escapeForHtmlAttribute($username) . ']" '
-                            . 'style="vertical-align: middle; margin: 0px 10px 0px 25px;"'  . ">\n";
-                        echo '<label for="removeUserCheckbox[' . Filter::escapeForHtmlAttribute($username) . ']">'
-                            . Filter::escapeForHtml($username) . "</label>\n<br />";
-                    }
+                    # $userList = implode(", ", $privateUsers);
+                    # echo Filter::escapeForHtml($userList);
+                    #oreach ($privateUsers as $username) {
+                        #echo '<input type="checkbox" name="removeUserCheckbox['
+                        #   . Filter::escapeForHtmlAttribute($username) . ']" '
+                        #   . 'style="vertical-align: middle; margin: 0px 10px 0px 25px;"'  . ">\n";
+                        #cho '<label for="removeUserCheckbox[' . Filter::escapeForHtmlAttribute($username) . ']">'
+                        #   . Filter::escapeForHtml($username) . "</label>\n<br />";
+                    #
                     ?>
               </div>
 
+              <!--
               <div>
-                 <a href='<?php echo $configureUserUrl ?>'>Add User Access</a>
+                 <a href='<?php # echo $configureUserUrl ?>'>Add User Access</a>
                  <br />
+              </div>
+              -->
+
+              <div>
+                  <button name="<?php echo Filter::escapeforHtmlAttribute($serverName); ?>"
+                          id="manage-private-access-users">
+                      Manage Private Access Users
+                  </button>
               </div>
 
              <input type="hidden" id="deletePrivateAccessUsers" name="deletePrivateAccessUsers" />
 
-           </fieldset>
+           </div>
         </tr>
      </table>
   </fieldset> 

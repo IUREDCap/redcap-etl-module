@@ -16,7 +16,8 @@ Feature: Server user access level management
     And I follow "Servers"
     And I follow server "(embedded server)"
     And I select "private" from "accessLevel"
-    And I follow "Add User Access"
+    And I press "Save"
+    And I follow "Users"
     And I follow "List"
     And I click on the user
     And I check "accessCheckbox[(embedded server)]"
@@ -53,6 +54,7 @@ Feature: Server user access level management
     And I follow "Servers"
     And I follow server "private-test"
     And I select "private" from "accessLevel"
+    And I press "Save"
     And I wait for 5 seconds
 
   Scenario: Log in a user who has been allowed private-level access and verify the correct servers are listed on the Run tab
@@ -100,11 +102,12 @@ Feature: Server user access level management
     And the "#serverId" element should contain "private-test"
 
 
- Scenario: Change the access level from private with users assigned to public and delete the users list
+  Scenario: Change the access level from private with users assigned to public and delete the users list
     When I access the admin interface
     And I follow "Servers"
     And I follow server "(embedded server)"
-    And I choose "public" as the access level and click "Delete list"
+    And I select "public" from "accessLevel"
+    And I press "Delete list"
     And I press "Save"
     And I wait for 5 seconds
     When I follow "Servers"

@@ -36,6 +36,23 @@ class RedCapDb
         return $users;
     }
 
+    public function getUserInfo($username)
+    {
+        $userInfo = array();
+        $sql = "select ui_id as id, username, user_firstname as firstname, user_lastname as lastname,"
+            . "  user_email as email"
+            . " from redcap_user_information "
+            . " where username = ?"
+            ;
+
+        $params = [$username];
+
+        $result = db_query($sql, $params);
+        $userInfo = db_fetch_assoc($result);
+
+        return $userInfo;
+    }
+
     /**
      * Gets the projects that the specified user has permission
      * to access.

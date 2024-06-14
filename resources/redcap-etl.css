@@ -152,7 +152,7 @@ fieldset.config legend {
     border: 2px solid #286090;
 }
 
-.ui-dialog.redcap-etl-help .ui-dialog-titlebar {
+.ui-dialog.redcap-etl-help .ui-dialog-titlebar.redcap-etl-help {
     border: 1px solid #286090;
     color: #286090;
 }
@@ -193,6 +193,9 @@ fieldset.config legend {
 }
 */
 
+
+
+
 a.etl-help {
     background-color: #FFFFFF;
     border: 1px solid #286090;
@@ -210,7 +213,7 @@ a.etl-help {
     border: 2px solid #222222;
 }
 
-.ui-dialog.etl-rules-check .ui-dialog-titlebar {
+.ui-dialog.etl-rules-check .ui-dialog-titlebar.etl-rules-check {
     border: 1px solid #222222;
     color: #222222;
 }
@@ -242,4 +245,50 @@ input.etl-submit, button.etl-submit {
     color: #000080;
 }
 
+
+/* REDCap-ETL Admin Dialog */
+.ui-dialog.redcap-etl-admin {
+    border: 2px solid #286090;
+}
+
+.ui-dialog.redcap-etl-admin .ui-dialog-titlebar.redcap-etl-admin {
+    border: 1px solid #286090;
+    /* color: #286090; */
+}
+
+.ui-dialog.redcap-etl-admin table {
+    border-top: 1px solid #000000;
+    border-right: 1px solid #000000;
+}
+
+.ui-dialog.redcap-etl-admin th {
+    border-bottom: 1px solid #000000;
+    border-left: 1px solid #000000;
+    font-weight: bold;
+    padding: 1px 4px;
+    background-color: #F8F8F8;
+}
+
+.ui-dialog.redcap-etl-admin td, .ui-widget.redcap-etl-admin td {
+    border-bottom: 1px solid #000000;
+    border-left: 1px solid #000000;
+    padding: 1px 4px;
+    background-color: #FFFFFF;
+}
+
+.ui-dialog.redcap-etl-admin a {
+    outline: none;
+    text-decoration: underline;
+    color: #0000c0;
+}
+
+.ui-dialog.redcap-etl-admin a:hover {
+    color: #f00000;
+    outline: 1px solid #4ca2ff;
+    text-decoration: underline;
+}
+
+.ui-dialog-buttonpane.redcap-etl-admin div {
+    background-color: blue;
+}
 

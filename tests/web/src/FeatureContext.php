@@ -372,6 +372,40 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         $element->click();
     }
 
+    /**
+     * @When /^I delete private server access for the test user$/
+     */
+    public function iDeletePrivateServerAccessForTheTestUser()
+    {
+        $session = $this->getSession();
+        ManagePrivateUsersDialog::deleteTestUser($session);
+    }
+
+    /**
+     * @Then /^the test user should have private server access$/
+     *
+     * Assumes that the dialog for managing private server user access is open.
+     */
+    public function theTestUserShouldHavePrivateServerAccess()
+    {
+        $session = $this->getSession();
+        if (!ManagePrivateUsersDialog::hasTestUser($session)) {
+            throw new \Exception("The test user does NOT have access to the private server.");
+        }
+    }
+
+    /**
+     * @Then /^the test user should not have private server access$/
+     *
+     * Assumes that the dialog for managing private server user access is open.
+     */
+    public function theTestUserDoesShouldNotHavePrivateServerAccess()
+    {
+        $session = $this->getSession();
+        if (ManagePrivateUsersDialog::hasTestUser($session)) {
+            throw new \Exception("The test user has access to the private server.");
+        }
+    }
 
     /**
      * @When /^I wait for (\d+) seconds$/

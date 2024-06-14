@@ -27,7 +27,7 @@ Feature: Server access level management
     And I select "admin" from "accessLevel"
     And I wait for 5 seconds
     Then the "#accessLevelId option:selected" element should contain "admin"
-    And I should not see "Users Currently Granted Access"
+    But I should not see "Manage Private Access Users"
 
     When I follow "Servers"
     Then I should see "local-server" followed by "admin"
@@ -38,7 +38,7 @@ Feature: Server access level management
     And I select "public" from "accessLevel"
     And I wait for 5 seconds
     Then the "#accessLevelId option:selected" element should contain "public"
-    But I should not see "Users Currently Granted Access"
+    But I should not see "Manage Private Access Users"
 
     When I follow "Servers"
     Then I should see "local-server" followed by "public"
@@ -49,79 +49,94 @@ Feature: Server access level management
     And I select "private" from "accessLevel"
     And I wait for 5 seconds
     Then the "#accessLevelId option:selected" element should contain "private"
-    And I should see "Users Currently Granted Access"
-    And I should see "Add User Access"
+    And I should see "Manage Private Access Users"
 
   Scenario: Access the User page for server with private access
     When I follow "Servers"
     And I follow server "(embedded server)"
     And I select "private" from "accessLevel"
-    And I follow "Add User Access"
-    Then I should see "User:"
-
+    And I wait for 2 seconds
+    Then I should see "Manage Private Access Users"
+ 
   Scenario: Add a user to a server with private access
     When I follow "Servers"
     And I follow server "(embedded server)"
     And I select "private" from "accessLevel"
-    And I follow "Add User Access"
+    And I press "Manage Private Access Users"
+    And I search for user
+    And I press "Add"
+    And I wait for 2 seconds
+    And I press "Save"
+    And I wait for 2 seconds
+    And I follow "Users"
     And I follow "List"
+    And I wait for 2 seconds
     Then I "should" see a "link" item for the user
-
+    
     When I click on the user
     Then I should see "Server private-level access for user"
     And I should see "(embedded server)"
+    And I wait for 10 seconds
 
     When I check "accessCheckbox[(embedded server)]"
     And I press "Save"
     And I click on the user
+    And I wait for 10 seconds
     Then the checkbox "accessCheckbox[(embedded server)]" should be checked
 
     When I follow "Servers"
     And I follow server "(embedded server)"
-    Then I "should" see a "remove user checkbox" item for the user
-    And I should see "Add User Access"
+    And I press "Manage Private Access Users"
+    Then the test user should have private server access
+    # Then I should see "Manage Private Access Users"
 
   Scenario: Using the server page, remove an assigned user from a server with private access
     When I follow "Servers"
     And I follow server "(embedded server)"
-    And I select "private" from "accessLevel"
-    And I follow "Add User Access"
-    And I follow "List"
-    And I click on the user
-    And I check "accessCheckbox[(embedded server)]"
-    And I press "Save"
-    And I follow "Servers"
-    And I follow server "(embedded server)"
-    And I check the box to remove the user
-    And I press "Save"
-    And I follow server "(embedded server)"
-    Then I "should not" see a "remove user checkbox" item for the user
+    And I press "Manage Private Access Users"
+    And I delete private server access for the test user
+    And I wait for 2 seconds
+    And I press "save-private-access"
+    And I wait for 2 seconds
+    And I press "Manage Private Access Users"
+    And I wait for 2 seconds
+    Then the test user should not have private server access
 
     When I follow "Users"
     And I click on the user
     Then the checkbox "accessCheckbox[(embedded server)]" should be unchecked
-
- Scenario: Using the user page, remove an assigned user from a server with private access
+     
+  Scenario: Using the user page, remove an assigned user from a server with private access
     When I follow "Servers"
     And I follow server "(embedded server)"
     And I select "private" from "accessLevel"
-    And I follow "Add User Access"
-    And I follow "List"
-    And I click on the user
-    And I check "accessCheckbox[(embedded server)]"
+    And I press "Manage Private Access Users"
+    And I search for user
+    And I press "Add"
+    And I wait for 2 seconds
+    And I press "save-private-access"
+    And I wait for 2 seconds
     And I press "Save"
+    And I wait for 2 seconds
+
+    And I follow "Users"
+    And I follow "List"
     And I click on the user
     And I uncheck "accessCheckbox[(embedded server)]"
     And I press "Save"
+
     And I follow "Servers"
     And I follow server "(embedded server)"
-    Then I "should not" see a "remove user checkbox" item for the user
+    And I press "Manage Private Access Users"
+    Then the test user should not have private server access
 
- Scenario: Change the access level from private with users assigned to admin and do not delete the users list
+  Scenario: Change the access level from private with users assigned to admin and do not delete the users list
     When I follow "Servers"
     And I follow server "(embedded server)"
     And I choose "private" as the access level
-    And I follow "Add User Access"
+    And I press "Save"
+
+    And I follow "Users"
     And I follow "List"
     And I click on the user
     And I check "accessCheckbox[(embedded server)]"
@@ -129,23 +144,24 @@ Feature: Server access level management
     And I wait for 2 seconds
     And I follow "Servers"
     And I follow server "(embedded server)" 
-    And I choose "admin" as the access level and click "Save list"
-    And I wait for 5 seconds
+    And I select "admin" from "accessLevel"
+    And I wait for 2 seconds
+    And I press "Save list"
+    And I wait for 4 seconds
     Then the "#accessLevelId option:selected" element should contain "admin"
-    And I "should not" see a "remove user checkbox" item for the user
 
-    When I choose "private" as the access level
-    Then I should see "Users Currently Granted Access"
-    And I should see "Add User Access"
-    And I "should" see a "remove user checkbox" item for the user
+    When I select "private" from "accessLevel"
+    And I press "Manage Private Access Users"
+    Then the test user should have private server access
 
- Scenario: Change the access level from private with users assigned to public and delete the users list
+  Scenario: Change the access level from private with users assigned to public and delete the users list
     When I follow "Servers"
     And I follow server "(embedded server)"
-    And I choose "public" as the access level and click "Delete list"
-    And I press "Save"
-    And I wait for 5 seconds
+    # And I choose "public" as the access level and click "Delete list"
+    And I select "public" from "accessLevel"
+    And I wait for 2 seconds
+    And I press "Delete list"
+    And I wait for 2 seconds
     When I follow "Servers"
     And I follow server "(embedded server)"
     Then the "#accessLevelId option:selected" element should contain "public"
-

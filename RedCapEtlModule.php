@@ -84,6 +84,12 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
         return $rights;
     }
 
+    public function getUserInfo($username = USERID)
+    {
+        $userInfo = $this->db->getUserInfo($username);
+        return $userInfo;
+    }
+
     /**
      * Gets the data export right for the current user. If the current
      * user is an admin 'Full data set' export permission will be
@@ -452,13 +458,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
 
     public function hasServerForUser($username, $isScheduled = null, $isFileDownload = null)
     {
-        $hasServer = $this->settings->hasServerForUser($username, $isScheduled, $isFileDownload);
+        $hasServer = $this->getSettings()->hasServerForUser($username, $isScheduled, $isFileDownload);
         return $hasServer;
     }
 
     public function getServersForUser($username = USERID, $isScheduled = null, $isFileDownload = null)
     {
-        $servers = $this->settings->getServersForUser($username, $isScheduled, $isFileDownload);
+        $servers = $this->getSettings()->getServersForUser($username, $isScheduled, $isFileDownload);
         return $servers;
     }
 
@@ -537,7 +543,8 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function getUserPrivateServerNames($username, $privateServers)
     {
         $userServerNames = array();
-        $userServers = $this->getSettings()->getUserPrivateServerNames($username);
+        # $userServers = $this->getSettings()->getUserPrivateServerNames($username);
+        $userServers = $this->getSettings()->getPrivateServersForUser($username);
 
         foreach ($userServers as $serverName) {
            #if the user-assigned server stills have private access, then keep it
@@ -560,6 +567,13 @@ class RedCapEtlModule extends \ExternalModules\AbstractExternalModule
     public function getPrivateServerUsers($serverName)
     {
         return $this->getSettings()->getPrivateServerUsers($serverName);
+    }
+
+    public function setPrivateServerUsers($serverName, $usernames)
+    {
+        $this->getSettings()->setPrivateServerUsers($serverName, $usernames);
+        $details = 'Allowable users for private server modified for server ' . $serverName;
+        \REDCap::logEvent(self::CHANGE_LOG_ACTION, $details, null, null, self::LOG_EVENT);
     }
 
     public function processPrivateServerUsers($serverName, $removeUsernames)
