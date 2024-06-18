@@ -52,6 +52,12 @@ Feature: Server configuration management
     And I configure server "local"
     Then I should see "local-server"
 
+    When I log out
+    And I log in as user and access REDCap-ETL for test project
+    And I follow "Run"
+    And I select "task" from "configType"
+    Then the "#serverId" element should contain "local-server"
+
   Scenario: Copy server configuration
     When I follow "Servers"
     And I copy server "local-server" to "local-server-copy"
@@ -79,4 +85,38 @@ Feature: Server configuration management
     And I press "Add Server"
     Then I should see "Error: "
     And I should see "already exists"
+
+  Scenario: Test local server configuration with run settings unchecked
+    When I follow "Servers"
+    And I follow server "local-server"
+    And I uncheck "allowOnDemandRun"
+    And I uncheck "allowCronRun"
+    And I press "Save"
+
+    And I log out
+    And I log in as user and access REDCap-ETL for test project
+    And I follow "Run"
+    And I select "task" from "configType"
+    Then the "#serverId" element should not contain "local-server"
+
+    And I follow "Schedule"
+    And I select "task" from "configType"
+    Then the "#serverId" element should not contain "local-server"
+
+  Scenario: Test local server configuration with run settings checked
+    When I follow "Servers"
+    And I follow server "local-server"
+    And I check "allowOnDemandRun"
+    And I check "allowCronRun"
+    And I press "Save"
+
+    And I log out
+    And I log in as user and access REDCap-ETL for test project
+    And I follow "Run"
+    And I select "task" from "configType"
+    Then the "#serverId" element should contain "local-server"
+
+    And I follow "Schedule"
+    And I select "task" from "configType"
+    Then the "#serverId" element should contain "local-server"
 
