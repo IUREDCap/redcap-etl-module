@@ -121,6 +121,7 @@ class SchemaGenerator
         # Create lookup table that maps multiple choice values to labels
         #----------------------------------------------------------------
         $this->lookupChoices = $this->dataProject->getLookupChoices();
+
         $keyType = $this->taskConfig->getGeneratedKeyType();
         $lookupTableName = $this->taskConfig->getLookupTableName();
         $this->lookupTable = new LookupTable($this->lookupChoices, $keyType, $lookupTableName);
@@ -223,7 +224,6 @@ class SchemaGenerator
                 }
                 
                 $fields = $this->generateFields($rule, $table);
-
 
                 # For a single checkbox, one field will be generated for each option.
                 # These generated fields will have type INT and an original field
@@ -346,7 +346,6 @@ class SchemaGenerator
 
                         // If this field has category/label choices
                         if (array_key_exists($originalFieldName, $this->lookupChoices)) {
-                            #------------------------------------------------------------
                             # Add label fields for multiple-choice fields
                             #
                             # Need one label for each checkbox, because multiple values
@@ -546,12 +545,27 @@ class SchemaGenerator
             if (in_array(RowsType::BY_EVENTS_SUFFIXES, $rowsType)) {
                 $hasEvent      = true;
                 $hasSuffixes   = true;
+            } elseif (in_array(RowsType::BY_REPEATING_INSTRUMENTS_SUFFIXES, $rowsType)) {
+                $hasEvent      = true;
+                $hasInstrument = true;
+                $hasInstance   = true;
+                $hasSuffixes   = true;
+            } elseif (in_array(RowsType::BY_REPEATING_EVENTS_SUFFIXES, $rowsType)) {
+                $hasEvent      = true;
+                $hasInstance   = true;
+                $hasSuffixes   = true;
             }
         } else {
             # Classic (non-longitudinal) study
             if (in_array(RowsType::BY_REPEATING_INSTRUMENTS, $rowsType)) {
                 $hasInstrument = true;
                 $hasInstance   = true;
+            }
+
+            if (in_array(RowsType::BY_REPEATING_INSTRUMENTS_SUFFIXES, $rowsType)) {
+                $hasInstrument = true;
+                $hasInstance   = true;
+                $hasSuffixes   = true;
             }
         }
 
@@ -618,27 +632,28 @@ class SchemaGenerator
 
         $fields = array();
                 
+        # For a field in a Suffix table, append a valid suffix to
+        # the field name to get a lookup table field name
+        if (RowsType::hasSuffixes($table->rowsType)) {
+            # Lookup the choices using any one of the valid suffixes,
+            # since, for the same base field,  they all should have
+            # the same choices
+            $suffixes = $table->getPossibleSuffixes();
+            $lookupFieldName = $fieldName.$suffixes[0];
+        } else {
+            $lookupFieldName = $fieldName;
+        }
+
+        $redcapFieldType = $this->dataProject->getFieldType($lookupFieldName);
+
         // If this is a checkbox field
         if ($fieldType === FieldType::CHECKBOX) {
-            # For a checkbox in a Suffix table, append a valid suffix to
-            # the field name to get a lookup table field name
-            if (RowsType::hasSuffixes($table->rowsType)) {
-                # Lookup the choices using any one of the valid suffixes,
-                # since, for the same base field,  they all should have
-                # the same choices
-                $suffixes = $table->getPossibleSuffixes();
-                $lookupFieldName = $fieldName.$suffixes[0];
-            } else {
-                $lookupFieldName = $fieldName;
-            }
-
-            $redcapFieldType = $this->dataProject->getFieldType($lookupFieldName);
-            
             # Process each value of the checkbox
             foreach ($this->lookupChoices[$lookupFieldName] as $value => $label) {
                 # It looks like REDCap uses the lower-case version of the
                 # value for making the field name
                 $lowerCaseValue = strtolower($value);
+
                 // Form the field names for this value
                 $checkBoxFieldName = $fieldName.RedCapEtl::CHECKBOX_SEPARATOR.$lowerCaseValue;
                 $checkBoxDbFieldName = '';
@@ -652,13 +667,12 @@ class SchemaGenerator
             }
         } else {  # Non-checkbox field
             // Process a single field
-            $redcapFieldType = $this->dataProject->getFieldType($fieldName);
 
             $field = new Field($fieldName, $fieldType, $fieldSize, $dbFieldName, $redcapFieldType);
 
-            if (array_key_exists($fieldName, $this->lookupChoices)) {
+            if (array_key_exists($lookupFieldName, $this->lookupChoices)) {
                 # A single-choice multiple choice field (e.g., dropdown or radio)
-                $field->valueToLabelMap = $this->lookupChoices[$fieldName];
+                $field->valueToLabelMap = $this->lookupChoices[$lookupFieldName];
 
                 if ($fieldType === FieldType::DROPDOWN || $fieldType === FieldType::RADIO) {
                     # if all values are integer, reset the field type to INT,

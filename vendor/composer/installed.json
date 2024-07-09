@@ -50,17 +50,17 @@
         },
         {
             "name": "iu-redcap/redcap-etl",
-            "version": "2.3.11",
-            "version_normalized": "2.3.11.0",
+            "version": "2.3.12",
+            "version_normalized": "2.3.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/redcap-etl.git",
-                "reference": "a3dd6f931bd2d284e12092ac93cc3f372e5e3fd0"
+                "reference": "a4d58a127dc76de272279339a44b199750fdf36b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/a3dd6f931bd2d284e12092ac93cc3f372e5e3fd0",
-                "reference": "a3dd6f931bd2d284e12092ac93cc3f372e5e3fd0",
+                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/a4d58a127dc76de272279339a44b199750fdf36b",
+                "reference": "a4d58a127dc76de272279339a44b199750fdf36b",
                 "shasum": ""
             },
             "require": {
@@ -74,7 +74,7 @@
                 "phpunit/phpunit": "11.0.4",
                 "squizlabs/php_codesniffer": "3.9.0"
             },
-            "time": "2024-06-20T18:49:59+00:00",
+            "time": "2024-07-09T13:40:39+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -93,7 +93,7 @@
             ],
             "support": {
                 "issues": "https://github.com/IUREDCap/redcap-etl/issues",
-                "source": "https://github.com/IUREDCap/redcap-etl/tree/2.3.11"
+                "source": "https://github.com/IUREDCap/redcap-etl/tree/2.3.12"
             },
             "install-path": "../iu-redcap/redcap-etl"
         },
@@ -217,17 +217,17 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "3.0.38",
-            "version_normalized": "3.0.38.0",
+            "version": "3.0.39",
+            "version_normalized": "3.0.39.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "b18b8788e51156c4dd97b7f220a31149a0052067"
+                "reference": "211ebc399c6e73c225a018435fe5ae209d1d1485"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/b18b8788e51156c4dd97b7f220a31149a0052067",
-                "reference": "b18b8788e51156c4dd97b7f220a31149a0052067",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/211ebc399c6e73c225a018435fe5ae209d1d1485",
+                "reference": "211ebc399c6e73c225a018435fe5ae209d1d1485",
                 "shasum": ""
             },
             "require": {
@@ -245,7 +245,7 @@
                 "ext-mcrypt": "Install the Mcrypt extension in order to speed up a few other cryptographic operations.",
                 "ext-openssl": "Install the OpenSSL extension in order to speed up a wide variety of cryptographic operations."
             },
-            "time": "2024-06-17T10:11:32+00:00",
+            "time": "2024-06-24T06:27:33+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -310,7 +310,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpseclib/phpseclib/issues",
-                "source": "https://github.com/phpseclib/phpseclib/tree/3.0.38"
+                "source": "https://github.com/phpseclib/phpseclib/tree/3.0.39"
             },
             "funding": [
                 {
