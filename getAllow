@@ -1,6 +1,0 @@
-RedCapEtlModule.php:                $sslVerify = $adminConfig->getSslVerify();
-RedCapEtlModule.php:    #        $properties[Configuration::EMAIL_FROM_ADDRESS] = $adminConfig->getEmbeddedServerEmailFromAddress();
-RedCapEtlModule.php:    #        $properties[Configuration::LOG_FILE]      = $adminConfig->getEmbeddedServerLogFile();
-RedCapEtlModule.php:            # if ($adminConfig->getAllowOnDemand()) {
-RedCapEtlModule.php:            # if ($adminConfig->getAllowCron()) {
-RedCapEtlModule.php:                                $sslVerify = $adminConfig->getSslVerify();
