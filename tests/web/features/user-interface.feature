@@ -18,27 +18,26 @@ I need to be able to view the REDCap-ETL external module pages
 
   Scenario: Access REDCap-ETL home page for test project
     Then I should see tabs "ETL Configurations", "ETL Workflows", "Configure", "Run", "Schedule","User Manual"
-    #Then I should see "ETL Configurations"
-    #And I should see "Configure"
-    #And I should see "Run"
-    #And I should see "Schedule"
-    #And I should see "User Manual"
+    But I should not see "REDCap crashed"
 
   Scenario: Access REDCap-ETL ETL workflows page for test project
     When I follow "ETL Workflows"
     Then I should see "REDCap-ETL Workflow name:"
     And I should see "Configure"
     And I should see "Run"
+    But I should not see "REDCap crashed"
 
   Scenario: Access REDCap-ETL configure page for test project
     When I follow "Configure"
     Then I should see "ETL Configuration"
     And I should see "ETL Workflow"
+    But I should not see "REDCap crashed"
 
   Scenario: Access REDCap-ETL run page for test project
     When I follow "Run"
     Then I should see "ETL Configuration"
     Then I should see "ETL Workflow"
+    But I should not see "REDCap crashed"
 
   Scenario: Access REDCap-ETL schedule page for test project
     When I follow "Schedule"
@@ -54,15 +53,19 @@ I need to be able to view the REDCap-ETL external module pages
     And I should see "Friday"
     And I should see "Saturday"
     And I should see "ETL Server"
+    But I should not see "REDCap crashed"
 
   Scenario: Access REDCap-ETL user manual page for test project
     When I follow "User Manual"
     Then I should see "Overview"
     And I should see "REDCap-ETL Configurations"
     And I should see "Running REDCap-ETL"
+    But I should not see "REDCap crashed"
+    But I should not see "Error message:"
 
   Scenario: Access ETL Configurations page using the tab
     When I follow "ETL Configurations"
     Then I should see "REDCap-ETL configuration name:"
     And I should see "Add"
+    But I should not see "REDCap crashed"
 

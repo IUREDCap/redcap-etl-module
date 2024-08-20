@@ -217,7 +217,7 @@ are 2 basic ways to run REDCap-ETL:
     <li><strong>On Demand</strong> 
     <?php
     # if (!$adminConfig->getAllowOnDemand()) {
-    $isScheduled = faise;
+    $isScheduled = false;
     if (!$module->hasServerForUser(USERID, $isScheduled)) {
         echo ' <span style="color: red">(disabled)</span> ';
     }

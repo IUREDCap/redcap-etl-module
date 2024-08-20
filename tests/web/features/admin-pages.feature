@@ -19,6 +19,7 @@ Feature: Admin-Interface
     And I should see "Users"
     And I should see "ETL Servers"
     And I should see "Help Edit"
+    But I should not see "REDCap crashed"
 
   Scenario: Access the admin config page
     When I follow "Config"
@@ -30,31 +31,37 @@ Feature: Admin-Interface
     And I should see "Thursday"
     And I should see "Friday"
     And I should see "Saturday"
+    But I should not see "REDCap crashed"
 
   Scenario: Access the admin cron detail page
     When I follow "Cron Detail"
     Then I should see "Day"
     And I should see "Time"
+    But I should not see "REDCap crashed"
 
   Scenario: Access the admin users page
     When I follow "Users"
     Then I should see "List"
     And I should see "Search"
+    But I should not see "REDCap crashed"
 
   Scenario: Access the admin user search page
     When I follow "Users"
     And I follow "Search"
     Then I should see "User:"
+    But I should not see "REDCap crashed"
 
   Scenario: Access the admin ETL servers page
     When I follow "ETL Servers"
     Then I should see "List"
     And I should see "Configuration"
+    But I should not see "REDCap crashed"
 
   Scenario: Access the admin ETL server config page
     When I follow "ETL Servers"
     And I follow "Configuration"
     Then I should see "Server:"
+    But I should not see "REDCap crashed"
 
   Scenario: Access the admin help edit list page
     When I follow "Help Edit"
@@ -62,6 +69,7 @@ Feature: Admin-Interface
     And I should see "Edit"
     And I should see "Topic"
     And I should see "Setting"
+    But I should not see "REDCap crashed"
 
   Scenario: Access the admin help edit edit page
     When I follow "Help Edit"
@@ -70,15 +78,18 @@ Feature: Admin-Interface
     And I should see "Help Text"
     And I should see "Preview"
     And I should see "Default Help Text"
+    But I should not see "REDCap crashed"
 
   Scenario: Access the admin info page
     When I follow "Info"
     Then I should see "Overview"
     And I should see "REDCap-ETL Servers"
     And I should see "Extract Transform Load"
+    But I should not see "REDCap crashed"
 
   Scenario: Access the admin log page
     When I follow "Log"
     Then I should see "REDCap-ETL Log"
     And I should see "Log Entries:"
+    But I should not see "REDCap crashed"
 
