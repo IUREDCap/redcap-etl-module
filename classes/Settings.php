@@ -1163,8 +1163,17 @@ class Settings
 
     public function isLastRunTime($date, $hour)
     {
+        $isLast = false;
+
         $lastRunTime = $this->getLastRunTime();
-        return $lastRunTime[0] == $date && $lastRunTime[1] == $hour;
+
+        if ($lastRunTime === null) {
+            $isLast = false;
+        } elseif ($lastRunTime[0] == $date && $lastRunTime[1] == $hour) {
+            $isLast = true;
+        }
+
+        return $isLast;
     }
 
 
