@@ -677,7 +677,7 @@ class Logger
         foreach ($mailToAddresses as $mailto) {
             $sent = mail($mailto, $subjectString, $message, $headers, $sendmailOpts);
             if ($sent === false) {
-                array_push($failedSentTos, $mailTo);
+                array_push($faliedSendTos, $mailto);
             }
         }
 
