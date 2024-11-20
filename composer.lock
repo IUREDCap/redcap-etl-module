@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "00a0e97f49340cfd2e561bc9abfd0f35",
+    "content-hash": "b78bb408b3fb92c89a1c55f89dc8d916",
     "packages": [
         {
             "name": "iu-redcap/phpcap",
@@ -53,16 +53,16 @@
         },
         {
             "name": "iu-redcap/redcap-etl",
-            "version": "2.3.12",
+            "version": "2.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/redcap-etl.git",
-                "reference": "a4d58a127dc76de272279339a44b199750fdf36b"
+                "reference": "bd6e65dcb5548fc4e7021cbdb65fabb3c7364e49"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/a4d58a127dc76de272279339a44b199750fdf36b",
-                "reference": "a4d58a127dc76de272279339a44b199750fdf36b",
+                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/bd6e65dcb5548fc4e7021cbdb65fabb3c7364e49",
+                "reference": "bd6e65dcb5548fc4e7021cbdb65fabb3c7364e49",
                 "shasum": ""
             },
             "require": {
@@ -93,9 +93,9 @@
             ],
             "support": {
                 "issues": "https://github.com/IUREDCap/redcap-etl/issues",
-                "source": "https://github.com/IUREDCap/redcap-etl/tree/2.3.12"
+                "source": "https://github.com/IUREDCap/redcap-etl/tree/2.3.13"
             },
-            "time": "2024-07-09T13:40:39+00:00"
+            "time": "2024-11-20T14:27:43+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
