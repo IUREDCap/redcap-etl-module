@@ -113,6 +113,7 @@ try {
                         header('Content-Disposition: attachment; filename="redcap-etl.zip"');
                         header('Content-Length: ' . filesize($result));
                         echo file_get_contents($result);
+                        exit();
                     }
                 }
             }
