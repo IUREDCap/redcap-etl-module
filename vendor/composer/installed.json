@@ -50,17 +50,17 @@
         },
         {
             "name": "iu-redcap/redcap-etl",
-            "version": "2.3.13",
-            "version_normalized": "2.3.13.0",
+            "version": "2.3.14",
+            "version_normalized": "2.3.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/redcap-etl.git",
-                "reference": "bd6e65dcb5548fc4e7021cbdb65fabb3c7364e49"
+                "reference": "896521a76fea0438082bc1f6604142e297eec668"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/bd6e65dcb5548fc4e7021cbdb65fabb3c7364e49",
-                "reference": "bd6e65dcb5548fc4e7021cbdb65fabb3c7364e49",
+                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/896521a76fea0438082bc1f6604142e297eec668",
+                "reference": "896521a76fea0438082bc1f6604142e297eec668",
                 "shasum": ""
             },
             "require": {
@@ -71,10 +71,10 @@
                 "php": ">=7.2.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "11.0.4",
-                "squizlabs/php_codesniffer": "3.9.0"
+                "phpunit/phpunit": "11.4.4",
+                "squizlabs/php_codesniffer": "3.11.1"
             },
-            "time": "2024-11-20T14:27:43+00:00",
+            "time": "2024-12-05T13:45:12+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -93,7 +93,7 @@
             ],
             "support": {
                 "issues": "https://github.com/IUREDCap/redcap-etl/issues",
-                "source": "https://github.com/IUREDCap/redcap-etl/tree/2.3.13"
+                "source": "https://github.com/IUREDCap/redcap-etl/tree/2.3.14"
             },
             "install-path": "../iu-redcap/redcap-etl"
         },
