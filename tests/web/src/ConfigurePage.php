@@ -34,9 +34,11 @@ class ConfigurePage
 
         # print( $page->getText() );
 
-        $page->selectFieldOption('api_token_username', $etlConfig['api_token_username']);
+        //$page->selectFieldOption('api_token_username', $etlConfig['api_token_username']);
+        Util::waitForAndSelectOption($session, 'api_token_username', $etlConfig['api_token_username']);
 
-        $page->pressButton('Auto-Generate');
+        //$page->pressButton('Auto-Generate');
+        Util::waitForAndPressButton($session, 'Auto-Generate');
 
         #------------------------------
         # Load database
@@ -67,7 +69,8 @@ class ConfigurePage
         #------------------------------
         # Save
         #------------------------------
-        $page->pressButton('Save');
+        //$page->pressButton('Save');
+        Util::waitForAndPressButton($session, 'Save');
     }
 
 

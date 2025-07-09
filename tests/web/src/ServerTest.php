@@ -67,6 +67,8 @@ class ServerTest extends TestCase
 
         $username = self::$testConfig->getUser()['username'];
 
+        sleep(14);
+
         Util::logInAsAdminAndAccessRedCapEtl(self::$session);
 
         $this->configureEtlServer($serverName);
@@ -133,8 +135,13 @@ class ServerTest extends TestCase
         $page = self::$session->getPage();
         #print "\nPAGE:\n";
         #print_r($page);
-        $page->pressButton('Test Server Connection');
-        sleep(6);
+
+        //$page->pressButton('Test Server Connection');
+        Util::waitForAndPressButton(self::$session, 'Test Server Connection');
+
+        //sleep(6);
+        Util::waitForElement(self::$session, "testOutput");
+
         $testOutput = $page->findById("testOutput")->getValue();
         $this->assertMatchesRegularExpression("/SUCCESS/", $testOutput); 
         $this->assertMatchesRegularExpression("/output of hostname command:/", $testOutput); 
@@ -169,7 +176,7 @@ class ServerTest extends TestCase
 
         try {
             RunPage::runConfiguration(self::$session, $configName, $serverName);
-            sleep(6);
+            sleep(10);
             $text = $page->getText();
             $this->assertMatchesRegularExpression("/Your job has been submitted to server/", $text); 
         } catch (\Exception $exception) {

@@ -86,6 +86,7 @@ class Util
 
         // $page = $session->getPage();
 
+        sleep(10);
         self::waitForAndFillField($session, 'username', $username);
         self::waitForAndFillField($session, 'password', $password);
         self::waitForAndPressButton($session, 'login_btn');
@@ -97,7 +98,7 @@ class Util
     public static function logOut($session)
     {
         $page = $session->getPage();
-        sleep(2);
+        sleep(4);
         $page->clickLink('Log out');
     }
 

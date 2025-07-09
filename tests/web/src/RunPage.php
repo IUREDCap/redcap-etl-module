@@ -27,8 +27,11 @@ class RunPage
     public static function runConfiguration($session, $configName, $etlServer)
     {
         $page = $session->getPage();
-        $page->selectFieldOption('configName', $configName);
-        $page->selectFieldOption('server', $etlServer);
-        $page->pressButton('Run');
+        //$page->selectFieldOption('configName', $configName);
+        //$page->selectFieldOption('server', $etlServer);
+        //$page->pressButton('Run');
+        Util::waitForAndSelectOption($session, 'configName', $configName);
+        Util::waitForAndSelectOption($session, 'server', $etlServer);
+        Util::waitForAndPressButton($session, 'Run');
     }
 }
