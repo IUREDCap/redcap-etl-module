@@ -33,11 +33,11 @@ I need to be able to autogenerate the transformation rules
     And I wait for 1 seconds
     And I am on "/"
     And I am logged in as user
-    And I follow "My Projects"
+    And I wait for and follow "My Projects"
     And I select the forms project
-    And I follow "REDCap-ETL"
+    And I wait for and follow "REDCap-ETL"
     And I follow configuration "behat-config-test"
-    Then I should see "Transform Settings"
+    Then I should eventually see "Transform Settings"
     And I "should" see this text "TABLE,registration,registration_id,ROOT"
 
   Scenario: Configure configuration that has the include auto-gen options specified 
@@ -102,11 +102,11 @@ I need to be able to autogenerate the transformation rules
     And I wait for 1 seconds
     And I am on "/"
     And I am logged in as user
-    And I follow "My Projects"
+    And I wait for and follow "My Projects"
     And I select the forms project
-    And I follow "REDCap-ETL"
+    And I wait for and follow "REDCap-ETL"
     And I follow configuration "behat-config-test"
-    Then I should see "Transform Settings"
+    Then I should eventually see "Transform Settings"
     And I "should" see this text "TABLE,registration,registration_id,ROOT"
     But I "should not" see this text "testtable"
 

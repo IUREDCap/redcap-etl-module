@@ -509,6 +509,13 @@ class Util
         return $element;
     }
 
+    public static function waitForAndFollow($session, $linkId, $timeout = 10)
+    {
+        Util::waitForElement($session, $linkId, $timeout);
+        $page = $session->getPage();
+        $page->clickLink($linkId);
+    }
+
     public static function waitForAndPressButton($session, $buttonId, $timeout = 10)
     {
         Util::waitForElement($session, $buttonId, $timeout);
