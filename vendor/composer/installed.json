@@ -2,17 +2,17 @@
     "packages": [
         {
             "name": "iu-redcap/phpcap",
-            "version": "1.5.1",
-            "version_normalized": "1.5.1.0",
+            "version": "1.5.3",
+            "version_normalized": "1.5.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/phpcap.git",
-                "reference": "86a0e0cb738601f9e926aac9115a421273b5950e"
+                "reference": "767f3b93f45bf3830a3756aaef0c8d08bf310766"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/phpcap/zipball/86a0e0cb738601f9e926aac9115a421273b5950e",
-                "reference": "86a0e0cb738601f9e926aac9115a421273b5950e",
+                "url": "https://api.github.com/repos/IUREDCap/phpcap/zipball/767f3b93f45bf3830a3756aaef0c8d08bf310766",
+                "reference": "767f3b93f45bf3830a3756aaef0c8d08bf310766",
                 "shasum": ""
             },
             "require": {
@@ -22,11 +22,12 @@
             },
             "require-dev": {
                 "erusev/parsedown": "1.7.4",
-                "phpunit/phpunit": "11.0.4",
-                "smalot/pdfparser": "2.9.0",
-                "squizlabs/php_codesniffer": "3.9.0"
+                "phpstan/phpstan": "2.1.0",
+                "phpunit/phpunit": "11.4.4",
+                "smalot/pdfparser": "2.11.0",
+                "squizlabs/php_codesniffer": "3.11.1"
             },
-            "time": "2024-03-08T16:31:03+00:00",
+            "time": "2025-01-16T13:12:12+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -44,37 +45,37 @@
             ],
             "support": {
                 "issues": "https://github.com/IUREDCap/phpcap/issues",
-                "source": "https://github.com/IUREDCap/phpcap/tree/1.5.1"
+                "source": "https://github.com/IUREDCap/phpcap/tree/1.5.3"
             },
             "install-path": "../iu-redcap/phpcap"
         },
         {
             "name": "iu-redcap/redcap-etl",
-            "version": "2.3.14",
-            "version_normalized": "2.3.14.0",
+            "version": "2.3.15",
+            "version_normalized": "2.3.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/IUREDCap/redcap-etl.git",
-                "reference": "896521a76fea0438082bc1f6604142e297eec668"
+                "reference": "ebd1d5d38641aef6f645922cbb8c81dfab4a91b3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/896521a76fea0438082bc1f6604142e297eec668",
-                "reference": "896521a76fea0438082bc1f6604142e297eec668",
+                "url": "https://api.github.com/repos/IUREDCap/redcap-etl/zipball/ebd1d5d38641aef6f645922cbb8c81dfab4a91b3",
+                "reference": "ebd1d5d38641aef6f645922cbb8c81dfab4a91b3",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "ext-dom": "*",
                 "ext-openssl": "*",
-                "iu-redcap/phpcap": "1.5.1",
+                "iu-redcap/phpcap": "1.5.3",
                 "php": ">=7.2.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "11.4.4",
-                "squizlabs/php_codesniffer": "3.11.1"
+                "phpunit/phpunit": "11.5.25",
+                "squizlabs/php_codesniffer": "3.13.2"
             },
-            "time": "2024-12-05T13:45:12+00:00",
+            "time": "2025-07-03T13:29:24+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -93,7 +94,7 @@
             ],
             "support": {
                 "issues": "https://github.com/IUREDCap/redcap-etl/issues",
-                "source": "https://github.com/IUREDCap/redcap-etl/tree/2.3.14"
+                "source": "https://github.com/IUREDCap/redcap-etl/tree/2.3.15"
             },
             "install-path": "../iu-redcap/redcap-etl"
         },
@@ -217,17 +218,17 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "3.0.42",
-            "version_normalized": "3.0.42.0",
+            "version": "3.0.46",
+            "version_normalized": "3.0.46.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "db92f1b1987b12b13f248fe76c3a52cadb67bb98"
+                "reference": "56483a7de62a6c2a6635e42e93b8a9e25d4f0ec6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/db92f1b1987b12b13f248fe76c3a52cadb67bb98",
-                "reference": "db92f1b1987b12b13f248fe76c3a52cadb67bb98",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/56483a7de62a6c2a6635e42e93b8a9e25d4f0ec6",
+                "reference": "56483a7de62a6c2a6635e42e93b8a9e25d4f0ec6",
                 "shasum": ""
             },
             "require": {
@@ -245,7 +246,7 @@
                 "ext-mcrypt": "Install the Mcrypt extension in order to speed up a few other cryptographic operations.",
                 "ext-openssl": "Install the OpenSSL extension in order to speed up a wide variety of cryptographic operations."
             },
-            "time": "2024-09-16T03:06:04+00:00",
+            "time": "2025-06-26T16:29:55+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -310,7 +311,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpseclib/phpseclib/issues",
-                "source": "https://github.com/phpseclib/phpseclib/tree/3.0.42"
+                "source": "https://github.com/phpseclib/phpseclib/tree/3.0.46"
             },
             "funding": [
                 {
