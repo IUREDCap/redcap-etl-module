@@ -48,8 +48,8 @@ I need to be able to create, run and schedule workflows
 
   Scenario: Save and exit config1 for workflow
     When I follow configuration "behat-workflow-config1-test"
-    And I press "Save and Exit"
-    Then I should see "Configuration Name"
+    And I wait for and press "Save and Exit"
+    Then I should eventually see "Configuration Name"
     And I should see "behat-workflow-config1-test"
 
   Scenario: Create config2 for workflow
@@ -68,8 +68,8 @@ I need to be able to create, run and schedule workflows
 
   Scenario: Save and exit config2 for workflow
     When I follow configuration "behat-workflow-config2-test"
-    And I press "Save and Exit"
-    Then I should see "Configuration Name"
+    And I wait for and press "Save and Exit"
+    Then I should eventually see "Configuration Name"
     And I should see "behat-workflow-config2-test"
 
   Scenario: Create workflow
@@ -86,7 +86,7 @@ I need to be able to create, run and schedule workflows
     And I specify etl-configuration "behat-workflow-config1-test" for task "Task1"
 
     And I add task for workflow
-    And I wait for 2 seconds
+    And I wait for 10 seconds
     And I rename task 2 to "Task2"
     And I specify etl-configuration "behat-workflow-config2-test" for task "Task2"
 
@@ -107,12 +107,12 @@ I need to be able to create, run and schedule workflows
 
   Scenario: Run workflow on embedded server
     When I follow "Run"
-    And I select "workflow" from "configType"
-    And I select "behat-workflow-test" from "workflowName"
-    And I select "(embedded server)" from "server"
-    And I press "Run"
-    Then I should see "[Task1] Processing complete."
-    And I should see "[Task2] Processing complete."
+    And I wait for and select "workflow" from "configType"
+    And I wait for and select "behat-workflow-test" from "workflowName"
+    And I wait for and select "(embedded server)" from "server"
+    And I wait for and press "Run"
+    Then I should eventually see "[Task1] Processing complete."
+    And I should eventually see "[Task2] Processing complete."
     And database table "redcap_project_info" should contain 2 rows
     And database table "enrollment" should contain 200 rows
     But I should not see "Error:"
@@ -160,13 +160,12 @@ I need to be able to create, run and schedule workflows
     And I fill in "E-mail subject" with "REDCap-ETL Module web test 2/3: run workflow on remote server"
     And I press "Save"
     And I follow "Run"
-    And I select "workflow" from "configType"
-    And I select "behat-workflow-test" from "workflowName"
-    And I select "remote-server-workflow-test" from "server"
-    And I press "Run"
-    And I wait for 4 seconds
+    And I wait for and select "workflow" from "configType"
+    And I wait for and select "behat-workflow-test" from "workflowName"
+    And I wait for and select "remote-server-workflow-test" from "server"
+    And I wait for and press "Run"
     # And Print element "body" text
-    Then I should see "Your job has been submitted to server"
+    Then I should eventually see "Your job has been submitted to server"
     And I should see "remote-server-workflow-test"
     And I should not see "Error:"
     # Need to check e-mail for this test

@@ -35,7 +35,7 @@ Feature: Server configuration management
   Scenario: Test embedded server connection
     When I follow "Servers"
     And I follow server "(embedded server)"
-    And I press "Test Server Connection"
+    And I wait for and press "Test Server Connection"
     Then the "#testOutput" element should contain "REDCap-ETL"
     And the "#testOutput" element should contain "found"
 
@@ -91,12 +91,12 @@ Feature: Server configuration management
     And I follow server "local-server"
     And I uncheck "allowOnDemandRun"
     And I uncheck "allowCronRun"
-    And I press "Save"
+    And I wait for and press "Save"
 
     And I log out
     And I log in as user and access REDCap-ETL for test project
     And I follow "Run"
-    And I select "task" from "configType"
+    And I wait for and select "task" from "configType"
     Then the "#serverId" element should not contain "local-server"
 
     And I follow "Schedule"
@@ -108,15 +108,15 @@ Feature: Server configuration management
     And I follow server "local-server"
     And I check "allowOnDemandRun"
     And I check "allowCronRun"
-    And I press "Save"
+    And I wait for and press "Save"
 
     And I log out
     And I log in as user and access REDCap-ETL for test project
     And I follow "Run"
-    And I select "task" from "configType"
+    And I wait for and select "task" from "configType"
     Then the "#serverId" element should contain "local-server"
 
     And I follow "Schedule"
-    And I select "task" from "configType"
+    And I wait for and select "task" from "configType"
     Then the "#serverId" element should contain "local-server"
 

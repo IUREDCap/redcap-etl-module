@@ -35,9 +35,8 @@ Feature: Admin User Management
     And I follow "My Projects"
     And I select the test project
     And I follow "REDCap-ETL"
-    And I press "Request ETL access for this project"
-    And I wait for 4 seconds
-    Then I should see "Request"
+    And I wait for and press "Request ETL access for this project"
+    Then I should eventually see "Request"
     And I should see "sent"
     But I should not see "Error:"
 

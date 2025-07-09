@@ -86,7 +86,7 @@ Feature: Server access level management
 
     When I follow "Servers"
     And I follow server "(embedded server)"
-    And I press "Manage Private Access Users"
+    And I wait for and press "Manage Private Access Users"
     Then the test user should have private server access
     # Then I should see "Manage Private Access Users"
 
@@ -109,49 +109,49 @@ Feature: Server access level management
   Scenario: Using the user page, remove an assigned user from a server with private access
     When I follow "Servers"
     And I follow server "(embedded server)"
-    And I select "private" from "accessLevel"
-    And I press "Manage Private Access Users"
+    And I wait for and select "private" from "accessLevel"
+    And I wait for and press "Manage Private Access Users"
     And I search for user
-    And I press "Add"
-    And I wait for 2 seconds
-    And I press "save-private-access"
-    And I wait for 2 seconds
-    And I press "Save"
+    And I wait for and press "Add"
+    And I wait for and press "save-private-access"
+    And I wait for and press "Save"
     And I wait for 2 seconds
 
     And I follow "Users"
     And I follow "List"
     And I click on the user
     And I uncheck "accessCheckbox[(embedded server)]"
-    And I press "Save"
+    And I wait for and press "Save"
 
+    And I wait for 5 seconds
     And I follow "Servers"
+    And I wait for 5 seconds
     And I follow server "(embedded server)"
-    And I press "Manage Private Access Users"
+    And I wait for and press "Manage Private Access Users"
     Then the test user should not have private server access
 
   Scenario: Change the access level from private with users assigned to admin and do not delete the users list
     When I follow "Servers"
     And I follow server "(embedded server)"
     And I choose "private" as the access level
-    And I press "Save"
+    And I wait for and press "Save"
 
     And I follow "Users"
     And I follow "List"
+    And I wait for 2 seconds
     And I click on the user
     And I check "accessCheckbox[(embedded server)]"
-    And I press "Save"
+    And I wait for and press "Save"
     And I wait for 2 seconds
     And I follow "Servers"
     And I follow server "(embedded server)" 
-    And I select "admin" from "accessLevel"
-    And I wait for 2 seconds
-    And I press "Save list"
+    And I wait for and select "admin" from "accessLevel"
+    And I wait for and press "Save list"
     And I wait for 4 seconds
     Then the "#accessLevelId option:selected" element should contain "admin"
 
-    When I select "private" from "accessLevel"
-    And I press "Manage Private Access Users"
+    When I wait for and select "private" from "accessLevel"
+    And I wait for and press "Manage Private Access Users"
     Then the test user should have private server access
 
   Scenario: Change the access level from private with users assigned to public and delete the users list

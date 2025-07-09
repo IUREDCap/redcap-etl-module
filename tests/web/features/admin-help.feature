@@ -16,15 +16,16 @@ Feature: Admin Help Customization
     And I follow "Help Edit"
     And I follow "Edit"
     And I select "E-mail To List" from "Help Topic"
-    And I wait for 4 seconds
-    Then I should see "A comma-separated list of e-mail addresses"
+    Then I should eventually see "A comma-separated list of e-mail addresses"
 
   Scenario: Try to save help with no help topic selected
     When I log in as admin and access REDCap-ETL
+    And I wait for 5 seconds
     And I follow "Help Edit"
+    And I wait for 5 seconds
     And I follow "Edit"
-    And I press "Save"
-    Then I should see "Error:"
+    And I wait for and press "Save"
+    Then I should eventually see "ERROR:"
     And I should see "No help topic specified"
 
   Scenario: Preview custom help prepended to default help
@@ -34,8 +35,7 @@ Feature: Admin Help Customization
     And I fill in "customHelp" with "custom help"
     And I select "Prepend custom text to default" from "helpSetting"
     And I press "Preview"
-    And I wait for 4 seconds
-    Then I should see "custom help REDCap-ETL uses the REDCap API"
+    Then I should eventually see "custom help REDCap-ETL uses the REDCap API"
 
   Scenario: Preview custom help appended to default help
     When I log in as admin and access REDCap-ETL
@@ -44,8 +44,7 @@ Feature: Admin Help Customization
     And I fill in "customHelp" with "custom help"
     And I select "Append custom text to default" from "helpSetting"
     And I press "Preview"
-    And I wait for 4 seconds
-    Then I should see "the same ETL process. custom help"
+    Then I should eventually see "the same ETL process. custom help"
 
   @modified-help-for-batch-size
   Scenario: Replacing default help text with custom help text and saving should update the admin help edit page
@@ -67,20 +66,21 @@ Feature: Admin Help Customization
     And I follow "Help Edit"
     # Edit batch size help
     And I follow "Batch Size"
-    And I fill in "customHelp" with "<p>Batch sizes over 500 are not recommended.</p>"
+    And I wait for and fill in "customHelp" with "<p>Batch sizes over 500 are not recommended.</p>"
     And I select "Use custom text" from "helpSetting"
-    And I press "Save"
+    And I wait for and press "Save"
     And I log out
 
     # Check that help modifications show up for user
     And I log in as user and access REDCap-ETL for test project
 
     # Add new configuration (so that help can be accessed):
-    And I fill in "behat-help-test" for "REDCap-ETL configuration name:"
-    And I press "Add"
+    # And I fill in "REDCap-ETL configuration name:" with "behat-help-test"
+    And I wait for and fill in "configurationName" with "behat-help-test"
+    And I wait for and press "Add"
     And I follow configuration "behat-help-test"
     And I follow "batch-size-help-link"
-    Then I should see "Batch sizes over 500 are not recommended."
+    Then I should eventually see "Batch sizes over 500 are not recommended."
     But I should not see "The batch size indicates how many REDCap record IDs will be processed"
 
   Scenario: Remove custom help text

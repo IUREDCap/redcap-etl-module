@@ -25,7 +25,9 @@ class EtlServersPage
 
         # Find the table row where the first element matches the server name, and then get the
         # 4th column element and click it
-        $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[5]/a");
+        # $element = $page->find("xpath", "//tr/td[text()='".$serverName."']/following-sibling::td[5]/a");
+        $xpath = "//tr/td[text()='{$serverName}']/following-sibling::td[5]/a";
+        $element = Util::waitToFindElementByXpath($session, $xpath);
         # print("SERVER LINK: " . $element->getHtml());
         $element->click();
     }

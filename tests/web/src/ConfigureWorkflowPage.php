@@ -30,11 +30,21 @@ class ConfigureWorkflowPage
         # Need to get the text from the select option that contains the test project title, because
         # the options have the REDCap project ID prepended to them, and the project ID is not known
         # in the code here.
-        $element = $page->find('xpath', "//select/option[contains(text(), '{$testProjectTitle}')]");
+        $xpath = "//select/option[contains(text(), '{$testProjectTitle}')]";
+        $element = Util::waitToFindElementByXpath($session, $xpath);
+
+        if (empty($element)) {
+            throw new \Exception("Could not find element with xpath: '{$xpath}'.\n");
+        }
+
+        // $element = $page->find('xpath', "//select/option[contains(text(), '{$testProjectTitle}')]");
         $optionText = $element->getText();
 
-        $page->selectFieldOption('newTask', $optionText);
-        $page->pressButton("Add Task");
+        Util::waitForAndSelectOption($session, 'newTask', $optionText);
+        //$page->selectFieldOption('newTask', $optionText);
+
+        Util::waitForAndPressButton($session, "Add Task");
+        //$page->pressButton("Add Task");
     }
 
     /**
@@ -48,7 +58,7 @@ class ConfigureWorkflowPage
         # the sort column (more then 1 task) or not (1 task)
         # so the rename column can be set
         $xpath = "//table[@id='workflowTasks']/thead/tr[1]/th[1]";
-        $element = $page->find("xpath", $xpath);
+        $element = Util::waitToFindElementByXpath($session, $xpath);
         if ($element->getText() === 'Task Name') {
             $renameColumn = 5;
         } else {
@@ -56,20 +66,25 @@ class ConfigureWorkflowPage
             $renameColumn = 6;
         }
 
-        sleep(2);
+        sleep(3);
 
         # Find the table row for the specified task number, and then get the
         # rename element and click it
         $xpath = "//table[@id='workflowTasks']/tbody/tr[{$taskNumber}]/td[{$renameColumn}]/input";
-        $element = $page->find("xpath", $xpath);
+        $element = Util::waitToFindElementByXpath($session, $xpath);
+        if ($element === null) {
+            throw new \Exception("Could not find element with xpath = '{$xpath}'.\n");
+        }
         $element->click();
-        sleep(2);
+        sleep(3);
 
         # Rename the task
-        $page->fillField("renameNewTaskName", $newTaskName);
-        sleep(2);
+        // $page->fillField("renameNewTaskName", $newTaskName);
+        Util::waitForAndFillField($session, "renameNewTaskName", $newTaskName);
+        sleep(3);
 
-        $page->pressButton("Rename task");
+        //$page->pressButton("Rename task");
+        Util::waitForAndPressButton($session, "Rename task");
     }
 
     public static function specifyEtlConfig($session, $taskName, $configName)
@@ -131,6 +146,7 @@ class ConfigureWorkflowPage
     public static function moveTask($session, $taskName, $direction)
     {
         $page = $session->getPage();
+        sleep(5);
         $taskRows = $page->findAll('css', 'table#workflowTasks tbody tr');
 
         if (count($taskRows)  > 1) {

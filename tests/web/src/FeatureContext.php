@@ -144,6 +144,51 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         $this->getSession()->wait(10000);
     }
 
+    /**
+     * @Then /^I should eventually see "([^"]*)"$/
+     */
+    public function iShouldEventuallySee($value)
+    {
+        $session = $this->getSession();
+        $found = Util::waitForAndSee($session, $value);
+    }
+
+    /**
+     * @When /^I wait for and press "([^"]*)"$/
+     */
+    public function iWaitForAndPress($id)
+    {
+        $session = $this->getSession();
+        $found = Util::waitForAndPressButton($session, $id);
+    }
+
+    /**
+     * @When /^I wait for and fill field "([^"]*)" with "([^"]*)"$/
+     */
+    public function iWaitForAndFillField($id, $value)
+    {
+        $session = $this->getSession();
+        $found = Util::waitForAndFillField($session, $id, $value);
+    }
+
+    /**
+     * @When /^I wait for and fill in "([^"]*)" with "([^"]*)"$/
+     */
+    public function iWaitForAndFill($id, $value)
+    {
+        $session = $this->getSession();
+        $found = Util::waitForAndFillField($session, $id, $value);
+    }
+
+    /**
+     * @When /^I wait for and select "([^"]*)" from "([^"]*)"$/
+     */
+    public function iWaitForAndSelect($value, $id)
+    {
+        $session = $this->getSession();
+        $found = Util::waitForAndSelectOption($session, $id, $value);
+    }
+
 
     /**
      * @Given /^ETL configuration "([^"]*)" does not exist$/

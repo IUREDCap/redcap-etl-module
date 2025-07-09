@@ -41,7 +41,7 @@ I need to be able to create, copy, rename and delete configurations
 
   Scenario: Save and exit configuration
     When I follow configuration "behat-config-test"
-    And I press "Save and Exit"
+    And I wait for and press "Save and Exit"
     Then I should see "Configuration Name"
     And I should see "behat-config-test"
 
@@ -50,9 +50,8 @@ I need to be able to create, copy, rename and delete configurations
     And I select "task" from "configType"
     And I select "behat-config-test" from "configName"
     And I select "(embedded server)" from "server"
-    And I press "Run"
-    And I wait for 4 seconds
-    Then I should see "ETL Configuration"
+    And I wait for and press "Run"
+    Then I should eventually see "ETL Configuration"
     And I should see "Run"
     And I should see "behat-config-test"
     And I should see "Created table"

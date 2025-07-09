@@ -122,9 +122,8 @@ I need to be able to autogenerate the transformation rules
     And I select "task" from "configType"
     And I select "behat-config-test" from "configName"
     And I select "(embedded server)" from "server"
-    And I press "Run"
-    And I wait for 5 seconds
-    Then I should see "Processing complete"
+    And I wait for and press "Run"
+    Then I should eventually see "Processing complete"
     And I should see "Created table 'testtable'"
     And I should see "Created table 'weight'"
     But I should not see "Created table 'registration'"

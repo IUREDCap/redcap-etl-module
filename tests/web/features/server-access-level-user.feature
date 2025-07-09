@@ -15,25 +15,25 @@ Feature: Server user access level management
     When I access the admin interface
     And I follow "Servers"
     And I follow server "(embedded server)"
-    And I select "private" from "accessLevel"
-    And I press "Save"
+    And I wait for and select "private" from "accessLevel"
+    And I wait for and press "Save"
     And I follow "Users"
     And I follow "List"
     And I click on the user
     And I check "accessCheckbox[(embedded server)]"
-    And I press "Save"
+    And I wait for and press "Save"
 
     And I follow "Servers"
     And I delete server "local-server"
     And I follow "Servers"
     And I fill in "server-name" with "local-server"
-    And I press "Add Server"
+    And I wait for and press "Add Server"
     And I follow "Servers"
     And I follow server "local-server"
     And I configure server "local"
     And I follow "Servers"
     And I follow server "local-server"
-    And I select "public" from "accessLevel"
+    And I wait for and select "public" from "accessLevel"
 
     And I follow "Servers"
     And I delete server "admin-test"
@@ -41,7 +41,7 @@ Feature: Server user access level management
     And I copy server "local-server" to "admin-test"
     And I follow "Servers"
     And I follow server "admin-test"
-    And I select "admin" from "accessLevel"
+    And I wait for and select "admin" from "accessLevel"
 
     #create a private server with no assigned users
     And I follow "Servers"
@@ -53,14 +53,14 @@ Feature: Server user access level management
     When I copy server "local-server" to "private-test"
     And I follow "Servers"
     And I follow server "private-test"
-    And I select "private" from "accessLevel"
-    And I press "Save"
+    And I wait for and select "private" from "accessLevel"
+    And I wait for and press "Save"
     And I wait for 5 seconds
 
   Scenario: Log in a user who has been allowed private-level access and verify the correct servers are listed on the Run tab
     And I log in as user and access REDCap-ETL for test project
     And I follow "Run"
-    And I select "task" from "configType"
+    And I wait for and select "task" from "configType"
     Then the "#serverId" element should contain "(embedded server)"
     And the "#serverId" element should contain "local-server"
     But the "#serverId" element should not contain "admin-test"
@@ -69,7 +69,7 @@ Feature: Server user access level management
   Scenario: Log in a user who has been allowed private-level access and verify the correct servers are listed on the Schedule tab
     When I log in as user and access REDCap-ETL for test project
     And I follow "Schedule"
-    And I select "task" from "configType"
+    And I wait for and select "task" from "configType"
     Then the "#serverId" element should contain "(embedded server)"
     And the "#serverId" element should contain "local-server"
     But the "#serverId" element should not contain "admin-test"

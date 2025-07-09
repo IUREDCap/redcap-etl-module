@@ -24,7 +24,7 @@ Feature: Zipped CSV file dowload functionality
     When I follow "Servers"
     And I follow server "(embedded server)"
     And I fill in "maxZipDownloadFileSize" with ""
-    And I press "Save"
+    And I wait for and press "Save"
     And I follow server "(embedded server)"
     Then the "maxZipDownloadFileSize" field should contain "100"
 

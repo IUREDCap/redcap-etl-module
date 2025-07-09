@@ -49,13 +49,16 @@ class Util
 
         $session->visit($baseUrl);
 
-        $page = $session->getPage();
+        # $page = $session->getPage();
 
         # Search for text "Logged in as user {$username}"
 
-        $page->fillField('username', $username);
-        $page->fillField('password', $password);
-        $page->pressButton('login_btn');
+        # $page->fillField('username', $username);
+        # $page->fillField('password', $password);
+        # $page->pressButton('login_btn');
+        Util::waitForAndfillField($session, 'username', $username);
+        Util::waitForAndfillField($session, 'password', $password);
+        Util::waitForAndpressButton($session, 'login_btn');
     }
     
     public static function logInAsUserAndAccessRedCapEtlForTestProject($session)
@@ -63,7 +66,9 @@ class Util
         self::logInAsUser($session);
         $page = $session->getPage();
         $page->clickLink('My Projects');
+
         self::selectTestProject($session);
+
         $page->clickLink('REDCap-ETL');
     }
 
@@ -79,11 +84,11 @@ class Util
 
         $session->visit($baseUrl);
 
-        $page = $session->getPage();
+        // $page = $session->getPage();
 
-        $page->fillField('username', $username);
-        $page->fillField('password', $password);
-        $page->pressButton('login_btn');
+        self::waitForAndFillField($session, 'username', $username);
+        self::waitForAndFillField($session, 'password', $password);
+        self::waitForAndPressButton($session, 'login_btn');
     }
 
     /**
@@ -92,6 +97,7 @@ class Util
     public static function logOut($session)
     {
         $page = $session->getPage();
+        sleep(2);
         $page->clickLink('Log out');
     }
 
@@ -103,10 +109,13 @@ class Util
     {
         self::loginAsAdmin($session);
 
+        sleep(2);
         $page = $session->getPage();
+        sleep(2);
         $page->clickLink('Control Center');
-        sleep(1);
+        sleep(2);
         $page->clickLink('REDCap-ETL');
+        sleep(2);
     }
 
     /**
@@ -178,7 +187,9 @@ class Util
     public static function accessTestProjectRedCapEtl($session)
     {
         self::loginAsUser($session);
+
         self::selectTestProject($session);
+
         $page = $session->getPage();
         $page->clickLink('REDCap-ETL');
     }
@@ -466,4 +477,88 @@ class Util
         return $exists;        
     }
 
+
+    public static function waitForElement($session, $id, $timeout = 10)
+    {
+        $waitTime = 0;
+
+        $page = $session->getPage();
+
+        $element = $page->findById($id);
+        while (empty($element) && $waitTime < $timeout) {
+            sleep(1);
+            $element = $page->findById($id);
+            $waitTime++;
+        }
+    }
+
+    public static function waitToFindElementByXpath($session, $xpath, $timeout = 10)
+    {
+        $waitTime = 0;
+
+        $page = $session->getPage();
+
+        $element = $page->find("xpath", $xpath);
+        while (empty($element) && $waitTime < $timeout) {
+            sleep(1);
+            $element = $page->find("xpath", $xpath);
+            $waitTime++;
+        }
+
+        return $element;
+    }
+
+    public static function waitForAndPressButton($session, $buttonId, $timeout = 10)
+    {
+        Util::waitForElement($session, $buttonId, $timeout);
+        $page = $session->getPage();
+        $page->pressButton($buttonId);
+    }
+
+    public static function waitForAndFillField($session, $fieldId, $fieldValue, $timeout = 10)
+    {
+        Util::waitForElement($session, $fieldId, $timeout);
+        $page = $session->getPage();
+        $page->fillField($fieldId, $fieldValue);
+    }
+
+    public static function waitForAndSelectOption($session, $fieldId, $fieldValue, $timeout = 10)
+    {
+        Util::waitForElement($session, $fieldId, $timeout);
+        $page = $session->getPage();
+        $page->selectFieldOption($fieldId, $fieldValue);
+    }
+
+    public static function waitForAndCheckField($session, $fieldId, $timeout = 10)
+    {
+        Util::waitForElement($session, $fieldId, $timeout);
+        $page = $session->getPage();
+        $page->checkField($fieldId);
+    }
+
+    public static function waitForAndSee($session, $value, $timeout = 10)
+    {
+        $waitTime = 0;
+        $found = false;
+
+        $page = $session->getPage();
+
+        sleep(1);
+
+        $pageText = $page->getText();
+        while ($waitTime < $timeout) {
+            if (str_contains($pageText, $value)) {
+                $found = true;
+                break;
+            }
+            sleep(1);
+            $page = $session->getPage();
+            $pageText = $page->getText();
+            $waitTime++;
+        }
+
+        if (!$found) {
+            throw new \Exception("Value \"{$value}\" was not found on the page.");
+        }
+    }
 }

@@ -15,7 +15,7 @@ Feature: Admin Log
   Scenario: Use the admin log page to see cron jobs
     When I follow "Log"
     And I select "Cron Jobs" from "Log Entries:"
-    And I press "Display"
+    And I wait for and press "Display"
     Then I should see "Cron Jobs"
     Then I should see table headers "Log ID", "Time", "Day", "Hour", "# Jobs"
 

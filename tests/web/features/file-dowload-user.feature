@@ -25,17 +25,18 @@ Feature: Zipped CSV file dowload functionality
     And I press "Add"
     And I follow configuration "behat-config-test"
     And I configure configuration "behat"
-    And I press "Save"
+    And I wait for and press "Save"
     And I follow "Run"
-    And I select "workflow" from "configType"
-    And I wait for 2 seconds
+    And I wait for and select "workflow" from "configType"
+    And I wait for 4 seconds
     Then I should not see "Load data into database"
 
-    When I select "task" from "configType"
-    And I select "behat-config-test" from "configName"
-    And I select "(embedded server)" from "server"
-    And I wait for 2 seconds
-    Then I should see "Load data into database"
+    #When I select "task" from "configType"
+    When I wait for and select "task" from "configType"
+    And I wait for and select "behat-config-test" from "configName"
+    And I wait for 10 seconds
+    And I wait for and select "(embedded server)" from "serverId"
+    Then I should eventually see "Load data into database"
 
     When I follow "Run"
     And I select "task" from "configType"
@@ -91,14 +92,12 @@ Feature: Zipped CSV file dowload functionality
     When I select the test project
     And I follow "REDCap-ETL"
     And I follow "Run"
-    And I select "task" from "configType"
-    And I select "behat-config-test" from "configName"
-    And I select "(embedded server)" from "server"
-    And I wait for 1 seconds
-    And I select "csv_zip" from "dataTarget"
-    And I press "Run"
-    And I wait for 6 seconds
-    Then I should see "ERROR: CSV zip"
+    And I wait for and select "task" from "configType"
+    And I wait for and select "behat-config-test" from "configName"
+    And I wait for and select "(embedded server)" from "server"
+    And I wait for and select "csv_zip" from "dataTarget"
+    And I wait for and press "Run"
+    Then I should eventually see "ERROR: CSV zip"
 
 
    Scenario: Clean up max Zip file size

@@ -47,12 +47,15 @@ class ManagePrivateUsersDialog
         $testConfig = new TestConfig(FeatureContext::CONFIG_FILE);
         $username = $testConfig->getUser()['username'];
 
-        sleep(2);
+        sleep(4);
 
         $page = $session->getPage();
 
+        sleep(4);
+
         $element = $page->find("xpath", "//tr/td[text()='".$username."']");
-        if ($element !== null) {
+
+        if (!empty($element)) {
             $hasTestUser = true;
         }
 

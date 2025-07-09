@@ -40,13 +40,12 @@ I need to be able schedule ETL processes to run in the future
 
   Scenario: Schedule configuration
     When I follow "Schedule"
-    And I select "task" from "configType"
-    And I select "behat-sched-test" from "configName"
-    And I select "(embedded server)" from "server"
+    And I wait for and select "task" from "configType"
+    And I wait for and select "behat-sched-test" from "configName"
+    And I wait for and select "(embedded server)" from "server"
     And I schedule for next hour
-    And I press "Save"
-    And I wait for 4 seconds
-    Then I should see "Save"
+    And I wait for and press "Save"
+    Then I should eventually see "Schedule saved"
     And I should see "ETL Server"
     And I should see "(embedded server)"
     
