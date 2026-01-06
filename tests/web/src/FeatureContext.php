@@ -847,11 +847,17 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
         $session = $this->getSession();
         $page = $session->getPage();
 
-        $element = $page->find("xpath", "//tr[contains(td[3],'".$testProjectTitle."')]/td[1]/input[@type='checkbox']");
+        // $element = $page->find("xpath", "//tr[contains(td[3],'".$testProjectTitle."')]/td[1]/input[@type='checkbox']");
+        $element = Util::waitToFindElementByXpath($session, "//tr[contains(td[3],'".$testProjectTitle."')]/td[1]/input[@type='checkbox']");
         $element->click();
 
-        $element = $page->find("xpath", "//tr[contains(td[3],'".$formsProjectTitle."')]/td[1]/input[@type='checkbox']");
+        sleep(4);
+
+        // $element = $page->find("xpath", "//tr[contains(td[3],'".$formsProjectTitle."')]/td[1]/input[@type='checkbox']");
+        $element = Util::waitToFindElementByXpath($session, "//tr[contains(td[3],'".$formsProjectTitle."')]/td[1]/input[@type='checkbox']");
         $element->click();
+
+        sleep(4);
     }
 
     /**

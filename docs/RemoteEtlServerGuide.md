@@ -46,7 +46,7 @@ Using the REDCap-ETL Application as a Remote ETL Server
 REDCap-ETL was originally implemented as a standalone application that runs outside of REDCap, and this
 application can be used as an ETL server.
 
-**The example commands used in this section are for Ubuntu 20.**
+**The example commands used in this section are for Ubuntu 24.**
 
 You first need to get REDCap-ETL on the system you want to use, for example:
 
@@ -70,17 +70,25 @@ If SSH has not been enabled, use the following commands to enable it:
 For the SSH key authentication option with the remote system,
 you need to specify the private key file in the ETL server configuration
 and the file must be readable by the user that the web server runs under (e.g., "www-data").
-You need to create the SSH key on the remote system where the ETL server runs, for example:
+You need to create the SSH key on the remote system where the ETL server runs, for example,
+for user "bhrs", in the user's home directory, run:
 
     ssh-keygen -m PEM -t rsa
-    ssh-copy-id abitc@127.0.0.1
+    ssh-copy-id bhrs@127.0.0.1
+
+Enter a password for the ssh-keygen step (e.g., "redcap-etl") and remember this password.
+
+Then, set up a directory (e.g., /var/www/redcap-etl-ssh/) on the remote server site that is
+readable by the Apache user (e.g., www-data),
+and copy the private key created above to this directory.
+After copying the private key file, make sure that it also is readble by the Apache user.
 
 Set up a configuration directory that the the user (used to SSH to the REDCap-ETL application)
 is able to write to.  The **config** directory under the REDCap-ETL installation can be used. Files in this directory, except
 for the example configuration file are set to be ignored by Git. The permission of this directory
-needs to be set so that user specified for authentication has access, for example, for user "abitc":
+needs to be set so that user specified for authentication has access, for example, for user "bhrs":
 
-    sudo chown abitc:abitc /opt/redcap-etl/config/
+    sudo chown bhrs:bhrs /opt/redcap-etl/config/
 
 
 Creating a Custom ETL Server

@@ -36,6 +36,7 @@ One-time initial setup:
 
     * the title of the project is unique
     * the project is created by importing the REDCap-ETL [Repeating Events](https://github.com/IUREDCap/redcap-etl/blob/master/tests/projects/RepeatingEvents.REDCap.xml) project file
+    * the REDCap-ETL external module is enabled in the project
     * the project is approved for REDCap-ETL use (by the non-admin user)
     * the project has no ETL configurations
     * the project has an API token with export permission
@@ -44,6 +45,7 @@ One-time initial setup:
 
     * the title of the project is unique
     * the project is created by importing the REDCap-ETL [Repeating Forms](https://github.com/IUREDCap/redcap-etl/blob/master/tests/projects/RepeatingForms.REDCap.xml) project file
+    * the REDCap-ETL external module is enabled in the project
     * the project is approved for REDCap-ETL use (by the non-admin user)
     * the project has no ETL configurations
     * the project has an API token with export permission

@@ -56,8 +56,8 @@ class Util
         # $page->fillField('username', $username);
         # $page->fillField('password', $password);
         # $page->pressButton('login_btn');
-        Util::waitForAndfillField($session, 'username', $username);
-        Util::waitForAndfillField($session, 'password', $password);
+        Util::waitForAndFillField($session, 'username', $username);
+        Util::waitForAndFillField($session, 'password', $password);
         Util::waitForAndpressButton($session, 'login_btn');
     }
     
