@@ -179,10 +179,22 @@ If tests that look like they should be working are failing, here are some things
   One of the reasons for this has been related to REDCap CSRF tokens (see below for more information).
   Additional reasons this can happen are also discussed below.
 
-* **Add wait statements.** Sometimes errors occur because an access of a page occurs before the page is
-  fully updated. To fix this issue, a wait statement (e.g., "And I wait for 4 seconds") can be added in the
-  feature file before the statement accessing the page that causes the error. If the issue occurs in PHP
+* **Add wait steps.** Sometimes errors occur because an access of a page occurs before the page is
+  fully updated. To fix this issue, a wait step (e.g., "And I wait for 4 seconds") can be added in the
+  feature file before the step accessing the page that causes the error. If the issue occurs in PHP
   code, then a sleep statement can be added, for example, "sleep(2);" to wait for 2 seconds.
+
+* **Change steps to use "wait for" step definitions.** Another way to fix timing issues, in addition to adding
+  wait steps, is to change a step to a corresponding "wait for" step. "Wait for" steps have been defined that wait
+  for the specified element to appear before taking action, for example:
+
+        When I wait for and follow "link" 
+        When I wait for and press "button"
+        When I wait for and fill field "field" with "value"
+        When I wait for and select "option" from "select"
+        Then I should eventually see "value"
+
+
 
 * **Check XPath expressions.** Some of the custom steps that have been defined use XPath expressions to specify
   elements on web pages. There have been inconsistencies in how these work between headless and non-headless
@@ -253,7 +265,7 @@ and then going through your tests in that browser. For example, in Chrome:
 Other commands
 ----------------------
 
-See the definition expressions for behat:
+See the step definition expressions for behat:
 
     ./vendor/bin/behat -dl
 
