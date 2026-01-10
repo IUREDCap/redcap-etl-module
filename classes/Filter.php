@@ -108,8 +108,9 @@ class Filter
      */
     public static function sanitizeLabel($value)
     {
+        $value = strip_tags($value);
         $flags = FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_BACKTICK;
-        return filter_var($value, FILTER_SANITIZE_STRING, $flags);
+        return filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS, $flags);
     }
 
     /**
@@ -135,8 +136,9 @@ class Filter
      */
     public static function sanitizeString($value)
     {
+        $value = strip_tags($value);
         $flags = FILTER_FLAG_STRIP_LOW;
-        return filter_var($value, FILTER_SANITIZE_STRING, $flags);
+        return filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS, $flags);
     }
 
     /**

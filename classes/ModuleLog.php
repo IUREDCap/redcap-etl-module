@@ -199,13 +199,18 @@ class ModuleLog
             ];
 
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['REDCap-ETL Processes']);
-            fputcsv($out, ['']);
-            fputcsv($out, ['Start Date', $startDate]);
-            fputcsv($out, ['End Date', $endDate]);
-            fputcsv($out, ['']);
 
-            fputcsv($out, $header);
+            $separator = ",";
+            $enclosure = "\"";
+            $escape = "\\";
+
+            fputcsv($out, ['REDCap-ETL Processes'], $separator, $enclosure, $escape);
+            fputcsv($out, [''], $separator, $enclosure, $escape);
+            fputcsv($out, ['Start Date', $startDate], $separator, $enclosure, $escape);
+            fputcsv($out, ['End Date', $endDate], $separator, $enclosure, $escape);
+            fputcsv($out, [''], $separator, $enclosure, $escape);
+
+            fputcsv($out, $header, $separator, $enclosure, $escape);
 
             $entries = $this->getData(self::ETL_RUN, $startDate, $endDate);
             foreach ($entries as $entry) {
@@ -227,7 +232,7 @@ class ModuleLog
 
                 $csvEntry[$i++] = $entry['cron_day'];
                 $csvEntry[$i++] = $entry['cron_hour'];
-                fputcsv($out, $csvEntry);
+                fputcsv($out, $csvEntry, $separator, $enclosure, $escape);
             }
             fclose($out);
         } elseif ($logType === self::ETL_CRON) {
@@ -237,13 +242,13 @@ class ModuleLog
                 'Log ID', 'Time', 'Cron Day', 'Cron Hour', 'Jobs'
             ];
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['REDCap-ETL Cron Jobs']);
-            fputcsv($out, ['']);
-            fputcsv($out, ['Start Date', $startDate]);
-            fputcsv($out, ['End Date', $endDate]);
-            fputcsv($out, ['']);
+            fputcsv($out, ['REDCap-ETL Cron Jobs'], $separator, $enclosure, $escape);
+            fputcsv($out, [''], $separator, $enclosure, $escape);
+            fputcsv($out, ['Start Date', $startDate], $separator, $enclosure, $escape);
+            fputcsv($out, ['End Date', $endDate], $separator, $enclosure, $escape);
+            fputcsv($out, [''], $separator, $enclosure, $escape);
 
-            fputcsv($out, $header);
+            fputcsv($out, $header, $separator, $enclosure, $escape);
 
             $entries = $this->getData(self::ETL_CRON, $startDate, $endDate);
             foreach ($entries as $entry) {
@@ -254,7 +259,7 @@ class ModuleLog
                 $csvEntry[$i++] = $entry['cron_day'];
                 $csvEntry[$i++] = $entry['cron_hour'];
                 $csvEntry[$i++] = $entry['num_jobs'];
-                fputcsv($out, $csvEntry);
+                fputcsv($out, $csvEntry, $separator, $enclosure, $escape);
             }
             fclose($out);
         }

@@ -20,7 +20,7 @@ class ProjectInfo implements \JsonSerializable
         $this->configs = array();
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return (object) get_object_vars($this);
     }
