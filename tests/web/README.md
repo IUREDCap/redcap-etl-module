@@ -169,6 +169,11 @@ Debugging tests
 
 If tests that look like they should be working are failing, here are some things to try:
 
+* **Rerun the tests.** Sometimes the tests randomnly fail (perhaps because of timing issues). The first
+  thing to try is to rerun the tests that are failing to see if they fail again
+  (you can use the `--rerun` option of the behat command). If they do not fail,
+  then it is probably OK. If the tests continue to consistently fail, then the steps below can be used.
+
 * **Run in Non-headless browser mode.** If you are running in headless browser mode, try running the tests
   in non-headless browser mode to see if you can see an error displayed in the browser.
   If an error message goes away before you
