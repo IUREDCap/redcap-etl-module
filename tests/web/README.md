@@ -170,9 +170,13 @@ Debugging tests
 If tests that look like they should be working are failing, here are some things to try:
 
 * **Rerun the tests.** Sometimes the tests randomnly fail (perhaps because of timing issues). The first
-  thing to try is to rerun the tests that are failing to see if they fail again
-  (you can use the `--rerun` option of the behat command). If they do not fail,
+  thing to try is to rerun the tests that are failing to see if they fail again. If they do not fail,
   then it is probably OK. If the tests continue to consistently fail, then the steps below can be used.
+  To rerun the failed tests you can use the `--rerun` option, however there can be dependencies between
+  scenarios in a feature, so it is safer to rerun the whole feature for any feature that
+  had a test that failed, for example:
+
+        ./vendor/bin/behat features/file-dowload-user.feature
 
 * **Run in Non-headless browser mode.** If you are running in headless browser mode, try running the tests
   in non-headless browser mode to see if you can see an error displayed in the browser.
