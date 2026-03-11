@@ -11,50 +11,50 @@ class ComposerStaticInitf5f63481dffe8fc7e9be3eef1fcfaf33
     );
 
     public static $prefixLengthsPsr4 = array (
-        'p' => 
+        'p' =>
         array (
             'phpseclib3\\' => 11,
         ),
-        'P' => 
+        'P' =>
         array (
             'ParagonIE\\ConstantTime\\' => 23,
         ),
-        'I' => 
+        'I' =>
         array (
             'IU\\RedCapEtlModule\\' => 19,
             'IU\\REDCapETL\\' => 13,
             'IU\\PHPCap\\' => 10,
         ),
-        'E' => 
+        'E' =>
         array (
             'ExternalModules\\' => 16,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'phpseclib3\\' => 
+        'phpseclib3\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib',
         ),
-        'ParagonIE\\ConstantTime\\' => 
+        'ParagonIE\\ConstantTime\\' =>
         array (
             0 => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src',
         ),
-        'IU\\RedCapEtlModule\\' => 
+        'IU\\RedCapEtlModule\\' =>
         array (
             0 => __DIR__ . '/../..' . '/',
             1 => __DIR__ . '/../..' . '/classes',
             2 => __DIR__ . '/../..' . '/tests/unit',
         ),
-        'IU\\REDCapETL\\' => 
+        'IU\\REDCapETL\\' =>
         array (
             0 => __DIR__ . '/..' . '/iu-redcap/redcap-etl/src',
         ),
-        'IU\\PHPCap\\' => 
+        'IU\\PHPCap\\' =>
         array (
             0 => __DIR__ . '/..' . '/iu-redcap/phpcap/src',
         ),
-        'ExternalModules\\' => 
+        'ExternalModules\\' =>
         array (
             0 => __DIR__ . '/../..' . '/tests/external',
         ),

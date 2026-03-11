@@ -67,7 +67,8 @@ class ServerConfigTest extends TestCase
         }
         $this->assertTrue($exceptionCaught, 'Unset ETL config exception test');
 
-        $etlConfigMock = $this->createMock(Configuration::class);
+        //$etlConfigMock = $this->createMock(Configuration::class);
+        $etlConfigMock = $this->createStub(Configuration::class);
         $exceptionCaught = false;
         try {
             $serverConfig->run($etlConfigMock);
