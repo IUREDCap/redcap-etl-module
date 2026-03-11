@@ -81,7 +81,7 @@ Enter a password for the ssh-keygen step (e.g., "redcap-etl") and remember this 
 Then, set up a directory (e.g., /var/www/redcap-etl-ssh/) on the remote server site that is
 readable by the Apache user (e.g., www-data),
 and copy the private key created above to this directory.
-After copying the private key file, make sure that it also is readble by the Apache user.
+After copying the private key file, make sure that it also is readable by the Apache user.
 
 Set up a configuration directory that the the user (used to SSH to the REDCap-ETL application)
 is able to write to.  The **config** directory under the REDCap-ETL installation can be used. Files in this directory, except
