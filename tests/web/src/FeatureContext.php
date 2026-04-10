@@ -172,6 +172,16 @@ class FeatureContext extends MinkContext implements SnippetAcceptingContext
     }
 
     /**
+     * @When /^I wait for and check "([^"]*)"$/
+     */
+    public function iWaitForAndCheck($id)
+    {
+        $session = $this->getSession();
+        $found = Util::waitForAndCheckField($session, $id, 20);
+    }
+
+
+    /**
      * @When /^I wait for and fill field "([^"]*)" with "([^"]*)"$/
      */
     public function iWaitForAndFillField($id, $value)

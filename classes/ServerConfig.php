@@ -1,6 +1,6 @@
 <?php
 
-#-------------------------------------------------------
+#------------------------------------------------------r
 # Copyright (C) 2019 The Trustees of Indiana University
 # SPDX-License-Identifier: BSD-3-Clause
 #-------------------------------------------------------
@@ -161,6 +161,12 @@ class ServerConfig implements \JsonSerializable
                             $this->$var = false;
                             ###$this->$var = '';
                         }
+                    }
+                    break;
+                case 'etlCommandSuffix':
+                    if (array_key_exists($var, $properties)) {
+                        $this->$var = Filter::stripTags($properties[$var]);
+                        $this->$var = rtrim($this->$var);
                     }
                     break;
                 default:

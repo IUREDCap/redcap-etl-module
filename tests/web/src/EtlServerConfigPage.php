@@ -92,6 +92,8 @@ class EtlServerConfigPage
             $page->checkField('enableSummaryEmail');
         }
 
+        $page->fillField('logFile', $serverConfig['log_file']);
+
         #sleep(2);
 
         #------------------------------
