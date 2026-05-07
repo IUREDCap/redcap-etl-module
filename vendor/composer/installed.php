@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'iu-redcap/redcap-etl-module',
-        'pretty_version' => 'dev-develop',
-        'version' => 'dev-develop',
-        'reference' => '12d93fec3437df88be3150231e5204d0c485fde9',
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
+        'reference' => '8d0423c3995d7d9eb6683b59219aad9b8129be74',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -29,9 +29,9 @@
             'dev_requirement' => false,
         ),
         'iu-redcap/redcap-etl-module' => array(
-            'pretty_version' => 'dev-develop',
-            'version' => 'dev-develop',
-            'reference' => '12d93fec3437df88be3150231e5204d0c485fde9',
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => '8d0423c3995d7d9eb6683b59219aad9b8129be74',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -56,9 +56,9 @@
             'dev_requirement' => false,
         ),
         'phpseclib/phpseclib' => array(
-            'pretty_version' => '3.0.51',
-            'version' => '3.0.51.0',
-            'reference' => 'd59c94077f9c9915abb51ddb52ce85188ece1748',
+            'pretty_version' => '3.0.52',
+            'version' => '3.0.52.0',
+            'reference' => '2adaefc83df2ec548558307690f376dd7d4f4fce',
             'type' => 'library',
             'install_path' => __DIR__ . '/../phpseclib/phpseclib',
             'aliases' => array(),
